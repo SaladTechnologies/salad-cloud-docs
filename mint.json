@@ -7,12 +7,11 @@
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
-    "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+    "primary": "#53A626",
+    "light": "#53A626",
+    "dark": "#53A626",
+    "background": {
+      "dark": "#0a2133"
     }
   },
   "topbarLinks": [
@@ -23,7 +22,7 @@
   ],
   "topbarCtaButton": {
     "name": "Portal",
-    "url": "https://portal.mintlify.com"
+    "url": "https://portal.salad.com"
   },
   "tabs": [
     {
@@ -89,8 +88,8 @@
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "x": "https://x.com/SaladTech",
+    "github": "https://github.com/SaladTechnologies",
+    "linkedin": "https://www.linkedin.com/company/salad-technologies"
   }
 }
