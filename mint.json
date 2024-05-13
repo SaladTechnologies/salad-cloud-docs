@@ -14,12 +14,7 @@
       "dark": "#0a2133"
     }
   },
-  "topbarLinks": [
-    {
-      "name": "Support",
-      "url": "mailto:hi@mintlify.com"
-    }
-  ],
+  "topbarLinks": [],
   "topbarCtaButton": {
     "name": "Portal",
     "url": "https://portal.salad.com"
@@ -88,7 +83,7 @@
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/SaladTech",
+    "x": "https://x.com/SaladTech ",
     "github": "https://github.com/SaladTechnologies",
     "linkedin": "https://www.linkedin.com/company/salad-technologies"
   }
