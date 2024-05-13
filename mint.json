@@ -45,8 +45,8 @@
   "anchors": [
     {
       "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "icon": "discord",
+      "url": "https://discord.gg/wtRnHbKe"
     },
     {
       "name": "Blog",
