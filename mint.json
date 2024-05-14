@@ -19,6 +19,9 @@
     "name": "Portal",
     "url": "https://portal.salad.com"
   },
+  "primaryTab": {
+    "name": "Home"
+  },
   "tabs": [
     {
       "name": "Container Engine",
@@ -31,6 +34,10 @@
     {
       "name": "Managed Services",
       "url": "managed-services"
+    },
+    {
+      "name": "Gateway Service",
+      "url": "gateway-service"
     },
     {
       "name": "API Reference",
@@ -80,6 +87,10 @@
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
+    },
+    {
+      "group": "Getting Started",
+      "pages": ["gateway-service/introduction"]
     }
   ],
   "footerSocials": {
