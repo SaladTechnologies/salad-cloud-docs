@@ -14,15 +14,13 @@
       "dark": "#0a2133"
     }
   },
-  "topbarLinks": [
-    {
-      "name": "Support",
-      "url": "mailto:hi@mintlify.com"
-    }
-  ],
+  "topbarLinks": [],
   "topbarCtaButton": {
     "name": "Portal",
     "url": "https://portal.salad.com"
+  },
+  "primaryTab": {
+    "name": "Home"
   },
   "tabs": [
     {
@@ -36,6 +34,10 @@
     {
       "name": "Managed Services",
       "url": "managed-services"
+    },
+    {
+      "name": "Gateway Service",
+      "url": "gateway-service"
     },
     {
       "name": "API Reference",
@@ -85,10 +87,14 @@
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
+    },
+    {
+      "group": "Getting Started",
+      "pages": ["gateway-service/introduction"]
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/SaladTech",
+    "x": "https://x.com/SaladTech ",
     "github": "https://github.com/SaladTechnologies",
     "linkedin": "https://www.linkedin.com/company/salad-technologies"
   }
