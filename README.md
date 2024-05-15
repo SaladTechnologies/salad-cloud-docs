@@ -8,7 +8,16 @@ Click on `Use this template` to copy the Mintlify starter kit. The starter kit c
 - API Reference pages
 - Use of popular components
 
-### Development
+### Installation
+
+Install NVM
+
+Windows - https://github.com/coreybutler/nvm-windows
+Mac/Linux = https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating
+
+
+Install Node
+`nvm install node`
 
 Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally. To install, use the following command
 

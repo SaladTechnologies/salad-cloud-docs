@@ -80,7 +80,7 @@
     },
     {
       "group": "Getting Started",
-      "pages": ["gateway-service/introduction"]
+      "pages": ["gateway-service/introduction", "gateway-service/quickstart"]
     }
   ],
   "footerSocials": {
