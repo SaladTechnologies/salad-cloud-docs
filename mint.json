@@ -61,7 +61,10 @@
       "group": "Get Started",
       "pages": ["introduction", "quickstart"]
     },
-
+    {
+      "group": "Common Services",
+      "pages": ["salad-simple-storage-service"]
+    },
     {
       "group": "API Documentation",
       "pages": ["api-reference/introduction"]
@@ -80,7 +83,15 @@
     },
     {
       "group": "Getting Started",
-      "pages": ["gateway-service/introduction", "gateway-service/quickstart", "gateway-service/proxy-v2", "gateway-service/node-removals", "gateway-service/approved-domains", "gateway-service/smart-routing", "gateway-service/faqs"]
+      "pages": [
+        "gateway-service/introduction",
+        "gateway-service/quickstart",
+        "gateway-service/proxy-v2",
+        "gateway-service/node-removals",
+        "gateway-service/approved-domains",
+        "gateway-service/smart-routing",
+        "gateway-service/faqs"
+      ]
     }
   ],
   "footerSocials": {
