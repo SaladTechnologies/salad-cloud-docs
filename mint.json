@@ -86,6 +86,16 @@
     ]
     },
     {
+      "group": "Container Registries",
+      "pages": [
+        "container-engine/registries/dockerhub",
+        "container-engine/registries/aws-ecr",
+        "container-engine/registries/azure-acr",
+        "container-engine/registries/gcp-gcr",
+        "container-engine/registries/quay"
+      ]
+    },
+    {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
     },
