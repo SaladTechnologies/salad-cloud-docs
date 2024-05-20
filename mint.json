@@ -77,7 +77,8 @@
       "group": "Getting Started",
       "pages": [
         "container-engine/introduction",
-        "container-engine/salad-container-engine"
+        "container-engine/salad-container-engine",
+        "container-engine/containers"
     ]
     },
     {
