@@ -93,6 +93,7 @@
             "container-engine/registries/quay"
           ]
         }
+        "container-engine/environment-variables"
     ]
     },
    
