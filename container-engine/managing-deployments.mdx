@@ -18,7 +18,6 @@ In the Salad Cloud Portal, you're able to see your deployments for each project 
 ![](container-engine\images\5ef427e-image.png)
 
 
-<br>
 
 ### Managing a Container Deployment
 
@@ -27,7 +26,6 @@ Click on any of your deployments to drill down to the Container Deployment Detai
 ![](container-engine\images\92a596a-image.png)
 
 
-<br>
 
 ### Managing Container Instances
 
@@ -35,16 +33,15 @@ On this page, you can also see a table of all instances of your container that h
 
 You can perform the following actions:
 
-** Restart a container instance** Occasionally, a workload may run for awhile on your node and then some part of the application might hang. In these cases, it's typically faster to get back up and running by restarting the container on the same node, rather than searching for a new one. The **Restart** option allows you to restart your container on the node, with all settings and downloaded data intact.
+**Restart a container instance** Occasionally, a workload may run for awhile on your node and then some part of the application might hang. In these cases, it's typically faster to get back up and running by restarting the container on the same node, rather than searching for a new one. The **Restart** option allows you to restart your container on the node, with all settings and downloaded data intact.
 
-** Recreate a container instance** For a harder reset, the **Recreate** option allows you to rebuild the container from scratch on the node. These features are accessible from the actions dropdown next to each node on the container group detail page.
+**Recreate a container instance** For a harder reset, the **Recreate** option allows you to rebuild the container from scratch on the node. These features are accessible from the actions dropdown next to each node on the container group detail page.
 
 **Reallocate a container instance** If a workload fails to run, Salad will automatically reallocate your container to a new node that matches the requirements you specified. However, in some rare cases, a node has trouble running a container replica but doesn't outright _fail_. If this happens, it's helpful to be able to manually trigger a reallocation of the workload to a new node.
 
-** View Container Logs** Use this link to open the Container Logs tab with the Machine ID filter pre-filled.
+**View Container Logs** Use this link to open the Container Logs tab with the Machine ID filter pre-filled.
 
 
-<br>
 
 ### Failures
 
@@ -76,6 +73,5 @@ If you update just the display name and/or replica count, the Container Group wo
 ![](container-engine\images\7bd5e3f-image.png)
 
 
-<br>
 
 To access the editing options for your Container Group deployment, simply navigate to the Salad dashboard, locate your deployment, and select the "Edit" option. To access the Reallocate option after edits resulting in a new container version, locate the container instance (on the Container Group detail page) expand the menu in the Actions column, and select "Reallocate".
