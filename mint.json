@@ -80,7 +80,8 @@
         "container-engine/salad-container-engine",
         "container-engine/containers",
         "container-engine/deploy-containers",
-        "container-engine/deploy-via-api-1"
+        "container-engine/deploy-via-api-1",
+        "container-engine/deployment-lifecycle.mdx"
     ]
     },
     {
