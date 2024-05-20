@@ -80,22 +80,28 @@
         "container-engine/salad-container-engine",
         "container-engine/containers",
         "container-engine/deploy-containers",
-        "container-engine/deploy-via-api-1",
-        "container-engine/deployment-lifecycle",
-        "container-engine/managing-deployments",
-        {
-          "group": "Container Registries",
-          "pages": [
-            "container-engine/registries/dockerhub",
-            "container-engine/registries/aws-ecr",
-            "container-engine/registries/azure-acr",
-            "container-engine/registries/gcp-gcr",
-            "container-engine/registries/quay"
-          ]
-        }
-    ]
+        "container-engine/deploy-via-api-1"
+      ]
     },
    
+    {
+      "group": "Container Registries",
+      "pages": [
+        "container-engine/registries/dockerhub",
+        "container-engine/registries/aws-ecr",
+        "container-engine/registries/azure-acr",
+        "container-engine/registries/gcp-gcr",
+        "container-engine/registries/quay"
+      ]
+    },
+    {
+      "group": "Job Queues",
+      "pages": [
+        "container-engine/job-queues/creating-a-job-queue",
+        "container-engine/job-queues/queue-worker",
+        "container-engine/job-queues/using-queues"
+      ]
+    },
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
