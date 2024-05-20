@@ -96,6 +96,34 @@
         "container-engine/environment-variables"
     ]
     },
+
+    {
+      "group": "Container Registries",
+      "pages": [
+        "container-engine/registries/dockerhub",
+        "container-engine/registries/aws-ecr",
+        "container-engine/registries/azure-acr",
+        "container-engine/registries/gcp-gcr",
+        "container-engine/registries/quay"
+      ]
+    },
+    {
+      "group": "Container Gateway",
+      "pages": [
+        "container-engine/gateway/enabling-ipv6",
+        "container-engine/gateway/sending-requests",
+        "container-engine/gateway/websockets",
+        "container-engine/gateway/networking-error-pages"
+      ]
+    },
+    {
+      "group": "Job Queues",
+      "pages": [
+        "container-engine/job-queues/creating-a-job-queue",
+        "container-engine/job-queues/queue-worker",
+        "container-engine/job-queues/using-queues"
+      ]
+    },
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]

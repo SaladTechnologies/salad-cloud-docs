@@ -1,29 +1,14 @@
 ---
-title: "Sending authenticated requests to your container"
+title: "Authenticated Requests"
 ---
 
 If you have selected authentication for the Container Gateway, the access domain name will indicated it is "Protected" and a lock icon will be shown. You will need to provide your API key in the header of requests.
 
-First, you'll need the domain name of your container group or recipe deployment and your API key. You can view and copy your API key at [https://portal.salad.com/api-key].
+First, you'll need the domain name of your container group or recipe deployment and your API key. You can view and copy your API key at [portal](https://portal.salad.com/api-key).
 
 Obtain the domain name in the details of your deployment, e.g.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/6b459be-image.png",
-null,
-""
-],
-"align": "center",
-"sizing": "600px",
-"border": true
-}
-]
-}
-[/block]
+<img src="https://files.readme.io/6b459be-image.png" />
 
 You can Copy the domain name by clicking the copy icon on the right.
 
@@ -42,19 +27,4 @@ curl --location '[YOUR ACCESS DOMAIN NAME HERE]'
 
 Please note that requiring authenticated networking to the containers is optional, You can choose whether to enable or disable authentication for your containers. However, we recommend implementing your own authentication if you plan not to use ours.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/1fc4ec5-image.png",
-null,
-"Authentication Option"
-],
-"align": "center",
-"border": true,
-"caption": "Authentication Option"
-}
-]
-}
-[/block]
+<img src="https://files.readme.io/1fc4ec5-image.png" />
