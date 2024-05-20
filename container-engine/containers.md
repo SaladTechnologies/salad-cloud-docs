@@ -15,22 +15,7 @@ Container Groups are fundamental to the deployment process within the Salad Clou
   - Memory (RAM) (1-30GB): Specify the amount of RAM required for your container.
   - GPUs: Define the number of GPUs needed for your container
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/60f17ed-image.png",
-        null,
-        "Resources"
-      ],
-      "align": "center",
-      "border": true,
-      "caption": "Resources"
-    }
-  ]
-}
-[/block]
+![title](container-engine\images\60f17ed-image.png)
 
 
 - **Additional Parameters**:
@@ -40,22 +25,8 @@ Container Groups are fundamental to the deployment process within the Salad Clou
   - **[External Logging Service](https://docs.salad.com/docs/external-logging)**: Optionally configure an external logging service for container logs.
   - **[Environment Variables](https://docs.salad.com/docs/environment-variables)**: Define environment variables to customize your container's environment.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/9118a3c-image.png",
-        null,
-        "Optional Settings"
-      ],
-      "align": "center",
-      "border": true,
-      "caption": "Optional Settings"
-    }
-  ]
-}
-[/block]
+![title](container-engine\images\9118a3c-image.png)
+
 
 
 ### Auto-Start Feature
@@ -76,19 +47,4 @@ Container Group actions  allow you to create, manage, and modify your container 
 - **Edit**: Update the display name, replica count, image source, resource requirements, and other configuration settings of a Container Group once it has been created.
 - **Delete**: Delete a Container Group and all associated information. This action is irreversible.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/e19a06d-image.png",
-        null,
-        "Container Group Actions"
-      ],
-      "align": "center",
-      "border": true,
-      "caption": "Container Group Actions"
-    }
-  ]
-}
-[/block]
+![title](container-engine\images\e19a06d-image.png)
