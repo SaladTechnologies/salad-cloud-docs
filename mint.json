@@ -92,7 +92,7 @@
             "container-engine/registries/gcp-gcr",
             "container-engine/registries/quay"
           ]
-        },
+        }
     ]
     },
    
