@@ -8,22 +8,22 @@ The status of container groups and recipe deployments, as well as individual ins
 
 - **Preparing:** A Preparing (or pending) deployment is undergoing initial processing that needs to occur before the deployment can be started. The required processing depends on if the container image has been previously stored and whether or not it is from a private registry. Depending on the size of the container image, this preparation can take some time. The stages are:
   - **Pulling** the image from the repository.
-  - **Compressing**the image for faster transmission.
-  - **Storing**the result for distribution.
-- **Stopped:**The container group or recipe deployment is prepared, but is either not yet running or has been stopped. Note that presently, individual instances can still be running even after the container group is stopped while the stop message propagates through the network.
+  - **Compressing** the image for faster transmission.
+  - **Storing** the result for distribution.
+- **Stopped:** The container group or recipe deployment is prepared, but is either not yet running or has been stopped. Note that presently, individual instances can still be running even after the container group is stopped while the stop message propagates through the network.
 - **Deploying:**The deployment has been started, but no instances are currently running.
-- **Running:**The container has been started and at least one instance is running.
-- **Failed:**A container group or recipe deployment can only fail if there was a problem in the Preparing process, either:
-  - **Failed**to pull if we were not able to pull the image from the repository. This could indicate an issue with the provided image name, or a transient issue with the registry. Check the provided image and try again.
+- **Running:** The container has been started and at least one instance is running.
+- **Failed:** A container group or recipe deployment can only fail if there was a problem in the Preparing process, either:
+  - **Failed** to pull if we were not able to pull the image from the repository. This could indicate an issue with the provided image name, or a transient issue with the registry. Check the provided image and try again.
   - **Failed to authenticate** if we could not authenticate to the registry. Check and correct the authentication details and try again.
   - **Failed to store or compress** indicate a rare problem preparing at the state.
 
-**Instances: **Instances are an assignment of your container to a SaladCloud node. Instances have separate status from the container group or recipe deployment they are a part of. While deploying on Salad is usually quick, it can occasionally take 20 minutes or more to get your containers up and running, but you are only charged for an instance once it reaches Running state.
+**Instances:** Instances are an assignment of your container to a SaladCloud node. Instances have separate status from the container group or recipe deployment they are a part of. While deploying on Salad is usually quick, it can occasionally take 20 minutes or more to get your containers up and running, but you are only charged for an instance once it reaches Running state.
 
-- **Allocating:**Instances are allocating when we are looking for a node to assign your deployment. If all instances show allocating for an extended time it indicates that either that instances are failing to create or that there are not currently nodes available with the requested properties.
-- **Downloading:**Downloading indicates that a node has been assigned to your workload and is downloading the container image.
-- **Creating:**The assigned node is preparing your deployment and starting the container image. If an instance is stuck creating you can **reallocate** your workload to another node.
-- **Running:**Running indicates the container has been started. Depending on your container, additional time may be needed before it is ready for Container Gateway (inbound networking) requests, e.g. to run startup scripts or download models. Health Probes can be configured to account for this. Note that [Billing](doc:billing) is usage-based on usage and only starts once a container is running. Running containers can be reallocated, recreated, or restarted.
+- **Allocating:** Instances are allocating when we are looking for a node to assign your deployment. If all instances show allocating for an extended time it indicates that either that instances are failing to create or that there are not currently nodes available with the requested properties.
+- **Downloading:** Downloading indicates that a node has been assigned to your workload and is downloading the container image.
+- **Creating:** The assigned node is preparing your deployment and starting the container image. If an instance is stuck creating you can **reallocate** your workload to another node.
+- **Running:** Running indicates the container has been started. Depending on your container, additional time may be needed before it is ready for Container Gateway (inbound networking) requests, e.g. to run startup scripts or download models. Health Probes can be configured to account for this. Note that [Billing](doc:billing) is usage-based on usage and only starts once a container is running. Running containers can be reallocated, recreated, or restarted.
 - **Stopping:** Indicates that a stop signal has been sent to your container instance. It can take up to several minutes for your container to stop while the signal propagates through the network.
 
 **Replicas:**Replicas are the desired number of instances for your container group or recipe deployment. While running, you can edit the desired replica count for your deployment.
