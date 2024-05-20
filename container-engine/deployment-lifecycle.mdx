@@ -11,7 +11,7 @@ The status of container groups and recipe deployments, as well as individual ins
   - **Compressing** the image for faster transmission.
   - **Storing** the result for distribution.
 - **Stopped:** The container group or recipe deployment is prepared, but is either not yet running or has been stopped. Note that presently, individual instances can still be running even after the container group is stopped while the stop message propagates through the network.
-- **Deploying:**The deployment has been started, but no instances are currently running.
+- **Deploying:** The deployment has been started, but no instances are currently running.
 - **Running:** The container has been started and at least one instance is running.
 - **Failed:** A container group or recipe deployment can only fail if there was a problem in the Preparing process, either:
   - **Failed** to pull if we were not able to pull the image from the repository. This could indicate an issue with the provided image name, or a transient issue with the registry. Check the provided image and try again.
@@ -26,7 +26,7 @@ The status of container groups and recipe deployments, as well as individual ins
 - **Running:** Running indicates the container has been started. Depending on your container, additional time may be needed before it is ready for Container Gateway (inbound networking) requests, e.g. to run startup scripts or download models. Health Probes can be configured to account for this. Note that [Billing](doc:billing) is usage-based on usage and only starts once a container is running. Running containers can be reallocated, recreated, or restarted.
 - **Stopping:** Indicates that a stop signal has been sent to your container instance. It can take up to several minutes for your container to stop while the signal propagates through the network.
 
-**Replicas:**Replicas are the desired number of instances for your container group or recipe deployment. While running, you can edit the desired replica count for your deployment.
+**Replicas:** Replicas are the desired number of instances for your container group or recipe deployment. While running, you can edit the desired replica count for your deployment.
 
 - For enhanced reliability and smoother operation, we strongly recommend deploying with a minimum of 2 replicas. This ensures your applications remain resilient and maintain performance, even if a node becomes temporarily unavailable. Scaling beyond a single node not only increases fault tolerance but also optimizes resource allocation and load balancing across our distributed cloud infrastructure. Start with 2 or more replicas to unlock the full potential of our platform and experience seamless scaling and improved uptime for your containers.
 
