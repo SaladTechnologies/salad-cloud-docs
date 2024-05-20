@@ -1,0 +1,56 @@
+---
+title: "Monitoring Jobs and Retrieving Results"
+---
+
+# Getting the status of a Job
+
+To check the status of a job, you will first need its `id`. The `id` is a string that is provided on the response object when you created the job.
+
+In our previous example, we saw the id returned on the response object was `50150edd-e182-47b5-a754-2d2a04d6ee31`
+
+Check the status of a job by sending a `GET` request to `https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs/{id}`
+
+# Interpreting the Job status
+
+Here is an example response when checking the Job status for job `id` 50150edd-e182-47b5-a754-2d2a04d6ee31:
+
+```json
+{
+  "id": "50150edd-e182-47b5-a754-2d2a04d6ee31",
+  "input": {
+    "width": 640,
+    "height": 480,
+    "iterations": 10,
+    "re_min": -2,
+    "re_max": 1,
+    "im_min": -1,
+    "im_max": 1,
+    "kind": "base64"
+  },
+  "metadata": {
+    "id": "my-custom-id-123"
+  },
+  "webhook": "https://callback.example.com/result",
+  "status": "pending",
+  "events": [
+    {
+      "action": "created",
+      "time": "2024-01-20T01:02:48.4787553+00:00"
+    }
+  ],
+  "create_time": "2024-01-20T01:02:48.4787553+00:00",
+  "update_time": "2024-01-20T01:02:48.4787553+00:00"
+}
+```
+
+`"status"` of the job can be:
+
+- `pending` - The job has been added to the queue and is waiting to be run
+- `running` - The job has been popped from the queue and dispatched to a workload instance for processing.
+- `succeeded` - The job has been run and the response has been received.
+- `cancelled` - The job was cancelled before it was dispatched to a workload instance. **Note: a job cannot be cancelled once it has been dispatched.**
+- `failed` - The job was retried three times and failed to run to completion. **Note: once a job has reached a failed status, it will not be retried and instead must be resubmitted to the queue.**
+
+# Viewing results
+
+Once the job has finished, the results will be available on this response object, and at the webhook URL (if provided).

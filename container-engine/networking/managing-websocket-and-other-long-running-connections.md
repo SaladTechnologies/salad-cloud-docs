@@ -1,0 +1,8 @@
+---
+title: "Managing WebSocket and other Long Running Connections"
+---
+
+When using long-lived WebSocket connections with Salad's Container Gateway, there are a couple things you need to be aware of.
+
+1. The WebSocket protocol doesn't allow passing headers of any kind, including authorization headers. This means you must disable authentication when you enable the Container Gateway for your container group. Your container will get assigned a highly unique domain name as a secure alternative to the `Salad-Api-Key` header.
+2. Idle connections get terminated after 100 seconds. This means you need to send a heartbeat through the WebSocket connection periodically to keep the connection alive.

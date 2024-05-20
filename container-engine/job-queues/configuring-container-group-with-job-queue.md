@@ -1,0 +1,85 @@
+---
+title: "Configuring a Container Group with a Job Queue"
+---
+# Using the Portal
+
+When configuring a new container group, click the 'Edit' link next to the Job Queues card:
+
+[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/6ef9e27-image.png",
+        null,
+        "The Job Queues card"
+      ],
+      "align": "center",
+      "border": true,
+      "caption": "The Job Queues card"
+    }
+  ]
+}
+[/block]
+
+
+Select your previously-created Job Queue from the 'Select a Job Queue' dropdown. (If you haven't yet created a Job Queue, press the 'Create New Job Queue' button and do so before returning to this page). 
+
+[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/0592577-image.png",
+        null,
+        "Screenshot showing the UI for connecting a Container Group to a Job Queue."
+      ],
+      "align": "center",
+      "border": true,
+      "caption": "Screenshot showing the UI for connecting a Container Group to a Job Queue."
+    }
+  ]
+}
+[/block]
+
+
+Enter the Port and Path of your application that you identified during the [Configuring the Job Queue Worker](doc:configuring-the-job-queue-worker) step. This information will be attached to jobs sent to the Queue Worker so that it knows where to post them to the application running inside the deployed container. 
+
+**We also recommend adding a [readiness probe](https://docs.salad.com/docs/readiness-probes) to your container deployment**.  This probe will allow your replica to announce to the Job Queue Service when it's ready to receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to look for jobs, even if your application inside is not yet ready to receive jobs. If this happens, the job will fail and you’ll need to submit it again. 
+
+How the readiness probe is configured will depend on your container image, and how it’s configured inside. Many prebuilt containers or http-apps found in open-source libraries will have a liveness API URL you can check, that will respond with a 200 code when it’s ready to receive work.  
+Other times, any pre-requisite work may be done before the server starts, and the server starts up as the last step, so any health-check endpoint would work. In a Whisper Large v3 example below, this is what we have.  
+If your container does not contain a way to check health statuses, you may need to add one of your own. You can usually find any references to this in the readme or documentation for the container image you are using. Readiness probes can flip between passing and failing, and will continue to check until it’s ready to go. 
+
+```json
+Enabled
+Protocol: HTTP/1.X
+Path: /hc
+Port: 8000
+Headers: None Configured
+Initial Delay Seconds: 60
+Period Seconds: 10
+Timeout Seconds: 1
+Success Threshold: 1
+Failure Threshold: 3
+```
+
+[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/6a6961b-image.png",
+        null,
+        ""
+      ],
+      "align": "center",
+      "sizing": "350px",
+      "border": true
+    }
+  ]
+}
+[/block]
+
+
+Finally, finish configuring your container group before deploying it. When selecting your image source, ensure you select the container image you configured in the previous step.

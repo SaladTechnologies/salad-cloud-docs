@@ -1,0 +1,32 @@
+---
+title: "Disk Space"
+---
+
+# How Disk Space is Calculated
+
+When you deploy a workload to the Salad Network, nodes are filtered on the criteria that you specify. If you do not specify disk space requirements, nodes are provided which meet a minimum free space allotment. This is calculated based on the size of the downloaded container, plus some extra buffer to account for operations like extracting the container, installing dependencies, and caching results.
+
+# Requesting additional Disk Space on nodes
+
+If you expect to need significantly more free space on your nodes than your container itself requires, configure it by selecting a Disk Space option when configuring your container group in the Portal or in the API by passing a`"storage_amount": x` in megabytes on the resources object.
+
+[block:image]
+{
+"images": [
+{
+"image": [
+"https://files.readme.io/270e77f-image.png",
+null,
+"Screenshot of the portal UI for requesting additional Disk Space."
+],
+"align": "center",
+"border": true,
+"caption": "Screenshot of the portal UI for requesting additional Disk Space."
+}
+]
+}
+[/block]
+
+> 📘 Need more space?
+>
+> Salad's disk space requirements for nodes are minimum thresholds; nodes may provide significantly more free space than the minimum. However, if you expect to regularly need more than highest disk space option provided, reach out to your account manager or email [cloud@salad.com](mailto:cloud@salad.com) to request nodes with additional space. We can take a look at how many nodes are available with high levels of free space to help guide you to the right balance of space requirements and node counts.
