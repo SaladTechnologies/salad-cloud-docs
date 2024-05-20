@@ -81,7 +81,8 @@
         "container-engine/containers",
         "container-engine/deploy-containers",
         "container-engine/deploy-via-api-1",
-        "container-engine/deployment-lifecycle"
+        "container-engine/deployment-lifecycle",
+        "container-engine/managing-deployments"
     ]
     },
     {
