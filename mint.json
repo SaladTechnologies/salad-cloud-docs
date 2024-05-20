@@ -92,11 +92,9 @@
             "container-engine/registries/gcp-gcr",
             "container-engine/registries/quay"
           ]
-        },
-        "container-engine/environment-variables"
+        }
     ]
     },
-   
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
