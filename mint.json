@@ -90,7 +90,7 @@
             "container-engine/external-logging",
             "container-engine/external-logging/axiom"
           ]
-        },
+        }
       ]
     },
 
