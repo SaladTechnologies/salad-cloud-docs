@@ -8,7 +8,7 @@ In the Salad Cloud Portal, you're able to see your deployments for each project 
 
 - Name of the deployment
 - Date created
-- [Deployment status (Preparing, Stopped, Deploying, Running, Failed)](https://docs.salad.com/docs/deployment-lifecycle)
+- [Deployment status (Preparing, Stopped, Deploying, Running, Failed)](/container-engine/deployment-lifecycle)
 - Replicas running
 - Version
 - Container Gateway details (if enabled)
@@ -54,12 +54,12 @@ Inside the "Edit" option on the Managing Deployments page in Salad, you have the
 - You can change the Display Name to make deployments more descriptive and easily identifiable. Note: the Container Group Name, set upon creation, cannot be edited.
 - You can update the Image Source URL. For private registries, re-enter authentication details. You'll see the first 12 characters of the image digest hash after saving.
 - You can adjust the replica count to scale your application up or down as needed.
-- You can modify hardware resource requirements, such as the number of vCPUs, Memory (RAM), GPUs, and [Disk Space](https://docs.salad.com/docs/disk-space).
-- You can edit the [Health Check Probes](https://docs.salad.com/docs/health-probes) (Startup, and Liveness).
-- You can edit the [Command](https://docs.salad.com/docs/specifying-a-command).
-- If enabled, you can edit the [Container Gateway](https://docs.salad.com/docs/networking) Port. Note: the edit Container Group functionality doesn't allow for the Container Gateway to be disabled, enabled, or authentication to be changed.
-- You can modify or enable/disable the [External Logging](https://docs.salad.com/docs/external-logging) Services.
-- You can edit the [Environment Variables](https://docs.salad.com/docs/environment-variables).
+- You can modify hardware resource requirements, such as the number of vCPUs, Memory (RAM), GPUs, and [Disk Space](/container-engine/disk-space).
+- You can edit the [Health Check Probes](/container-engine/health-probes) (Startup, and Liveness).
+- You can edit the [Command](/container-engine/specifying-a-command).
+- If enabled, you can edit the [Container Gateway](/container-engine/networking) Port. Note: the edit Container Group functionality doesn't allow for the Container Gateway to be disabled, enabled, or authentication to be changed.
+- You can modify or enable/disable the [External Logging](/container-engine/external-logging) Services.
+- You can edit the [Environment Variables](/container-engine/environment-variables).
 
 This editing functionality lets you update your container images, change hardware requirements, adjust configuration aspects, and utilize new features that Salad may release. Changes to your Container Groups can be made with minimal downtime and while retaining the original Container Gateway configuration (DNS name). As you make changes, you will see the predicted cost associated with those choices updated in real-time.
 

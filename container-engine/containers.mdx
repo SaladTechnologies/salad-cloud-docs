@@ -6,9 +6,9 @@ Container Groups are fundamental to the deployment process within the Salad Clou
 
 ## Container Group Components
 
-- **[Container Registries](https://docs.salad.com/docs/container-registries)**: Specify the container image you want to run in the Container Group.
+- **[Container Registries](/container-engine/container-registries)**: Specify the container image you want to run in the Container Group.
 - **Resource Requirements**:
-  - [Container Image](https://docs.salad.com/docs/container-registries): name(Public or Private). 
+  - [Container Image](/container-engine/container-registries): name(Public or Private). 
   - Replica Count:  Replicas are the desired number of instances for your container group deployment.  We recommend that you deploy with 2+ replicas to ensure the uptime of your deployment.
     - For enhanced reliability and smoother operation, we strongly recommend deploying with a minimum of 2 replicas. This ensures your applications remain resilient and maintain performance, even if a node becomes temporarily unavailable. Scaling beyond a single node not only increases fault tolerance but also optimizes resource allocation and load balancing across our distributed cloud infrastructure. Start with 2 or more replicas to unlock the full potential of our platform and experience seamless scaling and improved uptime for your containers.
   - Number of vCPUs (1-16): Define the desired number of virtual CPUs for your container.
@@ -19,11 +19,11 @@ Container Groups are fundamental to the deployment process within the Salad Clou
 
 
 - **Additional Parameters**:
-  - **[Startup Probe](https://docs.salad.com/docs/startup-probes)**: Set up a startup probe to check if the container is ready to accept traffic.
-  - **[Liveness Probe](https://docs.salad.com/docs/liveness-probes)**: Configure a liveness probe to check if the container is healthy.
-  - **[Container Gateway](https://docs.salad.com/docs/networking)**: Choose between authentication or no authentication for external requests and port number for enabling networking inside of container.
-  - **[External Logging Service](https://docs.salad.com/docs/external-logging)**: Optionally configure an external logging service for container logs.
-  - **[Environment Variables](https://docs.salad.com/docs/environment-variables)**: Define environment variables to customize your container's environment.
+  - **[Startup Probe](/container-engine/health-probes/startup-probes)**: Set up a startup probe to check if the container is ready to accept traffic.
+  - **[Liveness Probe](/container-engine/health-probes/liveness-probes)**: Configure a liveness probe to check if the container is healthy.
+  - **[Container Gateway](/container-engine/networking)**: Choose between authentication or no authentication for external requests and port number for enabling networking inside of container.
+  - **[External Logging Service](/container-engine/external-logging)**: Optionally configure an external logging service for container logs.
+  - **[Environment Variables](/container-engine/environment-variables)**: Define environment variables to customize your container's environment.
 
 ![title](container-engine\images\9118a3c-image.png)
 
@@ -33,7 +33,7 @@ Container Groups are fundamental to the deployment process within the Salad Clou
 
 The container configuration page offers an auto-start feature. By default, this feature is enabled, and it automatically starts the container when the image is pulled. This ensures that your containers are always up to date and readily available.
 
-Note: For detailed instructions on deploying containers, please refer to our "[Deploy Container Group](https://docs.salad.com/docs/deploy-containers)" documentation.
+Note: For detailed instructions on deploying containers, please refer to our "[Deploy Container Group](/container-engine/deploy-containers)" documentation.
 
 ## Container Group Actions
 
