@@ -85,7 +85,7 @@
         "container-engine/managing-deployments",
         "container-engine/environment-variables",
         {
-          "group": "Extern Logging",
+          "group": "External Logging",
           "pages": [
             "container-engine/external-logging",
             "container-engine/external-logging/axiom",
@@ -95,23 +95,37 @@
             "container-engine/external-logging/datadog",
             "container-engine/external-logging/http"
           ]
-        }
+        },
+        {
+          "group": "Health Probes",
+          "pages": [
+            "container-engine/health-probes",
+            "container-engine/health-probes/startup-probes",
+            "container-engine/health-probes/liveness-probes",
+            "container-engine/health-probes/readiness-probes",
+            "container-engine/health-probes/health-probe-examples"
+          ]
+        },
+        "container-engine/specifying-a-command"
       ]
     },
 
     {
       "group": "Container Registries",
       "pages": [
+        "container-engine/container-registries",
         "container-engine/registries/dockerhub",
         "container-engine/registries/aws-ecr",
         "container-engine/registries/azure-acr",
         "container-engine/registries/gcp-gcr",
-        "container-engine/registries/quay"
+        "container-engine/registries/quay",
+        "container-engine/registries/github-ghcr"
       ]
     },
     {
       "group": "Container Gateway",
       "pages": [
+        "container-engine/networking",
         "container-engine/gateway/enabling-ipv6",
         "container-engine/gateway/sending-requests",
         "container-engine/gateway/websockets",

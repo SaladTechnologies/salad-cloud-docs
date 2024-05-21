@@ -94,38 +94,10 @@ Logstash is now configured and ready to use the SSL/TLS private key and certific
 
 Once you've set up Logstash, you can configure your Container Group Deployment on SCE and provide the host and port number.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/ca6ca65-image1.png",
-null,
-"Configuring Container Group Deployment to stream logs via TCP to your endpoint"
-],
-"align": "center",
-"border": true,
-"caption": "Configuring Container Group Deployment to stream logs via TCP to your endpoint"
-}
-]
-}
-[/block]
+![](container-engine\images\ca6ca65-image1.png)
+
 
 Then, start the container group and, on your TCP endpoint, you should see streaming logs from your containers!
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/7d010f9-image2.png",
-null,
-"Streaming Logs"
-],
-"align": "center",
-"border": true,
-"caption": "Streaming Logs"
-}
-]
-}
-[/block]
+![](container-engine\images\7d010f9-image2.png)
+
