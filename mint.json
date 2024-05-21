@@ -106,7 +106,10 @@
             "container-engine/health-probes/health-probe-examples"
           ]
         },
-        "container-engine/specifying-a-command"
+        "container-engine/specifying-a-command",
+        "container-engine/disk-space",
+        "container-engine/workload-logs",
+        "container-engine/container-logs"
       ]
     },
 
@@ -135,6 +138,7 @@
     {
       "group": "Job Queues",
       "pages": [
+        "container-engine/job-queues",
         "container-engine/job-queues/creating-a-job-queue",
         "container-engine/job-queues/queue-worker",
         "container-engine/job-queues/using-queues"
