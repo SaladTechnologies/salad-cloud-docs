@@ -83,7 +83,8 @@
         "container-engine/deploy-via-api-1",
         "container-engine/deployment-lifecycle",
         "container-engine/managing-deployments",
-        "container-engine/environment-variables"
+        "container-engine/environment-variables",
+        "container-engine/external-logging"
       ]
     },
 
