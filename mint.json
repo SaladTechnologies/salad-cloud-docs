@@ -84,7 +84,12 @@
         "container-engine/deployment-lifecycle",
         "container-engine/managing-deployments",
         "container-engine/environment-variables",
-        "container-engine/external-logging"
+        {
+          "group": "Extern Logging",
+          "pages": [
+            "container-engine/external-logging",
+          ]
+        },
       ]
     },
 
