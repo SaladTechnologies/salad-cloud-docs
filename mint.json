@@ -76,7 +76,6 @@
     {
       "group": "Getting Started",
       "pages": [
-        "container-engine/introduction",
         "container-engine/salad-container-engine",
         "container-engine/containers",
         "container-engine/deploy-containers",
@@ -84,6 +83,18 @@
         "container-engine/deployment-lifecycle",
         "container-engine/managing-deployments",
         "container-engine/environment-variables",
+        {
+          "group": "Container Registries",
+          "pages": [
+            "container-engine/container-registries",
+            "container-engine/registries/dockerhub",
+            "container-engine/registries/aws-ecr",
+            "container-engine/registries/azure-acr",
+            "container-engine/registries/gcp-gcr",
+            "container-engine/registries/quay",
+            "container-engine/registries/github-ghcr"
+          ]
+        },
         {
           "group": "External Logging",
           "pages": [
@@ -94,6 +105,16 @@
             "container-engine/external-logging/tcp-logging",
             "container-engine/external-logging/datadog",
             "container-engine/external-logging/http"
+          ]
+        },
+        {
+          "group": "Container Gateway",
+          "pages": [
+            "container-engine/networking",
+            "container-engine/gateway/enabling-ipv6",
+            "container-engine/gateway/sending-requests",
+            "container-engine/gateway/websockets",
+            "container-engine/gateway/networking-error-pages"
           ]
         },
         {
@@ -109,41 +130,27 @@
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
         "container-engine/workload-logs",
-        "container-engine/container-logs"
+        "container-engine/container-logs",
+        {
+          "group": "Job Queues",
+          "pages": [
+            "container-engine/job-queues",
+            "container-engine/job-queues/creating-a-job-queue",
+            "container-engine/job-queues/queue-worker",
+            "container-engine/job-queues/using-queues"
+          ]
+        }
       ]
     },
 
-    {
-      "group": "Container Registries",
-      "pages": [
-        "container-engine/container-registries",
-        "container-engine/registries/dockerhub",
-        "container-engine/registries/aws-ecr",
-        "container-engine/registries/azure-acr",
-        "container-engine/registries/gcp-gcr",
-        "container-engine/registries/quay",
-        "container-engine/registries/github-ghcr"
-      ]
-    },
-    {
-      "group": "Container Gateway",
-      "pages": [
-        "container-engine/networking",
-        "container-engine/gateway/enabling-ipv6",
-        "container-engine/gateway/sending-requests",
-        "container-engine/gateway/websockets",
-        "container-engine/gateway/networking-error-pages"
-      ]
-    },
-    {
-      "group": "Job Queues",
-      "pages": [
-        "container-engine/job-queues",
-        "container-engine/job-queues/creating-a-job-queue",
-        "container-engine/job-queues/queue-worker",
-        "container-engine/job-queues/using-queues"
-      ]
-    },
+
+
+        {
+          "group": "Examples & Guides",
+          "pages": [
+            "container-engine/job-queues/using-queues"
+          ]
+  },
     {
       "group": "Getting Started",
       "pages": ["managed-services/introduction"]
