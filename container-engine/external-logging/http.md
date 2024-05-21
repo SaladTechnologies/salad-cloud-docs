@@ -31,42 +31,15 @@ while container group creation or configuration process at salad portal, locate 
    6. Headers (Optional): If your HTTP service requires custom headers, provide the name and value pairs.
    7. Click “Configure” to save the provided information.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/eec4c3f-image.png",
-null,
-"HTTP External Logging Configuration"
-],
-"align": "center",
-"border": true,
-"caption": "HTTP External Logging Configuration"
-}
-]
-}
-[/block]
+![](container-engine\images\eec4c3f-image.png)
+
 
 ## Step 3: Deploy Container Group
 
 Once you've provided the necessary information, deploy the Container Group by clicking on the “Deploy” and "Start" buttons.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/2acf3d1-image.png",
-null,
-"Start SCE"
-],
-"align": "center",
-"caption": "Start SCE"
-}
-]
-}
-[/block]
+![](container-engine\images\2acf3d1-image (1).png)
+
 
 ## Step 4: Verify Logs in HTTP Service
 
