@@ -88,7 +88,12 @@
           "group": "Extern Logging",
           "pages": [
             "container-engine/external-logging",
-            "container-engine/external-logging/axiom"
+            "container-engine/external-logging/axiom",
+            "container-engine/external-logging/new-relic",
+            "container-engine/external-logging/splunk-logging",
+            "container-engine/external-logging/tcp-logging",
+            "container-engine/external-logging/datadog",
+            "container-engine/external-logging/http"
           ]
         }
       ]
