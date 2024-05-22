@@ -10,18 +10,15 @@ The your python application up and running is as simple as packaging up the appl
 
 In this guide, we will create a simple `Hello World` python application, but these steps can be used to deploy any new or existing application on Salad.
 
-[block:embed]
-{
-  "html": false,
-  "url": "https://player.vimeo.com/video/918054913",
-  "provider": "player.vimeo.com",
-  "href": "https://player.vimeo.com/video/918054913",
-  "typeOfEmbed": "iframe",
-  "height": "500px",
-  "width": "100%",
-  "iframe": true
-}
-[/block]
+
+
+<video
+  controls
+  className="w-full aspect-video"
+  src="https://player.vimeo.com/video/918054913"
+></video>
+
+
 
 
 # Creating the Python Container
@@ -144,7 +141,7 @@ You will see something like:
 
 # Push Container to a Registry
 
-Now that you have a container locally, you will need to push that container image up to a container registry so it can be deployed on Salad. You can push to any of the [supported container registries](https://docs.salad.com/docs/container-registries), but for this guide we will use Docker Hub.
+Now that you have a container locally, you will need to push that container image up to a container registry so it can be deployed on Salad. You can push to any of the [supported container registries](/container-engine/container-registries), but for this guide we will use Docker Hub.
 
 ## Tagging the Image
 
@@ -174,45 +171,16 @@ Now that you have a complete (yet basic) FastAPI application running you can dep
 
 When you are asked to specify the "Image Source" you simply need to provide the image name you used to push the container up to the registry.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/5047308-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "border": true
-    }
-  ]
-}
-[/block]
+![](container-engine\images\5047308-image.png)
 
 
 Since the FastAPI is listening to port 80, you will need to enable the Container Gateway and configure the port when creating a new container group.
 
-[Deployment Guide](https://docs.salad.com/docs/deploy-containers)
+[Deployment Guide](/container-engine/deploy-containers)
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/0d2e830-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "border": true
-    }
-  ]
-}
-[/block]
+![](container-engine\images\0d2e830-image.png)
 
 
-<br>
 
 ## Connecting to the Application
 
