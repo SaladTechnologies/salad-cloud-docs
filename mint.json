@@ -245,5 +245,51 @@
     "x": "https://x.com/SaladTech ",
     "github": "https://github.com/SaladTechnologies",
     "linkedin": "https://www.linkedin.com/company/salad-technologies"
-  }
+  },
+  "redirects": [
+    {
+      "source": "/docs/yolov8-deployment-tutorial",
+      "destination": "/container-engine/guides/yolov8/deployment-tutorial"
+    },
+    {
+      "source": "/docs/yolov8-batch",
+      "destination": "/container-engine/guides/yolov8/batch-processing"
+    },
+    {
+      "source": "/docs/yolov8-model-training-guide",
+      "destination": "/container-engine/guides/yolov8/model-training-guide"
+    },
+    {
+      "source": "/docs.salad.com/docs/openvoice-api",
+      "destination": "/container-engine/guides/openvoice-api"
+    },
+    {
+      "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
+      "destination": "/container-engine/guides/run-tgi-text-generation-interface-by-huggingface"
+    },
+    {
+      "source": "/docs/run-ollama",
+      "destination": "/container-engine/guides/run-ollama"
+    },
+    {
+      "source": "/docs/sdxl",
+      "destination": "/container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
+    },
+    {
+      "source": "/docs/enabling-ipv6",
+      "destination": "/container-engine/gateway/enabling-ipv6"
+    },
+    {
+      "source": "/docs/billing",
+      "destination": "/container-engine/billing"
+    },
+    {
+      "source": "/docs/deploy-containers",
+      "destination": "/container-engine"
+    },
+    {
+      "source": "/reference/api-reference",
+      "destination": "/api-reference"
+    }
+  ]
 }
