@@ -12,10 +12,6 @@ Salad supports both Public and Private Registries, many providers offer both opt
 
 When configuring a Container Group for deployment, you'll need to specify the source of the container image. If your image is hosted on the Docker Hub Registry, you don't need to include the registry name. If your image is hosted on another registry, such as GitHub Container Registry, you'll need to include the registry path. This path is similar to a URL, but doesn't contain a protocol specifier (e.g. `https://`). You may optionally append a tag, as well. Note that if no tag is supplied, the `:latest` tag will be used by default.
 
-> 📘 Supported Image Manifest Specs
->
-> Only Docker v2 image manifest specs are currently supported. OCI image manifests are not yet supported, though we will be adding support for OCI soon. On Docker, you can check the image spec using the following command:
->
 > ```Text shell
 > docker manifest inspect $REMOTEIMAGESOURCE
 > ```

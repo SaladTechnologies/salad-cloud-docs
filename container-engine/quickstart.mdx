@@ -1,8 +1,9 @@
 ---
-title: "Deploy a Container Group with Salad Portal"
+title: "Quickstart"
+description: "Get your first container up and running on Salad in minutes!"
 ---
 
-Salad Cloud simplifies container deployment, allowing you to easily manage containers within their organization. In this step-by-step guide, we will walk you through the process of deploying a container using the Salad Cloud Portal. Let's get started!
+Salad Cloud simplifies container deployment, allowing you to easily manage containers within your organization. In this step-by-step guide, we will walk you through the process of deploying a container using the Salad Cloud Portal. Let's get started!
 
 ### Step 1: Log in to the Salad Cloud Portal
 
@@ -17,11 +18,9 @@ Salad Cloud simplifies container deployment, allowing you to easily manage conta
 
 ![](container-engine\images\0803131-image.png)
 
-
 2. Name the new organization and provide a project name.
 3. Click on "Create" to set up the new organization and project.
-![](container-engine\images\9aa8a8e-image.png)
-
+   ![](container-engine\images\9aa8a8e-image.png)
 
 ### Step 3: Create a Container Group
 
@@ -31,13 +30,11 @@ Salad Cloud simplifies container deployment, allowing you to easily manage conta
 ### Step 4: Configure the Container Group
 
 1. On the configuration page, enter a name for your container group.
-2. Provide the Docker image in the desired format: docker.io/example-org/my-image:latest.
-   1. In this example we are using `docker.io/saladtechnologies/demo-image:0.1`
-      > 📘 Image Source
-      >
-      > Currently, SaladCloud supports Docker manifest v1 and Docker manifest v2. OCI image manifests are not yet supported (but will be soon!). You can learn more about specifying the image source [here](/container-engine/container-registries).
-3. Specify the number of replicas (e.g., "1") that you want to deploy  
+2. Provide the Docker image, for example `docker.io/saladtechnologies/demo-image:0.1`
+3. Specify the number of replicas (e.g., "5") that you want to deploy
+
    ![](https://files.readme.io/7bfb490-b7fcc7e-image.png)
+
 4. Scroll down to the "Resource" section and choose the required vCPU, memory size needed for your container.  
    ![](https://files.readme.io/304f4f6-909d05c-image.png)
 5. After configuring the CPU and memory settings, scroll down to the GPU Selection section. You have the option to select a single GPU class or multiple GPU classes for their workload, or even choose all available GPU classes if needed.  
