@@ -67,7 +67,58 @@
     },
     {
       "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
+      "pages": [
+        {
+          "group": "container_groups",
+          "pages": [
+            "api-reference/container_groups/list-container-groups",
+            "api-reference/container_groups/create-a-container-group",
+            "api-reference/container_groups/get-a-container-group",
+            "api-reference/container_groups/delete-a-container-group",
+            "api-reference/container_groups/update-a-container-group",
+            "api-reference/container_groups/start-a-container-group",
+            "api-reference/container_groups/stop-a-container-group",
+            "api-reference/container_groups/list-container-group-instances",
+            "api-reference/container_groups/get-container-group-instance-by-instance-id",
+            "api-reference/container_groups/reallocate-container-group-instance-to-another-node",
+            "api-reference/container_groups/recreate-container-on-a-node",
+            "api-reference/container_groups/restart-container-on-a-node"
+          ]
+        },
+        {
+          "group": "workload_errors",
+          "pages": ["api-reference/workload_errors/get-workload-errors"]
+        },
+        {
+          "group": "quotas",
+          "pages": ["api-reference/quotas/get-quotas"]
+        },
+        {
+          "group": "recipe_deployments",
+          "pages": [
+            "api-reference/recipe_deployments/list-recipe-deployments",
+            "api-reference/recipe_deployments/create-a-recipe-deployment",
+            "api-reference/recipe_deployments/get-a-recipe-deployment",
+            "api-reference/recipe_deployments/delete-a-recipe-deployment",
+            "api-reference/recipe_deployments/update-a-recipe-deployment",
+            "api-reference/recipe_deployments/start-a-deployed-recipe",
+            "api-reference/recipe_deployments/restart-a-deployed-recipe",
+            "api-reference/recipe_deployments/stop-a-deployed-recipe",
+            "api-reference/recipe_deployments/list-recipe-deployment-instances"
+          ]
+        },
+        {
+          "group": "organization_data",
+          "pages": ["api-reference/organization_data/list-the-gpu-classes"]
+        },
+        {
+          "group": "recipes",
+          "pages": [
+            "api-reference/recipes/list-recipes",
+            "api-reference/recipes/get-a-recipe"
+          ]
+        }
+      ]
     },
     {
       "group": "Getting Started",
@@ -138,7 +189,7 @@
             "container-engine/gateway/enabling-ipv6",
             "container-engine/gateway/sending-requests",
             "container-engine/gateway/websockets",
-            "container-engine/gateway/error-pages"
+            "container-engine/gateway/networking-error-pages"
           ]
         },
         {
