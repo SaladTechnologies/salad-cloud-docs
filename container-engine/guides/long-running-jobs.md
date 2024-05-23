@@ -1,0 +1,172 @@
+---
+title: "Long-Running Jobs"
+slug: "long-running-jobs"
+excerpt: "Run ML/AI Training Jobs, Monte Carlo Simulations, and More"
+hidden: false
+createdAt: "Wed May 01 2024 14:20:34 GMT+0000 (Coordinated Universal Time)"
+updatedAt: "Wed May 01 2024 19:22:37 GMT+0000 (Coordinated Universal Time)"
+---
+Salad is capable of running all kinds of long-running compute-intensive jobs, from fine tuning SDXL to molecular simulations, with the following restrictions:
+
+- One job/block must be completed on a single GPU with up to 24gb vram. Typically very large simulations are broken up into smaller blocks so they can be processed concurrently on many GPUs.
+- Your job should periodically save checkpoints of its progress, so that it can be resumed in the event of an interruption.
+- Your job is packaged in a docker container.
+
+# Kelpie
+
+[Kelpie](https://github.com/SaladTechnologies/kelpie) is an open-source framework for managing long-running jobs across interruptible hardware. It coordinates with the [Kelpie API](https://github.com/SaladTechnologies/kelpie-api) (free for Salad customers) to ensure maximum utilization of your container group, and to ensure that jobs succeed despite node interruptions.
+
+## Preparing Your Job
+
+### Make it a Docker container
+
+The first step to preparing any workload for Salad is to get it packaged up as a Docker container. If you are unfamiliar with Docker, I recommend checking out this [guide to Docker for Data Science](https://www.datacamp.com/tutorial/docker-for-data-science-introduction).
+
+In addition, your job will need a very small amount of instrumentation to be fully compatible with Kelpie. You can find an [example application here](https://github.com/SaladTechnologies/kelpie-demo).
+
+### Add Kelpie
+
+Add Kelpie to your Dockerfile by downloading it from the [release page](https://github.com/SaladTechnologies/kelpie/releases).
+
+```dockerfile
+RUN wget https://github.com/SaladTechnologies/kelpie/releases/download/0.0.10/kelpie -O /kelpie && chmod +x /kelpie
+
+CMD ["/kelpie"]
+```
+
+Note you also need to override your `CMD` directive to launch kelpie instead of your original script.
+
+## Deploy Your Container Group
+
+Navigate to the [Salad Portal](https://portal.salad.com/), creating a user account, organization, and project if necessary.
+
+[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/dd1b98c-image.png",
+        null,
+        ""
+      ],
+      "align": "center"
+    }
+  ]
+}
+[/block]
+
+
+Click "Deploy a Container Group", and fill out the form, providing the docker image you just built, and specifying the hardware required to run the job. For now, you can leave `Replica Count` as `1`, since Kelpie is capable of scaling your container group for you once configured.
+
+[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/6dfce6a-image.png",
+        null,
+        "Your job almost definitely needs more hardware than this"
+      ],
+      "align": "center",
+      "caption": "Your job almost definitely needs more hardware than this"
+    }
+  ]
+}
+[/block]
+
+
+You do not need to override the command, and you do not need to enable `Container Gateway`.
+
+While not required, it is recommended to set up an [external logging provider](https://docs.salad.com/docs/external-logging) to help you debug when things go wrong. Salad has integrated logging to help with debugging, but it is not as full featured as stand-alone products.
+
+You will need to set up some environment variables to enable Kelpie to interact with the Kelpie API, and to enable it to sync your checkpoints and outputs to your preferred s3-compatible storage provider. Your `KELPIE_API_KEY` will be provided by Salad upon request. Note that it **is not** your Salad API Key.
+
+![](https://files.readme.io/f6bfba0-image.png)
+
+I highly recommend choosing a storage provider that does not charge data egress fees. My personal favorite is [Cloudflare R2](https://www.cloudflare.com/developer-platform/r2/), but there are other options on the market as well. Just google for "s3-compatible storage".
+
+You can go ahead and disable auto-start, and then hit deploy. You'll see your container group in a "preparing" phase where it is pulling your docker image into our cache.
+
+![](https://files.readme.io/33f3fc2-image.png)
+
+### (Optional) Add Kelpie to your Salad Organization
+
+Kelpie can start, stop, and scale your container group in response to job volume. It can also automatically reallocate nodes that fail too many jobs. In order to take advantage of these features, you must add the Kelpie user to your Salad Organization.
+
+From the left panel in the portal, select "Team"
+
+![](https://files.readme.io/188a958-image.png)
+
+Click "Invite New Team Member"
+
+![](https://files.readme.io/e91d2cc-image.png)
+
+And invite the Kelpie user. During our beta, this is [shawn.rushefsky@salad.com.](mailto:shawn.rushefsky@salad.com.) Once we exit beta, this will likely become [kelpie@salad.com](mailto:kelpie@salad.com).
+
+Once your invite is accepted (give us a ping on discord/slack/whatsapp/email and let us know you're ready), Kelpie will be able to manage your container group.
+
+### Get Your Container Group ID
+
+In order to make sure your jobs get scheduled on the correct container group, you need to retrieve the container group's unique ID via the API. You can do this from the [interactive docs](https://docs.salad.com/reference/get_container_group).
+
+### (Optional) Create Scaling Rules
+
+You can use the [Kelpie API](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule)  to create a scaling rule for your container group, setting min and max replicas, and how long to count an idle instance as active.![](https://files.readme.io/c1ed076-image.png)
+
+## Prepare Data For Your Job
+
+Kelpie deals with data in 3 categories:
+
+- Inputs - Data used as an input to your job. This might be images, text, or anything else. This data gets synced one-way _from_ your cloud storage _to_ a container's local storage, prior to starting a job. Changes made to the input directory locally are not detected, and are not pushed back up to the cloud.
+- Checkpoints - Data that saves the state of a job in a format that allows resuming. This directory is synced bi-directionally to and from the cloud. Data is downloaded from the cloud to the container's local storage prior to starting a job. Files added to the checkpoint directory locally are automatically pushed up to the cloud.
+- Outputs - The result of your job. This might be model weights, CSV files, or anything else. This directory is synced one-way _to_  your cloud storage _from_ a container's local storage, throughout a job's running time and at completion. Files added to the output directory locally are automatically pushed up to the cloud.
+
+Prior to starting a batch of jobs, you need to make sure your inputs are organized appropriately in your storage bucket.
+
+## Submit Jobs
+
+Use the Kelpie API to [submit your jobs](https://kelpie.saladexamples.com/docs#/default/post_CreateJob) . For each job, you'll be creating a submitting a JSON payload like this:
+
+```json
+{
+  "command": "string",
+  "arguments": [],
+  "environment": {},
+  "input_bucket": "string",
+  "input_prefix": "string",
+  "checkpoint_bucket": "string",
+  "checkpoint_prefix": "string",
+  "output_bucket": "string",
+  "output_prefix": "string",
+  "max_failures": 3,
+  "heartbeat_interval": 30,
+  "webhook": "string",
+  "container_group_id": "string"
+}
+```
+
+| Key                  | Type    | Description                                                         | Default      |
+| -------------------- | ------- | ------------------------------------------------------------------- | ------------ |
+| `command`            | string  | The command to execute.                                             | **required** |
+| `arguments`          | array   | List of arguments for the command.                                  | \[]          |
+| `environment`        | object  | Key-value pairs defining the environment variables.                 | {}           |
+| `input_bucket`       | string  | Name of the AWS S3 bucket for input files.                          | **required** |
+| `input_prefix`       | string  | Prefix for input files in the S3 bucket.                            | **required** |
+| `checkpoint_bucket`  | string  | Name of the AWS S3 bucket for checkpoint files.                     | **required** |
+| `checkpoint_prefix`  | string  | Prefix for checkpoint files in the S3 bucket.                       | **required** |
+| `output_bucket`      | string  | Name of the AWS S3 bucket for output files.                         | **required** |
+| `output_prefix`      | string  | Prefix for output files in the S3 bucket.                           | **required** |
+| `max_failures`       | integer | Maximum number of allowed failures before the job is marked failed. | 3            |
+| `heartbeat_interval` | integer | Time interval (in seconds) for sending heartbeat signals.           | 30           |
+| `webhook`            | string  | URL for the webhook to notify upon completion or failure.           | _optional_   |
+| `container_group_id` | string  | ID of the container group where the command will be executed.       | **required** |
+
+## (Optional) Manually Start Your Container Group
+
+If you've set up scaling rules and added the kelpie user to your salad org, you can skip this part, as it will be managed automatically for you.
+
+Otherwise, now is the time to start your container group, and set the number of replicas desired. Nodes will begin pulling work from the Kelpie API immediately when they become running. You can access the replica count from the "Edit" button in the container group view.
+
+![](https://files.readme.io/7d353a2-image.png)
+
+<br>

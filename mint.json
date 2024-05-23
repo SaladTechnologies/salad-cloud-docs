@@ -5,7 +5,7 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon-32x32.png",
   "colors": {
     "primary": "#53A626",
     "light": "#53A626",
@@ -59,22 +59,66 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["introduction", "quickstart", "development"]
+      "pages": ["introduction", "quickstart", "api-usage"]
     },
     {
-      "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
+      "group": "Common Services",
+      "pages": ["salad-simple-storage-service"]
     },
     {
       "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
+      "pages": [
+        {
+          "group": "container_groups",
+          "pages": [
+            "api-reference/container_groups/list-container-groups",
+            "api-reference/container_groups/create-a-container-group",
+            "api-reference/container_groups/get-a-container-group",
+            "api-reference/container_groups/delete-a-container-group",
+            "api-reference/container_groups/update-a-container-group",
+            "api-reference/container_groups/start-a-container-group",
+            "api-reference/container_groups/stop-a-container-group",
+            "api-reference/container_groups/list-container-group-instances",
+            "api-reference/container_groups/get-container-group-instance-by-instance-id",
+            "api-reference/container_groups/reallocate-container-group-instance-to-another-node",
+            "api-reference/container_groups/recreate-container-on-a-node",
+            "api-reference/container_groups/restart-container-on-a-node"
+          ]
+        },
+        {
+          "group": "workload_errors",
+          "pages": ["api-reference/workload_errors/get-workload-errors"]
+        },
+        {
+          "group": "quotas",
+          "pages": ["api-reference/quotas/get-quotas"]
+        },
+        {
+          "group": "recipe_deployments",
+          "pages": [
+            "api-reference/recipe_deployments/list-recipe-deployments",
+            "api-reference/recipe_deployments/create-a-recipe-deployment",
+            "api-reference/recipe_deployments/get-a-recipe-deployment",
+            "api-reference/recipe_deployments/delete-a-recipe-deployment",
+            "api-reference/recipe_deployments/update-a-recipe-deployment",
+            "api-reference/recipe_deployments/start-a-deployed-recipe",
+            "api-reference/recipe_deployments/restart-a-deployed-recipe",
+            "api-reference/recipe_deployments/stop-a-deployed-recipe",
+            "api-reference/recipe_deployments/list-recipe-deployment-instances"
+          ]
+        },
+        {
+          "group": "organization_data",
+          "pages": ["api-reference/organization_data/list-the-gpu-classes"]
+        },
+        {
+          "group": "recipes",
+          "pages": [
+            "api-reference/recipes/list-recipes",
+            "api-reference/recipes/get-a-recipe"
+          ]
+        }
+      ]
     },
     {
       "group": "Getting Started",
@@ -82,7 +126,92 @@
     },
     {
       "group": "Getting Started",
-      "pages": ["container-engine/introduction"]
+      "pages": [
+        "container-engine/containers",
+        "container-engine/quickstart",
+        "container-engine/quickstart-api"
+      ]
+    },
+    {
+      "group": "Container Groups",
+      "pages": [
+        "container-engine/salad-container-engine",
+        "container-engine/deployment-lifecycle",
+        "container-engine/managing-deployments",
+        "container-engine/environment-variables",
+        {
+          "group": "Container Registries",
+          "pages": [
+            "container-engine/container-registries",
+            "container-engine/registries/dockerhub",
+            "container-engine/registries/aws-ecr",
+            "container-engine/registries/azure-acr",
+            "container-engine/registries/gcp-gcr",
+            "container-engine/registries/quay",
+            "container-engine/registries/github-ghcr"
+          ]
+        },
+        {
+          "group": "External Logging",
+          "pages": [
+            "container-engine/external-logging",
+            "container-engine/external-logging/axiom",
+            "container-engine/external-logging/new-relic",
+            "container-engine/external-logging/splunk-logging",
+            "container-engine/external-logging/tcp-logging",
+            "container-engine/external-logging/datadog",
+            "container-engine/external-logging/http"
+          ]
+        },
+        {
+          "group": "Health Probes",
+          "pages": [
+            "container-engine/health-probes",
+            "container-engine/health-probes/startup-probes",
+            "container-engine/health-probes/liveness-probes",
+            "container-engine/health-probes/readiness-probes",
+            "container-engine/health-probes/health-probe-examples"
+          ]
+        },
+        "container-engine/specifying-a-command",
+        "container-engine/disk-space",
+        "container-engine/workload-logs",
+        "container-engine/container-logs"
+      ]
+    },
+    {
+      "group": "Accessing Containers",
+      "pages": [
+        {
+          "group": "Container Gateway",
+          "pages": [
+            "container-engine/networking",
+            "container-engine/gateway/enabling-ipv6",
+            "container-engine/gateway/sending-requests",
+            "container-engine/gateway/websockets",
+            "container-engine/gateway/networking-error-pages"
+          ]
+        },
+        {
+          "group": "Job Queues",
+          "pages": [
+            "container-engine/job-queues",
+            "container-engine/job-queues/creating-a-job-queue",
+            "container-engine/job-queues/queue-worker",
+            "container-engine/job-queues/using-queues"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Examples & Guides",
+      "pages": [
+        "container-engine/guides/using-salad-recipes",
+        "container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe",
+        "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
+        "container-engine/guides/run-ollama",
+        "container-engine/guides/run-a-python-app"
+      ]
     },
     {
       "group": "Getting Started",
@@ -90,7 +219,15 @@
     },
     {
       "group": "Getting Started",
-      "pages": ["gateway-service/introduction"]
+      "pages": [
+        "gateway-service/introduction",
+        "gateway-service/quickstart",
+        "gateway-service/proxy-v2",
+        "gateway-service/node-removals",
+        "gateway-service/approved-domains",
+        "gateway-service/smart-routing",
+        "gateway-service/faqs"
+      ]
     }
   ],
   "footerSocials": {

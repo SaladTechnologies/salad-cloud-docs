@@ -1,0 +1,48 @@
+---
+title: "Save to docker hub"
+slug: "save-to-docker-hub"
+excerpt: ""
+hidden: true
+metadata: 
+  image: []
+  robots: "index"
+createdAt: "Mon Dec 26 2022 04:17:40 GMT+0000 (Coordinated Universal Time)"
+updatedAt: "Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)"
+---
+To save a container image to Docker Hub, you will need to have a docker account and be logged in to the Docker command-line tool. You can **[create one here](https://hub.docker.com)**
+
+1. First, ensure that you are logged in to the Docker command-line tool using the **_docker login_** command.
+
+```text Copy code
+docker login
+```
+
+2. Next, use the **_docker push_** command to push your container image to Docker Hub. The syntax for the **_docker push_** command is as follows:
+
+```text Copy code
+docker push username/repository:tag
+```
+
+3. Replace "username" with your Docker Hub username, "repository" with the name of the repository where you want to save the image, and "tag" with an optional tag for the image.
+
+For example, to save an image with the repository name "my-image" and the tag "latest" to your Docker Hub account, you can use the following command:
+
+```text Copy code
+docker push username/my-image:latest
+```
+
+If you want to give the image a different tag, you can specify it in place of "latest". For example, to give the image the tag "v1.0", you can use the following command:
+
+```text Copy code
+docker push username/my-image:v1.0
+```
+
+To use this feature, you must first create a repository with the same name on Docker Hub. 
+
+Here's how:
+
+- Go to the Docker Hub website (<https://hub.docker.com/>) and log in.
+- Click the "Create Repository" button.
+- Follow the prompts to create a new repository with the desired name.
+
+Once you have created the repository on Docker Hub, you can proceed with the steps outlined in the documentation. Remember that the repository on Docker Hub must have the same name as the repository you are working with locally.

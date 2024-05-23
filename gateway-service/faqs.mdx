@@ -1,0 +1,17 @@
+---
+title: "FAQs"
+description: "Frequently Asked Questions about SGS"
+---
+
+<AccordionGroup>
+  <Accordion title="What happens when I first request SGS service in a region?">
+    When you first request SGS service, we ask you a few questions. Most important among these are which country you need service in, and how much traffic you anticipate the sesrver will need to handle. 
+Next, we provision a server in the requested country. If no reliable datacenter infrastructure is available there, a server is provisioned as near as possible to the target country to minimize latency. Each server is dedicated to a single customer's traffic through a single country -- no multi-tenancy. This helps ensure security as well as limit the potential for other customers' traffic to impact yours, and vice versa. 
+
+Once the SGS server is configured, we send a signal to Salad Nodes in the target country telling them to connect to that SGS server. Nodes are selected for eligibility based on a combination of their most recently-tested network speeds (up/down), ip quality, block rate, and other factors. Nodes are then rank ordered by performance and the best are selected to connect. The number of nodes allowed to connect is based on the contracted minimum traffic agreed upon, plus some additional buffer to support overages. If the connection to a node is lost for any reason, it is replaced by a new node to maintain the required node count.
+
+After internal testing, the SGS is deemed production-ready, and connection details are sent to you. These details will include the server hostname and port number and the connection password. 
+  </Accordion>
+
+</AccordionGroup>
+

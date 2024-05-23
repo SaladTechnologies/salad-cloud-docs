@@ -1,0 +1,46 @@
+---
+title: "Quay Container Registry"
+---
+
+In order to use Quay you need to have an organization and account at Quay. If you already have, you can skip step 1 and follow the guide from step 2.
+
+### **Step 1 : Create Quay Account**
+
+Begin by creating a Quay account for yourself or your organization at [Quay](https://quay.io).
+
+### **Step 2: Create Public/Private Repository**
+
+Inside your Quay account, create a public/private repository where you'll store your Docker images securely.  
+![Create private repository](https://files.readme.io/aacb155-createrepo.png)
+
+### **Step 3 : Initialize the Repository**
+
+Initialize your private repository in one of these ways:
+
+1. **Dockerfile**: If you have a Dockerfile, you can use it to initialize your repository.
+2. **GitHub Repository Path**: Link your Quay repository to a GitHub repository to automate image pushes.
+3. **Bitbucket**: Similar to GitHub, link your Quay repository to a Bitbucket repository for automated image pushes.
+4. **Custom Git Repository**: Link to a custom Git repository if your code is hosted elsewhere.
+
+### **Step 4: Build the Image on Quay Portal**
+
+Use the Quay portal to build the Docker image associated with your private repository. Follow the on-screen instructions.  
+![Build image on Quay portal](https://files.readme.io/38795a7-build.png)
+
+### **Step 5 : Configure Salad Container Environment (SCE)**:
+
+Access the Salad portal and set up your SCE by selecting the private registry tab when setting the image source. In the service dropdown option, choose "Quay Container Registry," and provide the following information:
+
+1. Quay username and password.
+2. Image name from your private Quay repository
+
+![](https://files.readme.io/8d0ac96-image.png)
+
+### **Step 6 :Start the Container**
+
+With all configurations in place, click the "Start" button in the Salad portal to launch your container using the private Quay registry image.  
+![](https://files.readme.io/2b29c9e-image.png)
+
+> 👍 Congratulations!
+>
+> Your container is now up and running, utilizing the image stored securely in your private Quay repository.

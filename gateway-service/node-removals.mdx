@@ -1,0 +1,51 @@
+---
+title: "Node Removals"
+description: "How to request removal of a Salad Node from your SGS server"
+---
+
+## When to request a node removal
+In the event that a salad node becomes blocked by a content provider, or for any other reason fails to meet your requirements, you can request that it be removed from the list of available IPs and replaced with a fresh node. At the time that the request is received, the node which is connected to the session ID in the request body will be removed.
+
+If a node becomes unavailable, it will automatically be replaced with a fresh node. For this reason, we recommend that you submit the node removal request as soon as possible after detecting an underperforming node to avoid inadvertently removing a fresh node which may have already replaced the underperforming node.
+
+## How to request a node removal
+Submit a node removal request by sending a POST request to the following endpoint:
+`https://app-api.salad.io/api/v2/sgs/$SGSID/removals`
+
+The `SGSID` will be shared with you before the trial period begins.
+
+Set the Authorization header as below:
+`Authorization: Bearer saladProvidedJwt`
+
+The JWT will be shared with you before the trial period begins.
+## Response Codes
+<AccordionGroup>
+  <Accordion title="202 Accepted">
+    The removal request has been accepted.
+  </Accordion>
+
+  <Accordion title="400 Bad Request">
+    The request is malformed or missing required fields. Please double-check your request.
+  </Accordion>
+
+  <Accordion title="409 Conflict">
+    A removal has already been performed on this sessionID.
+  </Accordion>
+</AccordionGroup>
+
+
+<Note>This should be in the format application/json. The only required field is the sessionId. Fields marked as optional are useful for Salad in preventing the use of nodes that may trigger a node removal request in the future.</Note>
+
+## Example Request
+``` JSON node_removal.json
+{
+// A required string representing the session identifier.
+"sessionId": "eb40cca0-c17b-4de8-a850-ac510bc29c6c",
+// An optional Unix timestamp (seconds) indicating when it was detected as bad.
+"timeDetectedAt": 1657639946,
+// An optional string with the reason for removal.
+"removalReason": "Reason for removal request.",
+// An optional string with the specific service.
+"service": "Example_Service"
+}
+```

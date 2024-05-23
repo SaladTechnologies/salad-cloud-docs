@@ -1,14 +1,14 @@
-# Mintlify Starter Kit
+# SaladCloud DOcs
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+### Installation
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+Install NVM
 
-### Development
+Windows - https://github.com/coreybutler/nvm-windows
+Mac/Linux = https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating
+
+Install Node
+`nvm install node`
 
 Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally. To install, use the following command
 
@@ -24,10 +24,14 @@ mintlify dev
 
 ### Publishing Changes
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
+Push up your changes to the repo, they will get merged with the live site ASAP.
 
-#### Troubleshooting
+### Updating the OpenAPI spec
 
-- Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
-- Page loads as a 404 - Make sure you are running in a folder with `mint.json`
- 
+1. Update the spec in the `./api-reference/openapi.json
+2. Automatically generate all the files from the spec
+   `npx @mintlify/scraping@latest openapi-file ./api-reference/openapi.json -o api-reference`
+
+### Additional Resources
+
+- If you use VSCode, mintlify has an extention for `.mdx` files https://marketplace.visualstudio.com/items?itemName=mintlify.mintlify-snippets

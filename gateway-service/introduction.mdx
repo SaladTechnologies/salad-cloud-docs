@@ -1,8 +1,14 @@
 ---
 title: "Introduction"
-description: "Introduction to SGS"
+description: "Introduction to Salad Gateway Service"
 ---
 
-## Welcome
+## SGS overview
 
-SGS is sooooo good.
+SGS is a proxy service that routes requests from VPN operators, or other customers who need distributed residential IP infrastructure, to Salad nodes. Salad Nodes are individually owned and operated desktop PCs whose owners have explicitly opted in to share their network bandwidth and local compute resources. Node owners, or ‘Salad Chefs’, are compensated by Salad based on the amount of compute resources or bandwidth they provide to the network. 
+
+## How nodes are selected
+
+SGS monitors and orchestrates these nodes while providing sticky session routing and load balancing across them. It allows parameter-based targeting of nodes by their location and, in certain cases, by the nodes' recently-demonstrated ability to reach specific streaming services. 
+
+Read on to learn how to start sending requests to SGS.
