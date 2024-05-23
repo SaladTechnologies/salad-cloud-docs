@@ -1,195 +1,4034 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.3",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "title": "SaladCloud Public API",
+    "description": "The SaladCloud Public API.",
+    "contact": {
+      "name": "Salad Support",
+      "url": "https://support.salad.com",
+      "email": "support@salad.com"
     },
-    "version": "1.0.0"
+    "termsOfService": "https://salad.com/terms",
+    "version": "1.0.0-alpha.108"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://api.salad.com/api/public"
     }
   ],
   "paths": {
-    "/plants": {
+    "/organizations/{organization_name}/projects/{project_name}/containers": {
+      "summary": "Container Groups",
+      "description": "Operations for container groups",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        }
+      ],
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
+        "operationId": "list_container_groups",
+        "summary": "List Container Groups",
+        "description": "Gets the list of container groups",
         "responses": {
           "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/ListContainerGroups"
           },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
           }
-        }
+        },
+        "tags": ["container_groups"]
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "operationId": "create_container_group",
+        "summary": "Create a Container Group",
+        "description": "Creates a new container group",
         "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
+          "$ref": "#/components/requestBodies/CreateContainerGroup"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateContainerGroup"
           },
-          "required": true
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_container_group",
+        "summary": "Get a Container Group",
+        "description": "Gets a container group",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetContainerGroup"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      },
+      "patch": {
+        "operationId": "update_container_group",
+        "summary": "Update a Container Group",
+        "description": "Updates a container group",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateContainerGroup"
         },
         "responses": {
           "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
+            "$ref": "#/components/responses/UpdateContainerGroup"
           },
           "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
           }
-        }
+        },
+        "tags": ["container_groups"]
+      },
+      "delete": {
+        "operationId": "delete_container_group",
+        "summary": "Delete a Container Group",
+        "description": "Deletes a container group",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteContainerGroup"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/errors": {
+      "summary": "Workload Errors",
+      "description": "Operations for workload errors",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        }
+      ],
+      "get": {
+        "operationId": "get__workload_errors",
+        "summary": "Get workload errors",
+        "description": "Gets the workload errors",
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "$ref": "#/components/responses/ListWorkloadErrors"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["workload_errors"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/start": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        }
+      ],
+      "post": {
+        "operationId": "start_container_group",
+        "summary": "Start a Container Group",
+        "description": "Starts a container group",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/StartContainerGroup"
           },
           "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
           }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/stop": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
         }
+      ],
+      "post": {
+        "operationId": "stop_container_group",
+        "summary": "Stop a Container Group",
+        "description": "Stops a container group",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/StopContainerGroup"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_container_group_instances",
+        "summary": "List Container Group Instances",
+        "description": "Retrieves a list of container group instances",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListContainerGroupInstances"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}": {
+      "summary": "Single Container Group Instance",
+      "description": "Operations for a single instance within a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_instance_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_container_group_instance_by_instance_id",
+        "summary": "Get Container Group Instance by instance ID",
+        "description": "Retrieves the details of a single instance within a container group by instance ID",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/GetContainerGroupInstance"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/reallocate": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_instance_id"
+        }
+      ],
+      "post": {
+        "operationId": "container_group_instance_reallocate",
+        "summary": "Reallocate container group instance to another node",
+        "description": "Remove a node from a workload and reallocate the workload to a different node",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/ReallocateContainerGroupInstance"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/recreate": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_instance_id"
+        }
+      ],
+      "post": {
+        "operationId": "container_group_instance_recreate",
+        "summary": "Recreate container on a node",
+        "description": "Stops a container, destroys it, creates a new one without requiring the image to be downloaded again on a different node",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/RecreateContainerGroupInstance"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/restart": {
+      "summary": "Container Group",
+      "description": "Operations for a container group",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_name"
+        },
+        {
+          "$ref": "#/components/parameters/container_group_instance_id"
+        }
+      ],
+      "post": {
+        "operationId": "container_group_instance_restart",
+        "summary": "Restart container on a node",
+        "description": "Restarts a workload on a node without reallocating it",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/RestartContainerGroupInstance"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["container_groups"]
+      }
+    },
+    "/organizations/{organization_name}/quotas": {
+      "summary": "Quotas",
+      "description": "Operations for quotas",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_quotas",
+        "summary": "Get Quotas",
+        "description": "Gets the organization quotas",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetQuotas"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["quotas"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments": {
+      "summary": "Recipe Deployments",
+      "description": "Operations for recipe deployments",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_recipe_deployments",
+        "summary": "List Recipe Deployments",
+        "description": "Gets the list of all recipe deployments",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListRecipeDeployments"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      },
+      "post": {
+        "operationId": "create_recipe_deployment",
+        "summary": "Create a Recipe Deployment",
+        "description": "Creates a new Recipe Deployment",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateRecipeDeployment"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateRecipeDeployment"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments/{recipe_deployment_name}": {
+      "summary": "Recipe Deployment",
+      "description": "Operations for a recipe",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_deployment_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_recipe_deployment",
+        "summary": "Get a Recipe Deployment",
+        "description": "Gets a Recipe Deployment by its unique name",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRecipeDeployment"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      },
+      "patch": {
+        "operationId": "update_recipe_deployment",
+        "summary": "Update a Recipe Deployment",
+        "description": "Updates a Recipe Deployment",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateRecipeDeployment"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateRecipeDeployment"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      },
+      "delete": {
+        "operationId": "delete_recipe_deployment",
+        "summary": "Delete a Recipe Deployment",
+        "description": "Deletes a Recipe Deployment",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteRecipeDeployment"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments/{recipe_deployment_name}/start": {
+      "summary": "Recipe Deployment",
+      "description": "Operations for a recipe",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_deployment_name"
+        }
+      ],
+      "post": {
+        "operationId": "start_deployed_recipe",
+        "summary": "Start a Deployed Recipe",
+        "description": "Starts a Deployed Recipe",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/StartRecipeDeployment"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments/{recipe_deployment_name}/restart": {
+      "summary": "Recipe Deployment",
+      "description": "Operations for a recipe",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_deployment_name"
+        }
+      ],
+      "post": {
+        "operationId": "restart_deployed_recipe",
+        "summary": "Restart a Deployed Recipe",
+        "description": "Restarts a Deployed Recipe",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/RestartRecipeDeployment"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments/{recipe_deployment_name}/stop": {
+      "summary": "Recipe Deployment",
+      "description": "Operations for a recipe",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_deployment_name"
+        }
+      ],
+      "post": {
+        "operationId": "stop_deployed_recipe",
+        "summary": "Stop a Deployed Recipe",
+        "description": "Stops a Deployed Recipe",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/StopRecipeDeployment"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/recipe-deployments/{recipe_deployment_name}/instances": {
+      "summary": "Recipe Deployment",
+      "description": "Operations for a recipe",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_deployment_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_recipe_deployment_instances",
+        "summary": "List Recipe Deployment Instances",
+        "description": "Retrieves a list of recipe deployment instances",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListRecipeDeploymentInstances"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipe_deployments"]
+      }
+    },
+    "/organizations/{organization_name}/gpu-classes": {
+      "summary": "GPU Classes",
+      "description": "Allows reading the GPU Classes collection available for the organization",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_gpu_classes",
+        "summary": "List the GPU Classes",
+        "description": "List the GPU Classes",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListGpuClasses"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["organization_data"]
+      }
+    },
+    "/organizations/{organization_name}/recipes": {
+      "summary": "Recipes",
+      "description": "Operations for recipes",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_recipes",
+        "summary": "List Recipes",
+        "description": "Gets the list of recipes",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListRecipes"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipes"]
+      }
+    },
+    "/organizations/{organization_name}/recipes/{recipe_name}": {
+      "summary": "Recipes",
+      "description": "Operations for recipes",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/recipe_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_recipe",
+        "summary": "Get a Recipe",
+        "description": "Gets a recipe",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRecipe"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["recipes"]
       }
     }
   },
   "components": {
+    "parameters": {
+      "container_group_instance_id": {
+        "in": "path",
+        "name": "container_group_instance_id",
+        "description": "The unique instance identifier",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "container_group_name": {
+        "in": "path",
+        "name": "container_group_name",
+        "description": "The unique container group name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        }
+      },
+      "organization_name": {
+        "in": "path",
+        "name": "organization_name",
+        "description": "The unique organization name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        }
+      },
+      "project_name": {
+        "in": "path",
+        "name": "project_name",
+        "description": "The unique project name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        }
+      },
+      "recipe_deployment_name": {
+        "in": "path",
+        "name": "recipe_deployment_name",
+        "description": "The unique recipe deployment name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+        }
+      },
+      "recipe_name": {
+        "in": "path",
+        "name": "recipe_name",
+        "description": "The unique recipe name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+        }
+      }
+    },
     "schemas": {
-      "Plant": {
+      "ProblemDetails": {
+        "description": "Represents a problem",
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The URI reference that identifies the problem type",
+            "type": "string",
+            "default": "about:blank",
+            "nullable": true
+          },
+          "title": {
+            "description": "A short, human-readable summary of the problem type",
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "description": "The HTTP status code generated by the origin server",
+            "type": "integer",
+            "nullable": true
+          },
+          "detail": {
+            "description": "A human-readable explanation specific to this occurrence of the problem",
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "description": "The URI reference that identifies the specific occurrence of the problem",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CountryCode": {
+        "type": "string",
+        "enum": [
+          "af",
+          "al",
+          "dz",
+          "as",
+          "ad",
+          "ao",
+          "ai",
+          "aq",
+          "ag",
+          "ar",
+          "am",
+          "aw",
+          "au",
+          "at",
+          "az",
+          "bs",
+          "bh",
+          "bd",
+          "bb",
+          "by",
+          "be",
+          "bz",
+          "bj",
+          "bm",
+          "bt",
+          "bo",
+          "bq",
+          "ba",
+          "bw",
+          "bv",
+          "br",
+          "io",
+          "bn",
+          "bg",
+          "bf",
+          "bi",
+          "cv",
+          "kh",
+          "cm",
+          "ca",
+          "ky",
+          "cf",
+          "td",
+          "cl",
+          "cn",
+          "cx",
+          "cc",
+          "co",
+          "km",
+          "cd",
+          "cg",
+          "ck",
+          "cr",
+          "hr",
+          "cu",
+          "cw",
+          "cy",
+          "cz",
+          "ci",
+          "dk",
+          "dj",
+          "dm",
+          "do",
+          "ec",
+          "eg",
+          "sv",
+          "gq",
+          "er",
+          "ee",
+          "sz",
+          "et",
+          "fk",
+          "fo",
+          "fj",
+          "fi",
+          "fr",
+          "gf",
+          "pf",
+          "tf",
+          "ga",
+          "gm",
+          "ge",
+          "de",
+          "gh",
+          "gi",
+          "gr",
+          "gl",
+          "gd",
+          "gp",
+          "gu",
+          "gt",
+          "gg",
+          "gn",
+          "gw",
+          "gy",
+          "ht",
+          "hm",
+          "va",
+          "hn",
+          "hk",
+          "hu",
+          "is",
+          "in",
+          "id",
+          "ir",
+          "iq",
+          "ie",
+          "im",
+          "il",
+          "it",
+          "jm",
+          "jp",
+          "je",
+          "jo",
+          "kz",
+          "ke",
+          "ki",
+          "kp",
+          "kr",
+          "kw",
+          "kg",
+          "la",
+          "lv",
+          "lb",
+          "ls",
+          "lr",
+          "ly",
+          "li",
+          "lt",
+          "lu",
+          "mo",
+          "mg",
+          "mw",
+          "my",
+          "mv",
+          "ml",
+          "mt",
+          "mh",
+          "mq",
+          "mr",
+          "mu",
+          "yt",
+          "mx",
+          "fm",
+          "md",
+          "mc",
+          "mn",
+          "me",
+          "ms",
+          "ma",
+          "mz",
+          "mm",
+          "na",
+          "nr",
+          "np",
+          "nl",
+          "nc",
+          "nz",
+          "ni",
+          "ne",
+          "ng",
+          "nu",
+          "nf",
+          "mp",
+          "no",
+          "om",
+          "pk",
+          "pw",
+          "ps",
+          "pa",
+          "pg",
+          "py",
+          "pe",
+          "ph",
+          "pn",
+          "pl",
+          "pt",
+          "pr",
+          "qa",
+          "mk",
+          "ro",
+          "ru",
+          "rw",
+          "re",
+          "bl",
+          "sh",
+          "kn",
+          "lc",
+          "mf",
+          "pm",
+          "vc",
+          "ws",
+          "sm",
+          "st",
+          "sa",
+          "sn",
+          "rs",
+          "sc",
+          "sl",
+          "sg",
+          "sx",
+          "sk",
+          "si",
+          "sb",
+          "so",
+          "za",
+          "gs",
+          "ss",
+          "es",
+          "lk",
+          "sd",
+          "sr",
+          "sj",
+          "se",
+          "ch",
+          "sy",
+          "tw",
+          "tj",
+          "tz",
+          "th",
+          "tl",
+          "tg",
+          "tk",
+          "to",
+          "tt",
+          "tn",
+          "tr",
+          "tm",
+          "tc",
+          "tv",
+          "ug",
+          "ua",
+          "ae",
+          "gb",
+          "um",
+          "us",
+          "uy",
+          "uz",
+          "vu",
+          "ve",
+          "vn",
+          "vg",
+          "vi",
+          "wf",
+          "eh",
+          "ye",
+          "zm",
+          "zw",
+          "ax"
+        ]
+      },
+      "ContainerGroupStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "running",
+          "stopped",
+          "succeeded",
+          "failed",
+          "deploying"
+        ]
+      },
+      "ContainerRestartPolicy": {
+        "type": "string",
+        "enum": ["always", "on_failure", "never"]
+      },
+      "ContainerNetworkingProtocol": {
+        "type": "string",
+        "enum": ["http"]
+      },
+      "ContainerGroup": {
+        "description": "Represents a container group",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/Container"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          },
+          "restart_policy": {
+            "$ref": "#/components/schemas/ContainerRestartPolicy"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "current_state": {
+            "$ref": "#/components/schemas/ContainerGroupState"
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1
+          },
+          "networking": {
+            "$ref": "#/components/schemas/ContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pending_change": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
         "required": [
-          "name"
-        ],
+          "id",
+          "name",
+          "display_name",
+          "container",
+          "autostart_policy",
+          "restart_policy",
+          "replicas",
+          "current_state",
+          "create_time",
+          "update_time",
+          "pending_change",
+          "version"
+        ]
+      },
+      "ContainerGroupList": {
+        "description": "Represents a list of container groups",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "CreateContainerGroup": {
+        "description": "Represents a request to create a container group",
         "type": "object",
         "properties": {
           "name": {
-            "description": "The name of the plant",
-            "type": "string"
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/CreateContainer"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          },
+          "restart_policy": {
+            "$ref": "#/components/schemas/ContainerRestartPolicy"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1
+          },
+          "networking": {
+            "$ref": "#/components/schemas/CreateContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "container",
+          "restart_policy",
+          "autostart_policy",
+          "replicas"
+        ]
+      },
+      "UpdateContainerGroup": {
+        "description": "Represents a request to update a container group",
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/UpdateContainer"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1,
+            "nullable": true
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "nullable": true
+          },
+          "networking": {
+            "$ref": "#/components/schemas/UpdateContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateContainerGroupNetworking": {
+        "description": "Represents update container group networking parameters",
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContainerGroupNetworking": {
+        "description": "Represents container group networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/ContainerNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          },
+          "dns": {
+            "type": "string",
+            "format": "url"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": ["protocol", "port", "auth", "dns"]
+      },
+      "CreateContainerGroupNetworking": {
+        "description": "Represents container group networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/ContainerNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": ["protocol", "port", "auth"]
+      },
+      "ContainerGroupStartupProbe": {
+        "description": "Represents the container group startup probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 2,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 1200,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
+      "ContainerGroupLivenessProbe": {
+        "description": "Represents the container group liveness probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
+      "ContainerProbeHttpScheme": {
+        "type": "string",
+        "enum": ["http"]
+      },
+      "HttpHeaders": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "value"],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "ContainerGroupProbeHttp": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
           },
-          {
-            "required": [
-              "id"
-            ],
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          },
+          "scheme": {
+            "$ref": "#/components/schemas/ContainerProbeHttpScheme"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/HttpHeaders"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["path", "port"]
+      },
+      "ContainerGroupProbeTcp": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["port"]
+      },
+      "ContainerGroupProbeGrpc": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["service", "port"]
+      },
+      "ContainerGroupProbeExec": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["command"]
+      },
+      "WorkloadErrorList": {
+        "description": "Represents a list of workload errors",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkloadError"
+            },
+            "maxItems": 50,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "WorkloadError": {
+        "description": "Represents a workload error",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "machine_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "allocated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "detail",
+          "failed_at",
+          "instance_id",
+          "machine_id",
+          "allocated_at",
+          "version"
+        ]
+      },
+      "Container": {
+        "description": "Represents a container",
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
+          },
+          "resources": {
+            "$ref": "#/components/schemas/ContainerResourceRequirements"
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "environment_variables": {
             "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "api_token", "dataset"]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": ["host", "api_key"]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "ingestion_key"]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "token"]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": ["host", "port"]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["json", "json_lines"]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": ["none", "gzip"]
+                  }
+                },
+                "required": ["host", "port", "format", "compression"]
               }
             }
           }
-        ]
+        },
+        "additionalProperties": false,
+        "required": ["image", "resources", "command"]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "CreateContainer": {
+        "description": "Represents a container",
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
           },
-          "message": {
+          "resources": {
+            "$ref": "#/components/schemas/ContainerResourceRequirements"
+          },
+          "command": {
+            "description": "Pass a command (and optional arguments) to override the ENTRYPOINT and CMD of a container image.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0,
+            "nullable": true
+          },
+          "environment_variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "api_token", "dataset"]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": ["host", "api_key"]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "ingestion_key"]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "token"]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": ["host", "port"]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["json", "json_lines"]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": ["none", "gzip"]
+                  }
+                },
+                "required": ["host", "port", "format", "compression"]
+              }
+            }
+          },
+          "registry_authentication": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "basic": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["username", "password"]
+              },
+              "gcp_gcr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["service_key"]
+              },
+              "aws_ecr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "access_key_id": {
+                    "type": "string"
+                  },
+                  "secret_access_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["access_key_id", "secret_access_key"]
+              },
+              "docker_hub": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "personal_access_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["username", "personal_access_token"]
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": ["image", "resources"]
+      },
+      "UpdateContainer": {
+        "description": "Represents an update container object",
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": true
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "cpu": {
+                "type": "integer",
+                "maximum": 16,
+                "minimum": 1,
+                "nullable": true
+              },
+              "memory": {
+                "type": "integer",
+                "maximum": 30720,
+                "minimum": 1024,
+                "nullable": true
+              },
+              "gpu_class": {
+                "type": "string",
+                "deprecated": true,
+                "nullable": true
+              },
+              "gpu_classes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "nullable": true
+              },
+              "storage_amount": {
+                "type": "integer",
+                "format": "int64",
+                "maximum": 53687091200,
+                "minimum": 1073741824,
+                "nullable": true
+              }
+            }
+          },
+          "command": {
+            "description": "Pass a command (and optional arguments) to override the ENTRYPOINT and CMD of a container image.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0,
+            "nullable": true
+          },
+          "environment_variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "api_token", "dataset"]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": ["host", "api_key"]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "ingestion_key"]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": ["host", "token"]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": ["host", "port"]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": ["json", "json_lines"]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["name", "value"],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": ["none", "gzip"]
+                  }
+                },
+                "required": ["host", "port", "format", "compression"]
+              }
+            }
+          },
+          "registry_authentication": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "basic": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["username", "password"]
+              },
+              "gcp_gcr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["service_key"]
+              },
+              "aws_ecr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "access_key_id": {
+                    "type": "string"
+                  },
+                  "secret_access_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["access_key_id", "secret_access_key"]
+              },
+              "docker_hub": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "personal_access_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["username", "personal_access_token"]
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true
+      },
+      "ContainerResourceRequirements": {
+        "description": "Represents a container resource requirements",
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "integer",
+            "maximum": 16,
+            "minimum": 1
+          },
+          "memory": {
+            "type": "integer",
+            "maximum": 30720,
+            "minimum": 1024
+          },
+          "gpu_class": {
+            "type": "string",
+            "deprecated": true,
+            "nullable": true
+          },
+          "gpu_classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "storage_amount": {
+            "type": "integer",
+            "format": "int64",
+            "maximum": 53687091200,
+            "minimum": 1073741824,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["cpu", "memory"]
+      },
+      "ContainerGroupState": {
+        "description": "Represents a container group state",
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ContainerGroupStatus"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finish_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instance_status_count": {
+            "$ref": "#/components/schemas/ContainerGroupInstanceStatusCount"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "start_time",
+          "finish_time",
+          "instance_status_count"
+        ]
+      },
+      "ContainerGroupInstanceStatusCount": {
+        "description": "Represents a container group instance status count",
+        "type": "object",
+        "properties": {
+          "allocating_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "creating_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "running_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "stopping_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "allocating_count",
+          "creating_count",
+          "running_count",
+          "stopping_count"
+        ]
+      },
+      "ContainerGroupInstance": {
+        "description": "Represents the details of a single container group instance",
+        "type": "object",
+        "properties": {
+          "instance_id": {
+            "description": "The unique instance ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "machine_id": {
+            "description": "The machine ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "description": "The state of the container group instance",
+            "type": "string",
+            "enum": [
+              "allocating",
+              "downloading",
+              "creating",
+              "running",
+              "stopping"
+            ]
+          },
+          "update_time": {
+            "description": "The UTC date & time when the workload on this machine transitioned to the current state",
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "description": "The version of the running container group",
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "instance_id",
+          "machine_id",
+          "state",
+          "update_time",
+          "version"
+        ]
+      },
+      "ContainerGroupInstances": {
+        "description": "Represents a list of container group instances",
+        "type": "object",
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroupInstance"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["instances"]
+      },
+      "GpuClass": {
+        "description": "Represents a GPU Class",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The GPU class name",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2
+          },
+          "is_high_demand": {
+            "description": "Whether the GPU class is in high demand",
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["id", "name"]
+      },
+      "GpuClassesList": {
+        "description": "Represents a list of GPU classes",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of GPU classes",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GpuClass"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "Quotas": {
+        "description": "Represents the organization quotas",
+        "type": "object",
+        "properties": {
+          "container_groups_quotas": {
+            "$ref": "#/components/schemas/ContainerGroupsQuotas"
+          },
+          "create_time": {
+            "description": "The time the resource was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "recipes_quotas": {
+            "$ref": "#/components/schemas/RecipesQuotas"
+          },
+          "update_time": {
+            "description": "The time the resource was last updated",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["container_groups_quotas", "recipes_quotas"]
+      },
+      "ContainerGroupsQuotas": {
+        "type": "object",
+        "properties": {
+          "max_created_container_groups": {
+            "type": "integer"
+          },
+          "container_instance_quota": {
+            "type": "integer"
+          },
+          "max_container_group_reallocations_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          },
+          "max_container_group_recreates_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          },
+          "max_container_group_restarts_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          }
+        },
+        "required": ["max_created_container_groups", "container_instance_quota"]
+      },
+      "RecipesQuotas": {
+        "type": "object",
+        "properties": {
+          "max_created_recipe_deployments": {
+            "type": "integer"
+          },
+          "recipe_instance_quota": {
+            "type": "integer"
+          }
+        },
+        "required": ["max_created_recipe_deployments", "recipe_instance_quota"]
+      },
+      "Recipe": {
+        "description": "Represents a recipe",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The recipe name",
             "type": "string"
+          },
+          "readme": {
+            "description": "A markdown file containing a brief summary of the recipe",
+            "type": "string"
+          },
+          "resources": {
+            "$ref": "#/components/schemas/RecipeResources"
+          },
+          "networking": {
+            "$ref": "#/components/schemas/RecipeNetworking"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["id", "name", "readme"]
+      },
+      "RecipeResources": {
+        "description": "Represents a recipe resources",
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "integer"
+          },
+          "ram": {
+            "type": "integer"
+          },
+          "gpu_class": {
+            "type": "string",
+            "deprecated": true
+          },
+          "gpu_classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["cpu", "ram"]
+      },
+      "RecipeList": {
+        "description": "Represents a list of recipes",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recipe"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "RecipeDeployment": {
+        "description": "Represents a deployed recipe",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current_state": {
+            "$ref": "#/components/schemas/ContainerGroupState"
+          },
+          "recipe": {
+            "$ref": "#/components/schemas/Recipe"
+          },
+          "networking": {
+            "$ref": "#/components/schemas/RecipeNetworking"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "replicas",
+          "current_state",
+          "recipe",
+          "autostart_policy"
+        ]
+      },
+      "RecipeNetworking": {
+        "description": "Represents recipe networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/RecipeNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          },
+          "dns": {
+            "type": "string",
+            "format": "url"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": ["protocol", "port", "auth", "dns"]
+      },
+      "RecipeNetworkingProtocol": {
+        "type": "string",
+        "enum": ["http"]
+      },
+      "RecipeDeploymentList": {
+        "description": "Represents a list of recipe deployments",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeDeployment"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "CreateRecipeDeployment": {
+        "description": "Represents a request to create a new recipe deployment",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1
+          },
+          "recipe_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+          },
+          "networking": {
+            "$ref": "#/components/schemas/CreateRecipeNetworking"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "display_name",
+          "replicas",
+          "recipe_name",
+          "autostart_policy"
+        ]
+      },
+      "CreateRecipeNetworking": {
+        "description": "Represents container group networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/RecipeNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": ["protocol", "port", "auth"]
+      },
+      "UpdateRecipeDeployment": {
+        "description": "Represents a request to update a recipe deployment",
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecipeDeploymentInstances": {
+        "description": "Represents a list of recipe deployment instances",
+        "type": "object",
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["instance_id", "machine_id", "state", "update_time"],
+              "properties": {
+                "instance_id": {
+                  "description": "The unique instance ID",
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "machine_id": {
+                  "description": "The organization-specific machine ID",
+                  "type": "string"
+                },
+                "state": {
+                  "description": "The state of the recipe deployment instance",
+                  "type": "string",
+                  "enum": [
+                    "allocating",
+                    "downloading",
+                    "creating",
+                    "running",
+                    "stopping"
+                  ]
+                },
+                "update_time": {
+                  "description": "The UTC date & time when the workload on this machine transitioned to the current state",
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["instances"]
+      }
+    },
+    "requestBodies": {
+      "CreateContainerGroup": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateContainerGroup"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "name": "sim1",
+                  "container": {
+                    "image": "acme-corp/anvil-drop-simulator:v65535",
+                    "resources": {
+                      "cpu": 1,
+                      "memory": 2048
+                    },
+                    "command": []
+                  },
+                  "autostart_policy": false,
+                  "restart_policy": "always",
+                  "replicas": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateContainerGroup": {
+        "required": true,
+        "content": {
+          "application/merge-patch+json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateContainerGroup"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "display_name": "Simulation 1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateRecipeDeployment": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateRecipeDeployment"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "name": "sim1",
+                  "display_name": "Sim 1",
+                  "replicas": 1,
+                  "recipe_name": "salad_recipe"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateRecipeDeployment": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateRecipeDeployment"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "display_name": "Salad Deployed Recipe",
+                  "replicas": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Bad Request",
+                  "status": 400,
+                  "detail": "Bad Request",
+                  "instance": "60907fdc"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "Forbidden",
+                  "instance": "962fc00e"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Not Found",
+                  "status": 404,
+                  "detail": "Not Found",
+                  "instance": "72ea5f29"
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Too Many Requests",
+                  "status": 409,
+                  "detail": "Too Many Requests",
+                  "instance": "cd6306ee"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnknownError": {
+        "description": "Unknown Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Unknown Error",
+                  "status": 500,
+                  "detail": "Unknown Error",
+                  "instance": "188f9bbb"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetContainerGroup": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "container": {
+                    "image": "acme-corp/anvil-drop-simulator:v65535",
+                    "resources": {
+                      "cpu": 1,
+                      "memory": 2048
+                    },
+                    "command": [],
+                    "size": 1024,
+                    "hash": 1311768467294899700
+                  },
+                  "restart_policy": "always",
+                  "replicas": 1,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "update_time": "2020-07-04T19:00:00Z",
+                  "version": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListContainerGroups": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroupList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "sim1",
+                      "display_name": "Simulation 1",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65535",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": 1311768467294899700
+                      },
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "version": 1
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65536",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": 1311768467294899700
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "version": 2
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateContainerGroup": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/projects/anvil-drop-simulator/containers/sim1"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "container": {
+                    "image": "acme-corp/anvil-drop-simulator:v65535",
+                    "resources": {
+                      "cpu": 1,
+                      "memory": 2048
+                    },
+                    "command": [],
+                    "size": 1024,
+                    "hash": 1311768467294899700
+                  },
+                  "restart_policy": "always",
+                  "replicas": 1,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "update_time": "2020-07-04T19:00:00Z",
+                  "version": 1
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "get_container_group_by_name": {
+            "operationId": "get_container_group",
+            "parameters": {
+              "container_group_name": "$response.body#/name"
+            }
+          }
+        }
+      },
+      "UpdateContainerGroup": {
+        "description": "OK",
+        "content": {
+          "application/merge-patch+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "container": {
+                    "image": "acme-corp/anvil-drop-simulator:v65535",
+                    "resources": {
+                      "cpu": 1,
+                      "memory": 2048
+                    },
+                    "command": [],
+                    "size": 1024,
+                    "hash": 1311768467294899700
+                  },
+                  "restart_policy": "always",
+                  "replicas": 1,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "update_time": "2020-07-04T19:00:00Z",
+                  "version": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteContainerGroup": {
+        "description": "Accepted"
+      },
+      "StartContainerGroup": {
+        "description": "Accepted"
+      },
+      "StopContainerGroup": {
+        "description": "Accepted"
+      },
+      "GetContainerGroupInstance": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroupInstance"
+            },
+            "example": [
+              {
+                "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+                "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
+                "state": "running",
+                "update_time": "2023-05-04T05:41:05Z",
+                "version": 1
+              }
+            ]
+          }
+        }
+      },
+      "ListContainerGroupInstances": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ContainerGroupInstances"
+            },
+            "example": {
+              "instances": [
+                {
+                  "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+                  "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
+                  "state": "running",
+                  "update_time": "2023-05-04T05:41:05Z",
+                  "version": 1
+                },
+                {
+                  "machine_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "instance_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "state": "creating",
+                  "update_time": "2023-05-04T05:38:12Z",
+                  "version": 1
+                },
+                {
+                  "machine_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "instance_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "state": "stopping",
+                  "update_time": "2023-05-04T05:38:12Z",
+                  "version": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ReallocateContainerGroupInstance": {
+        "description": "Accepted"
+      },
+      "RecreateContainerGroupInstance": {
+        "description": "Accepted"
+      },
+      "RestartContainerGroupInstance": {
+        "description": "Accepted"
+      },
+      "ListWorkloadErrors": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkloadErrorList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "details": "StartFailure:0",
+                      "failed_at": "2023-09-15T21:38:45.1220217Z",
+                      "machine_id": "2155a188-7304-8351-b98d-af6c79e5978f",
+                      "instance_id": "2155a188-7304-8351-b98d-af6c79e5978f",
+                      "allocated_at": "2023-09-15T21:25:39.4110673Z",
+                      "started_at": null,
+                      "version": 1
+                    },
+                    {
+                      "details": "RunFailure:-1",
+                      "failed_at": "2023-09-14T11:30:05.2271645Z",
+                      "machine_id": "dc96663a-fe19-345a-8363-174616159cb6",
+                      "instance_id": "dc96663a-fe19-345a-8363-174616159cb6",
+                      "allocated_at": "2023-09-10T15:44:20.8139996Z",
+                      "started_at": "2023-09-13T10:44:18.9824223Z",
+                      "version": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListGpuClasses": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/GpuClassesList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "3eae6ce4-aa14-4c7d-b502-131730c9af48",
+                      "name": "RTX 2060 (6 GB)"
+                    },
+                    {
+                      "id": "ed563892-aacd-40f5-80b7-90c9be6c759b",
+                      "name": "RTX 4090 (24 GB)",
+                      "is_high_demand": true
+                    },
+                    {
+                      "id": "951131f6-5acf-489c-b303-0906be8b26ef",
+                      "name": "RTX 3070 (8 GB)",
+                      "is_high_demand": false
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetQuotas": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Quotas"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "container_group_quotas": {
+                    "max_created_container_groups": 10,
+                    "container_instance_quota": 10
+                  },
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "recipes_quotas": {
+                    "max_created_recipe_deployments": 10,
+                    "recipe_instance_quota": 10
+                  },
+                  "update_time": "2020-07-04T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetRecipe": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Recipe"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                  "name": "anvil-drop-simulator",
+                  "readme": "test-readme"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListRecipes": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                      "name": "anvil-drop-simulator",
+                      "readme": "test-readme"
+                    },
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c22893",
+                      "name": "anvil-drop-simulator-2",
+                      "readme": "test-readme-2"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetRecipeDeployment": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeDeployment"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "replicas": 1,
+                  "size": 1024,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "recipe": {
+                    "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                    "name": "anvil-drop-simulator",
+                    "display_name": null,
+                    "readme": "test-readme",
+                    "resources": {
+                      "cpu": 1,
+                      "ram": 1,
+                      "gpu_classes": [
+                        "1a062756-5bb7-11ee-8c99-0242ac120002",
+                        "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
+                      ]
+                    }
+                  },
+                  "autostart_policy": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListRecipeDeployments": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeDeploymentList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "sim1",
+                      "display_name": "Simulation 1",
+                      "replicas": 1,
+                      "size": 1024,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "recipe": {
+                        "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                        "name": "anvil-drop-simulator",
+                        "display_name": null,
+                        "readme": "test-readme",
+                        "resources": {
+                          "cpu": 1,
+                          "ram": 1,
+                          "gpu_classes": [
+                            "1a062756-5bb7-11ee-8c99-0242ac120002",
+                            "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
+                          ]
+                        }
+                      },
+                      "autostart_policy": false
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "replicas": 1,
+                      "size": 2048,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "recipe": {
+                        "id": "3cc0c401-4159-4760-a1e1-b2dec9c22893",
+                        "name": "anvil-drop-simulator-2",
+                        "readme": "test-readme-2",
+                        "resources": {
+                          "cpu": 2,
+                          "ram": 2,
+                          "gpu_classes": [
+                            "1a062756-5bb7-11ee-8c99-0242ac120002",
+                            "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
+                          ]
+                        }
+                      },
+                      "autostart_policy": true
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateRecipeDeployment": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/projects/anvil-drop-simulator/recipe-deployments/salad-recipe"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeDeployment"
+            },
+            "example": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "replicas": 1,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "recipe": {
+                    "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                    "name": "anvil-drop-simulator",
+                    "display_name": null,
+                    "readme": "test-readme",
+                    "resources": {
+                      "cpu": 1,
+                      "ram": 1,
+                      "gpu_classes": [
+                        "1a062756-5bb7-11ee-8c99-0242ac120002",
+                        "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
+                      ]
+                    }
+                  },
+                  "autostart_policy": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateRecipeDeployment": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeDeployment"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "sim1",
+                  "display_name": "Simulation 1",
+                  "replicas": 1,
+                  "current_state": {
+                    "status": "stopped",
+                    "start_time": "2020-07-04T19:00:00Z",
+                    "finish_time": "2020-07-04T19:00:00Z",
+                    "instance_status_counts": {
+                      "allocating_count": 1,
+                      "creating_count": 1,
+                      "running_count": 1,
+                      "stopping_count": 1
+                    }
+                  },
+                  "recipe": {
+                    "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                    "name": "anvil-drop-simulator",
+                    "display_name": null,
+                    "readme": "test-readme",
+                    "resources": {
+                      "cpu": 1,
+                      "ram": 1,
+                      "gpu_classes": [
+                        "1a062756-5bb7-11ee-8c99-0242ac120002",
+                        "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteRecipeDeployment": {
+        "description": "Accepted"
+      },
+      "StartRecipeDeployment": {
+        "description": "Accepted"
+      },
+      "StopRecipeDeployment": {
+        "description": "Accepted"
+      },
+      "RestartRecipeDeployment": {
+        "description": "Accepted"
+      },
+      "ListRecipeDeploymentInstances": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RecipeDeploymentInstances"
+            },
+            "example": {
+              "instances": [
+                {
+                  "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+                  "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
+                  "state": "running",
+                  "update_time": "2023-05-04T05:41:05Z"
+                },
+                {
+                  "machine_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "instance_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "state": "creating",
+                  "update_time": "2023-05-04T05:38:12Z"
+                },
+                {
+                  "machine_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "instance_id": "a6c2e6d5-6c5a-4b3b-a4d4-4b13c2b634ad",
+                  "state": "stopping",
+                  "update_time": "2023-05-04T05:38:12Z"
+                }
+              ]
+            }
           }
         }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Salad-Api-Key"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "container_groups",
+      "description": "Container Groups"
+    },
+    {
+      "name": "organization_data",
+      "description": "Auxiliary organization data and info"
+    },
+    {
+      "name": "quotas",
+      "description": "quotas"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
 }
