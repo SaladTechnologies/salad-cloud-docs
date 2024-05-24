@@ -141,6 +141,7 @@
         "container-engine/deployment-lifecycle",
         "container-engine/managing-deployments",
         "container-engine/environment-variables",
+        "container-engine/requesting-a-jwt-from-salad",
         {
           "group": "Container Registries",
           "pages": [
