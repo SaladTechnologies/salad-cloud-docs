@@ -1,19 +1,9 @@
 ---
-title: "YOLOv8 Real-time Object Detection - Guide"
-slug: "yolov8-deployment-tutorial"
-excerpt: ""
-hidden: false
-metadata: 
-  description: "In this step-by-step guide, we share how to deploy YOLOv8 on Salad's distributed cloud infrastructure for real-time object detection."
-  image: 
-    - "https://files.readme.io/b02680a-image47.png"
-  robots: "index"
-createdAt: "Mon Nov 20 2023 20:18:33 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Tue Apr 09 2024 16:30:48 GMT+0000 (Coordinated Universal Time)"
+title: "Deployment Guide"
+description: "In this step-by-step guide, we share how to deploy YOLOv8 on Salad's distributed cloud infrastructure for real-time object detection."
 ---
-# YOLOv8 on Salad
 
-***
+# YOLOv8 on Salad
 
 ## **Introduction**
 
@@ -63,21 +53,7 @@ We are setting out to construct two distinct solutions to leverage the capabilit
   - This Docker container is then deployed on Salad compute resources to utilize processing capabilities.
   - The Docker image itself is housed in Azure Container Registry for secure and convenient access.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/0b3502a-6ab72e2-image.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/0b3502a-6ab72e2-image.png" />
 
 ### **Solution 2: Batch Processing for Asynchronous Workloads**
 
@@ -88,27 +64,13 @@ We are setting out to construct two distinct solutions to leverage the capabilit
   - A Python script for batch processing is containerized and deployed across multiple Salad compute nodes.
   - This batch process routinely checks the storage queue. When a new message appears, it picks up the corresponding stream for processing.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/f3b5dda-image-20231110-144732.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/f3b5dda-image-20231110-144732.png" />
 
 ## Folder Structure
 
 Our full solution is stored here: [git repo](https://github.com/SaladTechnologies/yolov8-on-salad)
 
-Here is the folder structure we will have once the project is done:  
+Here is the folder structure we will have once the project is done:
 
 ```java
 yolo8-video-stream/
@@ -194,21 +156,7 @@ bash dev/setup
 
 As we delve into the practicalities of implementing YOLOv8 for object detection, a fundamental step is to understand the range of its capabilities and the types of data it can process effectively. This knowledge will shape our approach to solving the problem at hand. Here is a list of possible inputs:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/f8abde5-image-20231110-144807.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/f8abde5-image-20231110-144807.png" />
 
 Our project's scope now narrows to the realm of video processing, with a particular focus on YouTube videos and live stream data. YOLOv8's versatility in handling video data makes it an ideal candidate for real-time object detection in these mediums.
 
@@ -268,21 +216,7 @@ With this script, as YOLO processes the video frames and identifies objects, bou
 
 And here is the magic!
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/a7afc2a-ezgif.com-video-to-gif.gif",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/a7afc2a-ezgif.com-video-to-gif.gif" />
 
 ## **Processing Live Video Stream from Youtube**
 
@@ -338,21 +272,7 @@ Let’s try it:
 
 That is great, but our main goal is to get a summary of how long an object was present on the video. I will now remove the appearing window with the bounding boxes and we will pay more attention to the data. For this part of the project I am using Jupyter in vscode and pandas. Let’s check what results object is:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/3296839-image-20231110-164853.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/3296839-image-20231110-164853.png" />
 
 We can see that results object has some metadata and all the detections. Let’s only keep the detections and convert them to a more readable format:
 
@@ -360,21 +280,7 @@ We can see that results object has some metadata and all the detections. Let’s
 json.loads(results[0].tojson())
 ```
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/6140c20-image-20231110-164932.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/6140c20-image-20231110-164932.png" />
 
 To get a detailed summary of object detections, we'll collate all the individual detection data into a pandas DataFrame. We will not only include the basic detection details provided by YOLOv8, such as bounding box coordinates, class ID, class name, and tracking ID, but also additional contextual information for a richer analysis.
 
@@ -432,21 +338,7 @@ After the loop is interrupted (by pressing 'q'), we convert the list of dictiona
 
 Let’s see what we’ve got.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/a513697-image-20231110-165537.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/a513697-image-20231110-165537.png" />
 
 ## **Readable summary**
 
@@ -521,7 +413,7 @@ car with id 9.0 was present in the video for 0 days 00:00:01.655127 from 2023-11
 
 ## **Run process on GPU**
 
-In our metadata Dataframe the last column “full_process_speed“ reflects a combination of preprocessing, inference and post-processing time. We can see that now we have the processing speed from 60 to 400 milliseconds per frame which is impressive, but we can do better. To unlock the full potential of our solution, we've added a simple enhancement: CUDA device detection. With just a few lines of code, our process now intelligently determines if a CUDA-compatible GPU is available and adjusts accordingly.:  
+In our metadata Dataframe the last column “full_process_speed“ reflects a combination of preprocessing, inference and post-processing time. We can see that now we have the processing speed from 60 to 400 milliseconds per frame which is impressive, but we can do better. To unlock the full potential of our solution, we've added a simple enhancement: CUDA device detection. With just a few lines of code, our process now intelligently determines if a CUDA-compatible GPU is available and adjusts accordingly.:
 
 ```java Python
 # Check for CUDA device and set it
@@ -534,27 +426,13 @@ This adjustment ensures that if the system has the capability, it will leverage 
 
 The results speak for themselves. After running a live stream through our enhanced process for about 40 minutes, we observed a dramatic improvement in processing speed. The times dropped to a stunning 5 to 15 milliseconds per frame. This enhancement means our YOLOv8 solution is now processing frames up to 10 times faster on a GPU compared to CPU processing.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/136c2c1-image-20231117-201658.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/136c2c1-image-20231117-201658.png" />
 
 ## **Storing Object Detection Results in Azure Storage**
 
 **Create Storage Account**
 
-Storing your YOLOv8 object detection results in Azure Storage is an excellent way to manage and archive your data efficiently. In order to be able to do that we created an account in Azure, created a subscription, resources group, storage account and a storage container name “yolo-results“. Since we only needed a storage account for our api solution we provisioned in through the portal. For our “batch“ process we created a bicep file that you can check [here](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/infrastructure/main.bicep). You can find a very detailed documentation on how to create a storage account from Microsoft here: <https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal>
+Storing your YOLOv8 object detection results in Azure Storage is an excellent way to manage and archive your data efficiently. In order to be able to do that we created an account in Azure, created a subscription, resources group, storage account and a storage container name “yolo-results“. Since we only needed a storage account for our api solution we provisioned in through the portal. For our “batch“ process we created a bicep file that you can check [here](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/infrastructure/main.bicep). You can find a very detailed documentation on how to create a storage account from Microsoft [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal)
 
 Next we got our storage connection string. To do that open azure portal and navigate to your storage account. On the left click “Access keys“. Click “show“ next to Connection string and save it somewhere.  
 Here is a little function we put together to connect to our storage account that uses container name and storage key as inputs:
@@ -581,7 +459,7 @@ Next we need to save our and summary into a suitable format for storage, such as
 1. **Timed Saves**: We implement logic within the processing loop to save interim results at intervals that will be specified in our api call. Since our stream might be infinite we need to do to be able to check the results without breaking the connection to the stream.
 2. **Final Save**: Ensure all results are saved once the process is completed:
 
-Function to save our Dataframe:  
+Function to save our Dataframe:
 
 ```java Python
 def save_df(df, filename, result_blob):
@@ -640,7 +518,7 @@ async def health_check():
     return "OK"
 ```
 
- We also need to change our processing logic replacing the key interruption with the stop call and adding our processing logic to “background“. Check our full python script [here](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/api/inference/fast.py)
+We also need to change our processing logic replacing the key interruption with the stop call and adding our processing logic to “background“. Check our full python script [here](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/api/inference/fast.py)
 
 **Local Testing with Uvicorn:**
 
@@ -652,91 +530,35 @@ Run the following command to start Uvicorn:
 uvicorn fast:app --host 0.0.0.0 --port 8000
 ```
 
-You should see something similar to that in your terminal:  
+You should see something similar to that in your terminal:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/7a4adc5-image-20231110-191541.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/7a4adc5-image-20231110-191541.png" />
 
 **Testing Your Endpoints:**
 
-Now your FastAPI application is running locally. To test it you can use tools like **curl**, **httpie**, or test directly from the automatically generated Swagger UI. In our case swagger will be available here: <http://localhost:8000/docs>.
+Now your FastAPI application is running locally. To test it you can use tools like **curl**, **httpie**, or test directly from the automatically generated Swagger UI. In our case swagger will be available [here](http://localhost:8000/docs).
 
 Let’s start with the “start“ endpoint. Fill in the required fields and execute it.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/5c016b4-image-20231110-145102.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/5c016b4-image-20231110-145102.png" />
 
 To stop the process execute the stop endpoint
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/64aaadb-image-20231110-145125.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/64aaadb-image-20231110-145125.png" />
 
 In your termial you will see that the process has stopped. Now lets check if our results saved in our azure account:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/4b2c3ed-image-20231110-145135.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/4b2c3ed-image-20231110-145135.png" />
 
 Great. We now have our solution packed into a fast api and have our control system of starting and stopping the process in place.
 
-## 
+##
 
 **Containerizing the FastAPI Application with Docker**
 
 Now that we have our FastAPI tested and verified, the next crucial step is to package our solution into a Docker image. This approach is key to facilitating deployment to our cloud clusters. Containerizing with Docker not only streamlines the deployment process but also ensures that our application runs reliably and consistently in the cloud environment, mirroring the conditions under which it was developed and tested. With Docker, we create a portable and scalable solution, ready to be deployed efficiently across various cloud infrastructures.
 
-When creating the Dockerfile, it's crucial to select a base image that includes all the necessary system dependencies, because that might cause some networking issues. We’ve tested our solution with “python3.9“ base image, so if possible stick to it. If you have to use a different base image for any reason check out salad documentation on networking: <https://docs.salad.com/docs/enabling-ipv6> . We should also keep in mind our earlier issues with the libraries. Here is the full Dockerfile we will use to build an image:
+When creating the Dockerfile, it's crucial to select a base image that includes all the necessary system dependencies, because that might cause some networking issues. We’ve tested our solution with “python3.9“ base image, so if possible stick to it. If you have to use a different base image for any reason check out salad documentation on networking. We should also keep in mind our earlier issues with the libraries. Here is the full Dockerfile we will use to build an image:
 
 ```java Python
 # Use the official Python image as the base image
@@ -777,25 +599,11 @@ We finally got to the last and most exiting part of our project. We will now dep
 
 Deploying your containerized FastAPI application to Salad's GPU Cloud can is a very efficient and cost-effective way to run your object detection solution. Salad's has a very user-friendly interface as well as an API for deployment. Let’s deploy our solution using salad portal.
 
-First create your account and log into <https://portal.salad.com/> Create your organization and let’s deploy our container app.
+First create your account and log into the [portal](https://portal.salad.com/) Create your organization and let’s deploy our container app.
 
-Under container groups click “Deploy a Container Group“:  
+Under container groups click “Deploy a Container Group“:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/72bde49-image-20231110-194241.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/72bde49-image-20231110-194241.png" />
 
 We now need to set up all of our container group parameters:
 
@@ -804,39 +612,27 @@ We now need to set up all of our container group parameters:
 1. **Create a unique name for your Container group**
 2. **Pick the Image Source:** In our case we are using a private Azure Container Registry. Click Edit next to Image source. Now switch to “Private Registry“, under “What Service Are You Using“ pick Azure Container Registry.  
    Now lets get back to our azure portal and find the image name, username and password of our container registry repository.  
-   Find your acr in azure and click “repositories“ on the left  
-   ![](https://files.readme.io/1196da2-image-20231110-195239.png)  
+   Find your acr in azure and click “repositories“ on the left
+
+   <img src="https://files.readme.io/1196da2-image-20231110-195239.png" />
+
    Chose the image repository and click on the version you want to pull.  
-   Now under “Manifest“ you will see a Docker pull command in the followings format: “docker pull <image name>“:  
-   ![](https://files.readme.io/90b2d4d-image-20231110-195608.png)  
-   Copy the “image name“ and paste back to salad portal.  
-   Now let’s find acr username and password back in azure portal.  
-   Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not enabled, do so. Now copy the username and password and pass it back to Salad portal.
+   Now under “Manifest“ you will see a Docker pull command in the followings format: `docker pull <image name>`:
+
+   <img src="https://files.readme.io/90b2d4d-image-20231110-195608.png" />
+
+   Copy the “image name“ and paste back to salad portal. Now let’s find acr username
+   and password back in azure portal. Get back to your azure container registry page
+   and click Access keys on the left. If your “Admin user” is not enabled, do so.
+   Now copy the username and password and pass it back to Salad portal.
+
 3. **Replica count**: I will pick for now, since our process is kind of “sunchromious“. We will use the second replica as a backup.
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative.
 5. **Optional Settings**: Salad gives you some pretty cool options like health check probe, external logging and passing environment variables. For our solution the one parameter that we have to pass is **the Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/5b0bbe1-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "sizing": "400px",
-      "border": true
-    }
-  ]
-}
-[/block]
+<img src="https://files.readme.io/5b0bbe1-image.png" />
 
-
-<br>
-
-In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found here: <https://portal.salad.com/api-key>  
+In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found [here](https://portal.salad.com/api-key)  
 With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
 Now check “AutoStart container group once image is pulled“ and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.
 
@@ -850,23 +646,9 @@ Now check “AutoStart container group once image is pulled“ and hit “Deploy
 
 With your solution deployed on Salad, the next step is to interact with your FastAPI application using its public endpoint. Salad provides you with a deployment URL, which you can use to send requests to your API in the same way you would locally, but now through Salad's infrastructure.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/649634f-image-20231110-202228.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+<img src="https://files.readme.io/649634f-image-20231110-202228.png" />
 
-
-This url will be used instead of the localhost we used to send requests to while testing our FastApi locally, so if we replace local host with the link and keep the /docs we will get to our swagger page, but now living in the cloud:  
+This url will be used instead of the localhost we used to send requests to while testing our FastApi locally, so if we replace local host with the link and keep the /docs we will get to our swagger page, but now living in the cloud:
 
 ```java Python
 https://tamarind-navybean-2kln8fkx9xruvxa2.salad.cloud/docs
@@ -874,21 +656,7 @@ https://tamarind-navybean-2kln8fkx9xruvxa2.salad.cloud/docs
 
 Now let’s send a start request, wait for a few hours and then hit the stop endpoint. Now let’s check if we have our results in cloud:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/ee7ea80-image-20231110-202920.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/ee7ea80-image-20231110-202920.png" />
 
 And our solution is now deployed to cloud compute and successfully writes the results to our storage account.
 
@@ -909,7 +677,7 @@ We will now compare the compute prices in Azure and Salad. Note that in Azure yo
 
 - **Lowest GPU Compute in Azure**: For our price comparison, we'll start by looking at Azure's lowest GPU compute price, keeping in mind the closest model to our solution is YOLOv5.
 
-#### 1\. Processing a Live Stream
+#### 1. Processing a Live Stream
 
 | Service   | Configuration             | Cost Per Hour | Remarks                                   |
 | --------- | ------------------------- | ------------- | ----------------------------------------- |
@@ -920,7 +688,7 @@ We will now compare the compute prices in Azure and Salad. Note that in Azure yo
 
 - **Salad is approximately 83% cheaper than Azure for general compute configurations.**
 
-#### 2\. Processing with GPU Support. This is the GPU Azure recommends for yolov5.
+#### 2. Processing with GPU Support. This is the GPU Azure recommends for yolov5.
 
 | Service   | Configuration                            | Cost Per Hour | Remarks                         |
 | --------- | ---------------------------------------- | ------------- | ------------------------------- |
@@ -931,14 +699,14 @@ We will now compare the compute prices in Azure and Salad. Note that in Azure yo
 
 - **Salad is approximately 73% cheaper than Azure for similar GPU configurations.**
 
-***
+---
 
-##  **Conclusions**
+## Conclusions
 
 Our journey into the realm of object detection using YOLOv8 and deploying it on Salad's GPU cloud has been both challenging and rewarding. We've successfully navigated through all stages of development and deployment of our solution. Our deployment on Salad has demonstrated not just the viability of such a system for real-time object detection in live video streams, but also its cost-effectiveness.
 
 The testing phase on Salad's platform has validated our application's functionality, providing a clear path from request to result, proving that advanced machine learning tasks can be both accessible and efficient.
 
-For those who might be interested we’ve also implemented **multithreading functionality** to our solution. With multithreading you can process several streams simultaneously by providing your api with a list of links. Here is the link to the multi-threading api code: <https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/api/inference/fast_multi_thread.py>
+For those who might be interested we’ve also implemented **multithreading functionality** to our solution. With multithreading you can process several streams simultaneously by providing your api with a list of links. Here is the link to the multi-threading api code: https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/api/inference/fast_multi_thread.py
 
 If you are going to deploy the milti-threading solution, remember to change the python script name in the Dockerfile. The api would now also be expecting a list of links instead of one link

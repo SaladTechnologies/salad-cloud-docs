@@ -1,8 +1,211 @@
 ---
-title: "Introduction"
-description: "Introduction to Salad Managed Services"
+title: "Managed Transcription Service"
+description: "Unlock the full potential of your audio and video content with our transcription service tailored for media companies. Transcribe files up to 2 hours long in 98 languages, complete with advanced features like speaker diarization and word-level time coding. Generate accurate transcripts and captions in .json & .srt format to enhance your media production, streamline post-production processes, and reach a global audience more effectively with closed captions and subtitles. More features are coming soon."
 ---
 
-## Welcome
 
-Here is where we talk about how managed services are better than anything.
+## Accounts & Credentials
+
+To start, you must create an account on [Salad portal](https://portal.salad.com/) and get an access token. Once you receive an email confirming access to Salad’s Transcription API, just follow the API reference below to start making transcription requests.
+
+### Transcription API
+
+To send a request you will need transcription service url:
+
+![](managed-services/images/transcription_url.png)
+
+### Authentication
+
+To use Managed Services, you will need your Salad API Key. You can find the API Key in the upper right hand Account drop down menu.
+
+![](inference-endpoints/images/7094421-image.png)
+![](inference-endpoints/images/9d9c06f-image.png)
+
+## API Reference
+
+### Send a POST request with job parameters
+
+To interact with the API, you first need to send a POST request to the endpoint url mentioned above. Salad API Key should be sent as a header: "Salad-Api-Key": "Your Salad Key". As a result you will recieve a job id. Follow the pattern below for the request body:
+
+```json
+{
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "word_level_timestamps": true,
+    "diarization": true,
+    "srt": true
+  },
+  "metadata": {
+    "my-job-id": 1234
+  }
+}
+
+```
+
+## Parameters
+
+### input
+An object that configures the job.
+- **url**: Publicly accessible URL of the media file to transcribe.
+- **language_code**: Language code of the media. Default is "en". Available options include:
+  - "en" (English)
+  - "fr" (French)
+  - "de" (German)
+  - "es" (Spanish)
+  - "it" (Italian)
+  - "ja" (Japanese)
+  - "zh" (Chinese)
+  - "nl" (Dutch)
+  - "uk" (Ukrainian)
+  - "pt" (Portuguese)
+  - "ar" (Arabic)
+  - "cs" (Czech)
+  - "ru" (Russian)
+  - "pl" (Polish)
+  - "hu" (Hungarian)
+  - "fi" (Finnish)
+  - "fa" (Persian)
+  - "el" (Greek)
+  - "tr" (Turkish)
+  - "da" (Danish)
+  - "he" (Hebrew)
+  - "vi" (Vietnamese)
+  - "ko" (Korean)
+  - "ur" (Urdu)
+  - "te" (Telugu)
+  - "hi" (Hindi)
+  - "ca" (Catalan)
+  - "ml" (Malayalam)
+- **word_level_timestamps**: Set to true to get word-level timestamps. Default is false, which gets sentence-level timestamps.
+- **diarization**: Set to true for speaker identification. Default is false.
+- **srt**: Set to true to generate .srt captions. Default is false.
+
+### metadata
+Optional object to identify your unique transcription job.
+
+## Example cURL Send for Transcription
+
+```bash
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
+   -H "Salad-Api-Key: "your salad api key" \
+   -d '{
+      "input": {
+         "url": "https://example.com/path/to/file.mp3",
+         "language_code": "en",
+         "word_level_timestamps": true,
+         "diarization": true,
+         "srt": true
+      }
+   }'
+```
+
+
+
+## Example cURL Get Transcript
+Once you have the job ID, you need to send a GET request with that job ID appended to the URL to retrieve the output. The pattern for the GET request is as follows:
+
+
+```bash
+curl -X GET "https://api.salad.com/api/public/organizations/{your-organization}/inference-endpoints/transcribe/jobs/{job_id}" \
+   -H "Salad-Api-Key: {your-api-key}"
+```
+
+## Example Transcript Output
+
+```bash
+{
+  "id": "54e84442-3576-45ca-904c-a1d90bc77baf",
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "word_level_timestamps": true,
+    "diarization": true,
+    "srt": true
+  },
+  "metadata": {
+    "my-job-id": 1234
+  },
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2024-05-15T23:49:37.9946816+00:00"
+    },
+    {
+      "action": "started",
+      "time": "2024-05-15T23:50:23.0483322+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2024-05-15T23:50:23.4688229+00:00"
+    }
+  ],
+  "output": {
+    "segments": [
+      {
+        "start": 19.2,
+        "end": 19.903,
+        "text": "Thank you.",
+        "words": [
+          {
+            "word": "Thank",
+            "start": 19.662,
+            "end": 19.783,
+            "score": 0.232
+          },
+          {
+            "word": "you.",
+            "start": 19.803,
+            "end": 19.903,
+            "score": 0.545
+          }
+        ],
+        "speaker": "SPEAKER_00"
+      }
+    ],
+    "word_segments": [
+      {
+        "word": "Thank",
+        "start": 19.662,
+        "end": 19.783,
+        "score": 0.232,
+        "speaker": "SPEAKER_00"
+      },
+      {
+        "word": "you.",
+        "start": 19.803,
+        "end": 19.903,
+        "score": 0.545,
+        "speaker": "SPEAKER_00"
+      }
+    ],
+    "srt_content": "1\n00:00:19,2 --> 00:00:22,233\nBecause when we change the dialogue, we can change our world.\n\n",
+    "duration": 142.7795,
+    "processing_time": 51.17370915412903
+  },
+  "create_time": "2024-05-15T23:49:37.9946816+00:00",
+  "update_time": "2024-05-15T23:50:23.4688229+00:00"
+}
+
+```
+
+- **Example: Using the Transcription API via Postman**
+  - Open postman and create a new HTTP request
+  - Set the HTTP method to POST
+  - Enter the API endpoint URL
+  - Add API Key Authorization
+    - Key: Salad-Api-Key
+    - Value: provide your Salad API Key
+    - Add to: header
+  - Add the Request Body
+    - select the raw option, and choose JSON from the dropdown menu
+    - Add the URL of your audio file and parameters in the request body as shown in the example.
+      - the file URL must be a direct download link
+  - Send the Request
+    - Click the Send button. The API will respond with the job id
+  - Send another GET request with that job id at the end of the URL
+    - Click the Send button. The API will respond with the transcription result in JSON format.
+
+### Cost
+ - Managed endpoints is being offered for free for a limited time!

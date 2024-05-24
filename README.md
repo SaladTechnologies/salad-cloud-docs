@@ -1,4 +1,4 @@
-# SaladCloud DOcs
+# SaladCloud Docs
 
 ### Installation
 

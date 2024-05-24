@@ -1,21 +1,9 @@
 ---
-title: "Training a custom YOLOv8 model for $0.25 (Tutorial)"
-slug: "yolov8-model-training-guide"
-excerpt: ""
-hidden: false
-metadata: 
-  description: "In this blog, we showcase training three distinct custom YOLOv8 models on SaladCloud within an hour for just $1."
-  image: 
-    - "https://files.readme.io/32620a1-YOLOv8_training_on_Salad_-_Twitter.png"
-  robots: "index"
-createdAt: "Mon Dec 04 2023 18:54:49 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Thu Dec 07 2023 01:41:35 GMT+0000 (Coordinated Universal Time)"
+title: "Training a custom YOLOv8 model"
+description: "In this blog, we showcase training three distinct custom YOLOv8 models on SaladCloud within an hour for just $1."
 ---
-***
 
-### 
-
-**Introduction: Training a Custom YOLO Model for Logo Detection**
+### Introduction: Training a Custom YOLO Model for Logo Detection\*\*
 
 In the realm of AI and machine learning, the power of customization cannot be overstated. Our previous article covered deploying a pre-trained YOLOv8 model using Salad's cloud infrastructure. During that journey we did real-time object tracking and analysis. In the landscape of AI and machine learning, the ability to train custom models for specific tasks opens up a world of possibilities. And now, we're taking a step further: training a custom YOLO (You Only Look Once) model using Salad cloud.
 
@@ -41,23 +29,9 @@ Brands included in the dataset: Adidas, Apple, Google, Coca Cola, Ferrari and ot
 
 In order to train a YOLOv8 model our dataset needs to be in a format that the model can understand and learn from effectively.
 
-We need to organize our training and validation images and labels like this:  
+We need to organize our training and validation images and labels like this:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/8a17a88-Screenshot_2023-11-26_144806.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/8a17a88-Screenshot_2023-11-26_144806.png" />
 
 We also need a dataset YAML to define paths to the images and the class names:
 
@@ -91,39 +65,11 @@ training/{dataset_name}/labels/
 training/{dataset_name}/yolo8.yaml
 ```
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/093038e-Screenshot_2023-11-26_155043.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/093038e-Screenshot_2023-11-26_155043.png" />
 
 Solution Architecture:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/b6dfaeb-Training_Architecture.drawio.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/b6dfaeb-Training_Architecture.drawio.png" />
 
 **Training Different YOLOv8 Models**
 
@@ -149,10 +95,10 @@ Training models requires careful selection of hyperparameters. Here are the choi
 Here's how you can initiate training using the YOLOv8 model with Python:
 
 ```java Python
-from ultralytics import YOLO 
-# Load the YOLOv8 Nano model 
-model = YOLO('yolov8n.pt') 
-# Start the training process 
+from ultralytics import YOLO
+# Load the YOLOv8 Nano model
+model = YOLO('yolov8n.pt')
+# Start the training process
 results = model.train( data='yolo8.yaml', imgsz=640, epochs=10, batch=8, name='yolov8n_custom' )
 ```
 
@@ -194,21 +140,7 @@ Keep in mind that checkpoints in Ultralytics YOLO are automatically saved at the
 
 To ensure a smooth and uninterrupted training process on Salad, especially when dealing with containerized environments, it's crucial to have a persistent storage solution. Azure File Shares provide an ideal way to maintain and access training data and model weights across different container sessions. In our setup, we utilize two Azure File Shares: `runs` and `training`.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/7ba7f70-Screenshot_2023-11-26_165430.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/7ba7f70-Screenshot_2023-11-26_165430.png" />
 
 **Directory Structure and Data Management**
 
@@ -217,21 +149,7 @@ To ensure a smooth and uninterrupted training process on Salad, especially when 
 
 **Process workflow**
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/529d48a-workflow.drawio.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/529d48a-workflow.drawio.png" />
 
 **Functionality of the Bash Script**
 
@@ -258,127 +176,29 @@ The first model in our comparative study is the YOLOv8 Nano, renowned for its co
 **Training results**: once our model is trained we can find all the weight along with training and validation results in our Azure storage.  
 We will first check the confusion matrix:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/6f5a5e3-confusion_matrix_normalized.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/6f5a5e3-confusion_matrix_normalized.png" />
 
 We can see that some of the labels are being detected pretty good, but a few are positively detected in less than half of the scenarios.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/d5c6c5c-results.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/d5c6c5c-results.png" />
 
 Here we can see what the labels on a picture are and what we predicted with our trained model:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/16f170b-val_batch0_labels.jpg",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+<img src="https://files.readme.io/16f170b-val_batch0_labels.jpg" />
 
-
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/e29a1f3-val_batch0_pred.jpg",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/e29a1f3-val_batch0_pred.jpg" />
 
 #### YOLOv8 Small Model Training:
 
 **Duration of Training**: Training session for the YOLOv8 Small model was completed in about 15 minutes. **Trainings Results**:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/69e0885-confusion_matrix_normalized_1.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/69e0885-confusion_matrix_normalized_1.png" />
 
 We can see that the model performs better
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/7caac82-results.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+<img src="https://files.readme.io/7caac82-results.png" />
 
-
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/4ebc600-val_batch0_pred.jpg",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/4ebc600-val_batch0_pred.jpg" />
 
 #### YOLOv8 Medium Model Training:
 
@@ -388,59 +208,17 @@ This time we stopped our process and allocated it to the other machine to check 
 
 **Trainings Results**:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/1402547-confusion_matrix_normalized.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+<img src="https://files.readme.io/1402547-confusion_matrix_normalized.png" />
 
+<img src="https://files.readme.io/d8d25f3-results.png" />
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/d8d25f3-results.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
-
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/ef883c8-val_batch0_pred.jpg",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/ef883c8-val_batch0_pred.jpg" />
 
 We can see that bigger models give us better results.
 
 ## Using custom model in the real life:
 
-We will now upload the medium model into our inference code and run it on a Coca-Cola video. To do that we just need to specify the model path in our script. Check out our previous article and step by step guide on how to deploy an inference using Salad  
+We will now upload the medium model into our inference code and run it on a Coca-Cola video. To do that we just need to specify the model path in our script. Check out our previous article and step by step guide on how to deploy an inference using Salad
 
 ```java Python
 # Load the model
@@ -450,21 +228,7 @@ results = model.track(image, persist=True)
 
 Let’s check the results:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/bd1dfb4-2023-11-29-16-00-34.gif",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+<img src="https://files.readme.io/bd1dfb4-2023-11-29-16-00-34.gif" />
 
 As a result we can see that we not only can use our custom trained model on images, but even on videos adding tracking possibilities.
 

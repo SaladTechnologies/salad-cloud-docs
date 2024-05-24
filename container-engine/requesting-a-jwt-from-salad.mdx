@@ -1,12 +1,39 @@
 ---
-title: "Requesting a JWT from Salad"
-slug: "requesting-a-jwt-from-salad"
+title: "Requesting and using a JWT from Salad"
 ---
 
-> 👍 Imagine you want your application to reach out across the Internet to your own infrastructure. How do you know that request comes from a valid Salad Node?
->
-> Luckily, applications running in containers on a Salad Node can obtain a short-lived JWT signed by the Salad backend. Using the JWT, you could validate that a request is being made from a node that was allocated your container.
->
-> Follow the steps below to request a short-lived JWT from Salad to improve your application security.
+We expose and provide JWTs to be used for authentication and validation inside your container as a replacement for Environment Variable secrets.
 
-HIDDEN, STUB
+# Instance Metadata Service (IMDS)
+The IMDS allows you to use JWTs issued by Salad to securely connect your infrastructure to your operating nodes. These JWTs are short-lived, and are destroyed and invalidated when an instance ends. This is a more secure method than using Environment Variables to define secrets. These JWTs are generic, and can be used for anthing. 
+
+
+# Obtaining the JWT:
+Obtaining a JWT from inside your Salad Replica Node is straightforward, requiring just one API call. To do this, you’ll send a `GET` request from inside your container to 
+`http://169.254.169.254:80/v1/token`.
+In response, you’ll get a simple JSON body containing the token following this schema:
+
+```
+{
+  'jwt": "eyJhbGci..."
+}
+```
+
+The following is an example Python script to obtain the JWT to use elsewhere:
+
+```
+import requests
+
+r = requests.get('http://169.254.169.254:80/v1/token')
+token =r.json()['jwt']
+print(token)
+```
+
+# Using the JWKS API
+
+By reconfiguring your backend to take JWTs issued by Salad, you can authenticate each node securely without needing to share permanent secrets or other authentication systems hardcoded into your container. 
+
+Our JWKS lets you validate your JWTs, and it’s exposed here:
+
+`https://matrix-rest-api.salad.com/.well-known/workload-jwks.json`
+

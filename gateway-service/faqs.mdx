@@ -12,6 +12,9 @@ Once the SGS server is configured, we send a signal to Salad Nodes in the target
 
 After internal testing, the SGS is deemed production-ready, and connection details are sent to you. These details will include the server hostname and port number and the connection password. 
   </Accordion>
+    <Accordion title="I'm having trouble connecting to SGS.">
+    First, test sending a simple curl request through the server with `curl -x 'https://{sessionID}:{password}@{sgsName}:{port}' https://www.ipinfo.io` If that request fails, there could be a network issue or an error on the sgs server side - contact your account manager and we'll take a look. If the request succeeds, ensure that your infrastructure is making requests using the correct protocol. Refer to the connection information sent by your account manager to determine if the SGS server is configured for the `HTTP CONNECT` or the `PROXY v2` protocol. Feel free to reach out to support via Slack and we can help you out. 
+  </Accordion>
 
 </AccordionGroup>
 
