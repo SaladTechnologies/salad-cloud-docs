@@ -6,6 +6,7 @@ hidden: true
 createdAt: "Mon Mar 25 2024 20:38:14 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Sat Mar 30 2024 14:23:52 GMT+0000 (Coordinated Universal Time)"
 ---
+
 ## Introduction
 
 Text-to-speech (TTS) technology has seen remarkable advancements in recent years, becoming increasingly accessible and efficient. Contemporary TTS models utilize deep learning and artificial intelligence to generate speech that is both natural-sounding and highly accurate. These advancements have led to widespread applications in various real-life scenarios, including voice assistants, audiobook narration, and accessibility tools for individuals with visual impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice, and demonstrate how to leverage its features on Salad Cloud in a cloud-based environment.
@@ -130,7 +131,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 echo "installing dependencies ..."
 (cd "${METAVOICE}" && pip install --upgrade pip && pip install -r requirements.txt)
-pip install --upgrade torch torchaudio 
+pip install --upgrade torch torchaudio
 pip install -e .
 ```
 
@@ -144,7 +145,7 @@ This script will prepare your local development environment for working with Met
 
 ### Voice cloning test with MetaVoice on Salad Cloud
 
-To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code as our base:  [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts MetaVoice also provides a ready to go fast api that we slightly updated to fit our needs. Here is the base MataVoice Fast API:
+To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code as our base: [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts MetaVoice also provides a ready to go fast api that we slightly updated to fit our needs. Here is the base MataVoice Fast API:
 
 ```python
 import json
@@ -296,15 +297,11 @@ if __name__ == "__main__":
 
 ```
 
-<br>
-
 ### Additional Endpoints
 
 Due to the computational needs of MetaVoice, which requires approximately one second per word to convert text to audio, we've introduced two new endpoints to accommodate different text lengths:
 
 **/process_short_text:** This endpoint is designed for processing shorter texts where the response time is not a significant concern. It directly calls the inference function and waits for the processing to complete before returning the result. This synchronous approach is suitable for texts that can be processed relatively quickly.
-
-<br>
 
 ```python
 @app.post("/process_short_text")
@@ -321,11 +318,7 @@ async def process(
 
 ```
 
-<br>
-
 **/process_long_text:** This endpoint is tailored for processing longer texts where immediate response is not feasible due to the extended processing time and a big chance of requests timeouts. It leverages FastAPI's BackgroundTasks to execute the inference function asynchronously. This means that the endpoint will initiate the processing task in the background and immediately return a response indicating that the process has started. The actual processing will continue independently, and the results will be stored in Azure Storage once completed.
-
-<br>
 
 ```python
 @app.post("/process_long_text")
@@ -369,7 +362,7 @@ To process larger text inputs with MetaVoice, we need to divide the text into sm
 Here's a code snippet that demonstrates how to split the text into sentences and combine the resulting audio files:
 
 ```python
-import nltk  
+import nltk
 import wave
 
 def split_into_sentences(text):
@@ -474,8 +467,8 @@ def inference(connection_string: str, input_container_name: str, output_containe
         with open(f"{voice_local_path}", "wb") as f:
             voice.readinto(f)
 
-    # TTS process: 
-    
+    # TTS process:
+
     tts_req = TTSRequest(text=text, speaker_ref_path=voice_local_path)
     with tempfile.NamedTemporaryFile(suffix=".wav") as wav_tmp:
         if tts_req.speaker_ref_path is None:
@@ -490,7 +483,7 @@ def inference(connection_string: str, input_container_name: str, output_containe
         if len(tts_req.text.split()) > 10:
             sentences = split_into_sentences(tts_req.text)
             list_of_wav_out = []
-            for sentence in sentences: 
+            for sentence in sentences:
                 wav_out_path = GlobalState.tts.synthesise(
                     text=sentence,
                     spk_ref_path=wav_path,
@@ -500,7 +493,7 @@ def inference(connection_string: str, input_container_name: str, output_containe
                 list_of_wav_out.append(wav_out_path)
             wav_out_path = "." + text_file.split(".")[1] + "_" + reference_voice.split(".")[0] + "_meta" + ".wav"
             combine_wav_files(list_of_wav_out, wav_out_path)
-        else: 
+        else:
             wav_out_path = GlobalState.tts.synthesise(
                 text=tts_req.text,
                 spk_ref_path=wav_path,
@@ -523,7 +516,7 @@ def inference(connection_string: str, input_container_name: str, output_containe
 We authenticate with Azure Storage and fetch the input text and reference voice files.  
 The text is split into sentences using the split_into_sentences function to manage the length limitations of MetaVoice.  
 Each sentence is processed individually, and the resulting audio files are combined into a final output file using the combine_wav_files function.  
-The final audio file is uploaded back to Azure Storage, and the function returns the status, location of the saved file, and processing time. 
+The final audio file is uploaded back to Azure Storage, and the function returns the status, location of the saved file, and processing time.
 
 **Local Testing with Uvicorn:**
 
@@ -579,7 +572,7 @@ RUN apt-get update && apt-get install -y python3.9
 RUN apt-get update && apt-get install -y curl wget ffmpeg unzip git python3-pip
 # Update pip and install requirements
 RUN pip install --upgrade pip
-RUN pip install torch==1.13.1+cu117 torchvision>=0.13.1+cu117 torchaudio>=0.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 --no-cache-dir 
+RUN pip install torch==1.13.1+cu117 torchvision>=0.13.1+cu117 torchaudio>=0.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 --no-cache-dir
 RUN pip install  -r inference/requirements.txt
 RUN pip install uvicorn
 
@@ -621,29 +614,29 @@ We now need to set up all of our container group parameters:
    If you are using your custom solution, specify your image location.
 
    [block:image]{"images":[{"image":["https://files.readme.io/b80f256-image.png",null,""],"align":"center","sizing":"352px"}]}[/block]
+
 3. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
-4. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version best suites your needs.  
+4. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version best suites your needs.
 5. **Networking.** Click “Edit“ next to it, check “Enable Networking“ and set port to 80:
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/61c8d63-image-20231110-201504.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "sizing": "400px"
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/61c8d63-image-20231110-201504.png",
+null,
+""
+],
+"align": "center",
+"sizing": "400px"
+}
+]
 }
 [/block]
 
-
 6. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
-7. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**. This will make sure our endpoint is accessible with IPv6 and port 80: 
+7. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**. This will make sure our endpoint is accessible with IPv6 and port 80:
 
    [block:image]{"images":[{"image":["https://files.readme.io/310cb33-image.png",null,""],"align":"center","sizing":"50% "}]}[/block]
 
@@ -665,13 +658,11 @@ Once your solution is deployed on Salad, the next step is to interact with your 
 
 ![](https://files.readme.io/0df9964-image.png)
 
-You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example:  <https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs>
+You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example: <https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs>
 
-You will see your Swagger page similar to this: 
+You will see your Swagger page similar to this:
 
 ![](https://files.readme.io/bceb94b-image.png)
-
-<br>
 
 On the Swagger page, you have the ability to engage with your API by supplying the necessary parameters to initiate the process. Certain parameters are optional, and it may not be necessary to modify them if you're utilizing the default Azure container names. It's important to mention that this solution relies on Azure storage, so ensure that your Azure resources are set up beforehand. If you're considering using a different storage provider, refer to the comprehensive solution documentation for guidance. The complete list of arguments has been provided earlier in the document.
 

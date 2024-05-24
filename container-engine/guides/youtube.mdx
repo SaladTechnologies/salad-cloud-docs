@@ -1,11 +1,12 @@
 ---
-title: "YouTube"
+title: "Transcribe YouTube Videos"
 slug: "youtube"
 excerpt: "Collect and Transcribe Millions of Hours of YouTube Videos on SaladCloud!"
 hidden: false
 createdAt: "Tue Apr 02 2024 22:46:35 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Thu Apr 04 2024 19:05:58 GMT+0000 (Coordinated Universal Time)"
 ---
+
 To collect and transcribe massive videos from YouTube using SaladCloud, the process typically involves three key steps:
 
 Data Collection from YouTube: Gather relevant video URLs from specific channels or based on particular topics, creating video metadata files. These files include essential details such as video title, URL, duration and codec, etc.
@@ -14,23 +15,9 @@ Data Processing on SaladCloud: Input the gathered video URLs into a transcriptio
 
 Validation, Analysis and Delivery: Validate outcomes using both the metadata files and the job results. The videos that failed to be transcribed can be further analyzed and may be refilled to the pipeline for reprocessing. Then, deliver the final output, potentially including index files containing YouTube video URLs paired with their corresponding transcript URLs on Cloudflare. This facilitates easy access to transcribed content for further analysis and utilization.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/cfef23d-1-1.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+![](/container-engine/images/youtube/cfef23d-1-1.jpg)
 
-
-The three steps can either constitute a single end-to-end pipeline or operate as three independent steps, depending on the specific business requirements. 
+The three steps can either constitute a single end-to-end pipeline or operate as three independent steps, depending on the specific business requirements.
 
 Transcribing YouTube videos doesn't inherently require pre-downloading and storage of the videos. Simultaneous downloading and transcribing are feasible. Additionally, if a YouTube video supports an audio codec, efficiency can be improved by exclusively downloading its audio. This approach not only reduces bandwidth demands but also significantly saves time, considering that video sizes are typically ten times larger than their corresponding audio files.
 
@@ -40,56 +27,20 @@ By leveraging the solution outlined in the documentation, we've managed to trans
 
 We need to develop a job generator capable of accepting named channels or playlists, as well as keywords, as input parameters. This generator will then produce multiple channel metadata files containing detailed information such as video title, URL, duration, codec, and other relevant data. Additionally, it will create an index file that maps each channel to its corresponding metadata file, ensuring organized and accessible storage of the collected data.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/f647902-2.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/f647902-2.jpg)
 
 
 The [index file](https://salad-public-transcripts.com/youtube_4m_videos_1.6m_hours_20240322.csv) comprises the following details for each channel: channel title, ID, URL, playlist number, total video number, total video duration (hour), and a link to the corresponding metadata file.  
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/5a72e29-3.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/5a72e29-3.jpg)
 
 
 A [metadata file](https://salad-public-transcripts.com/datasets/0001.csv) offers extensive details of videos within a channel, encompassing URL, title, duration (second), codec, and more. Extracting codec information for each video requires additional operations and time. Hence, we opt to randomly select a subset of videos to collect this information. Through our testing, we've noted that all YouTube videos encountered thus far support audio codecs.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/b0cbf46-4.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/b0cbf46-4.jpg)
 
 
 Downloading video metadata from a channel is time-consuming, ranging from a few minutes to several hours, depending on the channel's size. Additionally, there are constraints on concurrent access from a single IP address to YouTube.
@@ -100,7 +51,7 @@ Through testing, we've implemented and executed the job generator on a standard 
 
 We can utilize a variety of tools and libraries to construct the job generator:
 
-### [YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started)  and [Google API Client Library](https://developers.google.com/youtube/v3/quickstart/python)
+### [YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started) and [Google API Client Library](https://developers.google.com/youtube/v3/quickstart/python)
 
 This tool offers all the necessary functionalities for interacting with YouTube, such as searching channels, playlists, and videos based on keywords, retrieving all playlists from a particular channel, and uploading/downloading videos.
 
@@ -108,32 +59,11 @@ To utilize the API, we must possess a Google Account to request an API key and c
 
 Now, let's calculate the quota cost for collecting video URLs from a search on a specific keyword:
 
-[block:parameters]
-{
-  "data": {
-    "h-0": "Assumption",
-    "h-1": "Quota Cost",
-    "h-2": "Explanations",
-    "0-0": "Search and get 100 channels based on a keyword",
-    "0-1": "200",
-    "0-2": "Executing a search.list needs 100 units and it can return a maximum of 50 items:  \n100 x 2",
-    "1-0": "Get 10,000 playlists from the 100 channels, assuming each channel contains 100 playlists",
-    "1-1": "200",
-    "1-2": "Executing a playlist.list requires 1 unit and it can return a maximum of 50 items:  \n100 x 1 x 2",
-    "2-0": "Get 2,000,000 video URLs from the 10,000 playlists of the 100 channels, assuming each playlist contains 200 videos",
-    "2-1": "40000",
-    "2-2": "Executing a video.list requires 1 unit and it can return a maximum of 50 items:  \n100 x 100 x 1 x 4"
-  },
-  "cols": 3,
-  "rows": 3,
-  "align": [
-    "left",
-    "left",
-    "left"
-  ]
-}
-[/block]
-
+| Assumption | Quota Cost | Explanations |
+| :---- | :---- | :---- |
+| Search and get 100 channels based on a keyword | 200 | Executing a search.list needs 100 units and it can return a maximum of 50 items: 100 x 2 |
+| Get 10,000 playlists from the 100 channels, assuming each channel contains 100 playlists | 200 | Executing a playlist.list requires 1 unit and it can return a maximum of 50 items: 100 x 1 x 2 |
+| Get 2,000,000 video URLs from the 10,000 playlists of the 100 channels, assuming each playlist contains 200 videos | 40,000 | Executing a video.list requires 1 unit and it can return a maximum of 50 items: 100 x 100 x 1 x 4 |
 
 The default quota allocation of 10,000 units per day may prove insufficient if we need to collect numerous video URLs in a short timeframe. We can create several GCP projects with each providing 10,000 units per day, or we could also complete [an audit](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits) and request an additional quota following the process. Here we provide a combined solution by using both YouTube Data API and Pytube.
 
@@ -147,20 +77,8 @@ It is noteworthy that Pytube does not have a limit on API quota, but it is still
 
 ### The reference design for the job generator
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/19b1ccc-5.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/19b1ccc-5.jpg)
 
 
 We use a two-tier system for managing our collection: first, we create a metadata file for each channel, containing comprehensive details of all videos within the channel. Then, we maintain an index file that consolidates all the collected channels, with each channel linked to its corresponding metadata file.
@@ -189,20 +107,8 @@ Metadata Downloader: This component runs on a pool of Salad nodes distributed ac
 
 With this solution, we can effectively harness the global distributed network provided by SaladCloud, significantly accelerating the job generation process by tens or even hundreds of times.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/991061d-6.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/991061d-6.jpg)
 
 
 # STEP 2: Data Processing on SaladCloud
@@ -221,20 +127,8 @@ Cloud Storage: Generated assets stored in Cloudflare R2, which is AWS S3-compati
 
 Job Recording System: Job results, including YouTube video URLs, audio length, processing time, Cloudflare URLs, word count etc., are stored in NoSQL databases like AWS DynamoDB.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/49a6736-7.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/49a6736-7.jpg)
 
 
 ## Job Filler
@@ -245,20 +139,8 @@ Another approach is to continuously monitor the size of the job queue. The job f
 
 Here is an example: Every day, we initially inject a large batch of jobs into the pipeline and monitor progress. When the queue is nearly empty, we start injecting only a few jobs and aim to keep the number of available jobs in the queue as low as possible for a period of time. This strategy allows us to prioritize completing older jobs before injecting a massive influx of new ones.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/6a9c6fc-8.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/6a9c6fc-8.jpg)
 
 
 For time-sensitive tasks, implementing autoscaling is also beneficial. By continually monitoring the job count in the queue, the job filler dynamically adjusts the number of Salad node groups. This adaptive approach ensures that specific quantities of tasks can be completed within a predefined timeframe while also offering the flexibility to manage costs efficiently during periods of reduced demand.
@@ -271,38 +153,14 @@ Job Uploader: Operates on multiple threads to boost throughput; each thread retr
 
 Through testing, the job filler has demonstrated the capability to inject up to 1 million jobs to AWS SQS within a single hour.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/eaf53ec-9.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/eaf53ec-9.jpg)
 
 
 Below are the examples of jobs sent from the job filler to the job queue:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/4647030-10.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/4647030-10.jpg)
 
 
 ## Job Queue System Settings
@@ -315,20 +173,8 @@ Additionally, the AWS SQS Retention Period is set to 2 days. Once the message re
 
 Within each node in the GPU resource pool in SaladCloud, we follow best practices by utilizing two processes: the Inference Process, dedicated to GPU-based transcription inference; and the Benchmark Worker Process, focused on I/O- and CPU-bound tasks, such as downloading/uploading, pre-processing, and post-processing.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/bc5a767-11.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/bc5a767-11.jpg)
 
 
 ### Inference Process
@@ -349,29 +195,13 @@ The Global Interpreter Lock (GIL) in Python permits only one thread to execute P
 
 To maximize performance with better scalability, we adopt multiple threads to concurrently handle various tasks, with two queues created to facilitate information exchange among these threads.
 
-[block:parameters]
-{
-  "data": {
-    "h-0": "Thread",
-    "h-1": "Description",
-    "0-0": "Downloader",
-    "0-1": "In most cases, we require 3 threads to concurrently pull jobs from the job queue and download audio files from YouTube, and efficiently feed the inference server. It also performs the following pre-processing steps:  \n1)Removal of bad audio files.  \n2)Format conversion from Mp4A to MP3.  \n3)Chunking very long audio into 10-minute clips.  \n4)Metadata extraction (URL, file/clid ID, length).  \n  \nThe pre-processed audio files are stored in a shared folder, and their metadata are added to the transcribing queue simultaneously.  \n  \nTo prevent the download of excessive audio files, we enforce a maximum length limit on the transcribing queue. When the queue reaches its capacity, the downloader will sleep for a while.",
-    "1-0": "Caller",
-    "1-1": "It reads metadata from the transcribing queue, and subsequently sends a synchronous request, including the audio filename, to the inference server.  \n  \nUpon receiving the response, it forwards the generated texts along with statistics, and the transcribed audio filename to the reporting queue.  \n  \nThe simplicity of the caller is crucial as it directly influences the inference performance.",
-    "2-0": "Reporter",
-    "2-1": "The reporter, upon reading the reporting queue, deletes the processed audio files from the shared folder and manages post-processing tasks, including merging results and calculating real-time factor and word count.  \n  \nEventually, it uploads the generated assets to Cloudflare, reports the job results to AWS DynamoDB and removes the processed jobs from AWS SQS."
-  },
-  "cols": 2,
-  "rows": 3,
-  "align": [
-    "left",
-    "left"
-  ]
-}
-[/block]
+| Thread | Description |
+| :---- | :---- |
+| Downloader | In most cases, we require 3 threads to concurrently pull jobs from the job queue and download audio files from YouTube, and efficiently feed the inference server. It also performs the following pre-processing steps: 1.Removal of bad audio files; 2.Format conversion from Mp4A to MP3; 3.Chunking very long audio into 10-minute clips; 4.Metadata extraction (URL, file/clid ID, length).  The pre-processed audio files are stored in a shared folder, and their metadata are added to the transcribing queue simultaneously. To prevent the download of excessive audio files, we enforce a maximum length limit on the transcribing queue. When the queue reaches its capacity, the downloader will sleep for a while. |
+| Caller | It reads metadata from the transcribing queue, and subsequently sends a synchronous request, including the audio filename, to the inference server. Upon receiving the response, it forwards the generated texts along with statistics, and the transcribed audio filename to the reporting queue.  The simplicity of the caller is crucial as it directly influences the inference performance. |
+| Reporter | The reporter, upon reading the reporting queue, deletes the processed audio files from the shared folder and manages post-processing tasks, including merging results and calculating real-time factor and word count. Eventually, it uploads the generated assets to Cloudflare, reports the job results to AWS DynamoDB and removes the processed jobs from AWS SQS. |
 
-
-By running two processes to segregate GPU-bound tasks from I/O and CPU-bound tasks, and fetching and preparing the next audio clips concurrently and in advance while the current one is still being transcribed, we can eliminate any waiting period.  After one audio clip is completed, the next is immediately ready for transcription. This approach not only reduces the overall processing time for batch jobs but also leads to even more significant cost savings.
+By running two processes to segregate GPU-bound tasks from I/O and CPU-bound tasks, and fetching and preparing the next audio clips concurrently and in advance while the current one is still being transcribed, we can eliminate any waiting period. After one audio clip is completed, the next is immediately ready for transcription. This approach not only reduces the overall processing time for batch jobs but also leads to even more significant cost savings.
 
 Please refer to the[ example code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/tree/main/node) for the node implementation.
 
@@ -401,40 +231,16 @@ Determine the minimum number of downloader threads and maximum length limit of t
 
 Identify and handle various possible exceptions during application runtime, etc.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/78a6585-12.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/78a6585-12.jpg)
 
 
 # STEP 3: Validation, Delivery and Analysis
 
 Job results, which include video URL, audio length, processing time, Cloudflare URL, and word count for each video, serve multiple purposes.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/4fdaab6-13.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/4fdaab6-13.jpg)
 
 
 When combined with the index file and metadata files, the job results become instrumental in validating the pipeline output. They provide crucial information such as processing time, word count and Cloudflare URL for each video, as well as identify how many and which videos failed to be transcribed. In cases where videos failed to be transcribed, we can analyze the reasons and may refill them into the transcription pipeline for reprocessing.
@@ -443,54 +249,22 @@ Job results also provide the information like how many nodes have been actually 
 
 The final output comprises index files containing mappings from YouTube URLs to Cloudflare URLs, organized according to specific channels, topics, and title keywords. These index files adhere to a predefined schema and are intended to serve as input for subsequent pipelines, facilitating further analysis.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/1316655-14-1.jpg",
-        "",
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+
+![](/container-engine/images/youtube/1316655-14-1.jpg)
 
 
 # [Example Code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test)
 
-[block:parameters]
-{
-  "data": {
-    "h-0": "Code",
-    "h-1": "Description",
-    "0-0": "job_generator.py",
-    "0-1": "Generates metadata files in the directory \"./metadata/\" and updates the index file located at \"./index.csv\" based on named channels and search queries.  \nCreates temporary input and output files in the directory \"./temp_files/” for multiprocessing downloads.  \n  \nThe file “topics.csv” contains a list of popular topics.  \n  \nPlease ensure that the environment variable GCP_API_KEY is set:  \nexport GCP_API_KEY=’######################’",
-    "1-0": "job_queue_access.py",
-    "1-1": "Provides the access to the job queue and is imported by Job Filler, Job Cleaner and Job Monitor.  \n  \nPlease ensure that the following environment variables are set:  \nexport AWS_ID='######################'  \nexport AWS_KEY='######################'  \nexport QUEUE_URL='<https://sqs.us-east-2.amazonaws.com/######/###.fifo'>",
-    "2-0": "job_filler.py",
-    "2-1": "Supports two job injection strategies: one-time injection and send-monitor-replenish.  \n  \nNeed access to the index file located at \"./index.csv” and metadata files in the directory \"./metadata/”.  \n  \nKeep the cursor at the file “./last_position” to track progress, and send new tasks to the job queue after the position of the last generated task.",
-    "3-0": "job_queue_cleaner.py",
-    "3-1": "Purge the job queue mainly for tests.",
-    "4-0": "job_queue_monitor.py",
-    "4-1": "Monitor the available jobs in the queue and forecast when the queue will be empty.",
-    "5-0": "node/app/api_parakeet.py  \nnode/bench/benchmark_1m.py",
-    "5-1": "The inference process and the benchmark worker process.",
-    "6-0": "node/Dockerfile.parakeet.yt1m",
-    "6-1": "The dockerfile to build the image.  \n  \nBuild the image:  \ndocker image build -t docker.io/saladtechnologies/nemo:yt1m-test -f Dockerfile.parakeet.yt1m .  \n  \nRun the image and needs 10 environment variables:  \ndocker run --rm --gpus all  \n--env BENCHMARK_ID=$BENCHMARK_ID  \n--env REPORTING_API_URL=$REPORTING_API_URL  \n--env REPORTING_AUTH_HEADER=$REPORTING_AUTH_HEADER  \n--env REPORTING_API_KEY=$REPORTING_API_KEY  \n--env CLOUDFLARE_ID=$CLOUDFLARE_ID  \n--env CLOUDFLARE_KEY=$CLOUDFLARE_KEY  \n--env CLOUDFLARE_URL=$CLOUDFLARE_URL  \n--env AWS_ID=$AWS_ID  \n--env AWS_KEY=$AWS_KEY  \n--env QUEUE_URL=$QUEUE_URL  \ndocker.io/saladtechnologies/nemo:yt1m-test  \n  \nAccess the Job Queue System (AWS SQS):  \nexport AWS_ID='######################'  \nexport AWS_KEY='######################'  \nexport QUEUE_URL='<https://sqs.us-east-2.amazonaws.com/######/###.fifo'>  \n  \nAccess the Cloud Storage (Cloudflare R2):  \nexport CLOUDFLARE_ID='######################'  \nexport CLOUDFLARE_KEY='######################'  \nexport CLOUDFLARE_URL='https\\://######################.r2.cloudflarestorage.com'  \n  \nAccess the Job Reporting System (AWS Lambda to AWS DynamoDB):  \nexport BENCHMARK_ID=\"######################\"  \nexport REPORTING_API_URL=\"https\\://######################.lambda-url.us-east-2.on.aws\"  \nexport REPORTING_AUTH_HEADER=\"######################\"  \nexport REPORTING_API_KEY=\"######################\"",
-    "7-0": "",
-    "7-1": ""
-  },
-  "cols": 2,
-  "rows": 8,
-  "align": [
-    "left",
-    "left"
-  ]
-}
-[/block]
 
 
-<br>
+| Code | Description |
+| :---- | :---- |
+| job_generator.py | Generates metadata files in the directory \"./metadata/\" and updates the index file located at \"./index.csv\" based on named channels and search queries. Creates temporary input and output files in the directory \"./temp_files/” for multiprocessing downloads. The file “topics.csv” contains a list of popular topics. Please ensure that the environment variable GCP_API_KEY is set. |
+| job_queue_access.py | Provides the access to the job queue and is imported by Job Filler, Job Cleaner and Job Monitor. Please ensure that the following environment variables are set: AWS_ID, AWS_KEY and QUEUE_URL. |
+| job_filler.py | Supports two job injection strategies: one-time injection and send-monitor-replenish. Need access to the index file located at \"./index.csv” and metadata files in the directory \"./metadata/”. Keep the cursor at the file “./last_position” to track progress, and send new tasks to the job queue after the position of the last generated task. |
+| job_queue_cleaner.py | Purge the job queue mainly for tests. |
+| job_queue_monitor.py | Monitor the available jobs in the queue and forecast when the queue will be empty. |
+| node/app/api_parakeet.py, node/bench/benchmark_1m.py | The inference process and the benchmark worker process. |
+| node/Dockerfile.parakeet.yt1m | The dockerfile to build the image. 10 environment variables are required to run the image: 1.Access the Job Queue System (AWS SQS):AWS_ID, AWS_KEY and QUEUE_URL; 2.Access the Cloud Storage (Cloudflare R2):CLOUDFLARE_ID, CLOUDFLARE_KEY and CLOUDFLARE_URL; 3.Access the Job Reporting System (AWS Lambda to AWS DynamoDB): BENCHMARK_ID, REPORTING_API_URL, REPORTING_AUTH_HEADER and REPORTING_API_KEY . |
+ 
+

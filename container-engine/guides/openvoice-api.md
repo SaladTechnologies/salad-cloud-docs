@@ -6,6 +6,7 @@ hidden: false
 createdAt: "Mon Mar 18 2024 18:55:37 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Tue Apr 09 2024 16:23:12 GMT+0000 (Coordinated Universal Time)"
 ---
+
 ## Introduction
 
 Text-to-speech (TTS) technology has undergone significant advancements in recent years, becoming more affordable and efficient than ever before. Modern TTS models leverage deep learning and artificial intelligence to produce natural-sounding speech with remarkable accuracy. These models find applications in various real-life scenarios, such as voice assistants, audiobook narration, and accessibility tools for those with visual impairments or reading difficulties. In this article, we will focus on using one such TTS model, Open Voice, on Salad Cloud, demonstrating how to harness its capabilities in a cloud-based environment.
@@ -79,7 +80,7 @@ openvoice-on-salad/
 │  │  │  ├─ inference/
 │  │  │  │  ├─ dev/
 │  │  │  │  │  ├─ setup
-│  │  │  │  ├─ fast.py 
+│  │  │  │  ├─ fast.py
 │  │  │  │  ├─ other Open Voice python scripts
 │  │  │  ├─ .dockerignore
 │  │  │  ├─ Dockerfile
@@ -167,9 +168,9 @@ base_speaker_tts.tts(text, src_path, speaker='default', language='English', spee
 # Run the tone color converter
 encode_message = "@MyShell"
 tone_color_converter.convert(
-    audio_src_path=src_path, 
-    src_se=source_se, 
-    tgt_se=target_se, 
+    audio_src_path=src_path,
+    src_se=source_se,
+    tgt_se=target_se,
     output_path=save_path,
     message=encode_message)
 
@@ -184,7 +185,7 @@ Here is an example of the results:
 
 ### Separating TTS and Voice Cloning
 
-In our implementation, we first handle the text-to-speech conversion and then proceed to the optional voice cloning step. This way you can choose if you want to just use TTS part of the process, or add voice custom voice cloning on top of it: 
+In our implementation, we first handle the text-to-speech conversion and then proceed to the optional voice cloning step. This way you can choose if you want to just use TTS part of the process, or add voice custom voice cloning on top of it:
 
 #### Step 1: Text-to-Speech (TTS) Conversion
 
@@ -197,7 +198,7 @@ result_file_name = tts_file_name
 
 ```
 
-In this step, we use the `BaseSpeakerTTS` model from OpenVoice to convert the input text into speech. The `tts` method takes parameters such as the text, output path, speaker tone, language, and speed to generate the speech file. The resulting audio file is stored at `tts_path`, and its name is saved in `result_file_name`. Those paths will be used later in the cloning step if it is used, or to save the results back to azure. 
+In this step, we use the `BaseSpeakerTTS` model from OpenVoice to convert the input text into speech. The `tts` method takes parameters such as the text, output path, speaker tone, language, and speed to generate the speech file. The resulting audio file is stored at `tts_path`, and its name is saved in `result_file_name`. Those paths will be used later in the cloning step if it is used, or to save the results back to azure.
 
 #### Step 2: Voice Cloning
 
@@ -217,9 +218,9 @@ if clone is True:
     clone_result_name = f"{text_file.rsplit('.', 1)[0]}_cloned.wav"
     clone_result_path = f"{clone_dir}/{clone_result_name}"
     tone_color_converter.convert(
-        audio_src_path=tts_path, 
-        src_se=source_se, 
-        tgt_se=target_se, 
+        audio_src_path=tts_path,
+        src_se=source_se,
+        tgt_se=target_se,
         output_path=clone_result_path,
         message=encode_message)
     result_path = clone_result_path
@@ -231,7 +232,7 @@ In the voice cloning step, we first check if cloning is enabled (`clone` is `Tru
 
 ### Integrating Azure Storage
 
-To handle input text files, reference voices, and output results, we integrate Azure Blob Storage into our workflow. In order to do that we created a storage account in Azure with several storage container: input, voices, output. This allows us to fetch input files dynamically and store the processed audio files for easy access. You can use any other storage provider you prefer. 
+To handle input text files, reference voices, and output results, we integrate Azure Blob Storage into our workflow. In order to do that we created a storage account in Azure with several storage container: input, voices, output. This allows us to fetch input files dynamically and store the processed audio files for easy access. You can use any other storage provider you prefer.
 
 ```python
 
@@ -357,7 +358,7 @@ RUN apt-get update && apt-get install -y python3.9
 RUN apt-get update && apt-get install -y curl wget ffmpeg unzip git python3-pip
 # Update pip and install requirements
 RUN pip install --upgrade pip
-RUN pip install torch==1.13.1+cu117 torchvision>=0.13.1+cu117 torchaudio>=0.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 --no-cache-dir 
+RUN pip install torch==1.13.1+cu117 torchvision>=0.13.1+cu117 torchaudio>=0.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 --no-cache-dir
 RUN pip install  -r inference/requirements.txt
 RUN pip install uvicorn
 
@@ -399,30 +400,28 @@ We now need to set up all of our container group parameters:
    If you are using your custom solution, specify your image location.
 
    [block:image]{"images":[{"image":["https://files.readme.io/e934a91-Screenshot_2024-03-17_200414.png",null,""],"align":"center","sizing":"400px","border":true}]}[/block]
+
 3. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative. TTS process can be run on any GPU. Check out our benchmark to choose which GPU is better for your needs.
-5. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables. 
+5. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
 6. **Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/a4b1834-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "sizing": "400px",
-      "border": true
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/a4b1834-image.png",
+null,
+""
+],
+"align": "center",
+"sizing": "400px",
+"border": true
+}
+]
 }
 [/block]
-
-
-<br>
 
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found here: <https://portal.salad.com/api-key>  
 With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
@@ -440,32 +439,31 @@ Once your solution is deployed on Salad, the next step is to interact with your 
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/0df9964-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "border": true
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/0df9964-image.png",
+null,
+""
+],
+"align": "center",
+"border": true
+}
+]
 }
 [/block]
 
-
-You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example:  
+You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example:
 
 ```java
 https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs
 ```
 
-You will see your Swagger page similar to this: 
+You will see your Swagger page similar to this:
 
 ![](https://files.readme.io/aa0f2bc-image.png)
 
-On the Swagger page, you can interact with your API by providing the required parameters to run the process. Some parameters are optional, and you may not need to override them if you're using the same Azure container names. Additionally, some parameters are only relevant for voice cloning, so you can skip them if you're only running text-to-speech (TTS). Note, that we are using azure storage in the current solution, so make sure you deploy your azure resources in advance. If you want to use another storage provide, check out the full solution documentation. Here is a full list of the arguments:  
+On the Swagger page, you can interact with your API by providing the required parameters to run the process. Some parameters are optional, and you may not need to override them if you're using the same Azure container names. Additionally, some parameters are only relevant for voice cloning, so you can skip them if you're only running text-to-speech (TTS). Note, that we are using azure storage in the current solution, so make sure you deploy your azure resources in advance. If you want to use another storage provide, check out the full solution documentation. Here is a full list of the arguments:
 
 - `connection_string`: Azure Storage Connection String (e.g., "DefaultEndpointsProtocol=https;AccountName=accountname;AccountKey=key;[EndpointSuffix=core.windows.net](http://EndpointSuffix=core.windows.net)")
 - `input_container_name`: Container name for input files (e.g., "requests")
