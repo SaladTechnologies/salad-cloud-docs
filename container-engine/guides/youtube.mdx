@@ -6,6 +6,7 @@ hidden: false
 createdAt: "Tue Apr 02 2024 22:46:35 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Thu Apr 04 2024 19:05:58 GMT+0000 (Coordinated Universal Time)"
 ---
+
 To collect and transcribe massive videos from YouTube using SaladCloud, the process typically involves three key steps:
 
 Data Collection from YouTube: Gather relevant video URLs from specific channels or based on particular topics, creating video metadata files. These files include essential details such as video title, URL, duration and codec, etc.
@@ -16,8 +17,7 @@ Validation, Analysis and Delivery: Validate outcomes using both the metadata fil
 
 ![](/container-engine/images/youtube/cfef23d-1-1.jpg)
 
-
-The three steps can either constitute a single end-to-end pipeline or operate as three independent steps, depending on the specific business requirements. 
+The three steps can either constitute a single end-to-end pipeline or operate as three independent steps, depending on the specific business requirements.
 
 Transcribing YouTube videos doesn't inherently require pre-downloading and storage of the videos. Simultaneous downloading and transcribing are feasible. Additionally, if a YouTube video supports an audio codec, efficiency can be improved by exclusively downloading its audio. This approach not only reduces bandwidth demands but also significantly saves time, considering that video sizes are typically ten times larger than their corresponding audio files.
 
@@ -51,7 +51,7 @@ Through testing, we've implemented and executed the job generator on a standard 
 
 We can utilize a variety of tools and libraries to construct the job generator:
 
-### [YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started)  and [Google API Client Library](https://developers.google.com/youtube/v3/quickstart/python)
+### [YouTube Data API v3](https://developers.google.com/youtube/v3/getting-started) and [Google API Client Library](https://developers.google.com/youtube/v3/quickstart/python)
 
 This tool offers all the necessary functionalities for interacting with YouTube, such as searching channels, playlists, and videos based on keywords, retrieving all playlists from a particular channel, and uploading/downloading videos.
 
@@ -64,7 +64,6 @@ Now, let's calculate the quota cost for collecting video URLs from a search on a
 | Search and get 100 channels based on a keyword | 200 | Executing a search.list needs 100 units and it can return a maximum of 50 items: 100 x 2 |
 | Get 10,000 playlists from the 100 channels, assuming each channel contains 100 playlists | 200 | Executing a playlist.list requires 1 unit and it can return a maximum of 50 items: 100 x 1 x 2 |
 | Get 2,000,000 video URLs from the 10,000 playlists of the 100 channels, assuming each playlist contains 200 videos | 40,000 | Executing a video.list requires 1 unit and it can return a maximum of 50 items: 100 x 100 x 1 x 4 |
-
 
 The default quota allocation of 10,000 units per day may prove insufficient if we need to collect numerous video URLs in a short timeframe. We can create several GCP projects with each providing 10,000 units per day, or we could also complete [an audit](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits) and request an additional quota following the process. Here we provide a combined solution by using both YouTube Data API and Pytube.
 
@@ -202,8 +201,7 @@ To maximize performance with better scalability, we adopt multiple threads to co
 | Caller | It reads metadata from the transcribing queue, and subsequently sends a synchronous request, including the audio filename, to the inference server. Upon receiving the response, it forwards the generated texts along with statistics, and the transcribed audio filename to the reporting queue.  The simplicity of the caller is crucial as it directly influences the inference performance. |
 | Reporter | The reporter, upon reading the reporting queue, deletes the processed audio files from the shared folder and manages post-processing tasks, including merging results and calculating real-time factor and word count. Eventually, it uploads the generated assets to Cloudflare, reports the job results to AWS DynamoDB and removes the processed jobs from AWS SQS. |
 
-
-By running two processes to segregate GPU-bound tasks from I/O and CPU-bound tasks, and fetching and preparing the next audio clips concurrently and in advance while the current one is still being transcribed, we can eliminate any waiting period.  After one audio clip is completed, the next is immediately ready for transcription. This approach not only reduces the overall processing time for batch jobs but also leads to even more significant cost savings.
+By running two processes to segregate GPU-bound tasks from I/O and CPU-bound tasks, and fetching and preparing the next audio clips concurrently and in advance while the current one is still being transcribed, we can eliminate any waiting period. After one audio clip is completed, the next is immediately ready for transcription. This approach not only reduces the overall processing time for batch jobs but also leads to even more significant cost savings.
 
 Please refer to the[ example code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/tree/main/node) for the node implementation.
 

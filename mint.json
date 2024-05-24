@@ -64,10 +64,6 @@
       "pages": ["introduction", "quickstart", "api-usage"]
     },
     {
-      "group": "Common Services",
-      "pages": ["salad-simple-storage-service"]
-    },
-    {
       "group": "API Documentation",
       "pages": [
         {
@@ -179,7 +175,10 @@
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
         "container-engine/workload-logs",
-        "container-engine/container-logs"
+        "container-engine/container-logs",
+        "container-engine/billing",
+        "container-engine/quotas",
+        "container-engine/faqs"
       ]
     },
     {

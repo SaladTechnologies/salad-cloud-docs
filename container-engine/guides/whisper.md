@@ -6,11 +6,12 @@ hidden: false
 createdAt: "Thu Nov 30 2023 16:25:17 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Tue Apr 09 2024 16:35:02 GMT+0000 (Coordinated Universal Time)"
 ---
+
 We have a ready-to-go inference server for automatic speech recognition tasks, with a super simple API. [Check out the code.](https://github.com/SaladTechnologies/asr-api)
 
 # Automatic Speech Recognition API
 
-A minimalist, performance-oriented inference server for automatic speech recognition. 
+A minimalist, performance-oriented inference server for automatic speech recognition.
 
 Here's some prelimary performance numbers. These numbers are for total round-trip request time, including downloading the audio file, and parsing the response. The default configuration is used for all models.
 
@@ -51,7 +52,7 @@ This healthcheck will not respond until the server is fully ready to accept requ
 ```json
 {
   "status": "ok",
-  "version": "0.0.5",
+  "version": "0.0.5"
 }
 ```
 
@@ -59,7 +60,7 @@ This healthcheck will not respond until the server is fully ready to accept requ
 
 #### Request - JSON
 
-URL should be a download link to an audio file. It can also be a local filepath, if the server is running on the same machine as the file. 
+URL should be a download link to an audio file. It can also be a local filepath, if the server is running on the same machine as the file.
 
 Verified extension support:
 
@@ -73,7 +74,7 @@ It may support more formats. It is using ffmpeg and Soundfile under the hood.
 
 ```json
 {
-  "url": "https://example.com/audio.mp3",
+  "url": "https://example.com/audio.mp3"
 }
 ```
 
@@ -110,12 +111,9 @@ curl -X POST http://example.com/asr \
   "text": "hello world",
   "chunks": [
     {
-      "timestamp": [
-        0.0,
-        2.1
-      ],
+      "timestamp": [0.0, 2.1],
       "text": "hello world"
-    },
+    }
   ]
 }
 ```
@@ -216,26 +214,27 @@ Select or Create the organization and project you want to work with, then click 
 1. Give your container group a name that is unique within this organization and project.
 
    ![](https://files.readme.io/8b27841-cg-name.png)
+
 2. Select the `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2` image to deploy distil-whisper large v2, using BetterTransformers.
 
    ![](https://files.readme.io/dfecdb2-img-name.png)
+
 3. Set your replica count. We recommend at least 3 replicas for production use.
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/67d2659-replica.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/67d2659-replica.png",
+null,
+""
+],
+"align": "center"
+}
+]
 }
 [/block]
-
 
 4. Set the CPU to 2, and the memory to 8 GB.
 
@@ -253,22 +252,19 @@ Select or Create the organization and project you want to work with, then click 
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/27736f7-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "sizing": "400px"
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/27736f7-image.png",
+null,
+""
+],
+"align": "center",
+"sizing": "400px"
+}
+]
 }
 [/block]
-
-
-<br>
 
 8. Click "Deploy" to deploy your container group.
 

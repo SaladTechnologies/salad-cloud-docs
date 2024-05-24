@@ -6,6 +6,7 @@ hidden: false
 createdAt: "Wed May 01 2024 14:20:34 GMT+0000 (Coordinated Universal Time)"
 updatedAt: "Wed May 01 2024 19:22:37 GMT+0000 (Coordinated Universal Time)"
 ---
+
 Salad is capable of running all kinds of long-running compute-intensive jobs, from fine tuning SDXL to molecular simulations, with the following restrictions:
 
 - One job/block must be completed on a single GPU with up to 24gb vram. Typically very large simulations are broken up into smaller blocks so they can be processed concurrently on many GPUs.
@@ -42,38 +43,36 @@ Navigate to the [Salad Portal](https://portal.salad.com/), creating a user accou
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/dd1b98c-image.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/dd1b98c-image.png",
+null,
+""
+],
+"align": "center"
+}
+]
 }
 [/block]
-
 
 Click "Deploy a Container Group", and fill out the form, providing the docker image you just built, and specifying the hardware required to run the job. For now, you can leave `Replica Count` as `1`, since Kelpie is capable of scaling your container group for you once configured.
 
 [block:image]
 {
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/6dfce6a-image.png",
-        null,
-        "Your job almost definitely needs more hardware than this"
-      ],
-      "align": "center",
-      "caption": "Your job almost definitely needs more hardware than this"
-    }
-  ]
+"images": [
+{
+"image": [
+"https://files.readme.io/6dfce6a-image.png",
+null,
+"Your job almost definitely needs more hardware than this"
+],
+"align": "center",
+"caption": "Your job almost definitely needs more hardware than this"
+}
+]
 }
 [/block]
-
 
 You do not need to override the command, and you do not need to enable `Container Gateway`.
 
@@ -111,7 +110,7 @@ In order to make sure your jobs get scheduled on the correct container group, yo
 
 ### (Optional) Create Scaling Rules
 
-You can use the [Kelpie API](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule)  to create a scaling rule for your container group, setting min and max replicas, and how long to count an idle instance as active.![](https://files.readme.io/c1ed076-image.png)
+You can use the [Kelpie API](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule) to create a scaling rule for your container group, setting min and max replicas, and how long to count an idle instance as active.![](https://files.readme.io/c1ed076-image.png)
 
 ## Prepare Data For Your Job
 
@@ -119,7 +118,7 @@ Kelpie deals with data in 3 categories:
 
 - Inputs - Data used as an input to your job. This might be images, text, or anything else. This data gets synced one-way _from_ your cloud storage _to_ a container's local storage, prior to starting a job. Changes made to the input directory locally are not detected, and are not pushed back up to the cloud.
 - Checkpoints - Data that saves the state of a job in a format that allows resuming. This directory is synced bi-directionally to and from the cloud. Data is downloaded from the cloud to the container's local storage prior to starting a job. Files added to the checkpoint directory locally are automatically pushed up to the cloud.
-- Outputs - The result of your job. This might be model weights, CSV files, or anything else. This directory is synced one-way _to_  your cloud storage _from_ a container's local storage, throughout a job's running time and at completion. Files added to the output directory locally are automatically pushed up to the cloud.
+- Outputs - The result of your job. This might be model weights, CSV files, or anything else. This directory is synced one-way _to_ your cloud storage _from_ a container's local storage, throughout a job's running time and at completion. Files added to the output directory locally are automatically pushed up to the cloud.
 
 Prior to starting a batch of jobs, you need to make sure your inputs are organized appropriately in your storage bucket.
 
@@ -168,5 +167,3 @@ If you've set up scaling rules and added the kelpie user to your salad org, you 
 Otherwise, now is the time to start your container group, and set the number of replicas desired. Nodes will begin pulling work from the Kelpie API immediately when they become running. You can access the replica count from the "Edit" button in the container group view.
 
 ![](https://files.readme.io/7d353a2-image.png)
-
-<br>
