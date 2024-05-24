@@ -214,6 +214,8 @@
         "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
+        "container-engine/guides/jupyterlab",
+        "container-engine/guides/youtube",
         {
           "group": "YOLOv8",
           "pages": [
