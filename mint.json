@@ -215,6 +215,7 @@
         "container-engine/guides/run-a-python-app",
         "container-engine/guides/jupyterlab",
         "container-engine/guides/youtube",
+        "container-engine/guides/deploy-blip-with-cog",
         {
           "group": "YOLOv8",
           "pages": [
