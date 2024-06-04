@@ -27,5 +27,16 @@ We support options for both authenticated (recommended) and unauthenticated netw
 
 ### Container Gateway Requirements
 
-- Your application must bind to IPv4 (a WSL2 limitation) and IPv6 (for load balancing)
+- Your application support IPv6
 - All requests to the Salad load balancer must be over HTTPS
+
+### What is the maximum request size I can send?
+
+The maximum request size is set to 1 GB by the Container Gateway and its related services.
+
+To follow best practices for processing large files, we recommend architecting applications using a pull model rather than a push model:
+
+1. Put the large files in Cloud Storage, such as AWS S3，Cloudflare R2 or YouTube. Select the appropriate service tier and lifecycle policy (Hot/Warm/Cold/Archive) based on their access patterns to optimize costs.
+2. Following the principle of least privilege, grant access to these files for your containers on SaladCloud.
+3. Send the jobs (file URL and metadata) to the containers via the Container Gateway.
+4. Ensure your container application will receive the url, download and process the files and provide the results.
