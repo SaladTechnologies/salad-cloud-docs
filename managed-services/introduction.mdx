@@ -208,3 +208,111 @@ curl -X GET "https://api.salad.com/api/public/organizations/{your-organization}/
 
 ### Cost
  - Managed endpoints is being offered for free for a limited time!
+
+
+ ## Transcription Service Automation
+
+In the coming weeks, our transcription service will be enhanced with webhook functionality, allowing you to receive notifications when your transcription jobs are completed. Until then, you can use the following Python code snippet to automate the process of sending requests and retrieving transcription results.
+
+### Pass 1: Submitting Audio Files for Transcription
+This part of the script submits audio files for transcription and collects job IDs. The job IDs are used in the second pass to check the status and retrieve the results.
+
+```bash
+import requests
+import json
+# Set the organization name, url, and API key
+organization_name = "your_organization_name"
+url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+salad_key = "your_salad_key"
+language_code = "en"
+# Add your audio links here 
+list_of_audio_files = [
+    "audio_url",
+    "audio_url",
+    "audio_url",
+]
+# If you want to pull links from a file, you can use the following code
+# with open('audio_links.txt', 'r') as f:
+#     list_of_audio_files = f.readlines()
+# Placeholder for job_ids
+list_of_job_ids = []
+headers = {
+    "Salad-Api-Key": salad_key,
+    "Content-Type": "application/json",
+    "accept": "application/json",
+}
+# Pass 1: Submit audio files for transcription
+# Loop through the list of audio files and construct body of each request
+for audio_file in list_of_audio_files:
+    data = {
+        "input": {
+            "url": audio_file,
+            "language_code": language_code,
+            "word_level_timestamps": True,
+            "diarization": True,
+            "srt": True,
+        }
+    }
+    # Send the request
+    response = requests.post(url, headers=headers, json=data)
+    # Pull job id from response. And save it to a list or a file
+    job_id = response.json()["id"]
+    list_of_job_ids.append(job_id)
+    #save job_ids to a file if needed (uncomment the code below)
+    # job_id_str = f'"{job_id}",'
+    # # Open a file and write the job_id to it
+    # with open('queue_test.txt', 'a') as f:
+    #     f.write(job_id_str + '\n')
+
+```
+### Pass 2: Checking Job Status and Retrieving Results
+
+This part of the script checks the status of each transcription job periodically and retrieves the results once the transcription is completed.
+
+```bash
+    # Pass 2. Loop though the job_ids and get the results
+    # If you use both passes in the same script, just continue. 
+    # If you use scripts separatly you need to set up connection again 
+    # and initialize the list of job ids : 
+    # Uncomment the code below if you need to 
+    # import requests
+    # import json
+    # Set the organization name, url, and API key
+    # organization_name = "your_organization_name"
+    # url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+    # salad_key = "your_salad_key"
+    # language_code = "en"
+    # headers = {
+    #     "Salad-Api-Key": salad_key,
+    #     "Content-Type": "application/json",
+    #     "accept": "application/json",
+    # }
+    # Pull list from a file:
+    # with open('queue_test.txt', 'r') as f:
+    #     list_of_job_ids = f.readlines()
+    # or initialize the list manually
+    # list_of_job_ids = ["job_id1", "job_id2", "job_id3", "job_id4"]
+import time
+# Loop though the job_ids and get the results
+while len(list_of_job_ids) > 0:
+    for job in list_of_job_ids:
+        response_url = f"https://api.salad.com/api/public/organizations/salad/inference-endpoints/transcribe/jobs/{job}"
+        response = requests.get(response_url, headers=headers)
+        if response.json()['status'] == 'running' or response.json()['status'] == 'pending':
+            print(f"Job {job} is still {response.json()['status']}, waiting for retry...")
+            # wait for 30 seconds and retry
+            time.sleep(30) 
+            continue
+        if response.json()['status'] == 'succeded':
+            #save the response to a file
+            with open(f'result_{job}.json', 'w', encoding='utf-8') as f:
+                json.dump(response.json(), f, ensure_ascii=False)  
+            #remove the job_id from the list
+            list_of_job_ids.remove(job)
+        else:
+            print(f"Job {job} failed, waiting for retry...")
+            # wait for 30 seconds and retry
+            time.sleep(30)
+            continue
+
+```
