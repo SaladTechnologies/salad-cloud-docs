@@ -17,7 +17,7 @@ You can check more detailed project overview in our previous guide **Fast API fo
   - A Python script for batch processing is containerized and deployed across multiple Salad compute nodes.
   - This batch process routinely checks the storage queue. When a new message appears, it picks up the corresponding stream for processing.
 
-<img src="https://files.readme.io/ee8c70e-image-20231110-144732.png" />
+<img src="container-engine\images\ee8c70e-image-20231110-144732.png" />
 
 ## Folder Structure
 
@@ -92,7 +92,7 @@ Here’s a step-by-step guide to deploying these resources:
      ```
 4. **Check resources**:
    - Open your resource group in azure and check the resources. You should see something similar to this:  
-      ![](https://files.readme.io/95c899c-image-20231129-004732.png)
+      ![](container-engine\images\95c899c-image-20231129-004732.png)
 
 ## **Local Environment**
 
@@ -141,7 +141,7 @@ bash dev/setup
 
 As we delve into the practicalities of implementing YOLOv8 for object detection, a fundamental step is to understand the range of its capabilities and the types of data it can process effectively. This knowledge will shape our approach to solving the problem at hand. Here is a list of possible inputs:
 
-<img src="https://files.readme.io/6ca37bc-image-20231110-144807.png" />
+<img src="container-engine\images\6ca37bc-image-20231110-144807.png" />
 
 Our project's scope now narrows to the realm of video processing, with a particular focus on YouTube videos and live stream data.
 
@@ -199,7 +199,7 @@ cv2.destroyAllWindows()
 
 With this script, as YOLO processes the video frames and identifies objects, bounding boxes will be drawn around them. You'll see a display window pop up showing the video feed with the detections overlaid. Pay attention to the output displayed at the bottom of the screen for additional insights. Let’s run our code and see what happens.
 
-<img src="https://files.readme.io/eed5878-ezgif.com-video-to-gif.gif" />
+<img src="https://files.readme.io/eed5878-ezgif.com-video-to-gif.gif" /> #ISSUE!!
 
 ## **Processing Live Video Stream from Youtube**
 
@@ -251,11 +251,11 @@ results = model.track(frame, persist=True)
 
 Let’s try it:
 
-![](https://mgorkii.atlassian.net/wiki/download/thumbnails/3047425/2023-11-07-13-14-30.gif?version=1&modificationDate=1701215622987&cacheVersion=1&api=v2&width=760&height=506)
+![](https://mgorkii.atlassian.net/wiki/download/thumbnails/3047425/2023-11-07-13-14-30.gif?version=1&modificationDate=1701215622987&cacheVersion=1&api=v2&width=760&height=506) #ISSUE!!
 
 That is great, but our main goal is to get a summary of how long an object was present on the video. I will now remove the appearing window with the bounding boxes and we will pay more attention to the data. For this part of the project we are using Jupyter in vscode and pandas. Let’s check what results object is:
 
-<img src="https://files.readme.io/a58bc5f-image-20231110-164853.png" />
+<img src="container-engine\images\a58bc5f-image-20231110-164853.png" />
 
 We can see that results object has some metadata and all the detections. Let’s only keep the detections and convert them to a more readable format:
 
@@ -263,7 +263,7 @@ We can see that results object has some metadata and all the detections. Let’s
 json.loads(results[0].tojson())
 ```
 
-<img src="https://files.readme.io/8497acf-image-20231110-164932.png" />
+<img src="container-engine\images\8497acf-image-20231110-164932.png" />
 
 To get a detailed summary of object detections, we'll collate all the individual detection data into a pandas DataFrame. We will not only include the basic detection details provided by YOLOv8, such as bounding box coordinates, class ID, class name, and tracking ID, but also additional contextual information for a richer analysis.
 
@@ -321,7 +321,7 @@ After the loop is interrupted (by pressing 'q'), we convert the list of dictiona
 
 Let’s see what we’ve got.
 
-<img src="https://files.readme.io/78982db-image-20231110-165537.png" />
+<img src="container-engine\images\78982db-image-20231110-165537.png" />
 
 ## **Readable summary**
 
@@ -409,7 +409,7 @@ This adjustment ensures that if the system has the capability, it will leverage 
 
 The results speak for themselves. After running a live stream through our enhanced process for about 40 minutes, we observed a dramatic improvement in processing speed. The times dropped to a stunning 5 to 15 milliseconds per frame. This enhancement means our YOLOv8 solution is now processing frames up to 10 times faster on a GPU compared to CPU processing.
 
-<img src="https://files.readme.io/0213756-image-20231117-201658.png" />
+<img src="container-engine\images\0213756-image-20231117-201658.png" />
 
 **Files format and naming**
 
@@ -485,7 +485,7 @@ while True:
 
 Next our script will loop through messages in the Azure storage queue, decode the message, remove the message from queue to ensure that multiple containers do not process the same message and read the file we’ve put in the requests storage container. We'll specifically handle JSON files containing video links, along with metadata indicating whether each video is pre-recorded or live:
 
-<img src="https://files.readme.io/e59bab5-image-20231129-014434.png" />
+<img src="container-engine\images\e59bab5-image-20231129-014434.png" />
 
 Here is a link to the [full script](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch.py)
 
@@ -570,7 +570,7 @@ First create your account and log into https://portal.salad.com/ Create your org
 
 Under container groups click “Deploy a Container Group“:
 
-<img src="https://files.readme.io/3a503c3-image-20231110-194241.png" />
+<img src="container-engine\images\3a503c3-image-20231110-194241.png" />
 
 We now need to set up all of our container group parameters:
 
@@ -580,17 +580,17 @@ We now need to set up all of our container group parameters:
 2. **Pick the Image Source:** In our case we are using a private Azure Container Registry. Click Edit next to Image source. Now switch to “Private Registry“, under “What Service Are You Using“ pick Azure Container Registry.  
    Get back to your azure portal and find the image name, username and password of our container registry repository.  
    Find your acr in azure and click “repositories“ on the left  
-   ![](https://files.readme.io/84b5723-image-20231110-195239.png)  
+   ![](container-engine\images\84b5723-image-20231110-195239.png)  
    Chose the image repository and click on the version you want to pull.  
    Now under “Manifest“ you will see a Docker pull command in the followings format: `docker pull {image name}`:  
-   ![](https://files.readme.io/f99f106-image-20231110-195608.png)  
+   ![](container-engine\images\f99f106-image-20231110-195608.png)  
    Copy the “image name“ and paste back to salad portal.  
    Now let’s find acr username and password back in azure portal.  
    Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not enabled, do so. Now copy the username and password and pass it back to Salad portal.
 3. **Replica count**: This will define how many videos can be processed simultaneously. For example if we have 10 containers we can put 10 files with links and they will all be picked up one by one.
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative.
 5. **Environment variables:** This is where we need to add our environment variables we went through above. Specify them in a key-value format:  
-   ![](https://files.readme.io/907ff99-image-20231129-020041.png)
+   ![](container-engine\images\907ff99-image-20231129-020041.png)
 
 With everything in place, deploying your application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
 Now check “AutoStart container group once image is pulled“ and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.
@@ -607,7 +607,7 @@ Once your solution deployed on Salad you can put a file in the requests containe
 
 Ones the video is processed 2 files will be saved to results container:
 
-<img src="https://files.readme.io/a13d2b6-image-20231110-145135.png" />
+<img src="container-engine\images\a13d2b6-image-20231110-145135.png" />
 
 And our solution is now deployed to cloud compute and successful writes the results to our storage account.
 
@@ -617,7 +617,7 @@ Our journey into the realm of object detection using YOLOv8 and deploying it on 
 
 For those who might be interested we’ve also implemented **multithreading functionality** to our solution. With multithreading you can process several streams simultaneously at one node by providing multiple links in the request file:
 
-<img src="https://files.readme.io/2c460d2-image-20231129-020724.png" />
+<img src="container-engine\images\2c460d2-image-20231129-020724.png" />
 
 Here is a link to the multi-threading [code](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch-multi-thread.py)
 
