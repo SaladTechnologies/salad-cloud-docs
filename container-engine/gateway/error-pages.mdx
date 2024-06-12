@@ -34,6 +34,12 @@ If you try to send large files over the URL. Currently the maximum request size 
 
 ![](/container-engine/images/gateway-error-413.png)
 
+## 413
+
+If you try to send large files over the URL. Currently the maximum request size is set to 1GB by the Containger Gateway and its related services.
+
+![](/container-engine/images/gateway-error-413.png)
+
 ## 500
 
 <img src="container-engine\images\7661b54-500.png" />
@@ -51,7 +57,9 @@ If you try to send large files over the URL. Currently the maximum request size 
 It is possible to get this 503 error, if you have [health probes](/container-engine/health-probes) configured that are not yet passing
 
 If a readiness probe is configured, check that it is passing on at least 1 instance.
-<img src="container-engine\images\1de7468-503.png" />
+
+<img src="https://files.readme.io/1de7468-503.png" />
+
 
 ## 504
 
