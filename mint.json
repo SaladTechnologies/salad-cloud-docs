@@ -84,8 +84,31 @@
           ]
         },
         {
-          "group": "workload_errors",
-          "pages": ["api-reference/workload_errors/get-workload-errors"]
+          "group": "inference_endpoints",
+          "pages": [
+            "api-reference/inference_endpoints/gets-a-list-of-inference-endpoints-that-match-the-paginated-query-parameters-if-no-paginated-query/nparameters-are-provided-the-full-list-is-returned",
+            "api-reference/inference_endpoints/get-an-inference-endpoint",
+            "api-reference/inference_endpoints/create-a-new-job",
+            "api-reference/inference_endpoints/returns-a-job-in-an-inference-endpoint",
+            "api-reference/inference_endpoints/delete-a-job-from-an-inference-endpoint"
+          ]
+        },
+        {
+          "group": "organization_data",
+          "pages": ["api-reference/organization_data/list-the-gpu-classes"]
+        },
+        {
+          "group": "queues",
+          "pages": [
+            "api-reference/queues/list-queues",
+            "api-reference/queues/create-a-queue",
+            "api-reference/queues/get-a-queue",
+            "api-reference/queues/delete-a-queue",
+            "api-reference/queues/update-a-queue",
+            "api-reference/queues/create-a-new-job",
+            "api-reference/queues/returns-a-job-in-a-queue",
+            "api-reference/queues/delete-a-job-from-a-queue"
+          ]
         },
         {
           "group": "quotas",
@@ -106,15 +129,15 @@
           ]
         },
         {
-          "group": "organization_data",
-          "pages": ["api-reference/organization_data/list-the-gpu-classes"]
-        },
-        {
           "group": "recipes",
           "pages": [
             "api-reference/recipes/list-recipes",
             "api-reference/recipes/get-a-recipe"
           ]
+        },
+        {
+          "group": "workload_errors",
+          "pages": ["api-reference/workload_errors/get-workload-errors"]
         }
       ]
     },

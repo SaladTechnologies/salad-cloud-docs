@@ -9,7 +9,7 @@
       "email": "support@salad.com"
     },
     "termsOfService": "https://salad.com/terms",
-    "version": "1.0.0-alpha.108"
+    "version": "1.0.0-alpha.111"
   },
   "servers": [
     {
@@ -457,6 +457,244 @@
         "tags": ["container_groups"]
       }
     },
+    "/organizations/{organization_name}/projects/{project_name}/queues": {
+      "summary": "Queues",
+      "description": "Operations for queues",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        }
+      ],
+      "get": {
+        "operationId": "list_queues",
+        "summary": "List Queues",
+        "description": "Gets the list of queues",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListQueues"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      },
+      "post": {
+        "operationId": "create_queue",
+        "summary": "Create a Queue",
+        "description": "Creates a new queue",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateQueue"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateQueue"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}": {
+      "summary": "Queue",
+      "description": "Operations for a queue",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/queue_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_queue",
+        "summary": "Get a Queue",
+        "description": "Gets a queue",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetQueue"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      },
+      "patch": {
+        "operationId": "update_queue",
+        "summary": "Update a Queue",
+        "description": "Updates a queue",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateQueue"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateQueue"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      },
+      "delete": {
+        "operationId": "delete_queue",
+        "summary": "Delete a Queue",
+        "description": "Deletes a queue",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteQueue"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs": {
+      "summary": "Jobs in a Queue",
+      "description": "Operations for jobs in a queue",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/queue_name"
+        }
+      ],
+      "post": {
+        "operationId": "create_queue_job",
+        "summary": "Create a new Job",
+        "description": "Creates a new job",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateQueueJob"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateQueueJob"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      }
+    },
+    "/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs/{queue_job_id}": {
+      "summary": "Jobs in a Queue",
+      "description": "Operations for jobs in a queue",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/project_name"
+        },
+        {
+          "$ref": "#/components/parameters/queue_name"
+        },
+        {
+          "$ref": "#/components/parameters/queue_job_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_queue_job",
+        "summary": "Returns a job in a queue",
+        "description": "Retrieves a job in a queue",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetQueueJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      },
+      "delete": {
+        "operationId": "delete_queue_job",
+        "summary": "Delete a job from a queue",
+        "description": "Deletes a queue job",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteQueueJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      }
+    },
     "/organizations/{organization_name}/quotas": {
       "summary": "Quotas",
       "description": "Operations for quotas",
@@ -780,6 +1018,166 @@
         "tags": ["recipe_deployments"]
       }
     },
+    "/organizations/{organization_name}/inference-endpoints": {
+      "summary": "Inference Endpoints",
+      "description": "Operations for inference endpoints",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/page"
+        },
+        {
+          "$ref": "#/components/parameters/page_size"
+        }
+      ],
+      "get": {
+        "operationId": "list_inference_endpoints",
+        "summary": "Gets a list of inference endpoints that match the paginated query parameters. If no paginated query\\nparameters are provided, the full list is returned.",
+        "description": "Gets the list of all inference endpoints",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListInferenceEndpoints"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/{inference_endpoint_name}": {
+      "summary": "Inference Endpoint",
+      "description": "Operations for an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint",
+        "summary": "Get an Inference Endpoint",
+        "description": "Gets an inference endpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetInferenceEndpoint"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/{inference_endpoint_name}/jobs": {
+      "summary": "Jobs in an inference endpoint",
+      "description": "Operations for jobs in an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_name"
+        }
+      ],
+      "post": {
+        "operationId": "create_inference_endpoint_job",
+        "summary": "Create a new Job",
+        "description": "Creates a new job",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateInferenceEndpointJob"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateInferenceEndpointJob"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/{inference_endpoint_name}/jobs/{inference_endpoint_job_id}": {
+      "summary": "Jobs in an inference endpoint",
+      "description": "Operations for jobs in an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_job_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_job",
+        "summary": "Returns a job in an inference endpoint",
+        "description": "Retrieves a job in an inference endpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetInferenceEndpointJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      },
+      "delete": {
+        "operationId": "delete_inference_endpoint_job",
+        "summary": "Delete a job from an inference endpoint",
+        "description": "Deletes an inference endpoint job",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteInferenceEndpointJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      }
+    },
     "/organizations/{organization_name}/gpu-classes": {
       "summary": "GPU Classes",
       "description": "Allows reading the GPU Classes collection available for the organization",
@@ -895,6 +1293,27 @@
           "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
         }
       },
+      "inference_endpoint_job_id": {
+        "in": "path",
+        "name": "inference_endpoint_job_id",
+        "description": "The unique job id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "inference_endpoint_name": {
+        "in": "path",
+        "name": "inference_endpoint_name",
+        "description": "The unique inference endpoint name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2
+        }
+      },
       "organization_name": {
         "in": "path",
         "name": "organization_name",
@@ -907,6 +1326,30 @@
           "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
         }
       },
+      "page": {
+        "in": "query",
+        "name": "page",
+        "description": "The page number",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "maximum": 2147483647,
+          "minimum": 1,
+          "nullable": true
+        }
+      },
+      "page_size": {
+        "in": "query",
+        "name": "page_size",
+        "description": "The number of items per page",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "maximum": 100,
+          "minimum": 1,
+          "nullable": true
+        }
+      },
       "project_name": {
         "in": "path",
         "name": "project_name",
@@ -917,6 +1360,28 @@
           "maxLength": 63,
           "minLength": 2,
           "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        }
+      },
+      "queue_job_id": {
+        "in": "path",
+        "name": "queue_job_id",
+        "description": "The unique job id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "queue_name": {
+        "in": "path",
+        "name": "queue_name",
+        "description": "The unique queue name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
         }
       },
       "recipe_deployment_name": {
@@ -1303,8 +1768,14 @@
           "liveness_probe": {
             "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
           },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
+          },
           "startup_probe": {
             "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "queue_connection": {
+            "$ref": "#/components/schemas/ContainerGroupQueueConnection"
           },
           "create_time": {
             "type": "string",
@@ -1400,8 +1871,14 @@
           "liveness_probe": {
             "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
           },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
+          },
           "startup_probe": {
             "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "queue_connection": {
+            "$ref": "#/components/schemas/ContainerGroupQueueConnection"
           }
         },
         "additionalProperties": false,
@@ -1448,6 +1925,9 @@
           },
           "liveness_probe": {
             "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
           },
           "startup_probe": {
             "$ref": "#/components/schemas/ContainerGroupStartupProbe"
@@ -1616,6 +2096,58 @@
           "failure_threshold"
         ]
       },
+      "ContainerGroupReadinessProbe": {
+        "description": "Represents the container group readiness probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
       "ContainerProbeHttpScheme": {
         "type": "string",
         "enum": ["http"]
@@ -1755,6 +2287,233 @@
           "allocated_at",
           "version"
         ]
+      },
+      "QueueList": {
+        "description": "Represents a list of queues",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Queue"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "QueueJobList": {
+        "description": "Represents a list of queue jobs",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueJob"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "Queue": {
+        "description": "Represents a queue",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          },
+          "container_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "create_time",
+          "update_time",
+          "container_groups"
+        ]
+      },
+      "CreateQueue": {
+        "description": "Represents a request to create a queue",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["name"]
+      },
+      "UpdateQueue": {
+        "description": "Represents a request to update a queue",
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueueJob": {
+        "description": "Represents a queue job",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "succeeded", "cancelled", "failed"]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "output": {
+            "description": "The job output. May be any valid JSON."
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time"
+        ]
+      },
+      "QueueJobEvent": {
+        "description": "Represents an event for queue job",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["created", "started", "succeeded", "cancelled", "failed"]
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["action", "time"]
+      },
+      "CreateQueueJob": {
+        "description": "Represents a request to create a queue job",
+        "type": "object",
+        "properties": {
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["input"]
       },
       "Container": {
         "description": "Represents a container",
@@ -2670,6 +3429,14 @@
             "description": "The version of the running container group",
             "type": "integer",
             "minimum": 1
+          },
+          "ready": {
+            "description": "Specifies whether the container group instance is currently passing its readiness check. If no readiness probe is defined, is true once fully started.",
+            "type": "boolean"
+          },
+          "started": {
+            "description": "Specifies whether the container group instance passed its startup probe. Is always true when no startup probe is defined.",
+            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -2696,6 +3463,31 @@
         },
         "additionalProperties": false,
         "required": ["instances"]
+      },
+      "ContainerGroupQueueConnection": {
+        "description": "Represents container group queue connection",
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "queue_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": ["path", "port", "queue_name"]
       },
       "GpuClass": {
         "description": "Represents a GPU Class",
@@ -3083,6 +3875,14 @@
                   "description": "The UTC date & time when the workload on this machine transitioned to the current state",
                   "type": "string",
                   "format": "date-time"
+                },
+                "ready": {
+                  "description": "Specifies whether the container group instance is currently passing it's readiness check. If no readiness probe is defined, is true once fully started.",
+                  "type": "boolean"
+                },
+                "started": {
+                  "description": "Specifies whether the container group instance passed its startup probe. Is always true when no startup probe is defined.",
+                  "type": "boolean"
                 }
               }
             },
@@ -3092,6 +3892,180 @@
         },
         "additionalProperties": false,
         "required": ["instances"]
+      },
+      "InferenceEndpoint": {
+        "description": "Represents an inference endpoint",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "The inference endpoint display name",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "a brief description of the inference endpoint",
+            "type": "string"
+          },
+          "endpoint_url": {
+            "description": "The URL of the inference endpoint",
+            "type": "string",
+            "format": "url"
+          },
+          "readme": {
+            "description": "A markdown file containing a detailed description of the inference endpoint",
+            "type": "string"
+          },
+          "price_description": {
+            "description": "A description of the price",
+            "type": "string"
+          },
+          "icon_image": {
+            "description": "The URL of the icon image",
+            "type": "string",
+            "format": "url"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "description",
+          "endpoint_url",
+          "readme",
+          "price_description",
+          "icon_image"
+        ]
+      },
+      "InferenceEndpointsList": {
+        "description": "Represents a list of inference endpoints",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpoint"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
+      "InferenceEndpointJob": {
+        "description": "Represents a inference endpoint job",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "inference_endpoint_name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "succeeded", "cancelled", "failed"]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "organization_name": {
+            "description": "The organization name",
+            "type": "string"
+          },
+          "output": {
+            "description": "The job output. May be any valid JSON."
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time",
+          "inference_endpoint_name",
+          "organization_name"
+        ]
+      },
+      "InferenceEndpointJobEvent": {
+        "description": "Represents an event for inference endpoint job",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["created", "started", "succeeded", "cancelled", "failed"]
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": ["action", "time"]
+      },
+      "CreateInferenceEndpointJob": {
+        "description": "Represents a request to create a inference endpoint job",
+        "type": "object",
+        "properties": {
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": ["input"]
       }
     },
     "requestBodies": {
@@ -3172,6 +4146,76 @@
                 "value": {
                   "display_name": "Salad Deployed Recipe",
                   "replicas": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateQueue": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateQueue"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "name": "queue-1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateQueue": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UpdateQueue"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "display_name": "Queue 1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateQueueJob": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateQueueJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "name": "queue-1"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateInferenceEndpointJob": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateInferenceEndpointJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "input": {},
+                  "metadata": {},
+                  "webhook": "https://webhook_url:8080"
                 }
               }
             }
@@ -3625,6 +4669,384 @@
           }
         }
       },
+      "ListQueues": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QueueList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "jobs",
+                      "display_name": "job queue",
+                      "description": "The job queue",
+                      "container_groups": [
+                        {
+                          "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                          "name": "sim1",
+                          "display_name": "Simulation 1",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65535",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        },
+                        {
+                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                          "name": "sim2",
+                          "display_name": "Simulation 2",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65536",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "autostart_policy": true,
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        }
+                      ],
+                      "create_time": "2023-07-04T19:00:00Z",
+                      "update_time": "2023-07-04T19:00:00Z"
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "jobs2",
+                      "display_name": "job2 queue",
+                      "container_groups": [
+                        {
+                          "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                          "name": "sim1",
+                          "display_name": "Simulation 1",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65535",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        },
+                        {
+                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                          "name": "sim2",
+                          "display_name": "Simulation 2",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65536",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "autostart_policy": true,
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        }
+                      ],
+                      "description": "The job2 queue",
+                      "create_time": "2023-07-04T19:00:00Z",
+                      "update_time": "2023-07-04T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateQueue": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/projects/anvil-drop-simulator/queues/queue-1"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Queue"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "queue-1",
+                  "display_name": "Queue 1",
+                  "description": "The job queue"
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "get_queue_by_name": {
+            "operationId": "get_queue",
+            "parameters": {
+              "queue_name": "$response.body#/name"
+            }
+          }
+        }
+      },
+      "UpdateQueue": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Queue"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "queue-1",
+                  "display_name": "Queue 1",
+                  "description": "The job queue"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetQueue": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Queue"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "jobs",
+                      "display_name": "job queue",
+                      "description": "The job queue",
+                      "container_groups": [
+                        {
+                          "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                          "name": "sim1",
+                          "display_name": "Simulation 1",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65535",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        },
+                        {
+                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                          "name": "sim2",
+                          "display_name": "Simulation 2",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65536",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": 1311768467294899700
+                          },
+                          "autostart_policy": true,
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z"
+                        }
+                      ],
+                      "create_time": "2023-07-04T19:00:00Z",
+                      "update_time": "2023-07-04T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteQueue": {
+        "description": "Accepted"
+      },
+      "CreateQueueJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/projects/anvil-drop-simulator/queues/queue-1/jobs/job-1"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QueueJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "input": {},
+                  "metadata": {},
+                  "webhook": "yourapp.com/webhook/12345"
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "get_queue_job_by_name": {
+            "operationId": "get_queue_job",
+            "parameters": {
+              "queue_job_id": "$response.body#/id"
+            }
+          }
+        }
+      },
+      "GetQueueJob": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QueueJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "input": {},
+                  "metadata": {},
+                  "webhook": "yourapp.com/webhook/12345",
+                  "status": "pending",
+                  "events": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "type": "pending",
+                      "time": "2020-07-04T19:00:00Z"
+                    }
+                  ],
+                  "output": {},
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "update_time": "2020-07-04T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteQueueJob": {
+        "description": "Accepted"
+      },
       "ListGpuClasses": {
         "description": "OK",
         "content": {
@@ -4002,6 +5424,130 @@
             }
           }
         }
+      },
+      "GetInferenceEndpoint": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpoint"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": [
+                  {
+                    "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                    "name": "avatar-generator",
+                    "display_name": "Avatar Generator",
+                    "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator",
+                    "readme": "test-readme",
+                    "price_description": "0.05 credits per inference",
+                    "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator/icon"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ListInferenceEndpoints": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointsList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                      "name": "avatar-generator",
+                      "display_name": "Avatar Generator",
+                      "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator",
+                      "readme": "test-readme",
+                      "price_description": "0.05 credits per inference",
+                      "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator/icon"
+                    },
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c22893",
+                      "name": "audio-to-waveform",
+                      "display_name": "Audio to Waveform",
+                      "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform",
+                      "readme": "test-readme",
+                      "price_description": "0.10 credits per inference",
+                      "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform/icon"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateInferenceEndpointJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/inference-endpoints/avatar-generator/jobs/123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": [
+                  {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "inference_endpoint_name": "avatar-generator",
+                    "input": {},
+                    "metadata": null,
+                    "organization_name": "acme-corp",
+                    "status": "pending",
+                    "events": [],
+                    "create_time": "2024-05-01T19:00:00Z",
+                    "update_time": "2024-05-01T19:00:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "GetInferenceEndpointJob": {
+        "description": "Ok",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "example": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {},
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteInferenceEndpointJob": {
+        "description": "Accepted"
       }
     },
     "securitySchemes": {

@@ -26,7 +26,7 @@ SaladCloud is designed to execute stateless container workloads. To ensure data 
 
 We create a folder named 'data' within the /root directory of the container, acting as the current working directory that needs the data persistence. During the initial launch of the instance, a script file named ‘start.sh’ is executed, and all data is synchronized from the chosen cloud platform to the /root/data directory by use of Cloud-specific CLIs, the storage resource name and access credentials. Following this, the script continuously monitors the /root/data directory, and any changes (create, delete or modify) in this directory or its subfolders trigger the synchronization back to the cloud.
 
-![](/container-engine/images/jupyterlab/bfebac8-tech_doc_1.jpg)
+<img src="/container-engine/images/jupyterlab/bfebac8-tech_doc_1.jpg"/>
 
 Under the hood, we employ the inotifywait command-line tool that uses the inotify Linux kernel subsystem to watch for changes in the /root/data directory. Every time files are manually saved through the JupyerLab menu, or automatically saved by the JupyterLab’s autosave feature, the inotifywait command captures events such as create, delete or modify. Subsequently, the script triggers synchronization. All three public cloud platforms offer sync commands that can make the contents under the source the same as the content under the destination by calculating and copying only the differences instead of duplicating the entire directory. This integrated solution is highly effective, minimizing API calls to the cloud and reducing data transfer to the cloud to the minimum.
 
@@ -60,7 +60,7 @@ Log into the AWS Console, and create an AWS S3 bucket ('rxjupyterlab') with the 
 
 
 
-![](/container-engine/images/jupyterlab/2009ed8-tech_doc_2.jpg)
+<img src="/container-engine/images/jupyterlab/2009ed8-tech_doc_2.jpg"/>
 
 
 
@@ -71,7 +71,7 @@ Create an AWS IAM policy ('access_its_own_folder') using the provided JSON file.
 
 
 
-![](/container-engine/images/jupyterlab/0e960c6-tech_doc_3.jpg)
+<img src="/container-engine/images/jupyterlab/0e960c6-tech_doc_3.jpg"/>
 
 
 
@@ -113,25 +113,25 @@ Create an AWS IAM user ('user1') without the AWS Console access and attach the c
 
 
 
-![](/container-engine/images/jupyterlab/e1b930e-tech_doc_4.jpg)
+<img src="/container-engine/images/jupyterlab/e1b930e-tech_doc_4.jpg"/>
 
 
 
 
-![](/container-engine/images/jupyterlab/07a9f96-tech_doc_5.jpg)
+<img src="/container-engine/images/jupyterlab/07a9f96-tech_doc_5.jpg"/>
 
 
 
 Generate the access key ID/secret access key for the AWS IAM user ('user1'). Copy and securely keep the credentials in a safe location.
 
 
-![](/container-engine/images/jupyterlab/3c0975e-tech_doc_6.jpg)
+<img src="/container-engine/images/jupyterlab/3c0975e-tech_doc_6.jpg"/>
 
 
 
 When running the JupyterLab containers on SaladCloud with AWS as the backend cloud storage, three AWS-related environment variables are utilized to pass the access key ID/access key secret, as well as the bucket and folder name to the container.
 
-![](/container-engine/images/jupyterlab/1c7bad0-tech_doc_7.jpg)
+<img src="/container-engine/images/jupyterlab/1c7bad0-tech_doc_7.jpg"/>
 
 
 
@@ -141,7 +141,7 @@ When running the JupyterLab containers on SaladCloud with AWS as the backend clo
 
 Log into the Azure Console, and create an Azure Storage Account ('rxjupyterdata') with the default settings in one of the Azure Regions, and create a container ('data') within the storage account. This container will be synchronized with the /root/data directory inside a JupyterLab container running on SaladCloud. If an organization is providing the JupyterLab service for numerous users and aims to ensure exclusive access to their own data, creating one container per user within the same storage account is a recommended approach in Azure.
 
-![](/container-engine/images/jupyterlab/4e89d2d-tech_doc_8.jpg)
+<img src="/container-engine/images/jupyterlab/4e89d2d-tech_doc_8.jpg"/>
 
 
 
@@ -150,7 +150,7 @@ Navigate to the “Properties” menu on the left panel, and copy the container 
 
 
 
-![](/container-engine/images/jupyterlab/9042ffc-tech_doc_9.jpg)
+<img src="/container-engine/images/jupyterlab/9042ffc-tech_doc_9.jpg"/>
 
 
 
@@ -159,20 +159,20 @@ Navigate to the “Properties” menu on the left panel, and copy the container 
 For the access policy, you can define the start time, expiry time and permissions; all the 6 permissions are necessary for the data persistence of JupyterLab containers.
 
 
-![](/container-engine/images/jupyterlab/07728a3-tech_doc_10.jpg)
+<img src="/container-engine/images/jupyterlab/07728a3-tech_doc_10.jpg"/>
 
 
 
 After creating the access policy for the Azure storage account container, generate the shared access token.  Copy and securely keep the Blob SAS token in a safe location.
 
-![](/container-engine/images/jupyterlab/3afd7e5-tech_doc_11.jpg)
+<img src="/container-engine/images/jupyterlab/3afd7e5-tech_doc_11.jpg"/>
 
 
 
 When running the JupyterLab containers on SaladCloud with Azure as the backend cloud storage, two Azure-related environment variables are utilized to pass the container URL and Blob SAS token to the container.
 
 
-![](/container-engine/images/jupyterlab/207b332-tech_doc_12.jpg)
+<img src="/container-engine/images/jupyterlab/207b332-tech_doc_12.jpg"/>
 
 
 
@@ -182,14 +182,14 @@ When running the JupyterLab containers on SaladCloud with Azure as the backend c
 
 Log into the GCP Console, and create a GCP Cloud Storage bucket ('rxjupyterlab') with the default settings in one of the GCP Regions, and create a folder ('sa1') within the bucket. This folder will be synchronized with the /root/data directory inside a JupyterLab container running on SaladCloud. If an organization is providing the JupyterLab service for numerous users and aims to ensure exclusive access to their own data, creating one bucket per user is a recommended approach in GCP.
 
-![](/container-engine/images/jupyterlab/f2c9a5d-tech_doc_13.jpg)
+<img src="/container-engine/images/jupyterlab/f2c9a5d-tech_doc_13.jpg"/>
 
 
 ### Step 2: Create a service account and generate its credentials
 
 Create a service account (‘sa1’) without permissions, and add a key for the service account.  Download the key’s JSON file and securely keep it in a safe location.
 
-![](/container-engine/images/jupyterlab/c089355-tech_doc_14.jpg)
+<img src="/container-engine/images/jupyterlab/c089355-tech_doc_14.jpg"/>
 
 
 ### Step 3: Grant access to the bucket for the service account
@@ -197,13 +197,13 @@ Create a service account (‘sa1’) without permissions, and add a key for the 
 Navigate to the “rxjupyterlab” bucket again and grant the “Storage Admin” role to the sa1 service account. Unlike AWS, GCP does not provide an easy way to grant access only to a specific folder inside the bucket. With the above role assignment, the sa1 service account will have access to the entire bucket.
 
 
-![](/container-engine/images/jupyterlab/95b3117-tech_doc_15.jpg)
+<img src="/container-engine/images/jupyterlab/95b3117-tech_doc_15.jpg"/>
 
 
 When running the JupyterLab containers on SaladCloud with GCP as the backend cloud storage, three GCP-related environment variables are utilized to pass the credentials (content of the downloaded JSON file), the bucket and folder name, and project ID to the container.
 
 
-![](/container-engine/images/jupyterlab/7cdc53a-tech_doc_16.jpg)
+<img src="/container-engine/images/jupyterlab/7cdc53a-tech_doc_16.jpg"/>
 
 
 
@@ -213,7 +213,7 @@ When running the JupyterLab containers on SaladCloud with GCP as the backend clo
 To run a JupyterLab instance on SaladCloud, you can log in the SaladCloud Console and deploy the JupyterLab instance by selecting 'Deploy a Container Group' with the following parameters:
 
 
-![](/container-engine/images/jupyterlab/13b07e0-tech_doc_17-1.jpg)
+<img src="/container-engine/images/jupyterlab/13b07e0-tech_doc_17-1.jpg"/>
 
 
 | Parameter | Value |
@@ -230,7 +230,7 @@ To run a JupyterLab instance on SaladCloud, you can log in the SaladCloud Consol
 
 SaladCloud would take a few minutes to download the image to the selected node and run the container. Using the  Console, you can determine whether the JupyterLab instance is ready to use.
 
-![](/container-engine/images/jupyterlab/e657944-tech_doc_18.jpg)
+<img src="/container-engine/images/jupyterlab/e657944-tech_doc_18.jpg"/>
 
 
 
@@ -238,7 +238,7 @@ After the instance is running, you can type the generated Access Domain Name in 
 
 
 
-![](/container-engine/images/jupyterlab/4b5c193-tech_doc_19.jpg)
+<img src="/container-engine/images/jupyterlab/4b5c193-tech_doc_19.jpg"/>
 
 
 
@@ -248,7 +248,7 @@ Now you can write Python code to learn, test, fine-tune or train the popular AI 
 
 
 
-![](/container-engine/images/jupyterlab/a0383df-tech_doc_20.jpg)
+<img src="/container-engine/images/jupyterlab/a0383df-tech_doc_20.jpg"/>
 
 
 
@@ -258,7 +258,7 @@ In the JupyterLab terminal, you have the flexibility to use SH and BASH, and swi
 
 
 
-![](/container-engine/images/jupyterlab/6599a2b-tech_doc_21.jpg)
+<img src="/container-engine/images/jupyterlab/6599a2b-tech_doc_21.jpg"/>
 
 
 
