@@ -115,11 +115,11 @@ docker push docker.io/saladtechnologies/sip:0.0.3-blip
 ```
 
 After the container is running, you can log into it and do some tests for health checks and predictions.
-![](/container-engine/images/bligcog/blipcog1.png)
-![](/container-engine/images/bligcog/blipcog2.png)
+<img src="/container-engine/images/bligcog/blipcog1.png"/>
+<img src="/container-engine/images/bligcog/blipcog2.png"/>
 
 The Cog HTTP prediction server is now using IPv6. The port number is configurable via the environment variable - ‘PORT’. 
-![](/container-engine/images/bligcog/blipcog3.png)
+<img src="/container-engine/images/bligcog/blipcog3.png"/>
 
 
 
@@ -161,12 +161,12 @@ PORT, 5000 (Default) or others
 ```
 
 The Readiness Probe is used to evaluate whether a container is ready to accept the traffic from the load balancer. The probe with the protocol - exec, will run the given command inside the container, if the command returns an exit code of 0, the container is considered in a healthy state. Any other exit codes indicate the container is not ready yet. A Python script is provided here and run regularly to check whether  the models have been loaded successfully and the Cog HTTP prediction server is ready.
-![](/container-engine/images/bligcog/blipcog4.png)
+<img src="/container-engine/images/bligcog/blipcog4.png"/>
 
 # Test the inference endpoint
 
 After the container group is deployed,  an access domain name will be created and can be used to access the application.
-![](/container-engine/images/bligcog/blipcog5.png)
+<img src="/container-engine/images/bligcog/blipcog5.png"/>
 
 ```Text 
 # image_captioning

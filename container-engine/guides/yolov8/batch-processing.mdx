@@ -92,7 +92,7 @@ Here’s a step-by-step guide to deploying these resources:
      ```
 4. **Check resources**:
    - Open your resource group in azure and check the resources. You should see something similar to this:  
-      ![](container-engine\images\95c899c-image-20231129-004732.png)
+      <img src="container-engine\images\95c899c-image-20231129-004732.png"/>
 
 ## **Local Environment**
 
@@ -251,7 +251,7 @@ results = model.track(frame, persist=True)
 
 Let’s try it:
 
-![](container-engine\images\2023-11-07-13-14-30.gif)
+<img src="container-engine\images\2023-11-07-13-14-30.gif"/>
 
 That is great, but our main goal is to get a summary of how long an object was present on the video. I will now remove the appearing window with the bounding boxes and we will pay more attention to the data. For this part of the project we are using Jupyter in vscode and pandas. Let’s check what results object is:
 
@@ -580,17 +580,17 @@ We now need to set up all of our container group parameters:
 2. **Pick the Image Source:** In our case we are using a private Azure Container Registry. Click Edit next to Image source. Now switch to “Private Registry“, under “What Service Are You Using“ pick Azure Container Registry.  
    Get back to your azure portal and find the image name, username and password of our container registry repository.  
    Find your acr in azure and click “repositories“ on the left  
-   ![](container-engine\images\84b5723-image-20231110-195239.png)  
+   <img src="container-engine\images\84b5723-image-20231110-195239.png"/>  
    Chose the image repository and click on the version you want to pull.  
    Now under “Manifest“ you will see a Docker pull command in the followings format: `docker pull {image name}`:  
-   ![](container-engine\images\f99f106-image-20231110-195608.png)  
+   <img src="container-engine\images\f99f106-image-20231110-195608.png"/>  
    Copy the “image name“ and paste back to salad portal.  
    Now let’s find acr username and password back in azure portal.  
    Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not enabled, do so. Now copy the username and password and pass it back to Salad portal.
 3. **Replica count**: This will define how many videos can be processed simultaneously. For example if we have 10 containers we can put 10 files with links and they will all be picked up one by one.
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative.
 5. **Environment variables:** This is where we need to add our environment variables we went through above. Specify them in a key-value format:  
-   ![](container-engine\images\907ff99-image-20231129-020041.png)
+   <img src="container-engine\images\907ff99-image-20231129-020041.png"/>
 
 With everything in place, deploying your application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
 Now check “AutoStart container group once image is pulled“ and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.

@@ -80,24 +80,24 @@ Each probe can be in 1 of 3 states:
 
 ### Successful Startup Probe
 
-![](container-engine/images/c651b89-Startup_Success.png)
+<img src="container-engine/images/c651b89-Startup_Success.png"/>
 
 
 ### Failed Startup Probe
 
-![](container-engine/images/1046446-Startup_Failure.png)
+<img src="container-engine/images/1046446-Startup_Failure.png"/>
 
 
 ## Liveness Probe
 
 ### Successful Liveness Probe
 
-![](container-engine/images/67f4869-Liveness_Recovers.png)
+<img src="container-engine/images/67f4869-Liveness_Recovers.png"/>
 
 
 ### Failed Liveness Probe
 
-![](container-engine/images/05e66d5-Liveness_Failure.png)
+<img src="container-engine/images/05e66d5-Liveness_Failure.png"/>
 
 ## Readiness Probe (Coming Soon)
 
@@ -105,11 +105,11 @@ Each probe can be in 1 of 3 states:
 
 <br />
 
-![](container-engine/images/bca39c9-image.png)
+<img src="container-engine/images/bca39c9-image.png"/>
 
 ### Failed Readiness Probe
 
-![](container-engine/images/2a724dc-image.png)
+<img src="container-engine/images/2a724dc-image.png"/>
 
 <br />
 
@@ -119,7 +119,7 @@ Each probe can be in 1 of 3 states:
 
 Each of these probes can be configured from the container group configuration page by clicking the edit button beside each probe section.
 
-![](container-engine/images/74f4654-image.png)
+<img src="container-engine/images/74f4654-image.png"/>
 
 
 # Probe Configuration
@@ -128,11 +128,11 @@ Salad provides comprehensive protocol support, including `exec`, `gRPC`, `TCP`, 
 
 To perform a probe, Salad executes the command you specify in the target container. To configure a command, press the Edit link as shown below.
 
-![](container-engine/images/14265c8-image.png)
+<img src="container-engine/images/14265c8-image.png"/>
 
 Configure the command and any additional arguments. In this example, the container will attempt to read a file located at `/tmp/healthy` exactly `Initial Delay Seconds` after startup. If it successfully executes the command within `Timeout Seconds`, the probe returns an exit code 0. Once this has happened `Success Threshold` times, the Startup probe is 'done' and the Liveness and Readiness probes (if configured) are initiated.
 
-![](container-engine/images/a58f6be-image.png)
+<img src="container-engine/images/a58f6be-image.png"/>
 
 ## Standard Probe Properties
 
