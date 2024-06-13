@@ -53,7 +53,7 @@ We are setting out to construct two distinct solutions to leverage the capabilit
   - This Docker container is then deployed on Salad compute resources to utilize processing capabilities.
   - The Docker image itself is housed in Azure Container Registry for secure and convenient access.
 
-<img src="container-engine\images\0b3502a-6ab72e2-image.png" />
+<img src="/container-engine/images/0b3502a-6ab72e2-image.png" />
 
 ### **Solution 2: Batch Processing for Asynchronous Workloads**
 
@@ -64,7 +64,7 @@ We are setting out to construct two distinct solutions to leverage the capabilit
   - A Python script for batch processing is containerized and deployed across multiple Salad compute nodes.
   - This batch process routinely checks the storage queue. When a new message appears, it picks up the corresponding stream for processing.
 
-<img src="container-engine\images\f3b5dda-image-20231110-144732.png" />
+<img src="/container-engine/images/f3b5dda-image-20231110-144732.png" />
 
 ## Folder Structure
 
@@ -156,7 +156,7 @@ bash dev/setup
 
 As we delve into the practicalities of implementing YOLOv8 for object detection, a fundamental step is to understand the range of its capabilities and the types of data it can process effectively. This knowledge will shape our approach to solving the problem at hand. Here is a list of possible inputs:
 
-<img src="container-engine\images\f8abde5-image-20231110-144807.png" />
+<img src="/container-engine/images/f8abde5-image-20231110-144807.png" />
 
 Our project's scope now narrows to the realm of video processing, with a particular focus on YouTube videos and live stream data. YOLOv8's versatility in handling video data makes it an ideal candidate for real-time object detection in these mediums.
 
@@ -216,7 +216,7 @@ With this script, as YOLO processes the video frames and identifies objects, bou
 
 And here is the magic!
 
-<img src="container-engine\images\a7afc2a-ezgif.com-video-to-gif.gif" />
+<img src="/container-engine/images/a7afc2a-ezgif.com-video-to-gif.gif" />
 
 ## **Processing Live Video Stream from Youtube**
 
@@ -268,11 +268,11 @@ results = model.track(frame, persist=True)
 
 Let’s try it:
 
-<img src="container-engine\images\51b9dcf-image.png"/>
+<img src="/container-engine/images/51b9dcf-image.png"/>
 
 That is great, but our main goal is to get a summary of how long an object was present on the video. I will now remove the appearing window with the bounding boxes and we will pay more attention to the data. For this part of the project I am using Jupyter in vscode and pandas. Let’s check what results object is:
 
-<img src="container-engine\images\3296839-image-20231110-164853.png" />
+<img src="/container-engine/images/3296839-image-20231110-164853.png" />
 
 We can see that results object has some metadata and all the detections. Let’s only keep the detections and convert them to a more readable format:
 
@@ -280,7 +280,7 @@ We can see that results object has some metadata and all the detections. Let’s
 json.loads(results[0].tojson())
 ```
 
-<img src="container-engine\images\6140c20-image-20231110-164932.png" />
+<img src="/container-engine/images/6140c20-image-20231110-164932.png" />
 
 To get a detailed summary of object detections, we'll collate all the individual detection data into a pandas DataFrame. We will not only include the basic detection details provided by YOLOv8, such as bounding box coordinates, class ID, class name, and tracking ID, but also additional contextual information for a richer analysis.
 
@@ -338,7 +338,7 @@ After the loop is interrupted (by pressing 'q'), we convert the list of dictiona
 
 Let’s see what we’ve got.
 
-<img src="container-engine\images\a513697-image-20231110-165537.png" />
+<img src="/container-engine/images/a513697-image-20231110-165537.png" />
 
 ## **Readable summary**
 
@@ -426,7 +426,7 @@ This adjustment ensures that if the system has the capability, it will leverage 
 
 The results speak for themselves. After running a live stream through our enhanced process for about 40 minutes, we observed a dramatic improvement in processing speed. The times dropped to a stunning 5 to 15 milliseconds per frame. This enhancement means our YOLOv8 solution is now processing frames up to 10 times faster on a GPU compared to CPU processing.
 
-<img src="container-engine\images\136c2c1-image-20231117-201658.png" />
+<img src="/container-engine/images/136c2c1-image-20231117-201658.png" />
 
 ## **Storing Object Detection Results in Azure Storage**
 
@@ -532,7 +532,7 @@ uvicorn fast:app --host 0.0.0.0 --port 8000
 
 You should see something similar to that in your terminal:
 
-<img src="container-engine\images\7a4adc5-image-20231110-191541.png" />
+<img src="/container-engine/images/7a4adc5-image-20231110-191541.png" />
 
 **Testing Your Endpoints:**
 
@@ -540,15 +540,15 @@ Now your FastAPI application is running locally. To test it you can use tools li
 
 Let’s start with the “start“ endpoint. Fill in the required fields and execute it.
 
-<img src="container-engine\images\5c016b4-image-20231110-145102.png" />
+<img src="/container-engine/images/5c016b4-image-20231110-145102.png" />
 
 To stop the process execute the stop endpoint
 
-<img src="container-engine\images\64aaadb-image-20231110-145125.png" />
+<img src="/container-engine/images/64aaadb-image-20231110-145125.png" />
 
 In your termial you will see that the process has stopped. Now lets check if our results saved in our azure account:
 
-<img src="container-engine\images\4b2c3ed-image-20231110-145135.png" />
+<img src="/container-engine/images/4b2c3ed-image-20231110-145135.png" />
 
 Great. We now have our solution packed into a fast api and have our control system of starting and stopping the process in place.
 
@@ -603,7 +603,7 @@ First create your account and log into the [portal](https://portal.salad.com/) C
 
 Under container groups click “Deploy a Container Group“:
 
-<img src="container-engine\images\72bde49-image-20231110-194241.png" />
+<img src="/container-engine/images/72bde49-image-20231110-194241.png" />
 
 We now need to set up all of our container group parameters:
 
@@ -614,12 +614,12 @@ We now need to set up all of our container group parameters:
    Now lets get back to our azure portal and find the image name, username and password of our container registry repository.  
    Find your acr in azure and click “repositories“ on the left
 
-   <img src="container-engine\images\1196da2-image-20231110-195239.png" />
+   <img src="/container-engine/images/1196da2-image-20231110-195239.png" />
 
    Chose the image repository and click on the version you want to pull.  
    Now under “Manifest“ you will see a Docker pull command in the followings format: `docker pull <image name>`:
 
-   <img src="container-engine\images\90b2d4d-image-20231110-195608.png" />
+   <img src="/container-engine/images/90b2d4d-image-20231110-195608.png" />
 
    Copy the “image name“ and paste back to salad portal. Now let’s find acr username
    and password back in azure portal. Get back to your azure container registry page
@@ -630,7 +630,7 @@ We now need to set up all of our container group parameters:
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative.
 5. **Optional Settings**: Salad gives you some pretty cool options like health check probe, external logging and passing environment variables. For our solution the one parameter that we have to pass is **the Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
-<img src="container-engine\images\5b0bbe1-image.png" />
+<img src="/container-engine/images/5b0bbe1-image.png" />
 
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found [here](https://portal.salad.com/api-key)  
 With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
@@ -646,7 +646,7 @@ Now check “AutoStart container group once image is pulled“ and hit “Deploy
 
 With your solution deployed on Salad, the next step is to interact with your FastAPI application using its public endpoint. Salad provides you with a deployment URL, which you can use to send requests to your API in the same way you would locally, but now through Salad's infrastructure.
 
-<img src="container-engine\images\649634f-image-20231110-202228.png" />
+<img src="/container-engine/images/649634f-image-20231110-202228.png" />
 
 This url will be used instead of the localhost we used to send requests to while testing our FastApi locally, so if we replace local host with the link and keep the /docs we will get to our swagger page, but now living in the cloud:
 
@@ -656,7 +656,7 @@ https://tamarind-navybean-2kln8fkx9xruvxa2.salad.cloud/docs
 
 Now let’s send a start request, wait for a few hours and then hit the stop endpoint. Now let’s check if we have our results in cloud:
 
-<img src="container-engine\images\ee7ea80-image-20231110-202920.png" />
+<img src="/container-engine/images/ee7ea80-image-20231110-202920.png" />
 
 And our solution is now deployed to cloud compute and successfully writes the results to our storage account.
 

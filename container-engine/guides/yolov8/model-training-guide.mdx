@@ -31,7 +31,7 @@ In order to train a YOLOv8 model our dataset needs to be in a format that the mo
 
 We need to organize our training and validation images and labels like this:
 
-<img src="container-engine\images\8a17a88-Screenshot_2023-11-26_144806.png" />
+<img src="/container-engine/images/8a17a88-Screenshot_2023-11-26_144806.png" />
 
 We also need a dataset YAML to define paths to the images and the class names:
 
@@ -65,11 +65,11 @@ training/{dataset_name}/labels/
 training/{dataset_name}/yolo8.yaml
 ```
 
-<img src="container-engine\images\093038e-Screenshot_2023-11-26_155043.png" />
+<img src="/container-engine/images/093038e-Screenshot_2023-11-26_155043.png" />
 
 Solution Architecture:
 
-<img src="container-engine\images\b6dfaeb-Training_Architecture.drawio.png" />
+<img src="/container-engine/images/b6dfaeb-Training_Architecture.drawio.png" />
 
 **Training Different YOLOv8 Models**
 
@@ -140,7 +140,7 @@ Keep in mind that checkpoints in Ultralytics YOLO are automatically saved at the
 
 To ensure a smooth and uninterrupted training process on Salad, especially when dealing with containerized environments, it's crucial to have a persistent storage solution. Azure File Shares provide an ideal way to maintain and access training data and model weights across different container sessions. In our setup, we utilize two Azure File Shares: `runs` and `training`.
 
-<img src="container-engine\images\7ba7f70-Screenshot_2023-11-26_165430.png" />
+<img src="/container-engine/images/7ba7f70-Screenshot_2023-11-26_165430.png" />
 
 **Directory Structure and Data Management**
 
@@ -149,7 +149,7 @@ To ensure a smooth and uninterrupted training process on Salad, especially when 
 
 **Process workflow**
 
-<img src="container-engine\images\529d48a-workflow.drawio.png" />
+<img src="/container-engine/images/529d48a-workflow.drawio.png" />
 
 **Functionality of the Bash Script**
 
@@ -176,29 +176,29 @@ The first model in our comparative study is the YOLOv8 Nano, renowned for its co
 **Training results**: once our model is trained we can find all the weight along with training and validation results in our Azure storage.  
 We will first check the confusion matrix:
 
-<img src="container-engine\images\6f5a5e3-confusion_matrix_normalized.png" />
+<img src="/container-engine/images/6f5a5e3-confusion_matrix_normalized.png" />
 
 We can see that some of the labels are being detected pretty good, but a few are positively detected in less than half of the scenarios.
 
-<img src="container-engine\images\d5c6c5c-results.png" />
+<img src="/container-engine/images/d5c6c5c-results.png" />
 
 Here we can see what the labels on a picture are and what we predicted with our trained model:
 
-<img src="container-engine\images\16f170b-val_batch0_labels.jpg" />
+<img src="/container-engine/images/16f170b-val_batch0_labels.jpg" />
 
-<img src="container-engine\images\e29a1f3-val_batch0_pred.jpg" />
+<img src="/container-engine/images/e29a1f3-val_batch0_pred.jpg" />
 
 #### YOLOv8 Small Model Training:
 
 **Duration of Training**: Training session for the YOLOv8 Small model was completed in about 15 minutes. **Trainings Results**:
 
-<img src="container-engine\images\69e0885-confusion_matrix_normalized_1.png" />
+<img src="/container-engine/images/69e0885-confusion_matrix_normalized_1.png" />
 
 We can see that the model performs better
 
-<img src="container-engine\images\7caac82-results.png" />
+<img src="/container-engine/images/7caac82-results.png" />
 
-<img src="container-engine\images\4ebc600-val_batch0_pred.jpg" />
+<img src="/container-engine/images/4ebc600-val_batch0_pred.jpg" />
 
 #### YOLOv8 Medium Model Training:
 
@@ -208,11 +208,11 @@ This time we stopped our process and allocated it to the other machine to check 
 
 **Trainings Results**:
 
-<img src="container-engine\images\1402547-confusion_matrix_normalized.png" />
+<img src="/container-engine/images/1402547-confusion_matrix_normalized.png" />
 
-<img src="container-engine\images\d8d25f3-results.png" />
+<img src="/container-engine/images/d8d25f3-results.png" />
 
-<img src="container-engine\images\ef883c8-val_batch0_pred.jpg" />
+<img src="/container-engine/images/ef883c8-val_batch0_pred.jpg" />
 
 We can see that bigger models give us better results.
 
@@ -228,7 +228,7 @@ results = model.track(image, persist=True)
 
 Let’s check the results:
 
-<img src="container-engine\images\bd1dfb4-2023-11-29-16-00-34.gif" />
+<img src="/container-engine/images/bd1dfb4-2023-11-29-16-00-34.gif" />
 
 As a result we can see that we not only can use our custom trained model on images, but even on videos adding tracking possibilities.
 
