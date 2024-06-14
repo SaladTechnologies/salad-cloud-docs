@@ -1,10 +1,10 @@
 ---
-title: "Readiness Probes (Coming Soon)"
+title: "Readiness Probes (Preview)"
 ---
 
 # Overview
 
-Readiness probes are only available if [Container Gateway](/container-engine/networking) is turned on. They run after the startup probe has completed successfully. They are typically used to evaluate whether the application running in your container is ready to accept traffic. If configured, no traffic will be sent from the load balancer until the readiness probe has passed, so prevent your readiness probe from passing until you have downloaded and warmed up your models. Readiness probes can flap back between passing and failing. If a container's readiness probe reaches the failure state, the container will continue to run on the node but the load balancer will not route any networking traffic. Readiness probe configuration should be fairly strict in order to get that signal out as fast as possible so requests get routed to other nodes.
+Readiness probes are only available if [Container Gateway](/container-engine/networking) or [Job Queues](/container-engine/job-queues) are turned on. They run after the startup probe has completed successfully. They are typically used to evaluate whether the application running in your container is ready to accept traffic. If configured, no traffic will be sent from the load balancer until the readiness probe has passed, so prevent your readiness probe from passing until you have downloaded and warmed up your models. Readiness probes can flap back between passing and failing. If a container's readiness probe reaches the failure state, the container will continue to run on the node but the load balancer will not route any networking traffic. Readiness probe configuration should be fairly strict in order to get that signal out as fast as possible so requests get routed to other nodes.
 
 <br />
 
