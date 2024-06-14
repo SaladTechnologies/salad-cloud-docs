@@ -252,7 +252,15 @@
 
     {
       "group": "Getting Started",
-      "pages": ["managed-services/introduction"]
+      "pages": [
+        "managed-services/introduction"
+      ]
+    },
+    {
+      "group": "Tutorials And Guides",
+      "pages": [
+        "managed-services/dreambooth/tutorial"
+      ]
     },
     {
       "group": "Getting Started",

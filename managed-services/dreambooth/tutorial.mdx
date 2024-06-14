@@ -1,0 +1,391 @@
+---
+title: "Dreambooth API Tutorial - Pet Avatar"
+description: "Learn to create a pet avatar using the Salad Dreambooth API and Comfy UI."
+---
+
+## Introduction
+
+This tutorial will guide you through the process of creating a pet avatar LoRA using the Salad Dreambooth API, and Comfy UI. The tutorial will cover the following topics:
+1. Uploading pet images to the Salad Storage API (S4)
+2. Submitting the training job to the Dreambooth API
+3. Using ngrok to receive a notification when the model training is complete
+4. Using ComfyUI to generate avatar images using the trained model
+
+## Prerequisites
+
+Before you begin, you will need the following:
+1. [A Salad account](https://portal.salad.com/)
+2. [Your Salad API key](https://docs.salad.com/api-usage#get-your-saladcloud-api-key)
+3. [curl](https://curl.se/) to make API requests
+4. [jq](https://jqlang.github.io/jq/) to parse JSON responses
+5. [ngrok](https://dashboard.ngrok.com/login) to set up a public url for the notification
+6. [Python 3](https://www.python.org/) to run the webhook server
+
+In addition, it will be very helpful to have familiarity with terminal use, JSON, and the basics of API interactions.
+
+## Step 1: Uploading pet images to the Salad Storage API (S4)
+
+![Timber is the goodest boy](/managed-services/dreambooth/images/timber-photo.JPG)
+
+The first step is to collect some images of your pet, or whatever subject you're training on. I'll be using my dog, Timber. Some sources say you need as few as 3-5 images, but I have found much better results with 20-40. Ideally, you want a variety of angles, lighting conditions, and backgrounds, to help the model generalize better.
+
+I've gathered 36 images of Timber in a directory called `instance_images`. These are all unedited smartphone photos. Here's a preview of the directory:
+
+
+
+```
+❯ tree instance_images
+instance_images
+├── 00000IMG_00000_BURST20190101102301073_COVER.jpg
+├── 00100lPORTRAIT_00100_BURST20181230094336904_COVER.jpg
+├── 00100lPORTRAIT_00100_BURST20190505125527565_COVER.jpg
+├── 00100lrPORTRAIT_00100_BURST20200322130559846_COVER~2.jpg
+├── 65730110388__36AE7CE9-EFD0-4EE8-BCAB-FB6BB1528699.jpg
+├── 65768313201__36D94C7C-18DC-4D03-BA28-588726D396D3.jpg
+├── 66874197373__F70CD1BC-CB76-41C8-B537-2513631B09A3.jpg
+├── IMG_0003.jpg
+├── IMG_0219.jpg
+├── IMG_0239.jpg
+├── IMG_0242.jpg
+├── IMG_0244.jpg
+├── IMG_0554.jpg
+├── IMG_0655.JPG
+├── IMG_0658.JPG
+├── IMG_1113.jpg
+├── IMG_1178.jpg
+├── IMG_1191.jpg
+├── IMG_1195.jpg
+├── IMG_1204.jpg
+├── IMG_1263.jpg
+├── IMG_1274.jpg
+├── IMG_1275.jpg
+├── IMG_1276.jpg
+├── IMG_1277.jpg
+├── IMG_1278.jpg
+├── IMG_1300.jpg
+├── IMG_1376.JPG
+├── IMG_1953.JPG
+├── IMG_20200124_181205.jpg
+├── IMG_2234.JPG
+├── IMG_2235.JPG
+├── IMG_2259.JPG
+├── IMG_2919.JPG
+├── IMG_3200.JPG
+└── IMG_3571.jpg
+
+0 directories, 36 files
+```
+
+Next, we need to upload these images to the Salad Storage API, so they can be downloaded by the training job. This is a simple PUT request to your organization's storage api endpoint. Here's a script that will upload all the images in the `instance_images` directory. You can copy it into a file called `upload_images` and run `chmod +x upload_images` to make it executable.
+
+```bash
+#! /usr/bin/env bash
+
+input_directory=$1
+salad_org=$2
+output_prefix=$3
+
+if [ -z "$SALAD_API_KEY" ]; then
+    echo "SALAD_API_KEY is not set"
+    exit 1
+fi
+
+# If any inputs are unset, exit
+if [ -z "$input_directory" ] || [ -z "$salad_org" ] || [ -z "$output_prefix" ]; then
+    echo "Usage: $0 <input_directory> <salad_org> <output_prefix>"
+    exit 1
+fi
+
+# make sure output_prefix ends with a slash
+if [[ ! $output_prefix == */ ]]; then
+    output_prefix="$output_prefix/"
+fi
+
+for file in $input_directory/*; do
+  url="https://storage-api.salad.com/organizations/$salad_org/files/$output_prefix$(basename $file)"
+  resp=$(curl -X PUT $url \
+  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --form "file=@$file" \
+  --form "mimeType=\"$(file --mime-type -b $file)\"" \
+  --form "sign=\"true\"")
+  file_url=$(echo $resp | jq -r '.url')
+  echo $file_url >> file_urls.txt
+done
+jq -R -s -c 'split("\n") | map(select(length > 0))' "file_urls.txt" > "file_urls.json"
+rm "file_urls.txt"
+```
+
+You can run this script with the following command:
+
+```bash
+export SALAD_API_KEY=your_api_key
+./upload_images instance_images your_org_name some/path/in/your/storage/
+```
+
+This will create a file called `file_urls.json` that contains the signed URLs of all the uploaded images. Signed urls contain a time-limited token in the url that allows downloading the file without authentication. This is useful for sharing the urls with the training job.
+
+For me, using the salad org `your_salad_org_name`, and the output prefix `dreambooth_instance_images/timber/`, this file looks like this:
+
+```json
+[
+  "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00000IMG_00000_BURST20190101102301073_COVER.jpg?token=f3c27d98-c0a8-404e-933b-f5731971f633",
+  "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00100lPORTRAIT_00100_BURST20181230094336904_COVER.jpg?token=a033f5c0-ecd4-4796-9dce-0bc5113a8ff4",
+  "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00100lPORTRAIT_00100_BURST20190505125527565_COVER.jpg?token=b3021e18-2594-44ed-9972-d67a18d8c4cc"
+]
+```
+
+Your file will contain many more urls, one for each image you uploaded, and will be unique to your organization and storage path.
+
+## Step 2: Set up your webhook (optional)
+
+> Note: This step is optional, but recommended. If you do not do this, you will have to poll the Dreambooth API to check when your training job is complete.
+
+If you want to know when your training job is complete, you can set up a webhook to receive a notification. This is a simple Python script that listens for a POST request on a specified port, and prints the request body to the console. You can save it in a file called `webhook.py` on your local machine and use ngrok to create a public url.
+
+```python
+import http.server
+import json
+import os
+
+
+job_dir = os.path.join(os.path.dirname(__file__), 'jobs')
+
+# Create job_dir if it doesn't exist
+if not os.path.exists(job_dir):
+    os.makedirs(job_dir)
+
+
+class RequestHandler(http.server.BaseHTTPRequestHandler):
+    def log_request_to_json(self):
+        # Create a dictionary to store the request data
+        request_data = {
+            'method': self.command,
+            'path': self.path,
+            'headers': {k: v for k, v in self.headers.items()}
+        }
+
+        # Try to read the body of the request if there is one
+        content_length = self.headers.get('Content-Length')
+        if content_length:
+            request_data['body'] = json.loads(self.rfile.read(
+                int(content_length)).decode('utf-8'))
+
+        # Write the request data to a JSON file
+        with open('requests_log.jsonl', 'a') as f:
+            f.write(json.dumps(request_data) + "\n")
+
+        payload = request_data.get('body', {})
+        if 'data' in payload and 'job_id' in payload["data"]:
+            with open(os.path.join(job_dir, f"{payload['data']['job_id']}.json"), 'w') as f:
+                json.dump(payload["data"], f, indent=2)
+        print(json.dumps(request_data, indent=2))
+
+    def do_POST(self):
+        self.log_request_to_json()
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+
+if __name__ == "__main__":
+    server_address = ('', 8000)
+    httpd = http.server.HTTPServer(server_address, RequestHandler)
+    print("Server started on port 8000")
+    httpd.serve_forever()
+```
+
+In one terminal, run the script with the following command:
+
+```bash
+python webhook.py
+```
+
+In another terminal, run ngrok with the following command:
+
+```bash
+ngrok http 8000
+```
+
+You'll see something like this
+![ngrok running](/managed-services//dreambooth/images/ngrok-launch.png)
+
+Copy the public url provided, and save it for later. You'll need to provide this url to the Dreambooth API when you submit your training job.
+
+## Step 3: Submitting the training job to the Dreambooth API
+
+Now that we have our images uploaded, we can submit a training job to the Dreambooth API. This is a POST request to the Dreambooth API endpoint, with a JSON body containing the image urls, and some other parameters.
+
+**`POST https://api.salad.com/api/public/organizations/{your_salad_org_name}/inference-endpoints/dreambooth-sdxl/jobs`**
+
+Make sure to include your Salad API key in the `Salad-Api-Key` header.
+
+**Request Body**
+```json
+{
+  "input": {
+    "model": "stabilityai/stable-diffusion-xl-base-1.0",
+    "type": "lora",
+    "params": {
+      "instance_prompt": "photo of TOK dog",
+      "instance_images": [
+        "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00000IMG_00000_BURST20190101102301073_COVER.jpg?token=f3c27d98-c0a8-404e-933b-f5731971f633",
+        "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00100lPORTRAIT_00100_BURST20181230094336904_COVER.jpg?token=a033f5c0-ecd4-4796-9dce-0bc5113a8ff4"
+      ],
+      "class_preset": "photo_of_a_dog",
+      "max_train_steps": 7000,
+      "learning_rate": 0.0001,
+      "with_prior_preservation": true,
+      "train_text_encoder": false
+    }
+  },
+  "webhook": "https://your-ngrok-url.ngrok-free.app"
+}
+```
+> Leave out the "webhook" field if you don't want to set up a webhook.
+
+
+- `model`: The base model to use for training. For this, we're going to use `stabilityai/stable-diffusion-xl-base-1.0`, because it has a higher quality output than the alternative model `runwayml/stable-diffusion-v1-5`.
+- `type`: The type of model to train. For now, the only option is `lora`, though in the future we may support more options.
+- `params.instance_prompt`: This is a prompt that describes the instance images. It should include a special token so the model can learn the specific subject you're training. For example, `photo of TOK dog` will teach the model that Timber is TOK dog. The actual token doesn't matter, you can just slap your keyboard and it will work. The important thing is for it to be unique, and unlikely to have been otherwise included in the original training dataset for the model.
+- `params.instance_images`: A list of signed urls to the images you uploaded in the previous step. These do not have to be stored in the salad storage api, but the urls must be accessible without authentication.
+- `params.class_preset`: We offer several pre-generated image classes to make training with prior preservation more convenient for common use cases. An image class is a combination of a class prompt, such as "photo of a dog", that describes the *class* of image, and a set of images that represent that class, sampled from the base model. All of our class presets use 300 images, and are designed to be representative of the class prompt. For this tutorial, we're using `photo_of_a_dog`.
+- `params.max_train_steps`: The number of training steps to run. More steps will generally result in a higher quality model, but will take longer to train, and cost proportionately more. It is possible to overfit the model if you train for too long, so in practice you'll want to experiment with several configurations to find the best balance. I ran hundreds of trials to find the best settings for this tutorial.
+- `params.learning_rate`: The learning rate for the model. This is a hyperparameter that controls how quickly the model learns. A higher learning rate will make the model learn faster, but may cause it to overshoot the optimal solution. A lower learning rate will make the model learn more slowly, but may help it converge to a better solution. The default value is `0.0001`, which is a good starting point.
+- `params.with_prior_preservation`: Whether to use prior preservation. This is a technique that helps the model differentiate between a class of subject, and an individual subject. For example, if you're training on dogs, you might want the model to learn the difference between a generic dog, and your specific dog. This can help the model generalize better, and produce more accurate results.
+- `params.train_text_encoder`: Whether to train the text encoder while training the unet. This adjusts the model to better understand the instance prompt, and may help produce more accurate results in some cases. We're leaving this off for this tutorial, but you may want to experiment with it in your own projects.
+
+
+You'll receive a response with a job id, and some other information about the job. Here's an example response:
+
+**Example Response Body**
+```json
+{
+  "id": "0b4b5884-d430-4da4-bea3-fbe8b7b670aa",
+  "input": {
+    "model": "stabilityai/stable-diffusion-xl-base-1.0",
+    "type": "lora",
+    "params": {
+      "instance_prompt": "photo of TOK dog",
+      "instance_images": [
+        "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00000IMG_00000_BURST20190101102301073_COVER.jpg?token=f3c27d98-c0a8-404e-933b-f5731971f633",
+        "https://storage-api.salad.com/organizations/your_salad_org_name/files/dreambooth_instance_images/timber/00100lPORTRAIT_00100_BURST20181230094336904_COVER.jpg?"
+      ],
+      "class_preset": "photo_of_a_dog",
+      "max_train_steps": 7000,
+      "learning_rate": 0.0001,
+      "with_prior_preservation": true,
+      "train_text_encoder": false
+    }
+  },
+  "inference_endpoint_name": "dreambooth-sdxl",
+  "webhook": "https://your-ngrok-url.ngrok-free.app",
+  "status": "pending",
+  "events": [
+    {
+      "action": "created",
+      "time": "2024-06-13T21:06:37.3961306+00:00"
+    }
+  ],
+  "organization_name": "your_salad_org_name",
+  "create_time": "2024-06-13T21:06:37.3961306+00:00",
+  "update_time": "2024-06-13T21:06:37.3961306+00:00"
+}
+```
+
+Take note of the job id, as you'll need it to check the status of your training job, and to retrieve the final result if you have not set up a webhook.
+
+## Step 4: Wait For Your Model To Train
+
+After some time, you should receive a notification that your model has finished training. If you set up the above webhook, you can check for the creation of a JSON file named `jobs/${job_id}.json` to see the notification. 
+
+The file will look something like this:
+```json
+{
+  "output": {
+    "webui": "https://storage-api.salad.com/organizations/salad/files/dreambooth/0b4b5884-d430-4da4-bea3-fbe8b7b670aa/pytorch_lora_weights_webui.safetensors?token=95320539-9465-4047-863d-841a58f4a11e",
+    "diffusers": "https://storage-api.salad.com/organizations/salad/files/dreambooth/0b4b5884-d430-4da4-bea3-fbe8b7b670aa/pytorch_lora_weights.safetensors?token=a248c29d-db6f-4b2d-8d15-e2e81b0342a9"
+  },
+  "inference_endpoint_name": "dreambooth-sdxl",
+  "job_id": "0b4b5884-d430-4da4-bea3-fbe8b7b670aa"
+}
+```
+
+If you didn't set up a webhook, you'll need to poll the Dreambooth API to check the status of your training job.
+
+**`GET https://api.salad.com/api/public/organizations/{your_salad_org_name}/inference-endpoints/dreambooth-sdxl/jobs/{job_id}`**
+
+Make sure to include your Salad API key in the `Salad-Api-Key` header.
+
+## Step 5: Download Your Model
+
+In the `.output` field of the completed job json, you will find 2 urls: `webui` and `diffusers`. The `webui` url lets you download your model in a format that can be used with popular stable diffusion user interfaces. The `diffusers` url lets you download your model in a format that can be used with the Huggingface Diffusers library. Since I'll be using ComfyUI for this tutorial, I'll download the `webui` version.
+
+You can download the model by copying the url into your browser, or with the following command:
+
+```bash
+wget {webui_url}
+```
+
+You'll receive a file called `pytorch_lora_weights_webui.safetensors` that contains your trained model. This file can be used with the ComfyUI interface to generate images.
+
+## Step 6: Generate Images With ComfyUI
+
+Now that you have your trained model, you can use ComfyUI to generate images. ComfyUI is a powerful user interface for generating images with stable diffusion models. If you have docker, you can run ComfyUI with the following command:
+
+```bash
+docker run -it --rm \
+-v ./output:/opt/ComfyUI/output \
+-v ./models:/opt/ComfyUI/models \
+-p 8188:8188 \
+-e LOAD_SDXL_BASE=1 \
+-e LOAD_REFINER=1 \
+--gpus all \
+saladtechnologies/comfyui:dynamic
+```
+
+Otherwise, you can install ComfyUI locally by following the instructions in the [ComfyUI GitHub Repository](https://github.com/comfyanonymous/ComfyUI). For this method, you will also need to download [Stable Diffusion XL Base]([stabilityai/stable-diffusion-xl-base-1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors?download=true)) and [Stable Diffusion Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors?download=true) from Huggingface, and store them in the `checkpoints` directory in your comfyui installation. This step is automated in the above `docker run` command.
+
+The rest of this tutorial will assume you're using the docker method, but the process is very similar if you're running ComfyUI locally.
+
+Once ComfyUI is running, you can navigate to `http://localhost:8188` in your browser to access the interface. You'll see a screen like this:
+![ComfyUI Default View](/managed-services//dreambooth/images/comfy-default.png)
+
+You'll also see that two folders have been created in the directory you ran the docker command from, called `output` and `models`. This is where the images generated by ComfyUI will be saved. You'll see the models directory has several subdirectories, one of which is `loras`. This is where you'll place your trained model. You'll also see a `checkpoints` directory, which is where the base models are stored.
+
+```
+models
+├── checkpoints
+├── controlnet
+├── diffusers
+├── embeddings
+├── gligen
+├── hypernetworks
+├── loras
+├── style_models
+├── unet
+├── upscale_models
+├── vae
+└── vae_approx
+```
+
+ComfyUI has a feature where you can drag-and-drop any image made in ComfyUI, and it will populate the workflow used to make it. This is a great way to learn how to use the tool, and to experiment with different settings. You can also use the `Load Workflow` button to load a workflow from a file. Drag this image into the ComfyUI interface to see the workflow used to generate it.
+
+![Timber Image With Workflow](/managed-services//dreambooth/images/timber_00009_.png)
+
+You should see a workflow like this:
+
+![Timber Workflow](/managed-services//dreambooth/images/workflow.png)
+
+Find the "Load LoRA" node, and select your safetensors file from the list.
+
+![Lora Loader](/managed-services//dreambooth/images/lora-loader.png)
+
+The next step is adjust the prompts to generate the image you want. You can experiment with different prompts, and see how they affect the output. The top set of nodes labeled "CLIP Text Encode (Prompt)" is where you tell the model what you want. This should include the special token you used in the instance prompt when training the model. The bottom set of nodes labeled "CLIP Text Encode (Prompt)" is where you tell the model what you **don't** want.
+
+![prompts](/managed-services//dreambooth/images/prompts.png)
+
+Make sure to put your prompts in **both** nodes. The left nodes are for the refiner model, and the right nodes are for the base model.
+
+Finally, press the "Queue Prompt" button to generate the image. You'll see nodes highlight and show progress as the generation process moves through various stages. Once the image is generated, you'll see a preview of it in the "Save Image" node. You'll also see the file has been created in the `output` directory.
+
+![Timber as a steampunk engineer](/managed-services//dreambooth/images/timber_steampunk.png)
