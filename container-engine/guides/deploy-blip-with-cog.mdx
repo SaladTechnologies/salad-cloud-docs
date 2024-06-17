@@ -1,5 +1,5 @@
 ---
-title: "Deploy SLIP with Cog"
+title: "Deploy SLIP with Cog HTTP Prediction Server"
 ---
 
 [Cog](https://cog.run/) is an open-source tool that helps simplify the work of building inference applications for various AI models. It provides CLI tools, Python modules for prediction and fine-tuning, and an HTTP prediction server using FastAPI. 
@@ -151,7 +151,18 @@ Enbaled, Port 5000
 
 # Readiness Probe (Protocol: exec)
 
-python -c "import requests,sys;sys.exit(0 if 'READY' in requests.get('http://[::1]:5000/health-check').text else -1)"
+Enabled
+Protocol: exec
+
+Command: python
+Argument1: -c
+Argument2: import requests,sys;sys.exit(0 if 'READY' in requests.get('http://[::1]:5000/health-check').text else -1)
+
+Initial Delay Seconds: 60
+Period Seconds: 10
+Timeout Seconds: 5
+Success Threshold: 1
+Failure Threshold: 3
 
 # Environment Variables (Optional)
 
@@ -161,7 +172,7 @@ PORT, 5000 (Default) or others
 ```
 
 The Readiness Probe is used to evaluate whether a container is ready to accept the traffic from the load balancer. The probe with the protocol - exec, will run the given command inside the container, if the command returns an exit code of 0, the container is considered in a healthy state. Any other exit codes indicate the container is not ready yet. A Python script is provided here and run regularly to check whether  the models have been loaded successfully and the Cog HTTP prediction server is ready.
-<img src="/container-engine/images/bligcog/blipcog4.png"/>
+<img src="/container-engine/images/bligcog/blipcog6.png"/>
 
 # Test the inference endpoint
 
