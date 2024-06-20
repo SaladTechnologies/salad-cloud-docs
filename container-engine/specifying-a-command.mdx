@@ -19,6 +19,8 @@ As an example, running `docker run --entrypoint /bin/test mycontainer:latest arg
 ]
 ```
 
+**Note:** in the portal, you should not include include quotes around arguments. To reproduce the docker command line `docker run --entrypoint /bin/bash mydocker/mycontainer:latest -c "python server.py"`, you would enter `/bin/bash` as the command, `-c` as a first argument, and `python server.py` as a second argument, without quotes.
+
 > 🚧 Caution
 >
 > Specifying a command overrides the CMD and ENTRYPOINT from your dockerfile. This should only be used if you want to override what is already in your dockerfile.
