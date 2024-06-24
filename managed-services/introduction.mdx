@@ -1,122 +1,108 @@
 ---
-title: "Managed Transcription Service"
-description: "Unlock the full potential of your audio and video content with our transcription service tailored for media companies. Transcribe files up to 2 hours long in 98 languages, complete with advanced features like speaker diarization and word-level time coding. Generate accurate transcripts and captions in .json & .srt format to enhance your media production, streamline post-production processes, and reach a global audience more effectively with closed captions and subtitles. More features are coming soon."
+title: "Transcription API"
+description: "Salad's Managed Transcription API is available for Alpha customers. We don't have an SLA now, but we expect the service to reliably deliver high-quality transcripts/captions/subtitles at high volumes. We are quickly adding new capabilities and enhancing the scalability of our transcription service. Please use this [booking calendar](https://meetings.hubspot.com/derick-thompson1/salad-managed-ai-services) to schedule a time with our team to discuss your use case. If you want to get started quickly, [Fork this PostMan.com collection.](https://www.postman.com/salad-apis/workspace/salad-transcription-api/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac/fork?origin=request-send)"
 ---
-
 
 ## Accounts & Credentials
 
-To start, you must create an account on [Salad portal](https://portal.salad.com/) and get an access token. Once you receive an email confirming access to Salad’s Transcription API, just follow the API reference below to start making transcription requests.
+### Create Salad Account
 
-### Transcription API
+*To start,* visit [https://portal.salad.com/](https://portal.salad.com/) to log in or create a free account.
+<img src="/managed-services/images/create_account.png" alt="Create Salad Account" />
 
-To send a request you will need transcription service url:
-<img src="/managed-services/images/transcription_url.png" alt="Transcription API Page" />
+### Create Salad Organization
+
+*Next,* create a new organization or select an existing one you'd like to use for transcription.
+Click on *Switch to this Organization* for the org you want to use.
+<img src="/managed-services/images/projects.png" alt="Create Salad Organization" />
+### Get Transcription API URL
+
+*Then,* click on *Inference Endpoints* in the left-hand nav and open up the Transcription API.
+<img src="/managed-services/images/managed_services.png" alt="Access Salad Transcription API" />
+
+Copy your Transcription API URL
+<img src="/managed-services/images/cc_page.png" alt="Copy Transcription API URL" />
 
 ### Authentication
 
-To use Managed Services, you will need your Salad API Key. You can find the API Key in the upper right hand Account drop down menu.
-
-<img src="/inference-endpoints/images/7094421-image.png" alt="Token Instructions" />
+Copy your Salad API key from your account [here.](https://portal.salad.com/api-key)
 <img src="/inference-endpoints/images/9d9c06f-image.png" alt="Token Instructions" />
 
-### File Requirements
-
-Please make sure your audio file includes duration and the link to it is downloadable. 
 
 ## API Reference
 
-### Send a POST request with job parameters
-
-To interact with the API, you first need to send a POST request to the endpoint url mentioned above. Salad API Key should be sent as a header: "Salad-Api-Key": "Your Salad Key". As a result you will recieve a job id. Follow the pattern below for the request body:
-
-```json
-{
-  "input": {
-    "url": "https://example.com/path/to/file.mp3",
-    "language_code": "en",
-    "word_level_timestamps": true,
-    "diarization": true,
-    "srt": true
-  },
-  "metadata": {
-    "my-job-id": 1234
-  }
-}
-
-```
-
-## Parameters
-
-### input
-An object that configures the job.
-- **url**: Publicly accessible URL of the media file to transcribe.
-- **language_code**: Language code of the media. Default is "en". Available options include:
-  - "en" (English)
-  - "fr" (French)
-  - "de" (German)
-  - "es" (Spanish)
-  - "it" (Italian)
-  - "ja" (Japanese)
-  - "zh" (Chinese)
-  - "nl" (Dutch)
-  - "uk" (Ukrainian)
-  - "pt" (Portuguese)
-  - "ar" (Arabic)
-  - "cs" (Czech)
-  - "ru" (Russian)
-  - "pl" (Polish)
-  - "hu" (Hungarian)
-  - "fi" (Finnish)
-  - "fa" (Persian)
-  - "el" (Greek)
-  - "tr" (Turkish)
-  - "da" (Danish)
-  - "he" (Hebrew)
-  - "vi" (Vietnamese)
-  - "ko" (Korean)
-  - "ur" (Urdu)
-  - "te" (Telugu)
-  - "hi" (Hindi)
-  - "ca" (Catalan)
-  - "ml" (Malayalam)
-- **word_level_timestamps**: Set to true to get word-level timestamps. Default is false, which gets sentence-level timestamps.
-- **diarization**: Set to true for speaker identification. Default is false.
-- **srt**: Set to true to generate .srt captions. Default is false.
-
-### metadata
-Optional object to identify your unique transcription job.
-
-## Example cURL Send for Transcription
-
+### Example cURL Post Transcript
 ```bash
 curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
-   -H "Salad-Api-Key: "your salad api key" \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
    -d '{
       "input": {
          "url": "https://example.com/path/to/file.mp3",
          "language_code": "en",
-         "word_level_timestamps": true,
-         "diarization": true,
-         "srt": true
+         "word_level_timestamps": false,
+         "diarization": false,
+         "srt": false
+      },
+	  "metadata": {
+      "my-job-id": 1234
       }
    }'
 ```
 
-
-
-## Example cURL Get Transcript
-Once you have the job ID, you need to send a GET request with that job ID appended to the URL to retrieve the output. The pattern for the GET request is as follows:
-
-
+### Example cURL Get Transcript
 ```bash
-curl -X GET "https://api.salad.com/api/public/organizations/{your-organization}/inference-endpoints/transcribe/jobs/{job_id}" \
+curl https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs/54e84442-3576-45ca-904c-a1d90bc77baf \
    -H "Salad-Api-Key: {your-api-key}"
 ```
 
-## Example Transcript Output
+### Step1 | Configure Header
+Configure you header to include your unique Salad API URL which can be found above as the variable “API URL”. Also include your unique Salad API key [which can be found here](https://portal.salad.com/api-key) as the variable “Salad-Api-Key”. 
 
-```bash
+### Step 2 | Set Input Parameters
+Update the JSON input parameters to customize your transcription output.
+
+#### "url" 
+
+We recommend using a file service like S3 that offers secure [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html). It should look like this (https://bucketname.s3.us-east-2.amazonaws.com/filename.mp4?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2). You can't use YouTube videos, Google Drive, or other file-sharing services.
+
+Send media in any of these formats.
+
+		*Audio:* AIFF, FLAC, M4A, MP3, WAV
+		*Video:* MKV, MOV, WEBM, WMA
+
+#### “language_code”
+
+Transcription is available in 97 languages. We automatically identify the source language. We don’t support multiple-language media files at this time.
+
+#### “diarization” 
+
+Set to *"true"* for speaker separation and identification. If you don't require it, set it to *"false”*.
+
+Diarization requires the language_code to be defined. By default, it is set to *"en"* (English).
+ 
+You can also diarize in *"fr"* (French), *"de"* (German), *"es"* (Spanish), *"it"* (Italian), *"ja"* (Japanese), *"zh"* (Chinese), *"nl"* (Dutch), *"uk"* (Ukrainian), *"pt"* (Portuguese), *"ar"* (Arabic), *"cs”* (Czech), *"ru"* (Russian), *"pl"* (Polish), *"hu"* (Hungarian), *"fi"* (Finnish), *"fa"* (Persian), *"el"* (Greek), *"tr"* (Turkish), *"da"* (Danish), *"he"* (Hebrew), *"vi"* (Vietnamese), *"ko"* (Korean), *"ur"* (Urdu), *"te"* (Telugu), *"hi"* (Hindi), *"ca"* (Catalan), *"ml"* (Malayalam).
+
+#### “word_level_timestamps” 
+
+Set to "true" to get word-level timestamps. Set to "false", to get only sentence-level timestamps.
+
+#### “srt” 
+
+Set to *"true"* to generate a .srt output for caption and subtitles. If you don't require it, set it to *"false"*.
+
+#### "my-job-id"
+
+If you need an identifier from your system you can the job id as desired.
+
+### Step 3 | Make Post Request
+Make your POST transcript request. If successful, you will recieve a confirmation response that will include the job *"id"* *(ex: 00-681d01e03cec5f7122952100b66f2330-aa5b353301b6bc50-01).
+
+### Step 4 | Make Get Request
+Make your GET transcript request. If successful, you will receive a JSON transcript output that will include the inputs you requested.
+
+##### Example Transcript Output
+```json
 {
   "id": "54e84442-3576-45ca-904c-a1d90bc77baf",
   "input": {
@@ -183,38 +169,37 @@ curl -X GET "https://api.salad.com/api/public/organizations/{your-organization}/
         "speaker": "SPEAKER_00"
       }
     ],
-    "srt_content": "1\n00:00:19,2 --> 00:00:22,233\nBecause when we change the dialogue, we can change our world.\n\n",
+    "srt_content": "1
+00:00:19,2 --> 00:00:22,233
+Because when we change the dialogue, we can change our world.
+
+",
     "duration": 142.7795,
     "processing_time": 51.17370915412903
   },
   "create_time": "2024-05-15T23:49:37.9946816+00:00",
   "update_time": "2024-05-15T23:50:23.4688229+00:00"
 }
-
 ```
 
-- **Example: Using the Transcription API via Postman**
-  - Open postman and create a new HTTP request
-  - Set the HTTP method to POST
-  - Enter the API endpoint URL
-  - Add API Key Authorization
-    - Key: Salad-Api-Key
-    - Value: provide your Salad API Key
-    - Add to: header
-  - Add the Request Body
-    - select the raw option, and choose JSON from the dropdown menu
-    - Add the URL of your audio file and parameters in the request body as shown in the example.
-      - the file URL must be a direct download link
-  - Send the Request
-    - Click the Send button. The API will respond with the job id
-  - Send another GET request with that job id at the end of the URL
-    - Click the Send button. The API will respond with the transcription result in JSON format.
+**"status"** 
 
-### Cost
- - Managed endpoints is being offered for free for a limited time!
+If your transcription request is *“pending”*, it has not yet been picked up for processing. 
 
+*“created”*  the transcription job is now in our queue to be processed. 
 
- ## Transcription Service Automation
+*“running”* the transcription is processing. 
+
+*"succeeded"* the transcript is ready.
+
+*“failed”* the transcript was not created. We will automatically re-try the transcription process until it fails three times. If we are unable to transcribe your media, you will get a 200 error with one of the following messages. Send us a support request at [support@salad.com](https://mailto:support@salad.com/) if this happens.
+
+If for some reason we had an issue with the file you sent, you will get a mesage in the result:
+*File size is more than 3GB 
+*File can not be downloaded or duration is missing. Please check your file and try again. 
+*File duration is more than 2.5 hours
+
+ ## Transcription Automation
 
 In the coming weeks, our transcription service will be enhanced with webhook functionality, allowing you to receive notifications when your transcription jobs are completed. Until then, you can use the following Python code snippet to automate the process of sending requests and retrieving transcription results.
 
@@ -269,6 +254,7 @@ for audio_file in list_of_audio_files:
     #     f.write(job_id_str + '\n')
 
 ```
+
 ### Pass 2: Checking Job Status and Retrieving Results
 
 This part of the script checks the status of each transcription job periodically and retrieves the results once the transcription is completed.
@@ -302,12 +288,12 @@ while len(list_of_job_ids) > 0:
     for job in list_of_job_ids:
         response_url = f"https://api.salad.com/api/public/organizations/salad/inference-endpoints/transcribe/jobs/{job}"
         response = requests.get(response_url, headers=headers)
-        if response.json()['status'] == 'running' or response.json()['status'] == 'pending':
+        if response.json()['status']  'running' or response.json()['status']  'pending':
             print(f"Job {job} is still {response.json()['status']}, waiting for retry...")
             # wait for 30 seconds and retry
             time.sleep(30) 
             continue
-        if response.json()['status'] == 'succeded':
+        if response.json()['status']  'succeded':
             #save the response to a file
             with open(f'result_{job}.json', 'w', encoding='utf-8') as f:
                 json.dump(response.json(), f, ensure_ascii=False)  
