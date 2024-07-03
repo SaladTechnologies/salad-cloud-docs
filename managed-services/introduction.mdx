@@ -44,12 +44,15 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
          "diarization": false,
          "srt": false
       },
+    "webhook": {your webhook url},
 	  "metadata": {
       "my-job-id": 1234
       }
    }'
 ```
-
+* Fill in the file link instead of "https://example.com/path/to/file.mp3"
+* Optional : replace {your webhook url} with webhook url if needed. If not, remove the line.
+Webhook is a method that enables application to transmit data to another application immediately upon the occurrence of an event. Instead of having your application periodically poll for updates, a webhook delivers data to a specified URL as soon as the event accures, facilitating instant communication and minimizing latency. In our case transcription result gets sent to the webhook.  
 ### Example cURL Get Transcript
 ```bash
 curl https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs/54e84442-3576-45ca-904c-a1d90bc77baf \
@@ -69,7 +72,7 @@ We recommend using a file service like S3 that offers secure [presigned URLs](ht
 Send media in any of these formats.
 
 		*Audio:* AIFF, FLAC, M4A, MP3, WAV
-		*Video:* MKV, MOV, WEBM, WMA
+		*Video:* MKV, MOV, WEBM, WMA. MP4 (most codecs), AVI
 
 #### “language_code”
 
@@ -201,8 +204,7 @@ If for some reason we had an issue with the file you sent, you will get a mesage
 
  ## Transcription Automation
 
-In the coming weeks, our transcription service will be enhanced with webhook functionality, allowing you to receive notifications when your transcription jobs are completed. Until then, you can use the following Python code snippet to automate the process of sending requests and retrieving transcription results.
-
+Webhooks are already available, and you can check the documentation above (under Example cURL Post Transcript). Using webhooks is a better way to get results as soon as possible. However, if your use case better fits with polling, use the following code. Make sure you update it as needed:
 ### Pass 1: Submitting Audio Files for Transcription
 This part of the script submits audio files for transcription and collects job IDs. The job IDs are used in the second pass to check the status and retrieve the results.
 
@@ -288,12 +290,10 @@ while len(list_of_job_ids) > 0:
     for job in list_of_job_ids:
         response_url = f"https://api.salad.com/api/public/organizations/salad/inference-endpoints/transcribe/jobs/{job}"
         response = requests.get(response_url, headers=headers)
-        if response.json()['status']  'running' or response.json()['status']  'pending':
-            print(f"Job {job} is still {response.json()['status']}, waiting for retry...")
-            # wait for 30 seconds and retry
-            time.sleep(30) 
-            continue
-        if response.json()['status']  'succeded':
+        if response.json()['status'] == 'running' or response.json()['status'] == 'pending':
+          print(f"Job {job} is still {response.json()['status']}, waiting for retry...")
+          continue
+        elif response.json()['status'] == 'succeeded':
             #save the response to a file
             with open(f'result_{job}.json', 'w', encoding='utf-8') as f:
                 json.dump(response.json(), f, ensure_ascii=False)  
