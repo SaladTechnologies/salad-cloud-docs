@@ -32,19 +32,4 @@ This will display the version of the installed **`Nodejs`**
 
 **`node  -v`** 
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/1a2fd60-V.PNG",
-        "V.PNG",
-        625
-      ],
-      "align": "center",
-      "sizing": "smart",
-      "caption": "This displays the Nodejs version"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/1a2fd60-V.PNG "This displays the Nodejs version")

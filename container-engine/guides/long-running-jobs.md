@@ -41,38 +41,12 @@ Note you also need to override your `CMD` directive to launch kelpie instead of 
 
 Navigate to the [Salad Portal](https://portal.salad.com/), creating a user account, organization, and project if necessary.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/dd1b98c-image.png",
-null,
-""
-],
-"align": "center"
-}
-]
-}
-[/block]
+![](https://files.readme.io/dd1b98c-image.png)
+
 
 Click "Deploy a Container Group", and fill out the form, providing the docker image you just built, and specifying the hardware required to run the job. For now, you can leave `Replica Count` as `1`, since Kelpie is capable of scaling your container group for you once configured.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/6dfce6a-image.png",
-null,
-"Your job almost definitely needs more hardware than this"
-],
-"align": "center",
-"caption": "Your job almost definitely needs more hardware than this"
-}
-]
-}
-[/block]
+![](https://files.readme.io/6dfce6a-image.png "Your job almost definitely needs more hardware than this") 
 
 You do not need to override the command, and you do not need to enable `Container Gateway`.
 

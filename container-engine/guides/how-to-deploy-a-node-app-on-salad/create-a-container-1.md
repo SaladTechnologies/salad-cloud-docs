@@ -88,20 +88,7 @@ Be sure to have these extensions installed so you can remotely access your docke
 On the left section of this picture, you can see the **Docker extension, Remote live server,** and **Dev container extension icons.  
 ** 
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/70f9396-dockk.PNG",
-        "dockk.PNG",
-        396
-      ],
-      "sizing": "smart"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/70f9396-dockk.PNG "dockk.PNG")
 
 
 Be sure to install and download these two extensions if you are using Vscode (Visual Studio Code) so you can access your images and containers on your visual code editor registry easily.
@@ -151,20 +138,7 @@ Here is the result:
 
 You can see your built Nodejs docker image there.
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/d98a826-hio.PNG",
-        "hio.PNG",
-        1253
-      ],
-      "caption": "You can see the \"nodejs-app\" container image name"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/d98a826-hio.PNG "You can see the \"nodejs-app\" container image name")
 
 
 ## **Create a Container using Docker Desktop:**
@@ -174,41 +148,15 @@ You can easily do that using your Docket desktop with the following steps.
 
 1. Go to your **Docker desktop** and navigate to your Image tab
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/422af67-hio.PNG",
-        "hio.PNG",
-        1253
-      ],
-      "caption": "You can see the container image on the image tab on Docker Desktop"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/422af67-hio.PNG "You can see the container image on the image tab on Docker Desktop")
 
 
-2. Go to your created and built docker image from your application. The one we used here is named  "_node-app_"
+1. Go to your created and built docker image from your application. The one we used here is named  "_node-app_"
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/f291669-vogue.PNG",
-        "vogue.PNG",
-        1262
-      ],
-      "caption": "This pop-up shows you the process to run your created container"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/f291669-vogue.PNG "This pop-up shows you the process to run your created container")
 
 
-3. Before clicking on "RUN " from the image tab, Click on the “Optional settings “ specify a favorable container name or it will generate a random one for you.  
+1. Before clicking on "RUN " from the image tab, Click on the “Optional settings “ specify a favorable container name or it will generate a random one for you.  
    Then route the host to your local server application 
 
 Example: Localhost:5000. By typing your **`local host port (5000),`** which is what we are using. Yours can be 8080 or anything. 
@@ -217,56 +165,16 @@ Example: Localhost:5000. By typing your **`local host port (5000),`** which is w
 
 Launch **Run.** You have successfully created a container. You can view this via your container tab above the image tab on your Docker desktop. 
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/53a21ad-running.PNG",
-        "running.PNG",
-        1260
-      ],
-      "caption": "\"node-app\" is running on port 5000"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/53a21ad-running.PNG "\"node-app\" is running on port 5000")
 
 
 Navigate to actions and choose "Logs" to view your running container logs. 
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/49a6b5f-logs.PNG",
-        "logs.PNG",
-        1266
-      ],
-      "caption": "The server is running on port: 5000"
-    }
-  ]
-}
-[/block]
-
+![](https://files.readme.io/49a6b5f-logs.PNG "The server is running on port: 5000")
 
 Navigate to your browser and type in or paste " https\://localhost:5000" to view your running container image with display message " Hello world "
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/0eaeedd-hello_world.PNG",
-        "hello world.PNG",
-        1357
-      ],
-      "caption": "Nodejs container image running on localhost:5000 showing \"Hello world\" message"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/0eaeedd-hello_world.PNG "Nodejs container image running on localhost:5000 showing \"Hello world\" message")
 
 
 ## **Run a Container Using the terminal or command line  **

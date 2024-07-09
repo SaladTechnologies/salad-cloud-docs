@@ -41,7 +41,7 @@ To use this feature, you must first create a repository with the same name on Do
 
 Here's how:
 
-- Go to the Docker Hub website (<https://hub.docker.com/>) and log in.
+- Go to the Docker Hub website ([https://hub.docker.com/](https://hub.docker.com/)) and log in.
 - Click the "Create Repository" button.
 - Follow the prompts to create a new repository with the desired name.
 

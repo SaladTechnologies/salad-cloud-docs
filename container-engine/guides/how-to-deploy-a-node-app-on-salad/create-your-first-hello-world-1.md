@@ -39,7 +39,9 @@ npm install express --save
 
 Codebase should look like this below: 
 
-```javascript Copy code
+
+**Create a package.json file with the following content:**
+```json
 {
   "name": "node-app",
   "version": "1.0.0",
@@ -59,7 +61,7 @@ Codebase should look like this below:
 
 Here is the code below :
 
-```javascript Copy code
+```javascript
 const express = require('express');
 const app = express();
  
@@ -76,7 +78,7 @@ app.get("/", (req,res) => {
 
 **Now, Save this file above, open your terminal, CLI (Command Line) to run the application**
 
-```shell Run this command
+```shell
 node app.js
 ```
 
