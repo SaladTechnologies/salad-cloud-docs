@@ -258,7 +258,8 @@
             "container-engine/guides/yolov8/batch-processing",
             "container-engine/guides/yolov8/model-training-guide"
           ]
-        }
+        },
+        "container-engine/guides/long-running-jobs"
       ]
     },
 
