@@ -1,13 +1,5 @@
 ---
 title: "Create a container"
-slug: "create-a-container-1"
-excerpt: ""
-hidden: true
-metadata: 
-  image: []
-  robots: "index"
-createdAt: "Mon Dec 26 2022 04:16:46 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)"
 ---
 ## **What is a Container? **
 
@@ -59,7 +51,7 @@ It helps prevent the local module and debug logs from being copied into your Doc
 
 Now, let's create  a **`.dockerignorefile`** file so as not to copy unnecessary files to the container during its built process from the logs. 
 
-```dockerfile .dockerignorefile
+```dockerfile
 npm-debug.log
 /node_modules
 ```
@@ -102,16 +94,16 @@ It should look something like this below:
 
 If confirmed, you can run this command on your terminal or CLI tool. 
 
-```text Copy command
-Docker build -t <docker-image-name> <filepath> .
+```shell
+docker build -t <docker-image-name> <filepath> .
 ```
 
 The **`-t flag`** lets you tag your image so it’s easier to find later
 
 Here is an example we use in this guide:
 
-```text Copy command
-Docker build -t nodejs-app .
+```shell
+docker build -t nodejs-app .
 ```
 
 The result should look like this in the terminal with a message above **"FINISHED"** 
@@ -123,7 +115,7 @@ This means that the docker image was created successfully and the app is working
 
 Now that the build is complete, you can check your image or your docker using this docker command below :
 
-```text Copy command
+```shell
 docker image ls
 ```
 
@@ -182,8 +174,8 @@ Navigate to your browser and type in or paste " https\://localhost:5000" to view
 Do note that a container can be created as many times as you want.  
 Now we can run the docker image using the command:
 
-```text Docker run command
-Docker run -d -p <Host port>:<Docker port><docker-image-name>
+```shell
+docker run -d -p <Host port>:<Docker port><docker-image-name>
 ```
 
 The **`-d flag`** indicates the docker container is running in the background.
@@ -192,8 +184,8 @@ The **`-p flag`** shows which host port will be connected to the docker port.
 
 Example:
 
-```text Copy command
-Docker run -d -p 5000:5000 nodejs-app
+```shell
+docker run -d -p 5000:5000 nodejs-app
 ```
 
 Result:
