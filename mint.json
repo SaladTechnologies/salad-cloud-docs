@@ -236,6 +236,17 @@
         "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
+        {
+          "group": "Run a Node App",
+          "pages": [
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad",
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad/create-your-first-hello-world-1",
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad/create-a-container-1",
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad/save-to-docker-hub",
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad/deploy-via-portal",
+            "container-engine/guides/how-to-deploy-a-node-app-on-salad/deploy-via-api"
+          ]
+        },
         "container-engine/guides/jupyterlab",
         "container-engine/guides/youtube",
         "container-engine/guides/deploy-blip-with-cog",
