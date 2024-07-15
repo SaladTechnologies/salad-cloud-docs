@@ -16,7 +16,7 @@ You can use the prebuilt docker image at:
 saladtechnologies/sdnext:dynamic
 ```
 
-The Github Repo is available here: <https://github.com/SaladTechnologies/sdnext-dynamic>
+The Github Repo is available here: https://github.com/SaladTechnologies/sdnext-dynamic
 
 ### "Baked" Images
 
@@ -170,22 +170,22 @@ Since this probe primarily checks for memory issues, it should be configured wit
 
 1. Navigate to the Civit.ai page for the model you want to use
 
-   [block:image]{"images":[{"image":["https://files.readme.io/376ada9-image11.png","",""],"align":"center"}]}[/block]
+![](https://files.readme.io/376ada9-image11.png)
 
-2. Click the version of the model you want to download
+1. Click the version of the model you want to download
 
-   [block:image]{"images":[{"image":["https://files.readme.io/f24d4f4-image21.png","",""],"align":"center"}]}[/block]
+![](https://files.readme.io/f24d4f4-image21.png)
 
-3. Copy the version ID from the URL
+1. Copy the version ID from the URL
 
-   [block:image]{"images":[{"image":["https://files.readme.io/bb4c717-image31.png","",""],"align":"center"}]}[/block]
+![](https://files.readme.io/bb4c717-image31.png)
 
 **OR**
 
-2. Copy the link from the download button  
+1. Copy the link from the download button  
    ![](https://files.readme.io/2ecae2c-image51.png)
 
-3. Paste the link into a text editor and copy the model version ID from the URL
+2. Paste the link into a text editor and copy the model version ID from the URL
 
 ```
 https://civitai.com/api/download/models/128713
@@ -245,20 +245,7 @@ As an example, we're going to deploy the Dreamshaper XL model
 
 ### Create a Deployment
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/c987955-setup11.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/c987955-setup11.png)
 
 
 1. Name your deployment
@@ -266,114 +253,29 @@ As an example, we're going to deploy the Dreamshaper XL model
 3. Select how many vCPUs you need. For this we'll use 2
 4. Select how much RAM you need. Since we plan on using the refiner model, we'll use 30GB
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/799dedc-setup21.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/799dedc-setup21.png)
 
+1. Select your GPUs. For an SDXL based model, we'll want GPUs with at least 16GB of VRAM.
 
-5. Select your GPUs. For an SDXL based model, we'll want GPUs with at least 16GB of VRAM.
+![](https://files.readme.io/71b63f5-setup31.png)
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/71b63f5-setup31.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+1. Click "edit" on the Container Gateway section, and enable networking for port 7860 (the default port for SDNext).
 
+![](https://files.readme.io/2fc613c-image.png)
 
-6. Click "edit" on the Container Gateway section, and enable networking for port 7860 (the default port for SDNext).
-
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/2fc613c-image.png",
-        null,
-        ""
-      ],
-      "align": "center",
-      "sizing": "400px",
-      "border": true
-    }
-  ]
-}
-[/block]
-
-
-7. Click "edit" on the Environment Variables section, and add the following variables:
+1. Click "edit" on the Environment Variables section, and add the following variables:
    - `HOST` with a value of `[::]`
    - `CIVITAI_MODEL_VERSION_IDS` with a value of `126688`
    - `LOAD_REFINER` with a value of `1`
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/b22f861-setup51.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/b22f861-setup51.png)
 
-
-8. Click "Deploy" to finish creating your deployment. Then, click "Start" to start it.
+1. Click "Deploy" to finish creating your deployment. Then, click "Start" to start it.
 
 ### Your Finished Deployment
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/13ae364-deployment-info1.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
-
+![](https://files.readme.io/13ae364-deployment-info1.png)
 
 With the environment configured like this:
 
-[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/8e30503-deployed-env1.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]
+![](https://files.readme.io/8e30503-deployed-env1.png)

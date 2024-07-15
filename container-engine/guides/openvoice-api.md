@@ -34,7 +34,7 @@ The OpenVoice technology encompasses a sophisticated framework designed to repli
 
 In our benchmarking efforts, we discovered that OpenVoice can be executed on any GPU available on Salad Cloud, including those with lower memory capacities. However, when it comes to voice cloning, there is an exception; it cannot be run on 40x series GPUs due to current driver/library incompatibilities, which are expected to be resolved soon.
 
-Based on our analysis, the RTX 2070 emerges as the best choice for balancing cost and performance. Our benchmarks reveal that when using the RTX 2070 on Salad Cloud GPUs, OpenVoice can process an impressive 4 million words per dollar for text-to-speech plus cloning, and over 6 million words per dollar for text-to-speech alone, making it an efficient and economical option for voice synthesis and cloning tasks. You can check our benchmark here: <https://blog.salad.com/openvoice/>
+Based on our analysis, the RTX 2070 emerges as the best choice for balancing cost and performance. Our benchmarks reveal that when using the RTX 2070 on Salad Cloud GPUs, OpenVoice can process an impressive 4 million words per dollar for text-to-speech plus cloning, and over 6 million words per dollar for text-to-speech alone, making it an efficient and economical option for voice synthesis and cloning tasks. You can check our benchmark here: [https://blog.salad.com/openvoice/](https://blog.salad.com/openvoice/)
 
 ## Project Overview: TTS and Voice Cloning using Open Voice and Salad Cloud
 
@@ -51,7 +51,7 @@ In this project, our aim is to deploy an open voice solution that offers the fle
 
 Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are accessible to a broader audience, not just large organizations with significant resources. By combining OpenVoice with Salad Cloud, we democratize access to state-of-the-art voice technology, enabling users to create realistic and customizable speech with minimal effort. This initiative highlights the synergy between cloud computing and AI models in addressing real-world applications in voice synthesis and cloning, providing value in various scenarios such as content creation, accessibility, and personalized communication.
 
-Average processing price can be found in our benchmarks: <https://blog.salad.com/openvoice/>
+Average processing price can be found in our benchmarks: [https://blog.salad.com/openvoice/](https://blog.salad.com/openvoice/)
 
 ### Reference Architecture
 
@@ -70,7 +70,7 @@ Average processing price can be found in our benchmarks: <https://blog.salad.com
 
 Our full solution is stored here: [git repo](https://github.com/SaladTechnologies/openvoice-on-salad)
 
-```java Repo
+```text
 openvoice-on-salad/
 ├─ src/
 │  ├─ infrastructure/
@@ -123,7 +123,7 @@ rm -r ${OPENVOICE_DIR}/checkpoints_1226.zip
 
 To establish a clean virtual environment and install all the necessary libraries, you simply needs to execute the script using this command:
 
-```java bash
+```bash
 bash dev/setup
 ```
 
@@ -180,8 +180,8 @@ Speed and speaker emotion can be controlled with the `base_speaker_tts.tts` meth
 
 Here is an example of the results:
 
-- TTS only: <https://github.com/SaladTechnologies/openvoice-on-salad/blob/main/src/python/api/inference/exaples/Azimov1k.wav>
-- TTS + cloning reference speaker: <https://github.com/SaladTechnologies/openvoice-on-salad/blob/main/src/python/api/inference/exaples/Azimov1k_cloned.wav>
+- TTS only: https://github.com/SaladTechnologies/openvoice-on-salad/blob/main/src/python/api/inference/exaples/Azimov1k.wav
+- TTS + cloning reference speaker: https://github.com/SaladTechnologies/openvoice-on-salad/blob/main/src/python/api/inference/exaples/Azimov1k_cloned.wav
 
 ### Separating TTS and Voice Cloning
 
@@ -399,31 +399,18 @@ We now need to set up all of our container group parameters:
 2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under image name paste the image path: saladtechnologies/openvoice-api:1.0.0  
    If you are using your custom solution, specify your image location.
 
-   [block:image]{"images":[{"image":["https://files.readme.io/e934a91-Screenshot_2024-03-17_200414.png",null,""],"align":"center","sizing":"400px","border":true}]}[/block]
+![](https://files.readme.io/e934a91-Screenshot_2024-03-17_200414.png)
 
-3. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
-4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative. TTS process can be run on any GPU. Check out our benchmark to choose which GPU is better for your needs.
-5. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
-6. **Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/a4b1834-image.png",
-null,
-""
-],
-"align": "center",
-"sizing": "400px",
-"border": true
-}
-]
-}
-[/block]
+1. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
+2. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your process. The prices are very low in comparison to all the other cloud solutions, so be creative. TTS process can be run on any GPU. Check out our benchmark to choose which GPU is better for your needs.
+3. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
+4. **Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
-In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found here: <https://portal.salad.com/api-key>  
+![](https://files.readme.io/a4b1834-image.png)
+
+
+In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to provide your personal token together with the api call. Your token can be found here: https://portal.salad.com/api-key
 With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle intensive tasks at a fraction of the cost.  
 Now check “AutoStart container group once image is pulled“ and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.
 
@@ -437,25 +424,11 @@ Now check “AutoStart container group once image is pulled“ and hit “Deploy
 
 Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's infrastructure, just as you would locally.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/0df9964-image.png",
-null,
-""
-],
-"align": "center",
-"border": true
-}
-]
-}
-[/block]
+![](https://files.readme.io/0df9964-image.png)
 
 You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example:
 
-```java
+```text
 https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs
 ```
 
