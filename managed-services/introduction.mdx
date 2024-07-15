@@ -51,7 +51,9 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
    }'
 ```
 * Fill in the file link instead of "https://example.com/path/to/file.mp3"
+
 * Optional : replace `{your webhook url}` with webhook url if needed. If not, remove the line.
+
 Webhook is a method that enables application to transmit data to another application immediately upon the occurrence of an event. Instead of having your application periodically poll for updates, a webhook delivers data to a specified URL as soon as the event accures, facilitating instant communication and minimizing latency. In our case transcription result gets sent to the webhook.  
 ### Example cURL Get Transcript
 ```bash
