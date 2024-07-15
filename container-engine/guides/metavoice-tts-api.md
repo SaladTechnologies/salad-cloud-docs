@@ -613,34 +613,22 @@ We now need to set up all of our container group parameters:
 2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0**  
    If you are using your custom solution, specify your image location.
 
-   [block:image]{"images":[{"image":["https://files.readme.io/b80f256-image.png",null,""],"align":"center","sizing":"352px"}]}[/block]
+![](https://files.readme.io/b80f256-image.png)
 
-3. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
-4. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version best suites your needs.
-5. **Networking.** Click “Edit“ next to it, check “Enable Networking“ and set port to 80:
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/61c8d63-image-20231110-201504.png",
-null,
-""
-],
-"align": "center",
-"sizing": "400px"
-}
-]
-}
-[/block]
+1. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
+2. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version best suites your needs.
+3. **Networking.** Click “Edit“ next to it, check “Enable Networking“ and set port to 80:
 
-6. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
-7. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**. This will make sure our endpoint is accessible with IPv6 and port 80:
+![](https://files.readme.io/61c8d63-image-20231110-201504.png)
 
-   [block:image]{"images":[{"image":["https://files.readme.io/310cb33-image.png",null,""],"align":"center","sizing":"50% "}]}[/block]
 
-Additionally, for enhanced security, you have the option to enable Authentication under networking. When activated, you'll need to include your personal token with each API call. You can locate your token here:<https://portal.salad.com/api-key>
+1. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
+2. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**. This will make sure our endpoint is accessible with IPv6 and port 80:
+
+![](https://files.readme.io/310cb33-image.png.png)
+
+Additionally, for enhanced security, you have the option to enable Authentication under networking. When activated, you'll need to include your personal token with each API call. You can locate your token here: https://portal.salad.com/api-key
 
 With all configurations complete, deploying your FastAPI application on Salad is a straightforward process. Leveraging Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling demanding tasks cost-effectively.
 
@@ -658,7 +646,7 @@ Once your solution is deployed on Salad, the next step is to interact with your 
 
 ![](https://files.readme.io/0df9964-image.png)
 
-You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example: <https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs>
+You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example: https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs
 
 You will see your Swagger page similar to this:
 

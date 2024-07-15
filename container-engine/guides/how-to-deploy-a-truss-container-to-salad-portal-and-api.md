@@ -32,7 +32,7 @@ Here is a complete [guide and docs to guide you through Truss ](https://truss.ba
 **Step 1: Obtain Your API Key**  
 To authenticate your API requests, you'll need an API key. To obtain your API key, follow these steps:
 
-- Log in to your Salad Cloud account at <https://portal.salad.com>
+- Log in to your Salad Cloud account at [https://portal.salad.com](https://portal.salad.com)
 - Click on your profile in the top right corner of the page, then click API Key.
 - Copy the API key that is displayed. You'll need this in the next step. 
 
@@ -95,7 +95,7 @@ requirements:
   Make sure to replace "iris_rfc_truss" with a name that reflects your model.
 
 - Upload your container to Dockerhub  
-  First, ensure that you have a DockerHub account. If you don't, create one at <https://hub.docker.com/signup>.
+  First, ensure that you have a DockerHub account. If you don't, create one at [https://hub.docker.com/signup](https://hub.docker.com/signup).
 
 - Next, create a Docker image for your Truss model. This can be done by running the following command in your terminal or command prompt:
 

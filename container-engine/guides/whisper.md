@@ -17,8 +17,8 @@ Here's some prelimary performance numbers. These numbers are for total round-tri
 
 More extensive benchmarks are available here:
 
-- <https://blog.salad.com/whisper-large-v3/>
-- <https://blog.salad.com/distil-whisper-large-v2/>
+- https://blog.salad.com/whisper-large-v3/
+- https://blog.salad.com/distil-whisper-large-v2/
 
 **RTX 3080 Ti w/ BetterTransformers**
 
@@ -159,7 +159,7 @@ You can deploy this API on Salad using the following command:
 
 > See [API Docs](https://docs.salad.com/reference/create_container_group) for more information.
 
-```shell shell
+```shell
 organization_name="my-org"
 project_name="my-project"
 salad_api_key="my-api-key"
@@ -217,24 +217,11 @@ Select or Create the organization and project you want to work with, then click 
 
 2. Select the `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2` image to deploy distil-whisper large v2, using BetterTransformers.
 
-   ![](https://files.readme.io/dfecdb2-img-name.png)
+![](https://files.readme.io/dfecdb2-img-name.png)
 
 3. Set your replica count. We recommend at least 3 replicas for production use.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/67d2659-replica.png",
-null,
-""
-],
-"align": "center"
-}
-]
-}
-[/block]
+![](https://files.readme.io/67d2659-replica.png)
 
 4. Set the CPU to 2, and the memory to 8 GB.
 
@@ -250,22 +237,8 @@ null,
 
 7. Enable the Container Gateway for port `8000`, and choose authenticated or not authenticated. If you choose authenticated, you will need to provide an API key when making requests.
 
-[block:image]
-{
-"images": [
-{
-"image": [
-"https://files.readme.io/27736f7-image.png",
-null,
-""
-],
-"align": "center",
-"sizing": "400px"
-}
-]
-}
-[/block]
+![](https://files.readme.io/27736f7-image.png)
 
-8. Click "Deploy" to deploy your container group.
+1. Click "Deploy" to deploy your container group.
 
 ![](https://files.readme.io/ec5de23-deploy.png)
