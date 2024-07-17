@@ -272,7 +272,8 @@
     {
       "group": "Tutorials And Guides",
       "pages": [
-        "managed-services/dreambooth/tutorial"
+        "managed-services/dreambooth/pet-tutorial",
+        "managed-services/dreambooth/avatar-video-tutorial"
       ]
     },
     {
