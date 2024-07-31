@@ -238,6 +238,7 @@
         "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
+        "container-engine/guides/ubuntu-image",
         
         {
           "group": "Run a Node App",
