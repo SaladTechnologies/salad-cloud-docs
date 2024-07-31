@@ -234,6 +234,7 @@
         "container-engine/guides/using-salad-recipes",
         "container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe",
         "container-engine/guides/basic-how-to-deploy-stable-diffusion-on-salad",
+        "container-engine/guides/how-to-manage-a-large-number-of-stable-diffusion-models",
         "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
