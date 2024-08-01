@@ -1,6 +1,6 @@
 ---
-title: "How to Deploy Stable Diffusion (SD.Next)"
-description: "A guide to deploying a custom stable diffusion model on SaladCloud with SD.Next"
+title: "How to Deploy Stable Diffusion (Fooocus)"
+description: "A guide to deploying Fooocus on SaladCloud with the default models preloaded."
 ---
 
 # High Level
@@ -42,161 +42,113 @@ Find a docker image of your preferred stable diffusion inference server. Here ar
     Note that you will be interacting with these as an API, and not through their browser user interface. 
 
 ## Download Your Models and Extensions
-Download any model files you plan to use. For our example, we’re going to use [Dreamshaper 8](https://civitai.com/models/4384/dreamshaper) , available on [Civitai.com](http://Civitai.com) ([https://blog.salad.com/civitai-salad/](https://blog.salad.com/civitai-salad/))
+Fooocus comes with a set of pretrained checkpoints, loras, and vae, in addition to a prompt expansion model.
+By default in our docker image, these models download on start.
+However, we're going to add them to the docker image directly so our container can become productive much faster after it enters the "running" state.
 
 ## Create a Dockerfile
 1. Create a new file called `Dockerfile` and open it in your preferred text editor. At this point, your directory should look like this:
     
     ```
     .
-    ├── Dockerfile
-    └── dreamshaper_8.safetensors
+    └── Dockerfile
     ```
     
 2. Copy the following into your Dockerfile:
     
 ```docker
-# We're going to use this verified SD.Next image as a base
-FROM saladtechnologies/sdnext:base
+# We're going to use this verified Fooocus API image as a base
+FROM konieshadow/fooocus-api:v0.4.1.1
 
-# Now we copy our model into the image
-ENV MODEL_DIR=/webui/data/models
-ENV CKPT_PATH=${MODEL_DIR}/Stable-diffusion/dreamshaper_8.safetensors
-COPY dreamshaper_8.safetensors ${CKPT_PATH}
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV NVIDIA_VISIBLE_DEVICES=all
 
-ENV PORT=7860
-ENV HOST=[::]
-# We pass in all of the relevant launch arguments to the SD.Next server via
-# the CMD directive
-ENTRYPOINT []
-CMD ["/bin/bash", "-c", "${INSTALLDIR}/entrypoint.sh \
---data-dir=/webui/data \
---port ${PORT} \
---server-name ${HOST} \
---quick \
---use-cuda \
---docs \
---ckpt ${CKPT_PATH}"]
+# Now we pre-install the models used by Fooocus.
+# This way, the container will be ready to go much faster after container download is complete.
+ENV MODEL_DIR=/app/repositories/Fooocus/models
+ENV CKPT_PATH=${MODEL_DIR}/checkpoints
+ENV VAE_PATH=${MODEL_DIR}/vae_approx
+ENV LORA_PATH=${MODEL_DIR}/loras
+ENV PROMPT_EXPANSION_PATH=${MODEL_DIR}/prompt_expansion
+ADD https://huggingface.co/lllyasviel/fav_models/resolve/main/fav/juggernautXL_v8Rundiffusion.safetensors?download=true ${CKPT_PATH}/juggernautXL_v8Rundiffusion.safetensors
+ADD https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors?download=true ${LORA_PATH}/sd_xl_offset_example-lora_1.0.safetensors
+ADD https://huggingface.co/lllyasviel/misc/resolve/main/xlvaeapp.pth?download=true ${VAE_PATH}/xlvaeapp.pth
+ADD https://huggingface.co/lllyasviel/misc/resolve/main/vaeapp_sd15.pt?download=true ${VAE_PATH}/vaeapp_sd15.pth
+ADD https://huggingface.co/lllyasviel/misc/resolve/main/xl-to-v1_interposer-v3.1.safetensors?download=true ${VAE_PATH}/xl-to-v1_interposer-v3.1.safetensors
+ADD https://huggingface.co/lllyasviel/misc/resolve/main/fooocus_expansion.bin?download=true ${PROMPT_EXPANSION_PATH}/fooocus_expansion/pytorch_model.bin
+
+CMD ["python", "main.py", "--host", "*", "--port", "8888", "--skip-pip", "--preview-option", "none", "--always-gpu", "--preload-pipeline" ]
 ```
 
 ## Build and Test Your Docker Image
 1. Build the docker image. You should change the specified tag to suit your purpose.
     
 ```bash
-docker build -t saladtechnologies/sdnext:dreamshaper-8 .
+docker build -t saladtechnologies/fooocus-api:preloaded-2.4.3
 ```
     
 2. (Recommended) Run the docker image locally to confirm it works as expected
 
 ```bash
-docker run -it --rm --gpus all -p 7860:7860 --name sdnext -e HOST=0.0.0.0 \
-saladtechnologies/sdnext:dreamshaper-8
+docker run -it --rm --gpus all -p 8888:8888 --name fooocus \
+saladtechnologies/fooocus-api:preloaded-2.4.3
 ```
 
-Navigate to [http://localhost:7860/docs](http://localhost:7860/docs) in your browser to see the API docs for Automatic1111.
-
-Note that we set the `HOST` environment variable to `0.0.0.0` for local development.
-The default value of `HOST` is `[::]`, which is the ipv6 address that Salad uses to route traffic to your container.
+Navigate to [http://localhost:8888/docs](http://localhost:8888/docs) in your browser to see the API docs for Automatic1111.
 
 3. Test a Text-to-Image request
 
-See [the docs](http://localhost:7860/docs#/default/text2imgapi_sdapi_v1_txt2img_post) for more information on submitting a text-to-image request.
+See [the docs](http://localhost:8888/docs#/GenerateV1/text2img_generation_v1_generation_text_to_image_post) for more information on submitting a text-to-image request.
 Here's an example JSON request body:
 
 ```json
 {
-  "prompt": "A beautiful sunset over a calm lake"
+  "prompt": "beautiful clouds at sunset over a calm lake",
+  "require_base64": true
 }
 ```
 
-Submit this to the `/sdapi/v1/txt2img` endpoint as a POST request:
+Submit this to the `/v1/generation/text-to-image` endpoint as a POST request:
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:7860/sdapi/v1/txt2img' \
+  'http://localhost:8888/v1/generation/text-to-image' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "prompt": "A beautiful sunset over a calm lake"
+  "prompt": "beautiful clouds at sunset over a calm lake",
+  "require_base64": true
 }'
 ```
 
 You will receive back a response in JSON format, including the generated image in Base64 encoded format:
 
 ```json
-{
-  "images": ["base64encodedimage"],
-  "parameters": {
-    "prompt": "A beautiful sunset over a calm lake",
-    "negative_prompt": "",
-    "styles": null,
-    "seed": -1,
-    "subseed": -1,
-    "subseed_strength": 0,
-    "seed_resize_from_h": -1,
-    "seed_resize_from_w": -1,
-    "sampler_name": null,
-    "batch_size": 1,
-    "n_iter": 1,
-    "steps": 50,
-    "cfg_scale": 7,
-    "width": 512,
-    "height": 512,
-    "restore_faces": null,
-    "tiling": null,
-    "do_not_save_samples": false,
-    "do_not_save_grid": false,
-    "eta": null,
-    "denoising_strength": null,
-    "s_min_uncond": null,
-    "s_churn": null,
-    "s_tmax": null,
-    "s_tmin": null,
-    "s_noise": null,
-    "override_settings": null,
-    "override_settings_restore_afterwards": true,
-    "refiner_checkpoint": null,
-    "refiner_switch_at": null,
-    "disable_extra_networks": false,
-    "comments": null,
-    "enable_hr": false,
-    "firstphase_width": 0,
-    "firstphase_height": 0,
-    "hr_scale": 2,
-    "hr_upscaler": null,
-    "hr_second_pass_steps": 0,
-    "hr_resize_x": 0,
-    "hr_resize_y": 0,
-    "hr_checkpoint_name": null,
-    "hr_sampler_name": null,
-    "hr_prompt": "",
-    "hr_negative_prompt": "",
-    "sampler_index": "Euler",
-    "script_name": null,
-    "script_args": [],
-    "send_images": true,
-    "save_images": false,
-    "alwayson_scripts": {}
-  },
-  "info": "{\"prompt\": \"A beautiful sunset over a calm lake\", \"all_prompts\": [\"A beautiful sunset over a calm lake\"], \"negative_prompt\": \"\", \"all_negative_prompts\": [\"\"], \"seed\": 726538242, \"all_seeds\": [726538242], \"subseed\": 4102306259, \"all_subseeds\": [4102306259], \"subseed_strength\": 0, \"width\": 512, \"height\": 512, \"sampler_name\": \"Euler\", \"cfg_scale\": 7.0, \"steps\": 50, \"batch_size\": 1, \"restore_faces\": false, \"face_restoration_model\": null, \"sd_model_name\": \"dreamshaper_8\", \"sd_model_hash\": \"879db523c3\", \"sd_vae_name\": null, \"sd_vae_hash\": null, \"seed_resize_from_w\": -1, \"seed_resize_from_h\": -1, \"denoising_strength\": null, \"extra_generation_params\": {}, \"index_of_first_image\": 0, \"infotexts\": [\"A beautiful sunset over a calm lake\\nSteps: 50, Sampler: Euler, CFG scale: 7.0, Seed: 726538242, Size: 512x512, Model hash: 879db523c3, Model: dreamshaper_8, Version: v1.7.0\"], \"styles\": [], \"job_timestamp\": \"20240731152922\", \"clip_skip\": 1, \"is_using_inpainting_conditioning\": false, \"version\": \"v1.7.0\"}"
-}
+[
+  {
+    "base64": "base64encodedimage",
+    "url": "http://*:8888/files/2024-08-01/e3dd0868-dfca-45cb-b718-adf65c745c10-0.png",
+    "seed": "5413726088212485283",
+    "finish_reason": "SUCCESS"
+  }
+]
 ```
 
 4. Decode the base64 encoded string into your image. You can do this in a free browser tool such as https://codebeautify.org/base64-to-image-converter
         
-![Untitled](container-engine/guides/stable-diffusion-guide-images/sunset-base64-2.png)
+![Untitled](container-engine/guides/stable-diffusion-guide-images/sunset-base64-3.png)
 
 or using CLI tools like `jq` and `base64`. For this method, first save your response to a file called `response.json`. Then, run the following command:
 
 ```bash
-jq -r '.images[0]' response.json | base64 -d > image.png
+jq -r '.[0].base64' response.json | base64 -d > image.png
 ```
 
 ## Push and Deploy Your Docker Image
 1. Push your docker image up to docker hub (or the container registry of your choice.)
     
 ```bash
-docker push saladtechnologies/sdnext:dreamshaper-8
+docker push saladtechnologies/fooocus-api:preloaded-2.4.3
 ```
         
     2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](https://docs.salad.com/api-reference/container_groups/create-a-container-group)

@@ -1,5 +1,6 @@
 ---
 title: "How to Deploy Stable Diffusion (ComfyUI)"
+description: "A guide to deploying a custom stable diffusion model on SaladCloud with ComfyUI"
 ---
 
 # High Level
@@ -33,6 +34,10 @@ Find a docker image of your preferred stable diffusion inference server. Here ar
         4. Model Directory: `/webui/data/models`
         5. Extension Directory: `/webui/data/extensions`
         6. Controlnet Model Directory: `/webui/extensions-builtin/sd-webui-controlnet/models`
+    4. Fooocus:
+        1. Git Repo: [https://github.com/mrhan1993/Fooocus-API](https://github.com/mrhan1993/Fooocus-API)
+        2. Docker Image: `konieshadow/fooocus-api:v0.4.1.1`
+        3. Model Directory: `/app/repositories/Fooocus/models`
     
     Note that you will be interacting with these as an API, and not through their browser user interface. 
 
