@@ -1,6 +1,6 @@
 ---
 title: "Transcription API"
-description: "Salad's Managed Transcription API is available for Alpha customers. We don't have an SLA now, but we expect the service to reliably deliver high-quality transcripts/captions/subtitles at high volumes. We are quickly adding new capabilities and enhancing the scalability of our transcription service. Please use this [booking calendar](https://meetings.hubspot.com/derick-thompson1/salad-managed-ai-services) to schedule a time with our team to discuss your use case. If you want to get started quickly, [Fork this PostMan.com collection.](https://www.postman.com/salad-apis/workspace/salad-transcription-api/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac/fork?origin=request-send)"
+description: "Salad's Managed Transcription API is available for Alpha customers. We don't have an SLA now, but we expect the service to reliably deliver high-quality transcripts/captions/subtitles at high volumes. We are quickly adding new capabilities and enhancing the scalability of our transcription service. Please use this [booking calendar](https://meetings.hubspot.com/derick-thompson1/salad-managed-ai-services) to schedule a time with our team to discuss your use case. If you want to get started quickly, [Fork this PostMan.com collection.](https://www.postman.com/salad-apis/workspace/salad/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac)"
 ---
 
 ## Accounts & Credentials
@@ -40,9 +40,11 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
       "input": {
          "url": "https://example.com/path/to/file.mp3",
          "language_code": "en",
+         "sentence_level_timestamps": "true"
          "word_level_timestamps": false,
          "diarization": false,
-         "srt": false
+         "srt": false,
+         "translate": "to_eng"
       },
     "webhook": {your webhook url},
 	  "metadata": {
@@ -55,6 +57,7 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 * Optional : replace `{your webhook url}` with webhook url if needed. If not, remove the line.
 
 Webhook is a method that enables application to transmit data to another application immediately upon the occurrence of an event. Instead of having your application periodically poll for updates, a webhook delivers data to a specified URL as soon as the event accures, facilitating instant communication and minimizing latency. In our case transcription result gets sent to the webhook.  
+
 ### Example cURL Get Transcript
 ```bash
 curl https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs/54e84442-3576-45ca-904c-a1d90bc77baf \
@@ -69,16 +72,24 @@ Update the JSON input parameters to customize your transcription output.
 
 #### "url" 
 
-We recommend using a file service like S3 that offers secure [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html). It should look like this (https://bucketname.s3.us-east-2.amazonaws.com/filename.mp4?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2). You can't use YouTube videos, Google Drive, or other file-sharing services.
+URL has to be a downloadable link to a file. We recommend using a file service like S3 or Blob that offers secure [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html). It should look like this (https://bucketname.s3.us-east-2.amazonaws.com/filename.mp4?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2). You can't use YouTube links, Google Drive, or other file-sharing services if they do not provide downloadable url's.
 
 Send media in any of these formats.
 
 		*Audio:* AIFF, FLAC, M4A, MP3, WAV
 		*Video:* MKV, MOV, WEBM, WMA, MP4 (most codecs), AVI
 
+#### “sentence_level_timestamps”
+
+Sentence level timestamps are returned on default. Set to false if not needed.
+
+#### “word_level_timestamps” 
+
+Set to "true" for word level timestamps. Set to "false” on default.
+
 #### “language_code”
 
-Transcription is available in 97 languages. We automatically identify the source language. We don’t support multiple-language media files at this time.
+Transcription is available in 97 languages. We automatically identify the source language. “language_code” need to be specified only if diarization is required.
 
 #### “diarization” 
 
@@ -88,17 +99,19 @@ Diarization requires the language_code to be defined. By default, it is set to *
  
 You can also diarize in *"fr"* (French), *"de"* (German), *"es"* (Spanish), *"it"* (Italian), *"ja"* (Japanese), *"zh"* (Chinese), *"nl"* (Dutch), *"uk"* (Ukrainian), *"pt"* (Portuguese), *"ar"* (Arabic), *"cs”* (Czech), *"ru"* (Russian), *"pl"* (Polish), *"hu"* (Hungarian), *"fi"* (Finnish), *"fa"* (Persian), *"el"* (Greek), *"tr"* (Turkish), *"da"* (Danish), *"he"* (Hebrew), *"vi"* (Vietnamese), *"ko"* (Korean), *"ur"* (Urdu), *"te"* (Telugu), *"hi"* (Hindi), *"ca"* (Catalan), *"ml"* (Malayalam).
 
-#### “word_level_timestamps” 
-
-Set to "true" to get word-level timestamps. Set to "false", to get only sentence-level timestamps.
 
 #### “srt” 
 
 Set to *"true"* to generate a .srt output for caption and subtitles. If you don't require it, set it to *"false"*.
 
+### "webhook"
+
+*Optional. Webhook is a method that enables application to transmit data to another application immediately when process is finished. Specify your webhook url to use.
+
 #### "my-job-id"
 
-If you need an identifier from your system you can the job id as desired.
+*Optional. If you need an identifier from your system you can the job id as desired.
+
 
 ### Step 3 | Make Post Request
 Make your POST transcript request. If successful, you will recieve a confirmation response that will include the job *"id"* *(ex: 00-681d01e03cec5f7122952100b66f2330-aa5b353301b6bc50-01).
@@ -195,11 +208,10 @@ If your transcription request is *“pending”*, it has not yet been picked up 
 
 *“running”* the transcription is processing. 
 
-*"succeeded"* the transcript is ready.
-
 *“failed”* the transcript was not created. We will automatically re-try the transcription process until it fails three times. If we are unable to transcribe your media, you will get a 200 error with one of the following messages. Send us a support request at [support@salad.com](https://mailto:support@salad.com/) if this happens.
 
-If for some reason we had an issue with the file you sent, you will get a mesage in the result:
+*"succeeded" the transcript is ready. If we were not able to pull your url, or there was another issue with the audio file you will see an "error" in the response and one of the reasons:
+
 *File size is more than 3GB 
 *File can not be downloaded or duration is missing. Please check your file and try again. 
 *File duration is more than 2.5 hours
