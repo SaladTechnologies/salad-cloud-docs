@@ -235,6 +235,7 @@
         {
           "group": "Stable Diffusion",
           "pages": [
+            "container-engine/guides/stable-diffusion/image-gen-general",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",

@@ -14,32 +14,18 @@ Regardless of your choice of stable diffusion inference server, models, or exten
 5. Deploy the image as a salad container group
 
 ## Find a Docker Image
-Find a docker image of your preferred stable diffusion inference server. Here are some popular ones that we’ve verified work on Salad. We’ll be using ComfyUI for this example, but the principles covered apply to all of these options.
-    1. ComfyUI
-        1. Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
-        2. Docker Image: [ghcr.io/ai-dock/comfyui:latest-cuda](http://ghcr.io/ai-dock/comfyui:latest-cuda)
-        3. Model Directory: `/opt/ComfyUI/models`
-        4. Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
-    2. Automatic1111
-        1. Git Repo: [https://github.com/SaladTechnologies/stable-diffusion-webui-docker](https://github.com/SaladTechnologies/stable-diffusion-webui-docker)
-        2. Docker Image: `saladtechnologies/a1111:ipv6-latest` 
-        3. Data Directory: `/data`
-        4. Model Directory: `/data/models`
-        5. Extension Directory: `/data/config/auto/extensions`
-        6. Controlnet Model Directory (If controlnet extension is installed): `/data/config/auto/extensions/sd-webui-controlnet/models`
-    3. SD.Next
-        1. Git Repo: [https://github.com/SaladTechnologies/sdnext](https://github.com/SaladTechnologies/sdnext)
-        2. Docker Image: `saladtechnologies/sdnext:base`
-        3. Data Directory: `/webui/data`
-        4. Model Directory: `/webui/data/models`
-        5. Extension Directory: `/webui/data/extensions`
-        6. Controlnet Model Directory: `/webui/extensions-builtin/sd-webui-controlnet/models`
-    4. Fooocus:
-        1. Git Repo: [https://github.com/mrhan1993/Fooocus-API](https://github.com/mrhan1993/Fooocus-API)
-        2. Docker Image: `konieshadow/fooocus-api:v0.4.1.1`
-        3. Model Directory: `/app/repositories/Fooocus/models`
+Find a docker image of Automatic1111.
+Here's one we've verified works on Salad:
+
+**Automatic1111**
+- Git Repo: [https://github.com/SaladTechnologies/stable-diffusion-webui-docker](https://github.com/SaladTechnologies/stable-diffusion-webui-docker)
+- Docker Image: `saladtechnologies/a1111:ipv6-latest` 
+- Data Directory: `/data`
+- Model Directory: `/data/models`
+- Extension Directory: `/data/config/auto/extensions`
+- Controlnet Model Directory (If controlnet extension is installed): `/data/config/auto/extensions/sd-webui-controlnet/models`
     
-    Note that you will be interacting with these as an API, and not through their browser user interface. 
+Note that you will be interacting with this as an API, and not through the browser user interface. 
 
 ## Download Your Models and Extensions
 Download any model files you plan to use. For our example, we’re going to use [Dreamshaper 8](https://civitai.com/models/4384/dreamshaper) , available on [Civitai.com](http://Civitai.com) ([https://blog.salad.com/civitai-salad/](https://blog.salad.com/civitai-salad/))
