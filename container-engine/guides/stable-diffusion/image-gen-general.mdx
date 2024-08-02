@@ -46,3 +46,34 @@ Here are some popular stable diffusion inference servers that we’ve verified w
     
 ## Container Gateway or Job Queue?
 
+When deploying your stable diffusion inference server, you have two options for how to access it:
+
+1. **Container Gateway**: This is the easiest way to access your container group. 
+    1. It can be enabled during container group creation, and maps a public https URL to a specific IPv6 port in your container.
+    1. You can optionally enable auth, which then requires your Salad API Token to access the container group.
+    1. Only requires your server to listen on IPv6, no additional binary.
+    1. Salad's Container Gateway uses least-connection load balancing, so you can scale your container group up or down without needing to change the URL.
+    1. Completed image generations are returned to the client in the response.
+    1. However, it is **not suitable for long-running tasks**, as the container gateway will time out after 100 seconds, a hard limit imposed by Cloudflare on idle connections.
+    For most image generation workloads, this is not a problem, as generations typically take under 30s.
+    1. **Does Not Retry Failed Requests**: If a request fails, the client must retry the request.
+    1. Excess load will result in failed requests, as the container gateway will not queue requests.
+2. **Job Queue**: This is a more resilient way to access your container group.
+    1. You can submit jobs to a queue, and the container group will process them in order.
+    1. You must add a binary to your container image that connects the job queue to your inference server.
+    1. High utililization of the container group will result in longer queue times, but no failed requests.
+    1. **Retries Failed Requests**: If a request fails, the job queue will retry the request 3 times.
+    1. **Long-Running Tasks**: The job queue is suitable for long-running tasks, as it does not have a timeout.
+    1. **Fully asyncronous**: Completed jobs are not returned to the client, but instead must be fetched from the job queue, or received by a webhook.
+
+There are several factors you should consider when choosing between the two options:
+
+1. **How predictable is load?**
+Scaling services with many gigabytes of models can not be done instantly, so if you expect sudden spikes in traffic, you may want to use a job queue.
+On the other hand, if you have very predictable load, the container gateway is easier to use, and you can simply scale your container group up or down as needed with about an hour of lead-time.
+1. **How long do you expect your tasks to take?**
+Most image generation tasks take just a few seconds on a powerful GPU, but if you have a particularly complex multi-modal workflow, and are using older, less expensive GPUs, you may end up with generation times approaching the cloudflare timeout limit of 100s.
+1. **What is the cost structure for your client application?**
+If you are using a serverless architecture, you should check to see if you are billed for CPU time, or clock time for your function execution.
+If you are billed for clock time, you will likely want to use the job queue, as you will not be billed for time spent waiting in the queue.
+If you are billed for CPU time, there will be little difference between the two options.
