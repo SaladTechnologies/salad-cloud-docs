@@ -10,7 +10,7 @@ If a node becomes unavailable, it will automatically be replaced with a fresh no
 
 ## How to request a node removal
 Submit a node removal request by sending a POST request to the following endpoint:
-`https://app-api.salad.io/api/v2/sgs/$SGSID/removals`
+`https://matrix-rest-api.salad.com/api/v2/sgs/$SGSID/removals`
 
 The `SGSID` will be shared with you before the trial period begins.
 
@@ -34,7 +34,7 @@ The JWT will be shared with you before the trial period begins.
 </AccordionGroup>
 
 
-<Note>This should be in the format application/json. The only required field is the sessionId. Fields marked as optional are useful for Salad in preventing the use of nodes that may trigger a node removal request in the future.</Note>
+<Note>This should be in the format application/json. Fields marked as optional are useful for Salad in preventing the use of nodes that may trigger a node removal request in the future.</Note>
 
 ## Example Request
 ``` JSON node_removal.json
@@ -43,9 +43,9 @@ The JWT will be shared with you before the trial period begins.
 "sessionId": "eb40cca0-c17b-4de8-a850-ac510bc29c6c",
 // An optional Unix timestamp (seconds) indicating when it was detected as bad.
 "timeDetectedAt": 1657639946,
-// An optional string with the reason for removal.
+// A string with the reason for removal.
 "removalReason": "Reason for removal request.",
-// An optional string with the specific service.
+// A string describing the specific service that was failing.
 "service": "Example_Service"
 }
 ```
