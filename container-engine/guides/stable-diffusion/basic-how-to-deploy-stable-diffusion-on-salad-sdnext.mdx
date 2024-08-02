@@ -1,6 +1,6 @@
 ---
-title: "How to Deploy Stable Diffusion (Automatic1111)"
-description: "A guide to deploying a custom stable diffusion model on SaladCloud with Automatic1111"
+title: "How to Deploy Stable Diffusion (SD.Next)"
+description: "A guide to deploying a custom stable diffusion model on SaladCloud with SD.Next"
 ---
 
 # High Level
@@ -14,16 +14,16 @@ Regardless of your choice of stable diffusion inference server, models, or exten
 5. Deploy the image as a salad container group
 
 ## Find a Docker Image
-Find a docker image of Automatic1111.
-Here's one we've verified works on Salad:
+Find a docker image of SD.Next.
+Here is one that we have verified works on Salad:
 
-**Automatic1111**
-- Git Repo: [https://github.com/SaladTechnologies/stable-diffusion-webui-docker](https://github.com/SaladTechnologies/stable-diffusion-webui-docker)
-- Docker Image: `saladtechnologies/a1111:ipv6-latest` 
-- Data Directory: `/data`
-- Model Directory: `/data/models`
-- Extension Directory: `/data/config/auto/extensions`
-- Controlnet Model Directory (If controlnet extension is installed): `/data/config/auto/extensions/sd-webui-controlnet/models`
+**SD.Next**
+    - Git Repo: [https://github.com/SaladTechnologies/sdnext](https://github.com/SaladTechnologies/sdnext)
+    - Docker Image: `saladtechnologies/sdnext:base`
+    - Data Directory: `/webui/data`
+    - Model Directory: `/webui/data/models`
+    - Extension Directory: `/webui/data/extensions`
+    - Controlnet Model Directory: `/webui/extensions-builtin/sd-webui-controlnet/models`
     
 Note that you will be interacting with this as an API, and not through the browser user interface. 
 
@@ -42,35 +42,47 @@ Download any model files you plan to use. For our example, we’re going to use 
 2. Copy the following into your Dockerfile:
     
 ```docker
-# We're going to use this verified Automatic1111 image as a base
-FROM saladtechnologies/a1111:ipv6-latest
+# We're going to use this verified SD.Next image as a base
+FROM saladtechnologies/sdnext:base
 
 # Now we copy our model into the image
-ENV MODEL_DIR=/data/models
-COPY dreamshaper_8.safetensors ${MODEL_DIR}/Stable-diffusion/dreamshaper_8.safetensors
+ENV MODEL_DIR=/webui/data/models
+ENV CKPT_PATH=${MODEL_DIR}/Stable-diffusion/dreamshaper_8.safetensors
+COPY dreamshaper_8.safetensors ${CKPT_PATH}
 
-# We set A1111 to listen on the ipv4 port 7859, and then use socat to forward traffic 
-# from the ipv6 port 7860 (or whatever you set PORT to) to the ipv4 port 7859
 ENV PORT=7860
-CMD python -u webui.py --listen --port 7859 --xformers --api \
-  & socat TCP6-LISTEN:${PORT},fork TCP4:127.0.0.1:7859;
+ENV HOST=[::]
+# We pass in all of the relevant launch arguments to the SD.Next server via
+# the CMD directive
+ENTRYPOINT []
+CMD ["/bin/bash", "-c", "${INSTALLDIR}/entrypoint.sh \
+--data-dir=/webui/data \
+--port ${PORT} \
+--server-name ${HOST} \
+--quick \
+--use-cuda \
+--docs \
+--ckpt ${CKPT_PATH}"]
 ```
 
 ## Build and Test Your Docker Image
 1. Build the docker image. You should change the specified tag to suit your purpose.
     
 ```bash
-docker build -t saladtechnologies/a1111:dreamshaper-8 .
+docker build -t saladtechnologies/sdnext:dreamshaper-8 .
 ```
     
 2. (Recommended) Run the docker image locally to confirm it works as expected
 
 ```bash
-docker run -it --rm --gpus all -p 7860:7860 --name a1111 \
-saladtechnologies/a1111:dreamshaper-8
+docker run -it --rm --gpus all -p 7860:7860 --name sdnext -e HOST=0.0.0.0 \
+saladtechnologies/sdnext:dreamshaper-8
 ```
 
-Navigate to [http://localhost:7860/docs](http://localhost:7860/docs) in your browser to see the API docs for Automatic1111.
+Navigate to [http://localhost:7860/docs](http://localhost:7860/docs) in your browser to see the API docs for SD.Next.
+
+Note that we set the `HOST` environment variable to `0.0.0.0` for local development.
+The default value of `HOST` is `[::]`, which is the ipv6 address that Salad uses to route traffic to your container.
 
 3. Test a Text-to-Image request
 
@@ -158,7 +170,7 @@ You will receive back a response in JSON format, including the generated image i
 
 4. Decode the base64 encoded string into your image. You can do this in a free browser tool such as https://codebeautify.org/base64-to-image-converter
         
-![Decoded Image](/container-engine/guides/stable-diffusion-guide-images/sunset-base-64.png)
+![Example Image](/container-engine/guides/stable-diffusion-guide-images/sunset-base64-2.png)
 
 or using CLI tools like `jq` and `base64`. For this method, first save your response to a file called `response.json`. Then, run the following command:
 
@@ -170,40 +182,40 @@ jq -r '.images[0]' response.json | base64 -d > image.png
 1. Push your docker image up to docker hub (or the container registry of your choice.)
     
 ```bash
-docker push saladtechnologies/a1111:dreamshaper-8
+docker push saladtechnologies/sdnext:dreamshaper-8
 ```
         
     2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](https://docs.salad.com/api-reference/container_groups/create-a-container-group)
         
-        ![Create a Container Group](/container-engine/guides/stable-diffusion-guide-images/Untitled%206.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/Untitled%206.png)
         
         We’re going to name our container group something obvious, and fill in the configuration form. 
         We’re going to use 3 replicas, to ensure coverage during node interruptions and reallocations.
         
-        ![Set up the image, and the replica count.](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-1.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-1.png)
         
         Since this is a stable diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vcpus, 12GB ram, and an RTX 3060 Ti GPU.
-        ![Choose appropriate hardware](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-2.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-2.png)
         
         We want to add the container gateway to our deployment, so that we will get a URL we can use to access it. Make sure to set the port to 7860, or whatever you set the PORT environment variable to in your Dockerfile.
-        ![Enable a way to access the container group](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-3.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-3.png)
 
         We need to enable a startup probe and a liveness probe, to make sure the container gateway only routes requests to nodes that are ready for them.
-        ![Configure probes for better reliability](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-4.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-3.png)
 
 ## Interact with Your Deployment
     1. Wait for the deployment to be ready.
         1. First, Salad pulls your container image into our own internal high-performance cache.
             
-            ![The container group is preparing](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-5.png)
+            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-4.png)
             
         2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
             
-            ![Container group is deploying, instances are allocating](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-6.png)
+            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-5.png)
             
         3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
             
-            ![Container group is deploying, instances are downloading](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-7.png)
+            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-6.png)
             
             This step can take tens of minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes.
             Note that our progress bars are only estimates, and do not necessarily reflect real-time download status.
@@ -211,8 +223,8 @@ docker push saladtechnologies/a1111:dreamshaper-8
             
         4. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
             
-            ![Container group is running, 1 or more instances is running](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-8.png)
+            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-7.png)
             
     2. Submit your prompt to the provided Access Domain Name. You will get back a json response within a few seconds. See [above](#build-and-test-your-docker-image) for how to submit the request and process the response.
         
-        ![Submit an API request to verify everything is working](/container-engine/guides/stable-diffusion-guide-images/deploy-a1111-9.png)
+        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-sdnext-8.png)
