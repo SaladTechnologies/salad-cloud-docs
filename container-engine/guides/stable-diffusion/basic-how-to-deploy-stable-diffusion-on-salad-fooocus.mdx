@@ -139,36 +139,36 @@ docker push saladtechnologies/fooocus-api:preloaded-2.4.3
         
     2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](https://docs.salad.com/api-reference/container_groups/create-a-container-group)
         
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/Untitled%206.png)
+        ![Untitled](/container-engine/images/stable-diffusion/salad-create-container-group.png)
         
         We’re going to name our container group something obvious, and fill in the configuration form. 
         We’re going to use 3 replicas, to ensure coverage during node interruptions and reallocations.
         
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-1.png)
+        ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-1.png)
         
         Since Fooocus uses an SDXL based model, we’re gong to give ourselves fairly powerful hardware: 4 vcpus, 24GB ram, and an RTX 3090 Ti GPU.
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-2.png)
+        ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-2.png)
         
         We want to add the container gateway to our deployment, so that we will get a URL we can use to access it.
         Make sure to set the port to 8888, or whatever you set the port to in the CMD of your dockerfile.
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-3.png)
+        ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-3.png)
 
         We need to enable a startup probe and a liveness probe, to make sure the container gateway only routes requests to nodes that are ready for them.
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-4.png)
+        ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-4.png)
 
 ## Interact with Your Deployment
     1. Wait for the deployment to be ready.
         1. First, Salad pulls your container image into our own internal high-performance cache.
             
-            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-5.png)
+            ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-5.png)
             
         2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
             
-            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-6.png)
+            ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-6.png)
             
         3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
             
-            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-7.png)
+            ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-7.png)
             
             This step can take tens of minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes.
             Note that our progress bars are only estimates, and do not necessarily reflect real-time download status.
@@ -176,8 +176,8 @@ docker push saladtechnologies/fooocus-api:preloaded-2.4.3
             
         4. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
             
-            ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-8.png)
+            ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-8.png)
             
     2. Submit your prompt to the provided Access Domain Name. You will get back a json response within 10-20 seconds. See [above](#build-and-test-your-docker-image) for how to submit the request and process the response.
         
-        ![Untitled](/container-engine/guides/stable-diffusion-guide-images/deploy-fooocus-9.png)
+        ![Untitled](/container-engine/images/stable-diffusion/deploy-fooocus-9.png)
