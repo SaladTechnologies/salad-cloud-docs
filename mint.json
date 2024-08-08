@@ -240,7 +240,6 @@
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-            "container-engine/guides/stable-diffusion/how-to-deploy-and-use-stable-diffusion-xl-recipe",
             "container-engine/guides/stable-diffusion/how-to-manage-a-large-number-of-stable-diffusion-models"
           ]
         },
