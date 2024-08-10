@@ -9,7 +9,7 @@
       "email": "support@salad.com"
     },
     "termsOfService": "https://salad.com/terms",
-    "version": "1.0.0-alpha.111"
+    "version": "1.0.0-alpha.119"
   },
   "servers": [
     {
@@ -610,6 +610,34 @@
           "$ref": "#/components/parameters/queue_name"
         }
       ],
+      "get": {
+        "operationId": "list_queue_jobs",
+        "summary": "List Jobs in a Queue that match the paginated query parameters. If no paginated query\\nparameters are provided, the full list is returned.",
+        "description": "Retrieves a list of queue jobs",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListQueueJobs"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["queues"]
+      },
       "post": {
         "operationId": "create_queue_job",
         "summary": "Create a new Job",
@@ -1024,18 +1052,20 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/organization_name"
-        },
-        {
-          "$ref": "#/components/parameters/page"
-        },
-        {
-          "$ref": "#/components/parameters/page_size"
         }
       ],
       "get": {
         "operationId": "list_inference_endpoints",
         "summary": "Gets a list of inference endpoints that match the paginated query parameters. If no paginated query\\nparameters are provided, the full list is returned.",
         "description": "Gets the list of all inference endpoints",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/ListInferenceEndpoints"
@@ -1096,6 +1126,34 @@
           "$ref": "#/components/parameters/inference_endpoint_name"
         }
       ],
+      "get": {
+        "operationId": "get_inference_endpoint_jobs",
+        "summary": "Gets a list of inference endpoints jobs that match the paginated query parameters. If no paginated query\\nparameters are provided, the full list is returned.",
+        "description": "Retrieves a list of an inference endpoint jobs",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListInferenceEndpointJobs"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": ["inference_endpoints"]
+      },
       "post": {
         "operationId": "create_inference_endpoint_job",
         "summary": "Create a new Job",
@@ -1381,7 +1439,7 @@
           "type": "string",
           "maxLength": 63,
           "minLength": 2,
-          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
         }
       },
       "recipe_deployment_name": {
@@ -1393,7 +1451,7 @@
           "type": "string",
           "maxLength": 63,
           "minLength": 2,
-          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
         }
       },
       "recipe_name": {
@@ -1405,7 +1463,7 @@
           "type": "string",
           "maxLength": 63,
           "minLength": 2,
-          "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
         }
       }
     },
@@ -2988,6 +3046,16 @@
                   }
                 },
                 "required": ["username", "personal_access_token"]
+              },
+              "gcp_gar": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["service_key"]
               }
             }
           }
@@ -3020,11 +3088,6 @@
                 "type": "integer",
                 "maximum": 30720,
                 "minimum": 1024,
-                "nullable": true
-              },
-              "gpu_class": {
-                "type": "string",
-                "deprecated": true,
                 "nullable": true
               },
               "gpu_classes": {
@@ -3290,6 +3353,16 @@
                   }
                 },
                 "required": ["username", "personal_access_token"]
+              },
+              "gcp_gar": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": ["service_key"]
               }
             }
           }
@@ -3310,11 +3383,6 @@
             "type": "integer",
             "maximum": 30720,
             "minimum": 1024
-          },
-          "gpu_class": {
-            "type": "string",
-            "deprecated": true,
-            "nullable": true
           },
           "gpu_classes": {
             "type": "array",
@@ -3354,7 +3422,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "instance_status_count": {
+          "instance_status_counts": {
             "$ref": "#/components/schemas/ContainerGroupInstanceStatusCount"
           }
         },
@@ -3363,7 +3431,7 @@
           "status",
           "start_time",
           "finish_time",
-          "instance_status_count"
+          "instance_status_counts"
         ]
       },
       "ContainerGroupInstanceStatusCount": {
@@ -3629,10 +3697,6 @@
           "ram": {
             "type": "integer"
           },
-          "gpu_class": {
-            "type": "string",
-            "deprecated": true
-          },
           "gpu_classes": {
             "type": "array",
             "items": {
@@ -3677,7 +3741,7 @@
             "type": "string",
             "maxLength": 63,
             "minLength": 2,
-            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
           },
           "replicas": {
             "type": "integer",
@@ -3782,7 +3846,7 @@
             "type": "string",
             "maxLength": 63,
             "minLength": 2,
-            "pattern": "^[a-z][a-z0-9-]{0,62}[a-z0-9]$"
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
           },
           "networking": {
             "$ref": "#/components/schemas/CreateRecipeNetworking"
@@ -3965,6 +4029,23 @@
         "additionalProperties": false,
         "required": ["items"]
       },
+      "InferenceEndpointJobList": {
+        "description": "Represents a list of inference endpoint jobs",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": ["items"]
+      },
       "InferenceEndpointJob": {
         "description": "Represents a inference endpoint job",
         "type": "object",
@@ -4127,7 +4208,8 @@
                   "name": "sim1",
                   "display_name": "Sim 1",
                   "replicas": 1,
-                  "recipe_name": "salad_recipe"
+                  "recipe_name": "salad-recipe",
+                  "autostart_policy": true
                 }
               }
             }
@@ -4196,7 +4278,12 @@
             "examples": {
               "jsonExample": {
                 "value": {
-                  "name": "queue-1"
+                  "input": "value",
+                  "metadata": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "webhook": "https://webhooks.example.com:8080"
                 }
               }
             }
@@ -4213,9 +4300,15 @@
             "examples": {
               "jsonExample": {
                 "value": {
-                  "input": {},
-                  "metadata": {},
-                  "webhook": "https://webhook_url:8080"
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "webhook": "https://webhooks.example.com:8080"
                 }
               }
             }
@@ -4350,8 +4443,9 @@
                     },
                     "command": [],
                     "size": 1024,
-                    "hash": 1311768467294899700
+                    "hash": "0x1234567890abcdef"
                   },
+                  "autostart_policy": true,
                   "restart_policy": "always",
                   "replicas": 1,
                   "current_state": {
@@ -4367,6 +4461,7 @@
                   },
                   "create_time": "2020-07-04T19:00:00Z",
                   "update_time": "2020-07-04T19:00:00Z",
+                  "pending_change": false,
                   "version": 1
                 }
               }
@@ -4397,38 +4492,7 @@
                         },
                         "command": [],
                         "size": 1024,
-                        "hash": 1311768467294899700
-                      },
-                      "restart_policy": "always",
-                      "replicas": 1,
-                      "current_state": {
-                        "status": "stopped",
-                        "start_time": "2020-07-04T19:00:00Z",
-                        "finish_time": "2020-07-04T19:00:00Z",
-                        "instance_status_counts": {
-                          "allocating_count": 1,
-                          "creating_count": 1,
-                          "running_count": 1,
-                          "stopping_count": 1
-                        }
-                      },
-                      "create_time": "2020-07-04T19:00:00Z",
-                      "update_time": "2020-07-04T19:00:00Z",
-                      "version": 1
-                    },
-                    {
-                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
-                      "name": "sim2",
-                      "display_name": "Simulation 2",
-                      "container": {
-                        "image": "acme-corp/anvil-drop-simulator:v65536",
-                        "resources": {
-                          "cpu": 1,
-                          "memory": 2048
-                        },
-                        "command": [],
-                        "size": 1024,
-                        "hash": 1311768467294899700
+                        "hash": "0x1234567890abcdef"
                       },
                       "autostart_policy": true,
                       "restart_policy": "always",
@@ -4446,6 +4510,40 @@
                       },
                       "create_time": "2020-07-04T19:00:00Z",
                       "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 1
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65536",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
                       "version": 2
                     }
                   ]
@@ -4484,8 +4582,9 @@
                     },
                     "command": [],
                     "size": 1024,
-                    "hash": 1311768467294899700
+                    "hash": "0x1234567890abcdef"
                   },
+                  "autostart_policy": true,
                   "restart_policy": "always",
                   "replicas": 1,
                   "current_state": {
@@ -4501,6 +4600,7 @@
                   },
                   "create_time": "2020-07-04T19:00:00Z",
                   "update_time": "2020-07-04T19:00:00Z",
+                  "pending_change": false,
                   "version": 1
                 }
               }
@@ -4537,8 +4637,9 @@
                     },
                     "command": [],
                     "size": 1024,
-                    "hash": 1311768467294899700
+                    "hash": "0x1234567890abcdef"
                   },
+                  "autostart_policy": true,
                   "restart_policy": "always",
                   "replicas": 1,
                   "current_state": {
@@ -4554,6 +4655,7 @@
                   },
                   "create_time": "2020-07-04T19:00:00Z",
                   "update_time": "2020-07-04T19:00:00Z",
+                  "pending_change": false,
                   "version": 1
                 }
               }
@@ -4577,15 +4679,13 @@
             "schema": {
               "$ref": "#/components/schemas/ContainerGroupInstance"
             },
-            "example": [
-              {
-                "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
-                "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
-                "state": "running",
-                "update_time": "2023-05-04T05:41:05Z",
-                "version": 1
-              }
-            ]
+            "example": {
+              "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+              "instance_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+              "state": "running",
+              "update_time": "2023-05-04T05:41:05Z",
+              "version": 1
+            }
           }
         }
       },
@@ -4600,7 +4700,7 @@
               "instances": [
                 {
                   "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
-                  "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
+                  "instance_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
                   "state": "running",
                   "update_time": "2023-05-04T05:41:05Z",
                   "version": 1
@@ -4645,7 +4745,7 @@
                 "value": {
                   "items": [
                     {
-                      "details": "StartFailure:0",
+                      "detail": "StartFailure:0",
                       "failed_at": "2023-09-15T21:38:45.1220217Z",
                       "machine_id": "2155a188-7304-8351-b98d-af6c79e5978f",
                       "instance_id": "2155a188-7304-8351-b98d-af6c79e5978f",
@@ -4654,7 +4754,7 @@
                       "version": 1
                     },
                     {
-                      "details": "RunFailure:-1",
+                      "detail": "RunFailure:-1",
                       "failed_at": "2023-09-14T11:30:05.2271645Z",
                       "machine_id": "dc96663a-fe19-345a-8363-174616159cb6",
                       "instance_id": "dc96663a-fe19-345a-8363-174616159cb6",
@@ -4698,37 +4798,7 @@
                             },
                             "command": [],
                             "size": 1024,
-                            "hash": 1311768467294899700
-                          },
-                          "restart_policy": "always",
-                          "replicas": 1,
-                          "current_state": {
-                            "status": "stopped",
-                            "start_time": "2020-07-04T19:00:00Z",
-                            "finish_time": "2020-07-04T19:00:00Z",
-                            "instance_status_counts": {
-                              "allocating_count": 1,
-                              "creating_count": 1,
-                              "running_count": 1,
-                              "stopping_count": 1
-                            }
-                          },
-                          "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
-                        },
-                        {
-                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
-                          "name": "sim2",
-                          "display_name": "Simulation 2",
-                          "container": {
-                            "image": "acme-corp/anvil-drop-simulator:v65536",
-                            "resources": {
-                              "cpu": 1,
-                              "memory": 2048
-                            },
-                            "command": [],
-                            "size": 1024,
-                            "hash": 1311768467294899700
+                            "hash": "0x1234567890abcdef"
                           },
                           "autostart_policy": true,
                           "restart_policy": "always",
@@ -4745,7 +4815,42 @@
                             }
                           },
                           "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
+                          "update_time": "2020-07-04T19:00:00Z",
+                          "pending_change": false,
+                          "version": 1
+                        },
+                        {
+                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                          "name": "sim2",
+                          "display_name": "Simulation 2",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65536",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": "0x1234567890abcdef"
+                          },
+                          "autostart_policy": true,
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z",
+                          "pending_change": false,
+                          "version": 2
                         }
                       ],
                       "create_time": "2023-07-04T19:00:00Z",
@@ -4768,37 +4873,7 @@
                             },
                             "command": [],
                             "size": 1024,
-                            "hash": 1311768467294899700
-                          },
-                          "restart_policy": "always",
-                          "replicas": 1,
-                          "current_state": {
-                            "status": "stopped",
-                            "start_time": "2020-07-04T19:00:00Z",
-                            "finish_time": "2020-07-04T19:00:00Z",
-                            "instance_status_counts": {
-                              "allocating_count": 1,
-                              "creating_count": 1,
-                              "running_count": 1,
-                              "stopping_count": 1
-                            }
-                          },
-                          "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
-                        },
-                        {
-                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
-                          "name": "sim2",
-                          "display_name": "Simulation 2",
-                          "container": {
-                            "image": "acme-corp/anvil-drop-simulator:v65536",
-                            "resources": {
-                              "cpu": 1,
-                              "memory": 2048
-                            },
-                            "command": [],
-                            "size": 1024,
-                            "hash": 1311768467294899700
+                            "hash": "0x1234567890abcdef"
                           },
                           "autostart_policy": true,
                           "restart_policy": "always",
@@ -4815,7 +4890,42 @@
                             }
                           },
                           "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
+                          "update_time": "2020-07-04T19:00:00Z",
+                          "pending_change": false,
+                          "version": 1
+                        },
+                        {
+                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                          "name": "sim2",
+                          "display_name": "Simulation 2",
+                          "container": {
+                            "image": "acme-corp/anvil-drop-simulator:v65536",
+                            "resources": {
+                              "cpu": 1,
+                              "memory": 2048
+                            },
+                            "command": [],
+                            "size": 1024,
+                            "hash": "0x1234567890abcdef"
+                          },
+                          "autostart_policy": true,
+                          "restart_policy": "always",
+                          "replicas": 1,
+                          "current_state": {
+                            "status": "stopped",
+                            "start_time": "2020-07-04T19:00:00Z",
+                            "finish_time": "2020-07-04T19:00:00Z",
+                            "instance_status_counts": {
+                              "allocating_count": 1,
+                              "creating_count": 1,
+                              "running_count": 1,
+                              "stopping_count": 1
+                            }
+                          },
+                          "create_time": "2020-07-04T19:00:00Z",
+                          "update_time": "2020-07-04T19:00:00Z",
+                          "pending_change": false,
+                          "version": 2
                         }
                       ],
                       "description": "The job2 queue",
@@ -4848,9 +4958,79 @@
               "jsonExample": {
                 "value": {
                   "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
-                  "name": "queue-1",
-                  "display_name": "Queue 1",
-                  "description": "The job queue"
+                  "name": "jobs",
+                  "display_name": "job queue",
+                  "description": "The job queue",
+                  "container_groups": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "sim1",
+                      "display_name": "Simulation 1",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65535",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 1
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65536",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 2
+                    }
+                  ],
+                  "create_time": "2023-07-04T19:00:00Z",
+                  "update_time": "2023-07-04T19:00:00Z"
                 }
               }
             }
@@ -4876,9 +5056,79 @@
               "jsonExample": {
                 "value": {
                   "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
-                  "name": "queue-1",
-                  "display_name": "Queue 1",
-                  "description": "The job queue"
+                  "name": "jobs",
+                  "display_name": "job queue",
+                  "description": "The job queue",
+                  "container_groups": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "name": "sim1",
+                      "display_name": "Simulation 1",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65535",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 1
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65536",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 2
+                    }
+                  ],
+                  "create_time": "2023-07-04T19:00:00Z",
+                  "update_time": "2023-07-04T19:00:00Z"
                 }
               }
             }
@@ -4895,79 +5145,80 @@
             "examples": {
               "jsonExample": {
                 "value": {
-                  "items": [
+                  "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                  "name": "jobs",
+                  "display_name": "job queue",
+                  "description": "The job queue",
+                  "container_groups": [
                     {
                       "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
-                      "name": "jobs",
-                      "display_name": "job queue",
-                      "description": "The job queue",
-                      "container_groups": [
-                        {
-                          "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
-                          "name": "sim1",
-                          "display_name": "Simulation 1",
-                          "container": {
-                            "image": "acme-corp/anvil-drop-simulator:v65535",
-                            "resources": {
-                              "cpu": 1,
-                              "memory": 2048
-                            },
-                            "command": [],
-                            "size": 1024,
-                            "hash": 1311768467294899700
-                          },
-                          "restart_policy": "always",
-                          "replicas": 1,
-                          "current_state": {
-                            "status": "stopped",
-                            "start_time": "2020-07-04T19:00:00Z",
-                            "finish_time": "2020-07-04T19:00:00Z",
-                            "instance_status_counts": {
-                              "allocating_count": 1,
-                              "creating_count": 1,
-                              "running_count": 1,
-                              "stopping_count": 1
-                            }
-                          },
-                          "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
+                      "name": "sim1",
+                      "display_name": "Simulation 1",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65535",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
                         },
-                        {
-                          "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
-                          "name": "sim2",
-                          "display_name": "Simulation 2",
-                          "container": {
-                            "image": "acme-corp/anvil-drop-simulator:v65536",
-                            "resources": {
-                              "cpu": 1,
-                              "memory": 2048
-                            },
-                            "command": [],
-                            "size": 1024,
-                            "hash": 1311768467294899700
-                          },
-                          "autostart_policy": true,
-                          "restart_policy": "always",
-                          "replicas": 1,
-                          "current_state": {
-                            "status": "stopped",
-                            "start_time": "2020-07-04T19:00:00Z",
-                            "finish_time": "2020-07-04T19:00:00Z",
-                            "instance_status_counts": {
-                              "allocating_count": 1,
-                              "creating_count": 1,
-                              "running_count": 1,
-                              "stopping_count": 1
-                            }
-                          },
-                          "create_time": "2020-07-04T19:00:00Z",
-                          "update_time": "2020-07-04T19:00:00Z"
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
                         }
-                      ],
-                      "create_time": "2023-07-04T19:00:00Z",
-                      "update_time": "2023-07-04T19:00:00Z"
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 1
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "name": "sim2",
+                      "display_name": "Simulation 2",
+                      "container": {
+                        "image": "acme-corp/anvil-drop-simulator:v65536",
+                        "resources": {
+                          "cpu": 1,
+                          "memory": 2048
+                        },
+                        "command": [],
+                        "size": 1024,
+                        "hash": "0x1234567890abcdef"
+                      },
+                      "autostart_policy": true,
+                      "restart_policy": "always",
+                      "replicas": 1,
+                      "current_state": {
+                        "status": "stopped",
+                        "start_time": "2020-07-04T19:00:00Z",
+                        "finish_time": "2020-07-04T19:00:00Z",
+                        "instance_status_counts": {
+                          "allocating_count": 1,
+                          "creating_count": 1,
+                          "running_count": 1,
+                          "stopping_count": 1
+                        }
+                      },
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z",
+                      "pending_change": false,
+                      "version": 2
                     }
-                  ]
+                  ],
+                  "create_time": "2023-07-04T19:00:00Z",
+                  "update_time": "2023-07-04T19:00:00Z"
                 }
               }
             }
@@ -4976,6 +5227,56 @@
       },
       "DeleteQueue": {
         "description": "Accepted"
+      },
+      "ListQueueJobs": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QueueJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
+                      "input": {},
+                      "metadata": {},
+                      "webhook": "https://webhooks.example.com:8080",
+                      "status": "pending",
+                      "events": [
+                        {
+                          "action": "created",
+                          "time": "2020-07-04T19:00:00Z"
+                        }
+                      ],
+                      "output": {},
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z"
+                    },
+                    {
+                      "id": "b697f678-b987-4992-bbbf-d6dda171b34a",
+                      "input": {},
+                      "metadata": {},
+                      "webhook": "https://webhooks.example.com:8080",
+                      "status": "pending",
+                      "events": [
+                        {
+                          "action": "created",
+                          "time": "2020-07-04T19:00:00Z"
+                        }
+                      ],
+                      "output": {},
+                      "create_time": "2020-07-04T19:00:00Z",
+                      "update_time": "2020-07-04T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
       },
       "CreateQueueJob": {
         "description": "Created",
@@ -4998,7 +5299,17 @@
                   "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
                   "input": {},
                   "metadata": {},
-                  "webhook": "yourapp.com/webhook/12345"
+                  "webhook": "https://webhooks.example.com:8080",
+                  "status": "pending",
+                  "events": [
+                    {
+                      "action": "created",
+                      "time": "2020-07-04T19:00:00Z"
+                    }
+                  ],
+                  "output": {},
+                  "create_time": "2020-07-04T19:00:00Z",
+                  "update_time": "2020-07-04T19:00:00Z"
                 }
               }
             }
@@ -5026,12 +5337,11 @@
                   "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
                   "input": {},
                   "metadata": {},
-                  "webhook": "yourapp.com/webhook/12345",
+                  "webhook": "https://webhooks.example.com:8080",
                   "status": "pending",
                   "events": [
                     {
-                      "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
-                      "type": "pending",
+                      "action": "created",
                       "time": "2020-07-04T19:00:00Z"
                     }
                   ],
@@ -5089,7 +5399,7 @@
             "examples": {
               "jsonExample": {
                 "value": {
-                  "container_group_quotas": {
+                  "container_groups_quotas": {
                     "max_created_container_groups": 10,
                     "container_instance_quota": 10
                   },
@@ -5181,7 +5491,6 @@
                   "recipe": {
                     "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
                     "name": "anvil-drop-simulator",
-                    "display_name": null,
                     "readme": "test-readme",
                     "resources": {
                       "cpu": 1,
@@ -5230,7 +5539,6 @@
                       "recipe": {
                         "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
                         "name": "anvil-drop-simulator",
-                        "display_name": null,
                         "readme": "test-readme",
                         "resources": {
                           "cpu": 1,
@@ -5297,7 +5605,7 @@
             "schema": {
               "$ref": "#/components/schemas/RecipeDeployment"
             },
-            "example": {
+            "examples": {
               "jsonExample": {
                 "value": {
                   "id": "500dec9c-aaf3-4a0b-aa7f-de6483d0b9b1",
@@ -5318,7 +5626,6 @@
                   "recipe": {
                     "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
                     "name": "anvil-drop-simulator",
-                    "display_name": null,
                     "readme": "test-readme",
                     "resources": {
                       "cpu": 1,
@@ -5364,7 +5671,6 @@
                   "recipe": {
                     "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
                     "name": "anvil-drop-simulator",
-                    "display_name": null,
                     "readme": "test-readme",
                     "resources": {
                       "cpu": 1,
@@ -5374,7 +5680,8 @@
                         "2a08f3f4-5bb7-11ee-8c99-0242ac120002"
                       ]
                     }
-                  }
+                  },
+                  "autostart_policy": true
                 }
               }
             }
@@ -5404,7 +5711,7 @@
               "instances": [
                 {
                   "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
-                  "instance_id": "5ebfa363-6e0-4db1-b9be-70ed4995d0b1",
+                  "instance_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
                   "state": "running",
                   "update_time": "2023-05-04T05:41:05Z"
                 },
@@ -5434,17 +5741,16 @@
             },
             "examples": {
               "jsonExample": {
-                "value": [
-                  {
-                    "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
-                    "name": "avatar-generator",
-                    "display_name": "Avatar Generator",
-                    "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator",
-                    "readme": "test-readme",
-                    "price_description": "0.05 credits per inference",
-                    "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator/icon"
-                  }
-                ]
+                "value": {
+                  "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                  "name": "avatar-generator",
+                  "display_name": "Avatar Generator",
+                  "description": "Generates the best avatars of cartoon characters",
+                  "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator",
+                  "readme": "test-readme",
+                  "price_description": "0.05 credits per inference",
+                  "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator/icon"
+                }
               }
             }
           }
@@ -5465,6 +5771,7 @@
                       "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
                       "name": "avatar-generator",
                       "display_name": "Avatar Generator",
+                      "description": "Generates the best avatars of cartoon characters",
                       "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/avatar-generator",
                       "readme": "test-readme",
                       "price_description": "0.05 credits per inference",
@@ -5474,10 +5781,57 @@
                       "id": "3cc0c401-4159-4760-a1e1-b2dec9c22893",
                       "name": "audio-to-waveform",
                       "display_name": "Audio to Waveform",
+                      "description": "Does something technical with audio",
                       "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform",
                       "readme": "test-readme",
                       "price_description": "0.10 credits per inference",
                       "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform/icon"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListInferenceEndpointJobs": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174001",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
                     }
                   ]
                 }
@@ -5503,19 +5857,20 @@
             },
             "examples": {
               "jsonExample": {
-                "value": [
-                  {
-                    "id": "123e4567-e89b-12d3-a456-426614174000",
-                    "inference_endpoint_name": "avatar-generator",
-                    "input": {},
-                    "metadata": null,
-                    "organization_name": "acme-corp",
-                    "status": "pending",
-                    "events": [],
-                    "create_time": "2024-05-01T19:00:00Z",
-                    "update_time": "2024-05-01T19:00:00Z"
-                  }
-                ]
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
               }
             }
           }
@@ -5528,12 +5883,15 @@
             "schema": {
               "$ref": "#/components/schemas/InferenceEndpointJob"
             },
-            "example": {
+            "examples": {
               "jsonExample": {
                 "value": {
                   "id": "123e4567-e89b-12d3-a456-426614174001",
                   "inference_endpoint_name": "avatar-generator",
-                  "input": {},
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
                   "metadata": null,
                   "organization_name": "acme-corp",
                   "status": "pending",
@@ -5564,12 +5922,32 @@
       "description": "Container Groups"
     },
     {
+      "name": "inference_endpoints",
+      "description": "Inference Endpoints"
+    },
+    {
       "name": "organization_data",
       "description": "Auxiliary organization data and info"
     },
     {
+      "name": "queues",
+      "description": "Job Queues"
+    },
+    {
       "name": "quotas",
       "description": "quotas"
+    },
+    {
+      "name": "recipe_deployments",
+      "description": "Recipe Deployments"
+    },
+    {
+      "name": "recipes",
+      "description": "Recipe Marketplace"
+    },
+    {
+      "name": "workload_errors",
+      "description": "Workload Errors"
     }
   ],
   "security": [
