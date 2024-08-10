@@ -67,77 +67,54 @@
       "group": "API Documentation",
       "pages": [
         {
-          "group": "container_groups",
+          "group": "Organizations",
+          "pages": [
+            "api-reference/organizations/get-gpu-classes",
+            "api-reference/organizations/get-quotas"
+          ]
+        },
+        {
+          "group": "Container Groups",
           "pages": [
             "api-reference/container_groups/list-container-groups",
             "api-reference/container_groups/create-a-container-group",
             "api-reference/container_groups/get-a-container-group",
-            "api-reference/container_groups/delete-a-container-group",
             "api-reference/container_groups/update-a-container-group",
+            "api-reference/container_groups/delete-a-container-group",
             "api-reference/container_groups/start-a-container-group",
             "api-reference/container_groups/stop-a-container-group",
+            "api-reference/container_groups/get-container-group-errors",
             "api-reference/container_groups/list-container-group-instances",
-            "api-reference/container_groups/get-container-group-instance-by-instance-id",
-            "api-reference/container_groups/reallocate-container-group-instance-to-another-node",
-            "api-reference/container_groups/recreate-container-on-a-node",
-            "api-reference/container_groups/restart-container-on-a-node"
+            "api-reference/container_groups/get-a-container-group-instance",
+            "api-reference/container_groups/restart-a-container-group-instance",
+            "api-reference/container_groups/recreate-a-container-group-instance",
+            "api-reference/container_groups/reallocate-a-container-group-instance"
           ]
         },
         {
-          "group": "inference_endpoints",
-          "pages": [
-            "api-reference/inference_endpoints/gets-a-list-of-inference-endpoints-that-match-the-paginated-query-parameters-if-no-paginated-query/nparameters-are-provided-the-full-list-is-returned",
-            "api-reference/inference_endpoints/get-an-inference-endpoint",
-            "api-reference/inference_endpoints/create-a-new-job",
-            "api-reference/inference_endpoints/returns-a-job-in-an-inference-endpoint",
-            "api-reference/inference_endpoints/delete-a-job-from-an-inference-endpoint"
-          ]
-        },
-        {
-          "group": "organization_data",
-          "pages": ["api-reference/organization_data/list-the-gpu-classes"]
-        },
-        {
-          "group": "queues",
+          "group": "Job Queues",
           "pages": [
             "api-reference/queues/list-queues",
             "api-reference/queues/create-a-queue",
             "api-reference/queues/get-a-queue",
-            "api-reference/queues/delete-a-queue",
             "api-reference/queues/update-a-queue",
-            "api-reference/queues/create-a-new-job",
-            "api-reference/queues/returns-a-job-in-a-queue",
-            "api-reference/queues/delete-a-job-from-a-queue"
+            "api-reference/queues/delete-a-queue",
+            "api-reference/queues/list-queue-jobs",
+            "api-reference/queues/create-a-queue-job",
+            "api-reference/queues/get-a-queue-job",
+            "api-reference/queues/delete-a-queue-job"
           ]
         },
         {
-          "group": "quotas",
-          "pages": ["api-reference/quotas/get-quotas"]
-        },
-        {
-          "group": "recipe_deployments",
+          "group": "Inference Endpoints",
           "pages": [
-            "api-reference/recipe_deployments/list-recipe-deployments",
-            "api-reference/recipe_deployments/create-a-recipe-deployment",
-            "api-reference/recipe_deployments/get-a-recipe-deployment",
-            "api-reference/recipe_deployments/delete-a-recipe-deployment",
-            "api-reference/recipe_deployments/update-a-recipe-deployment",
-            "api-reference/recipe_deployments/start-a-deployed-recipe",
-            "api-reference/recipe_deployments/restart-a-deployed-recipe",
-            "api-reference/recipe_deployments/stop-a-deployed-recipe",
-            "api-reference/recipe_deployments/list-recipe-deployment-instances"
+            "api-reference/inference_endpoints/list-inference-endpoints",
+            "api-reference/inference_endpoints/get-an-inference-endpoint",
+            "api-reference/inference_endpoints/list-inference-endpoint-jobs",
+            "api-reference/inference_endpoints/create-an-inference-endpoint-job",
+            "api-reference/inference_endpoints/get-an-inference-endpoint-job",
+            "api-reference/inference_endpoints/delete-an-inference-endpoint-job"
           ]
-        },
-        {
-          "group": "recipes",
-          "pages": [
-            "api-reference/recipes/list-recipes",
-            "api-reference/recipes/get-a-recipe"
-          ]
-        },
-        {
-          "group": "workload_errors",
-          "pages": ["api-reference/workload_errors/get-workload-errors"]
         }
       ]
     },
