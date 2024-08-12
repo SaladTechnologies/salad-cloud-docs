@@ -81,3 +81,23 @@ Most image generation tasks take just a few seconds on a powerful GPU, but if yo
 If you are using a serverless architecture, you should check to see if you are billed for CPU time, or clock time for your function execution.
 If you are billed for clock time, you will likely want to use the job queue, as you will not be billed for time spent waiting in the queue.
 If you are billed for CPU time, there will be little difference between the two options.
+
+## Hardware Requirements
+
+The hardware requirements for your stable diffusion inference server will depend on the type of model you are running, and to some extent your choice of inference server.
+- For models based on Stable Diffusion 1.5, you can get by with as little as 8gb of VRAM, and at least 8gb of system RAM.
+If you are using multiple LoRAs, ControlNets, etc, you may need more VRAM and system RAM.
+The only way to be certain is to measure real-world performance.
+- For models based on Stable Diffusion XL, you will need at least 16gb of VRAM, and 24gb if you intend to use the refiner.
+For SD.Next and Automatic1111, you will need at least 30gb of system RAM if you intend to use the refiner, and 24gb if you do not.
+For ComfyUI, you will need at least 16gb of system RAM, but may find better performance with more.
+- For models based on Flux1 (fp8 or nf4), you will want 24gb of VRAM and 24gb of system RAM.
+
+## Warming up your server
+
+In most situations, the first request to an inference server will be signficantly slower than subsequent requests.
+This is because the server must load the model into VRAM, and establish its internal kv cache.
+For this reason, it is often desirable to send a dummy request to the server before sending real requests.
+For Salad, this can be done conveniently via the Startup Probe in the container group configuration.
+You set the startup probe as a `curl` command that submits an inference request to the server.
+This results in the server being warmed up before it is added to the load balancer, and can result in a significant performance improvement.
