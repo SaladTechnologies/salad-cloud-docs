@@ -225,6 +225,7 @@
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
         "container-engine/guides/ubuntu-image",
+        "container-engine/guides/example-image",
         "container-engine/guides/run-triton-server",
         
         {
