@@ -217,13 +217,15 @@
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-            "container-engine/guides/stable-diffusion/how-to-manage-a-large-number-of-stable-diffusion-models"
+            "container-engine/guides/stable-diffusion/how-to-manage-a-large-number-of-stable-diffusion-models",
+            "container-engine/guides/stable-diffusion/basic-how-to-deploy-flux-on-salad-comfy"
           ]
         },
         "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
         "container-engine/guides/run-ollama",
         "container-engine/guides/run-a-python-app",
         "container-engine/guides/ubuntu-image",
+        "container-engine/guides/example-image",
         "container-engine/guides/run-triton-server",
         
         {
