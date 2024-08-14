@@ -65,8 +65,14 @@ COPY flux1-schnell-fp8.safetensors ${CHECKPOINT_DIR}/
 # We also need to copy the comfyui-wrapper binary into the image, since ComfyUI
 # is fully asyncronous by default, and has no convenient way to retrieve 
 # generated images.
-ADD https://github.com/SaladTechnologies/comfyui-wrapper/releases/download/1.0.0/comfyui-wrapper .
+ADD https://github.com/SaladTechnologies/comfyui-wrapper/releases/download/1.1.0/comfyui-wrapper .
 RUN chmod +x comfyui-wrapper
+
+# OPTIONAL: Warmup the server by running a workflow before starting the server.
+# The comfyui-wrapper supports a warmup mode, where it will run a provided workflow before starting the server.
+# This example assumes you have a workflow json file in the same directory as your Dockerfile.
+COPY workflow_api_flux_fp8.json .
+ENV WARMUP_PROMPT_FILE=workflow_api_flux_fp8.json
 
 CMD ["./comfyui-wrapper"]
 ```
