@@ -11,6 +11,9 @@
     "light": "#53A626",
     "dark": "#53A626"
   },
+  "feedback": {
+    "thumbsRating": true
+  },
   "analytics": {
     "mixpanel": {
       "projectToken": "26a3dcda21415501306f3f077a446ec5"
