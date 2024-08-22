@@ -37,10 +37,6 @@
       "url": "inference-endpoints"
     },
     {
-      "name": "Managed Services",
-      "url": "managed-services"
-    },
-    {
       "name": "Gateway Service",
       "url": "gateway-service"
     },
@@ -124,6 +120,20 @@
     {
       "group": "Getting Started",
       "pages": ["inference-endpoints/introduction"]
+    },
+    {
+      "group": "Transcription",
+      "pages": [
+        "inference-endpoints/transcription/transcription",
+        "inference-endpoints/transcription/transcriptionquickstart"
+      ]
+    },
+    {
+      "group": "Dreambooth",
+      "pages": [
+        "inference-endpoints/dreambooth/avatar-video-tutorial",
+        "inference-endpoints/dreambooth/pet-tutorial"
+      ]
     },
     {
       "group": "Getting Started",
@@ -255,20 +265,6 @@
           ]
         },
         "container-engine/guides/long-running-jobs"
-      ]
-    },
-
-    {
-      "group": "Getting Started",
-      "pages": [
-        "managed-services/introduction"
-      ]
-    },
-    {
-      "group": "Guides & FAQ",
-      "pages": [
-        "managed-services/dreambooth/pet-tutorial",
-        "managed-services/dreambooth/avatar-video-tutorial"
       ]
     },
     {
