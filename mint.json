@@ -125,7 +125,15 @@
       "group": "Transcription",
       "pages": [
         "inference-endpoints/transcription/transcription",
+        "inference-endpoints/transcription/transcriptionfaq",
         "inference-endpoints/transcription/transcriptionquickstart"
+        ,{
+          "group": "Transcription Guides",
+          "pages": [
+            "inference-endpoints/transcription/dropboxdownloadable",
+            "inference-endpoints/transcription/googledrivedownloadable"
+          ]
+        }
       ]
     },
     {
@@ -222,6 +230,7 @@
       "group": "Guides & FAQ",
       "pages": [
         "container-engine/guides/using-salad-recipes",
+        "container-engine/guides/howtousethesaladterminal",
         {
           "group": "Stable Diffusion",
           "pages": [
