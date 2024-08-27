@@ -33,7 +33,7 @@ In this example, we are going to build a new image which uses `s6-overlay` to se
    ```
    1. Navigate to the [sample-image/original/](https://github.com/SaladTechnologies/saladcloud-job-queue-worker-sdk/tree/main/samples/sample-image/original) directory and run `docker build -t foobar .`
    2. Notice that the name of the output container image in this case is `foobar`; you may substitute any name you like. The image with that name will not be pushed to any registry and will remain solely on your local disk.
-3. Because the resulting container will run two processes, we will use the `s6-overlay` hypervisor to manage them. It has to be configured with the way to start your application, as probably indicated in CMD or ENTRYPOINT lines in the original Dockerfile. As an example, see [sample-image/with-s6-overlay](https://github.com/SaladTechnologies/saladcloud-job-queue-worker-sdk/tree/main/samples/sample-image/with-s6-overlay)
+3. Because the resulting container will run two processes, we will use the `s6-overlay` hypervisor to manage them. It has to be configured with the way to start your application, as probably indicated in CMD or ENTRYPOINT lines in the original Dockerfile. As an example, see [sample-image/with-s6-overlay](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot)
 
    ```dockerfile
    FROM foobar
