@@ -20,5 +20,6 @@ Terminal access is currently a Preview feature, and may not behave as expected.
 - If you’re having issues getting the Terminal to load, try closing additional Portal tabs and windows, and hard-refreshing the page with CTRL/CMD+SHIFT+R.
 - If the above steps don’t work, try re-allocating the replica to a new node.
 - If you suddenly lose access to the terminal, it’s possible the replica went offline or was re-allocated. Try heading back to the deployment page and see if the node is still online.
+- Some container images will exit if no command is specified, resulting in repeated failures and reallocations, and you will not be able to interact with it using the terminal. If    you wish to interact with a terminal in one of these containers, adding a command of sleep with an argument of infinity will usually ensure the container stays running and you can access the terminal.
 
 Please Note: We do not recommend using the Salad Terminal for final deployment and configuration of each replica as this is considered stateful. Salad deployments should be configured to be stateless, as they could be reallocated to another machine at any moment. This could mean you need to regularly re-configure replicas every time they adjust.

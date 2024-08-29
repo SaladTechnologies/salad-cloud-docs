@@ -146,7 +146,7 @@
     {
       "group": "Getting Started",
       "pages": [
-        "container-engine/containers",
+        "container-engine/gettingstartedwithsaladcloud",
         "container-engine/quickstart",
         "container-engine/quickstart-api"
       ]
@@ -154,6 +154,7 @@
     {
       "group": "Container Groups",
       "pages": [
+        "container-engine/containers",
         "container-engine/salad-container-engine",
         "container-engine/deployment-lifecycle",
         "container-engine/managing-deployments",
