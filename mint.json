@@ -15,6 +15,9 @@
     "thumbsRating": true
   },
   "analytics": {
+    "ga4": {
+      "measurementId": "G-C9B6SKYZEY"
+    },
     "mixpanel": {
       "projectToken": "26a3dcda21415501306f3f077a446ec5"
     }
