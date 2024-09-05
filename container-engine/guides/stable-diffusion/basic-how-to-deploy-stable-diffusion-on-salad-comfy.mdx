@@ -19,7 +19,7 @@ Here's one we've verified works on Salad:
 
 **ComfyUI**
 - Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
-- Docker Image: [ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.0.8](http://ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.0.8)
+- Docker Image: [ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0](http://ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0)
 - Model Directory: `/opt/ComfyUI/models`
 - Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
 
@@ -54,7 +54,7 @@ See [below](#build-and-test-your-docker-image) for more details.
     
 ```docker
 # We're going to use this verified comfyui image as a base
-FROM ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.0.8
+FROM ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0
 
 # Disable the authentication provided by the base image
 ENV WEB_ENABLE_AUTH=false
@@ -63,23 +63,19 @@ ENV WEB_ENABLE_AUTH=false
 ENV MODEL_DIR=/opt/ComfyUI/models
 COPY dreamshaper_8.safetensors ${MODEL_DIR}/checkpoints/dreamshaper_8.safetensors
 
-# We also need to copy the comfyui-wrapper binary into the image, since ComfyUI
+# We also need to copy the comfyui-api binary into the image, since ComfyUI
 # is fully asyncronous by default, and has no convenient way to retrieve 
 # generated images.
-ADD https://github.com/SaladTechnologies/comfyui-wrapper/releases/download/1.2.0/comfyui-wrapper .
-RUN chmod +x comfyui-wrapper
+ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.4.0/comfyui-api .
+RUN chmod +x comfyui-api
 
 # OPTIONAL: Warmup the server by running a workflow before starting the server.
-# The comfyui-wrapper supports a warmup mode, where it will run a provided workflow before starting the server.
+# The comfyui-api supports a warmup mode, where it will run a provided workflow before starting the server.
 # This example assumes you have a workflow json file in the same directory as your Dockerfile.
 COPY workflow_api_dreamshaper.json .
 ENV WARMUP_PROMPT_FILE=workflow_api_dreamshaper.json
 
-# The comfyui-wrapper has some built in simple templated endpoints for common workflows.
-# We can specify to just mount the stable diffusion 1.5 endpoints.
-ENV WORKFLOW_MODELS=sd1.5
-
-CMD ["./comfyui-wrapper"]
+CMD ["./comfyui-api"]
 ```
 
 Note that we are including a simple wrapper binary to the image to make it easier to retrieve generated images.
@@ -90,17 +86,17 @@ This additional binary extends the ComfyUI `/prompt` API to allow either receivi
 ## Build and Test Your Docker Image
 1. Build the docker image.
 You should change the specified tag to suit your purpose.
-We've chosen to include the ComfyUI version (0.0.8) and the model name (dreamshaper8) in the tag.
+We've chosen to include the ComfyUI version (0.2.0), the API version (1.4.0) and the model name (dreamshaper8) in the tag.
     
 ```bash
-docker build -t saladtechnologies/comfyui:0.0.8-dreamshaper8 .
+docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
 ```
     
 2. (Recommended) Run the docker image locally to confirm it works as expected
     
     ```bash
     docker run -it --rm --gpus all -p 3000:3000 -p 8188:8188 --name comfyui \
-    saladtechnologies/comfyui:0.0.8-dreamshaper8
+    saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
     ```
     
     Using it here locally, we’re going to expose port 3000, which is required for the wrapper, and port 8188 that will let us access the web ui locally to make it easier to get the prompt object we need for the api.
@@ -274,7 +270,7 @@ docker build -t saladtechnologies/comfyui:0.0.8-dreamshaper8 .
 1. Push your docker image up to docker hub (or the container registry of your choice.)
     
 ```bash
-docker push saladtechnologies/comfyui:0.0.8-dreamshaper8
+docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
 ```
     
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](https://docs.salad.com/api-reference/container_groups/create-a-container-group)
