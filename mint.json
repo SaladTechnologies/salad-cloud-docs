@@ -199,6 +199,20 @@
             "container-engine/health-probes/health-probe-examples"
           ]
         },
+        {
+          "group": "Instance Metadata Service (IMDS)",
+          "pages": [
+            "container-engine/imds/introduction",
+            {
+              "group": "API Reference",
+              "pages": [
+                "container-engine/imds/api-reference/get-container-status",
+                "container-engine/imds/api-reference/get-container-token",
+                "container-engine/imds/api-reference/reallocate-container"
+              ]
+            }
+          ]
+        },
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
         "container-engine/workload-logs",
