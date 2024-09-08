@@ -136,7 +136,9 @@
             "inference-endpoints/transcription/dropboxdownloadable",
             "inference-endpoints/transcription/awsdownloadablefile",
             "inference-endpoints/transcription/azuredownloadablefile",
-            "inference-endpoints/transcription/googledrivedownloadable"
+            "inference-endpoints/transcription/googledrivedownloadable",
+            "inference-endpoints/transcription/zapiertranscriptionguide",
+            "inference-endpoints/transcription/pabblyintegration"
           ]
         }
       ]
