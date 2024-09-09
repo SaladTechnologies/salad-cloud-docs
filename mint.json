@@ -215,6 +215,13 @@
             }
           ]
         },
+        {
+          "group": "Biling and Pricing",
+          "pages": [
+            "container-engine/billing",
+            "container-engine/prioritypricing"
+          ]
+        },
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
         "container-engine/workload-logs",
