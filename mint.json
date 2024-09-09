@@ -215,6 +215,13 @@
             }
           ]
         },
+        {
+          "group": "Biling and Pricing",
+          "pages": [
+            "container-engine/billing",
+            "container-engine/prioritypricing"
+          ]
+        },
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
         "container-engine/workload-logs",
@@ -265,8 +272,16 @@
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-flux-on-salad-comfy"
           ]
         },
-        "container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
-        "container-engine/guides/run-ollama",
+
+        {
+          "group": "LLM",
+          "pages": [
+            "container-engine/guides/llm/llm-general",
+            "container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface",
+            "container-engine/guides/llm/run-ollama"         
+          ]
+        },
+
         "container-engine/guides/run-a-python-app",
         "container-engine/guides/ubuntu-image",
         "container-engine/guides/example-image",
@@ -333,14 +348,33 @@
       "source": "/docs.salad.com/docs/openvoice-api",
       "destination": "/container-engine/guides/openvoice-api"
     },
+
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/guides/run-tgi-text-generation-interface-by-huggingface"
+      "destination": "/container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface"
+    },
+    {
+      "source": "/container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
+      "destination": "/container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface"
     },
     {
       "source": "/docs/run-ollama",
-      "destination": "/container-engine/guides/run-ollama"
+      "destination": "/container-engine/guides/llm/run-ollama"
     },
+    {
+      "source": "/container-engine/guides/run-ollama",
+      "destination": "/container-engine/guides/llm/run-ollama"
+    },
+    
+    {
+      "source": "/docs/youtube",
+      "destination": "/container-engine/guides/youtube"
+    },
+    {
+      "source": "/docs/jupyterlab",
+      "destination": "/container-engine/guides/jupyterlab"
+    },
+    
     {
       "source": "/docs/sdxl",
       "destination": "/container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
