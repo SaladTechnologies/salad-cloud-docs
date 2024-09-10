@@ -219,7 +219,7 @@
           "group": "Biling and Pricing",
           "pages": [
             "container-engine/billing",
-            "container-engine/prioritypricing"
+            "container-engine/priority-pricing"
           ]
         },
         "container-engine/specifying-a-command",
