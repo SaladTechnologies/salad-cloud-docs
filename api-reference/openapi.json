@@ -2010,9 +2010,6 @@
           "version": {
             "type": "integer",
             "minimum": 1
-          },
-          "queue_autoscaler": {
-            "$ref": "#/components/schemas/QueueAutoscaler"
           }
         },
         "additionalProperties": false,
@@ -2103,9 +2100,6 @@
           },
           "queue_connection": {
             "$ref": "#/components/schemas/ContainerGroupQueueConnection"
-          },
-          "queue_autoscaler": {
-            "$ref": "#/components/schemas/QueueAutoscaler"
           }
         },
         "additionalProperties": false,
@@ -4972,15 +4966,7 @@
                   "create_time": "2020-07-04T19:00:00Z",
                   "update_time": "2020-07-04T19:00:00Z",
                   "pending_change": false,
-                  "version": 1,
-                  "queue_autoscaler": {
-                    "min_replicas": 1,
-                    "max_replicas": 10,
-                    "desired_queue_length": 100,
-                    "polling_period": 15,
-                    "max_upscale_per_minute": 5,
-                    "max_downscale_per_minute": 2
-                  }
+                  "version": 1
                 }
               }
             }
