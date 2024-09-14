@@ -1,6 +1,9 @@
 ---
-title: " Salad Simple Storage"
-description: This is a simple HTTP service to allow Salad customers to temporarily upload assets for use in other salad services. Examples include uploading images for stable diffusion training or inference, audio clips for transcription, etc.
+title: 'Salad Simple Storage'
+description:
+  This is a simple HTTP service to allow SaladCloud customers to temporarily upload assets for use in other SaladCloud
+  services. Examples include uploading images for stable diffusion training or inference, audio clips for transcription,
+  etc.
 ---
 
 ## Limitations
@@ -14,8 +17,9 @@ description: This is a simple HTTP service to allow Salad customers to temporari
 
 Requests to the S4 service must include either:
 
-- A `Salad-Api-Key` header with a valid Salad API key.
-- An `Authorization` header with a valid Salad JWT (issued by the [instance metadata service](https://github.com/SaladTechnologies/saladcloud-job-queue-worker-sdk/blob/main/docs/retrieving_token.md)) as a bearer token.
+- A `Salad-Api-Key` header with a valid SaladCloud API key.
+- An `Authorization` header with a valid SaladCloud JWT (issued by the
+  [Instance Metadata Service](/container-engine/imds)) as a bearer token.
 
 ### Upload a File
 
@@ -26,7 +30,8 @@ Uploads a file to the specified organization.
 **Request Parameters:**
 
 - `organization_name` (string): The name of the organization.
-- `filename` (string): The name of the file to upload. This can be a path, and the file will be stored in a directory structure based on the path. e.g. `path/to/my/file.tar.gz` will be stored as `path/to/my/file.tar.gz`.
+- `filename` (string): The name of the file to upload. This can be a path, and the file will be stored in a directory
+  structure based on the path. e.g. `path/to/my/file.tar.gz` will be stored as `path/to/my/file.tar.gz`.
 
 **Example Request:**
 
@@ -48,7 +53,8 @@ curl  -X PUT \
 
 **Example Request, Creating Signed URL**
 
-When uploading a file, you can optionally request to sign the url, which will allow you to use the returned url to fetch the file without needing to include the `Salad-Api-Key` header.
+When uploading a file, you can optionally request to sign the url, which will allow you to use the returned url to fetch
+the file without needing to include the `Salad-Api-Key` header.
 
 ```bash
 curl  -X PUT \

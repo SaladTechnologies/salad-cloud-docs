@@ -1,5 +1,42 @@
 {
-    "cSpell.words": [
-        "howtousethesaladterminal"
-    ]
+  "cSpell.customDictionaries": {
+    "salad-cloud": {
+      "name": "salad-cloud",
+      "path": "${workspaceRoot}/dictionary.txt",
+      "description": "Words used on the SaladCloud documentation website",
+      "addWords": true
+    }
+  },
+  "cSpell.enableFiletypes": ["markdown", "mdx"],
+  "cSpell.language": "en,en-US",
+  "editor.formatOnSave": true,
+  "editor.minimap.maxColumn": 120,
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [120],
+  "git.branchProtection": ["master"],
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "mdx": true,
+    "scminput": false
+  },
+  "mdx.validate.validateDuplicateLinkDefinitions": "hint",
+  "mdx.validate.validateFileLinks": "error",
+  "mdx.validate.validateFragmentLinks": "error",
+  "mdx.validate.validateMarkdownFileLinkFragments": "error",
+  "mdx.validate.validateReferences": "error",
+  "mdx.validate.validateUnusedLinkDefinitions": "error",
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[mdx]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

@@ -47,8 +47,38 @@
             "$ref": "#/components/responses/UnknownError"
           }
         },
-        "tags": [
-          "metadata"
+        "tags": ["metadata"],
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl --silent --noproxy \"*\" --request POST \\\n  --header 'Content-Type: application/json' \\\n  --header \"Metadata: true\" \\\n  --data '{\"reason\":\"laborum culpa\"}' \\\n  --url http://169.254.169.254/v1/reallocate"
+          },
+          {
+            "lang": "csharp",
+            "label": "C#",
+            "source": "using Salad.Cloud.IMDS.SDK;\nusing Salad.Cloud.IMDS.SDK.Models;\n\nvar client = new SaladCloudImdsSdkClient();\n\nvar input = new ReallocateContainer(\"laborum culpa\");\n\nawait client.Metadata.ReallocateContainerAsync(input);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n  \"fmt\"\n  \"encoding/json\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata\"\n)\n\nconfig := saladcloudimdssdkconfig.NewConfig()\nclient := saladcloudimdssdk.NewSaladCloudImdsSdk(config)\n\n\nrequest := metadata.ReallocateContainer{}\nrequest.SetReason(\"Reason\")\n\nresponse, err := client.Metadata.ReallocateContainer(context.Background(), request)\nif err != nil {\n  panic(err)\n}\n\nfmt.Print(response)\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.salad.cloud.imdssdk.SaladCloudImdsSdk;\nimport com.salad.cloud.imdssdk.models.ReallocateContainer;\n\npublic class Main {\n\n  public static void main(String[] args) {\n    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();\n\n    ReallocateContainer reallocateContainer = ReallocateContainer.builder().reason(\"laborum culpa\").build();\n\n    saladCloudImdsSdk.metadataService.reallocateContainer(reallocateContainer);\n  }\n}\n"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment\nfrom salad_cloud_imds_sdk.models import ReallocateContainer\n\nsdk = SaladCloudImdsSdk(\n    base_url=Environment.DEFAULT.value,\n    timeout=10000\n)\n\nrequest_body = ReallocateContainer(\n    reason=\"aliqua ad dolor officia\"\n)\n\nresult = sdk.metadata.reallocate_container(request_body=request_body)\n\nprint(result)\n"
+          },
+          {
+            "lang": "typescript",
+            "label": "TypeScript",
+            "source": "import { ReallocateContainer, SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk';\n\n(async () => {\n  const saladCloudImdsSdk = new SaladCloudImdsSdk({});\n\n  const reallocateContainer: ReallocateContainer = {\n    reason: 'laborum culpa',\n  };\n\n  const { data } = await saladCloudImdsSdk.metadata.reallocateContainer(input);\n\n  console.log(data);\n})();\n"
+          }
         ]
       }
     },
@@ -73,8 +103,38 @@
             "$ref": "#/components/responses/UnknownError"
           }
         },
-        "tags": [
-          "metadata"
+        "tags": ["metadata"],
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl --silent --noproxy \"*\" --request GET \\\n  --header \"Metadata: true\" \\\n  --url http://169.254.169.254/v1/status"
+          },
+          {
+            "lang": "csharp",
+            "label": "C#",
+            "source": "using Salad.Cloud.IMDS.SDK;\n\nvar client = new SaladCloudImdsSdkClient();\n\nvar response = await client.Metadata.GetContainerStatusAsync();\n\nConsole.WriteLine(response);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n  \"fmt\"\n  \"encoding/json\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk\"\n)\n\nconfig := saladcloudimdssdkconfig.NewConfig()\nclient := saladcloudimdssdk.NewSaladCloudImdsSdk(config)\n\nresponse, err := client.Metadata.GetContainerStatus(context.Background())\nif err != nil {\n  panic(err)\n}\n\nfmt.Print(response)\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.salad.cloud.imdssdk.SaladCloudImdsSdk;\nimport com.salad.cloud.imdssdk.models.ContainerStatus;\n\npublic class Main {\n\n  public static void main(String[] args) {\n    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();\n\n    ContainerStatus response = saladCloudImdsSdk.metadataService.getContainerStatus();\n\n    System.out.println(response);\n  }\n}\n"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment\n\nsdk = SaladCloudImdsSdk(\n    base_url=Environment.DEFAULT.value,\n    timeout=10000\n)\n\nresult = sdk.metadata.get_container_status()\n\nprint(result)\n"
+          },
+          {
+            "lang": "typescript",
+            "label": "TypeScript",
+            "source": "import { SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk';\n\n(async () => {\n  const saladCloudImdsSdk = new SaladCloudImdsSdk({});\n\n  const { data } = await saladCloudImdsSdk.metadata.getContainerStatus();\n\n  console.log(data);\n})();\n"
+          }
         ]
       }
     },
@@ -99,8 +159,38 @@
             "$ref": "#/components/responses/UnknownError"
           }
         },
-        "tags": [
-          "metadata"
+        "tags": ["metadata"],
+        "x-codeSamples": [
+          {
+            "lang": "bash",
+            "label": "cURL",
+            "source": "curl --silent --noproxy \"*\" --request GET \\\n  --header \"Metadata: true\" \\\n  --url http://169.254.169.254/v1/token"
+          },
+          {
+            "lang": "csharp",
+            "label": "C#",
+            "source": "using Salad.Cloud.IMDS.SDK;\n\nvar client = new SaladCloudImdsSdkClient();\n\nvar response = await client.Metadata.GetContainerTokenAsync();\n\nConsole.WriteLine(response);\n"
+          },
+          {
+            "lang": "go",
+            "label": "Go",
+            "source": "import (\n  \"fmt\"\n  \"encoding/json\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig\"\n  \"github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk\"\n)\n\nconfig := saladcloudimdssdkconfig.NewConfig()\nclient := saladcloudimdssdk.NewSaladCloudImdsSdk(config)\n\nresponse, err := client.Metadata.GetContainerToken(context.Background())\nif err != nil {\n  panic(err)\n}\n\nfmt.Print(response)\n"
+          },
+          {
+            "lang": "java",
+            "label": "Java",
+            "source": "import com.salad.cloud.imdssdk.SaladCloudImdsSdk;\nimport com.salad.cloud.imdssdk.models.ContainerToken;\n\npublic class Main {\n\n  public static void main(String[] args) {\n    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();\n\n    ContainerToken response = saladCloudImdsSdk.metadataService.getContainerToken();\n\n    System.out.println(response);\n  }\n}\n"
+          },
+          {
+            "lang": "python",
+            "label": "Python",
+            "source": "from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment\n\nsdk = SaladCloudImdsSdk(\n    base_url=Environment.DEFAULT.value,\n    timeout=10000\n)\n\nresult = sdk.metadata.get_container_token()\n\nprint(result)\n"
+          },
+          {
+            "lang": "typescript",
+            "label": "TypeScript",
+            "source": "import { SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk';\n\n(async () => {\n  const saladCloudImdsSdk = new SaladCloudImdsSdk({});\n\n  const { data } = await saladCloudImdsSdk.metadata.getContainerToken();\n\n  console.log(data);\n})();\n"
+          }
         ]
       }
     }
@@ -111,9 +201,7 @@
         "description": "Represents a request to reallocate a container.",
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "reason"
-        ],
+        "required": ["reason"],
         "properties": {
           "reason": {
             "description": "The reason for reallocating the container. This value is reported to SaladCloud support for quality assurance of Salad Nodes.",
@@ -127,12 +215,7 @@
         "description": "Identifies the type of the API request failure.",
         "type": "string",
         "nullable": true,
-        "enum": [
-          "reason_required",
-          "request_header_invalid",
-          "container_not_found",
-          null
-        ]
+        "enum": ["reason_required", "request_header_invalid", "container_not_found", null]
       },
       "ReallocateContainerProblemDetails": {
         "description": "Represents a failed API request.",
@@ -167,10 +250,7 @@
         "description": "Represents the health statuses of the running container.",
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "ready",
-          "started"
-        ],
+        "required": ["ready", "started"],
         "properties": {
           "ready": {
             "description": "`true` if the running container is ready. If a readiness probe is defined, this returns the latest result of the probe. If a readiness probe is not defined but a startup probe is defined, this returns the same value as the `started` property. If neither a readiness probe nor a startup probe are defined, returns `true`.",
@@ -186,11 +266,7 @@
         "description": "Identifies the type of the API request failure.",
         "type": "string",
         "nullable": true,
-        "enum": [
-          "request_header_invalid",
-          "container_not_found",
-          null
-        ]
+        "enum": ["request_header_invalid", "container_not_found", null]
       },
       "ContainerStatusProblemDetails": {
         "description": "Represents a failed API request.",
@@ -225,9 +301,7 @@
         "description": "Represents the identity token of the running container.",
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "jwt"
-        ],
+        "required": ["jwt"],
         "properties": {
           "jwt": {
             "description": "The JSON Web Token (JWT) that may be used to identify the running container. The JWT may be verified using the JSON Web Key Set (JWKS) available at https://matrix-rest-api.salad.com/.well-known/stash-jwks.json.",
@@ -241,11 +315,7 @@
         "description": "Identifies the type of the API request failure.",
         "type": "string",
         "nullable": true,
-        "enum": [
-          "request_header_invalid",
-          "container_not_found",
-          null
-        ]
+        "enum": ["request_header_invalid", "container_not_found", null]
       },
       "ContainerTokenProblemDetails": {
         "description": "Represents a failed API request.",
