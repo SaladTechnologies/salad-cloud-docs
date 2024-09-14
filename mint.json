@@ -1,65 +1,16 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Salad Cloud",
+  "name": "SaladCloud",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
-  "favicon": "/favicon-32x32.png",
+  "favicon": "/favicon.png",
   "colors": {
     "primary": "#53A626",
     "light": "#53A626",
     "dark": "#53A626"
   },
-  "feedback": {
-    "thumbsRating": true
-  },
-  "analytics": {
-    "ga4": {
-      "measurementId": "G-C9B6SKYZEY"
-    },
-    "mixpanel": {
-      "projectToken": "26a3dcda21415501306f3f077a446ec5"
-    }
-  },
-  "topbarLinks": [],
-  "topbarCtaButton": {
-    "name": "Portal",
-    "url": "https://portal.salad.com"
-  },
-  "primaryTab": {
-    "name": "Home"
-  },
-  "tabs": [
-    {
-      "name": "Container Engine",
-      "url": "container-engine"
-    },
-    {
-      "name": "Inference Endpoints",
-      "url": "inference-endpoints"
-    },
-    {
-      "name": "Gateway Service",
-      "url": "gateway-service"
-    },
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
-  "anchors": [
-    {
-      "name": "Community",
-      "icon": "discord",
-      "url": "https://discord.gg/ApSm4Kn7Aq"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://blog.salad.com"
-    }
-  ],
   "navigation": [
     {
       "group": "Get Started",
@@ -70,10 +21,7 @@
       "pages": [
         {
           "group": "Organizations",
-          "pages": [
-            "api-reference/organizations/get-gpu-classes",
-            "api-reference/organizations/get-quotas"
-          ]
+          "pages": ["api-reference/organizations/get-gpu-classes", "api-reference/organizations/get-quotas"]
         },
         {
           "group": "Container Groups",
@@ -129,8 +77,8 @@
       "pages": [
         "inference-endpoints/transcription/transcription",
         "inference-endpoints/transcription/transcriptionfaq",
-        "inference-endpoints/transcription/transcriptionquickstart"
-        ,{
+        "inference-endpoints/transcription/transcriptionquickstart",
+        {
           "group": "Transcription Guides",
           "pages": [
             "inference-endpoints/transcription/dropboxdownloadable",
@@ -145,10 +93,7 @@
     },
     {
       "group": "Dreambooth",
-      "pages": [
-        "inference-endpoints/dreambooth/avatar-video-tutorial",
-        "inference-endpoints/dreambooth/pet-tutorial"
-      ]
+      "pages": ["inference-endpoints/dreambooth/avatar-video-tutorial", "inference-endpoints/dreambooth/pet-tutorial"]
     },
     {
       "group": "Getting Started",
@@ -217,10 +162,7 @@
         },
         {
           "group": "Biling and Pricing",
-          "pages": [
-            "container-engine/billing",
-            "container-engine/priority-pricing"
-          ]
+          "pages": ["container-engine/billing", "container-engine/priority-pricing"]
         },
         "container-engine/specifying-a-command",
         "container-engine/disk-space",
@@ -272,21 +214,18 @@
             "container-engine/guides/stable-diffusion/basic-how-to-deploy-flux-on-salad-comfy"
           ]
         },
-
         {
           "group": "LLM",
           "pages": [
             "container-engine/guides/llm/llm-general",
             "container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface",
-            "container-engine/guides/llm/run-ollama"         
+            "container-engine/guides/llm/run-ollama"
           ]
         },
-
         "container-engine/guides/run-a-python-app",
         "container-engine/guides/ubuntu-image",
         "container-engine/guides/example-image",
         "container-engine/guides/run-triton-server",
-        
         {
           "group": "Run a Node App",
           "pages": [
@@ -326,10 +265,67 @@
       ]
     }
   ],
+  "topbarLinks": [
+    {
+      "name": "Blog",
+      "url": "https://blog.salad.com"
+    },
+    {
+      "name": "Community",
+      "url": "https://discord.gg/ApSm4Kn7Aq"
+    },
+    {
+      "name": "Support",
+      "url": "/support"
+    }
+  ],
+  "topbarCtaButton": {
+    "url": "https://portal.salad.com",
+    "name": "Portal",
+    "arrow": false
+  },
+  "tabs": [
+    {
+      "name": "Container Engine",
+      "url": "container-engine"
+    },
+    {
+      "name": "Inference Endpoints",
+      "url": "inference-endpoints"
+    },
+    {
+      "name": "Gateway Service",
+      "url": "gateway-service"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "primaryTab": {
+    "name": "SaladCloud"
+  },
   "footerSocials": {
-    "x": "https://x.com/SaladTech ",
+    "website": "https://salad.com",
+    "discord": "https://discord.gg/ApSm4Kn7Aq",
     "github": "https://github.com/SaladTechnologies",
+    "youtube": "https://www.youtube.com/channel/UCFqO8W9-bxGCf-PdSrc7wVg",
+    "x": "https://x.com/SaladTech",
     "linkedin": "https://www.linkedin.com/company/salad-technologies"
+  },
+  "feedback": {
+    "thumbsRating": true
+  },
+  "search": {
+    "prompt": "Search..."
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-C9B6SKYZEY"
+    },
+    "mixpanel": {
+      "projectToken": "26a3dcda21415501306f3f077a446ec5"
+    }
   },
   "redirects": [
     {
@@ -348,7 +344,6 @@
       "source": "/docs.salad.com/docs/openvoice-api",
       "destination": "/container-engine/guides/openvoice-api"
     },
-
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
       "destination": "/container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface"
@@ -365,7 +360,6 @@
       "source": "/container-engine/guides/run-ollama",
       "destination": "/container-engine/guides/llm/run-ollama"
     },
-    
     {
       "source": "/docs/youtube",
       "destination": "/container-engine/guides/youtube"
@@ -374,7 +368,6 @@
       "source": "/docs/jupyterlab",
       "destination": "/container-engine/guides/jupyterlab"
     },
-    
     {
       "source": "/docs/sdxl",
       "destination": "/container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
