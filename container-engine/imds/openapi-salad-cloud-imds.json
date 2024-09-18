@@ -304,7 +304,7 @@
         "required": ["jwt"],
         "properties": {
           "jwt": {
-            "description": "The JSON Web Token (JWT) that may be used to identify the running container. The JWT may be verified using the JSON Web Key Set (JWKS) available at https://matrix-rest-api.salad.com/.well-known/stash-jwks.json.",
+            "description": "The JSON Web Token (JWT) may be used to identify the running container. The JWT may be verified using the JSON Web Key Set (JWKS) available at https://matrix-rest-api.salad.com/.well-known/stash-jwks.json.",
             "type": "string",
             "minLength": 1,
             "maxLength": 1000

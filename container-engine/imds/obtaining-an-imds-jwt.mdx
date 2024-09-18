@@ -1,0 +1,107 @@
+---
+title: 'Obtaining an IMDS JWT'
+---
+
+To obtain the JWT, you'll use our Token endpoint. You can access this with either our SDK, or via a JSON request.
+
+## SDK
+In this example, we'll use our Python SDK to retrieve and store the JWT in a text file for later.
+
+```python Python
+from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
+
+sdk = SaladCloudImdsSdk( base_url=Environment.DEFAULT.value, timeout=10000 )
+
+result = sdk.metadata.get_container_token()
+
+with open('jwt.txt', 'w+') as token:
+  token.write(result)
+  print("Saved JWT to file...")
+```
+### SDK Examples
+
+<CodeGroup>
+```python Python
+from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
+
+sdk = SaladCloudImdsSdk( base_url=Environment.DEFAULT.value, timeout=10000 )
+
+result = sdk.metadata.get_container_token()
+
+print(result)
+````
+```java Java
+import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+import com.salad.cloud.imdssdk.models.ContainerToken;
+
+public class Main {
+
+  public static void main(String[] args) {
+    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+    ContainerToken response = saladCloudImdsSdk.metadataService.getContainerToken();
+
+    System.out.println(response);
+  }
+}
+````
+```go Go
+import (
+  "fmt"
+  "encoding/json"
+  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+)
+
+config := saladcloudimdssdkconfig.NewConfig()
+client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+response, err := client.Metadata.GetContainerToken(context.Background())
+if err != nil {
+  panic(err)
+}
+
+fmt.Print(response)
+```
+```csharp C#
+using Salad.Cloud.IMDS.SDK;
+
+var client = new SaladCloudImdsSdkClient();
+
+var response = await client.Metadata.GetContainerTokenAsync();
+
+Console.WriteLine(response);
+```
+</CodeGroup>
+
+## JSON Request
+
+You can request the token directly from the endpoint at `http://169.254.169.254/v1/token`. In this example, we'll do the same as before but with a JSON post request via Python.
+
+```python Python
+import requests
+
+r = requests.get('http://169.254.169.254:80/v1/token')
+token =r.json()['jwt']
+
+with open('jwt.txt', 'w+') as token:
+  token.write(result)
+  print("Saved JWT to file...")
+```
+
+### JSON Request Examples
+<CodeGroup>
+```python Python
+import requests
+
+r = requests.get('http://169.254.169.254:80/v1/token')
+token =r.json()['jwt']
+
+print(token)
+````
+```curl Curl
+curl --silent --noproxy "*" --request GET \
+  --header "Metadata: true" \
+  --url http://169.254.169.254/v1/token
+```
+</CodeGroup>
