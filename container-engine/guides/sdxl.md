@@ -82,7 +82,7 @@ Load SDXL Base and Refiner, and push the image to your own repository with a cus
 
 | Variable                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| HOST                      | The host to listen on. Use `[::]` on Salad. You may need to use an ipv4 address like `0.0.0.0` for local development                                                                                                                                                                                                                                                                                                                                                                             | `[::]`  |
+| HOST                      | The host to listen on. Use `[::]` on SaladCloud. You may need to use an ipv4 address like `0.0.0.0` for local development                                                                                                                                                                                                                                                                                                                                                                        | `[::]`  |
 | PORT                      | The port to listen on. This should match the port you configure for Salad networking.                                                                                                                                                                                                                                                                                                                                                                                                            | 7860    |
 | CIVITAI_MODEL_VERSION_IDS | A comma-separated list of model version IDs to download. ex `128713` for just [Dreamshaper 8](https://civitai.com/models/4384?modelVersionId=128713) or `128713,166808` for Dreamshaper and [Arterior](https://civitai.com/models/112229/arterior-digital-art-style). This supports Checkpoints, VAEs, Controlnets, and LoRAs. The rightmost checkpoint value will be the default checkpoint when the server starts, and the rightmost vae value will be the default vae when the server starts. | None    |
 | LOAD_SDXL_BASE            | If set to `1`, the SDXL base model will be downloaded.                                                                                                                                                                                                                                                                                                                                                                                                                                           | 0       |
@@ -182,7 +182,7 @@ Since this probe primarily checks for memory issues, it should be configured wit
 
 **OR**
 
-1. Copy the link from the download button  
+1. Copy the link from the download button
    ![](https://files.readme.io/2ecae2c-image51.png)
 
 2. Paste the link into a text editor and copy the model version ID from the URL
@@ -195,10 +195,10 @@ For this url, the model version id is `128713`.
 
 ## Finding Your Model Version ID (API)
 
-1. Navigate to the Civit.ai page for the model you want to use  
+1. Navigate to the Civit.ai page for the model you want to use
    ![](https://files.readme.io/0522c19-image11.png)
 
-2. Grab the model ID from the URL  
+2. Grab the model ID from the URL
    ![](https://files.readme.io/7fcd140-image41.png)
 
 3. Use the API to get the model versions
