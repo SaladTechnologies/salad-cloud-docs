@@ -513,9 +513,9 @@ def inference(connection_string: str, input_container_name: str, output_containe
 
 ```
 
-We authenticate with Azure Storage and fetch the input text and reference voice files.  
-The text is split into sentences using the split_into_sentences function to manage the length limitations of MetaVoice.  
-Each sentence is processed individually, and the resulting audio files are combined into a final output file using the combine_wav_files function.  
+We authenticate with Azure Storage and fetch the input text and reference voice files.
+The text is split into sentences using the split_into_sentences function to manage the length limitations of MetaVoice.
+Each sentence is processed individually, and the resulting audio files are combined into a final output file using the combine_wav_files function.
 The final audio file is uploaded back to Azure Storage, and the function returns the status, location of the saved file, and processing time.
 
 **Local Testing with Uvicorn:**
@@ -595,7 +595,7 @@ By following this Dockerfile, our FastAPI application is prepared for deployment
 
 ## Deploying Solution to Salad
 
-We've reached the final and most exciting stage of our project: deploying our solution to Salad. If you're not making any additional customizations, you can directly proceed to this step.
+We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not making any additional customizations, you can directly proceed to this step.
 
 Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
 
@@ -610,7 +610,7 @@ We now need to set up all of our container group parameters:
 **Configure Container Group:**
 
 1. **Create a unique name for your Container group**
-2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0**  
+2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0**
    If you are using your custom solution, specify your image location.
 
 ![](https://files.readme.io/b80f256-image.png)
