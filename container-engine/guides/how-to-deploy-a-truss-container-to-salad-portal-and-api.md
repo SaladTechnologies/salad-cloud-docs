@@ -1,16 +1,20 @@
 ---
-title: "Truss Deployment Guide to Salad Portal and API"
-slug: "how-to-deploy-a-truss-container-to-salad-portal-and-api"
-excerpt: ""
+title: 'Truss Deployment Guide to Salad Portal and API'
+slug: 'how-to-deploy-a-truss-container-to-salad-portal-and-api'
+excerpt: ''
 hidden: true
-metadata: 
+metadata:
   image: []
-  robots: "index"
-createdAt: "Wed Mar 01 2023 16:44:54 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)"
+  robots: 'index'
+createdAt: 'Wed Mar 01 2023 16:44:54 GMT+0000 (Coordinated Universal Time)'
+updatedAt: 'Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)'
 ---
+
 **Introduction**  
-Truss is a Python library that simplifies the deployment of machine learning models by creating containerized models that can be served via HTTP requests. This guide will show you how to deploy a Truss container to **[Salad Portal ](http://portal.salad.com)** and ** [Salad API](https://docs.salad.com/reference/api-reference)** so that your model can be accessed from anywhere.
+Truss is a Python library that simplifies the deployment of machine learning models by creating containerized models
+that can be served via HTTP requests. This guide will show you how to deploy a Truss container to
+**[Salad Portal ](http://portal.salad.com)** and ** [Salad API](https://docs.salad.com/reference/api-reference)** so
+that your model can be accessed from anywhere.
 
 Prerequisites  
 Before you begin, you will need the following:
@@ -18,10 +22,10 @@ Before you begin, you will need the following:
 - A [Salad Cloud account](http://portal.salad.com)
 - [A project in Salad Cloud](https://docs.salad.com/docs/set-up-a-project)
 - A container image built using [Truss](https://truss.baseten.co/)
-- The Truss library installed. 
+- The Truss library installed.
 
 Truss requires Python >=3.7 and \<3.11. To install Truss from PyPi,  
-To install Truss, run this command: 
+To install Truss, run this command:
 
 ```text
 pip install truss
@@ -34,13 +38,15 @@ To authenticate your API requests, you'll need an API key. To obtain your API ke
 
 - Log in to your Salad Cloud account at [https://portal.salad.com](https://portal.salad.com)
 - Click on your profile in the top right corner of the page, then click API Key.
-- Copy the API key that is displayed. You'll need this in the next step. 
+- Copy the API key that is displayed. You'll need this in the next step.
 
 **Step 2: Package Your Model**  
 Before deploying your model to Salad Portal and API, you need to package it as a Truss container. Follow these steps:
 
-- Install the required dependencies for your model. For example, if you used `scikit-learn` to create your model, run: `pip install --upgrade scikit-learn truss`
-- Create your model using the Truss library. For example, if you used `scikit-learn` to create your model, run the following code: 
+- Install the required dependencies for your model. For example, if you used `scikit-learn` to create your model, run:
+  `pip install --upgrade scikit-learn truss`
+- Create your model using the Truss library. For example, if you used `scikit-learn` to create your model, run the
+  following code:
 
 ```python
 import truss
@@ -60,13 +66,13 @@ rfc.fit(data_x, data_y)
 tr = truss.create(rfc, target_directory="iris_rfc_truss")
 ```
 
-- Serve your model locally using Docker by running: 
+- Serve your model locally using Docker by running:
 
 ```shell
 truss run-image iris_rfc_truss.
 ```
 
- The container will start running on port `8080.`
+The container will start running on port `8080.`
 
 - Ensure that the container is running, then invoke the model as an API using a POST request:
 
@@ -75,7 +81,9 @@ curl -X POST http://127.0.0.1:8080/v1/models/model:predict -d '{"inputs": [[0, 0
 ```
 
 - Configure Your Model for Deployment :  
-  To configure your Truss, include a file **config.yaml** in the root directory of your Truss. Configuration is optional, as every configurable value has a sensible default. The Truss we generated in the quickstart sample provides a good example of a typical Truss config:
+  To configure your Truss, include a file **config.yaml** in the root directory of your Truss. Configuration is
+  optional, as every configurable value has a sensible default. The Truss we generated in the quickstart sample provides
+  a good example of a typical Truss config:
 
 ```yaml
 model_framework: sklearn
@@ -84,20 +92,23 @@ model_metadata:
   supports_predict_proba: true
 python_version: py39
 requirements:
-- scikit-learn==1.0.2
-- threadpoolctl==3.0.0
-- joblib==1.1.0
-- numpy==1.20.3
-- scipy==1.7.3
+  - scikit-learn==1.0.2
+  - threadpoolctl==3.0.0
+  - joblib==1.1.0
+  - numpy==1.20.3
+  - scipy==1.7.3
 ```
 
-- Create a Docker image for your Truss model by following the steps outlined in the [Quickstart: making a Truss" section of the Truss documentation guide](https://truss.baseten.co/).  
+- Create a Docker image for your Truss model by following the steps outlined in the
+  [Quickstart: making a Truss" section of the Truss documentation guide](https://truss.baseten.co/).  
   Make sure to replace "iris_rfc_truss" with a name that reflects your model.
 
 - Upload your container to Dockerhub  
-  First, ensure that you have a DockerHub account. If you don't, create one at [https://hub.docker.com/signup](https://hub.docker.com/signup).
+  First, ensure that you have a DockerHub account. If you don't, create one at
+  [https://hub.docker.com/signup](https://hub.docker.com/signup).
 
-- Next, create a Docker image for your Truss model. This can be done by running the following command in your terminal or command prompt:
+- Next, create a Docker image for your Truss model. This can be done by running the following command in your terminal
+  or command prompt:
 
 - Build the Docker image by running the following command in your terminal:
 
@@ -105,7 +116,8 @@ requirements:
 docker build -t <image-name> <path-to-Dockerfile>
 ```
 
-- Replace `<image-name>` with a name for your Docker image and `<path-to-Dockerfile>` with the path to the directory containing your Dockerfile.
+- Replace `<image-name>` with a name for your Docker image and `<path-to-Dockerfile>` with the path to the directory
+  containing your Dockerfile.
 
 - Once the build process is complete, you can push the image to DockerHub by running the following command:
 
@@ -113,7 +125,7 @@ docker build -t <image-name> <path-to-Dockerfile>
 docker push <your_username>/<image_name>:<tag>
 ```
 
-- Test your Docker image by running the following command in your terminal: 
+- Test your Docker image by running the following command in your terminal:
 
 ```shell
 docker run -p 8080:8080 <your_username>/<image_name>:<tag>
@@ -121,19 +133,20 @@ docker run -p 8080:8080 <your_username>/<image_name>:<tag>
 
 - This should start the Truss container and make it available at http\://localhost:8080.
 
-- Stop the running Docker container by running the following command in your terminal: 
+- Stop the running Docker container by running the following command in your terminal:
 
 ```shell
 docker stop $(docker ps -q)
 ```
 
 **Step 3: Deploy the Container Image to Salad Portal. **  
-Follow this step-by-step guide to deploy a container to [ Salad Portal here ](https://docs.salad.com/docs/how-to-deploy-a-container-using-salad-portal)
+Follow this step-by-step guide to deploy a container to
+[ Salad Portal here ](https://docs.salad.com/docs/how-to-deploy-a-container-using-salad-portal)
 
 **Step 4: Deploy the Container Image to Salad API**  
-To deploy your container image to Salad  API, follow these steps:
+To deploy your container image to Salad API, follow these steps:
 
-- Send a POST request to the following URL: 
+- Send a POST request to the following URL:
 
 ```json
 https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers \
@@ -142,7 +155,8 @@ https://api.salad.com/api/public/organizations/{organization_name}/projects/{pro
 Replace `organization_name}` and `{project_name}` with the name of your organization and project, respectively.
 
 - In the headers of the POST request, include `accept: application/json` and `content-type: application/json`.
-- In the body of the POST request, include the following JSON data, replacing `{API_KEY}` with your Salad Cloud API key and `{CONTAINER_IMAGE_URL}` with the URL of your container image:
+- In the body of the POST request, include the following JSON data, replacing `{API_KEY}` with your Salad Cloud API key
+  and `{CONTAINER_IMAGE_URL}` with the URL of your container image:
 
 ```json
 {
@@ -152,7 +166,7 @@ Replace `organization_name}` and `{project_name}` with the name of your organiza
 }
 ```
 
-- Send a POST request using  `curl`  
+- Send a POST request using `curl`
 
 ```json
 curl --request POST \
@@ -167,7 +181,7 @@ curl --request POST \
 }
 ```
 
-- Check the status of the deployment by sending a GET request to the following URL: 
+- Check the status of the deployment by sending a GET request to the following URL:
 
 ```json
 curl --request GET \
@@ -175,4 +189,6 @@ curl --request GET \
      --header 'accept: application/json'
 ```
 
-Congratulations, You have successfully deployed a Truss container to Salad Portal and API! Remember to configure your Truss as needed for deployment and update it regularly. If you encounter any issues or have any questions, don't hesitate to reach out to the [Salad support team](Mailto:cloud@salad.com).
+Congratulations, You have successfully deployed a Truss container to Salad Portal and API! Remember to configure your
+Truss as needed for deployment and update it regularly. If you encounter any issues or have any questions, don't
+hesitate to reach out to the [Salad support team](Mailto:cloud@salad.com).

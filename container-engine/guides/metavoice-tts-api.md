@@ -1,72 +1,115 @@
 ---
-title: "MetaVoice TTS with Voice Cloning Guide"
-slug: "metavoice-tts-api"
-excerpt: ""
+title: 'MetaVoice TTS with Voice Cloning Guide'
+slug: 'metavoice-tts-api'
+excerpt: ''
 hidden: true
-createdAt: "Mon Mar 25 2024 20:38:14 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Sat Mar 30 2024 14:23:52 GMT+0000 (Coordinated Universal Time)"
+createdAt: 'Mon Mar 25 2024 20:38:14 GMT+0000 (Coordinated Universal Time)'
+updatedAt: 'Sat Mar 30 2024 14:23:52 GMT+0000 (Coordinated Universal Time)'
 ---
 
 ## Introduction
 
-Text-to-speech (TTS) technology has seen remarkable advancements in recent years, becoming increasingly accessible and efficient. Contemporary TTS models utilize deep learning and artificial intelligence to generate speech that is both natural-sounding and highly accurate. These advancements have led to widespread applications in various real-life scenarios, including voice assistants, audiobook narration, and accessibility tools for individuals with visual impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice, and demonstrate how to leverage its features on Salad Cloud in a cloud-based environment.
+Text-to-speech (TTS) technology has seen remarkable advancements in recent years, becoming increasingly accessible and
+efficient. Contemporary TTS models utilize deep learning and artificial intelligence to generate speech that is both
+natural-sounding and highly accurate. These advancements have led to widespread applications in various real-life
+scenarios, including voice assistants, audiobook narration, and accessibility tools for individuals with visual
+impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice,
+and demonstrate how to leverage its features on Salad Cloud in a cloud-based environment.
 
-** If you are looking for fast deployment of MetaVoice Endpoint on Salad move to [Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
+** If you are looking for fast deployment of MetaVoice Endpoint on Salad move to
+[Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
 
 ### Discover MetaVoice: The Open-Source Voice Cloning Tool
 
-MetaVoice-1B is a sophisticated text-to-speech (TTS) model with an impressive 1.2 billion parameters, trained on an extensive dataset of 100,000 hours of speech. It is specifically tailored to produce emotionally rich English speech rhythms and tones, setting it apart for its accuracy and lifelike voice synthesis.
+MetaVoice-1B is a sophisticated text-to-speech (TTS) model with an impressive 1.2 billion parameters, trained on an
+extensive dataset of 100,000 hours of speech. It is specifically tailored to produce emotionally rich English speech
+rhythms and tones, setting it apart for its accuracy and lifelike voice synthesis.
 
-A notable feature of MetaVoice-1B is its capability for zero-shot voice cloning, which can accurately replicate American and British voices with just a 30-second audio sample. Additionally, it boasts cross-lingual cloning abilities, demonstrated with minimal training data, such as one minute for Indian accents. Released under the flexible Apache 2.0 license, MetaVoice-1B is particularly well-suited for long-form synthesis, making it a versatile tool for various applications.
+A notable feature of MetaVoice-1B is its capability for zero-shot voice cloning, which can accurately replicate American
+and British voices with just a 30-second audio sample. Additionally, it boasts cross-lingual cloning abilities,
+demonstrated with minimal training data, such as one minute for Indian accents. Released under the flexible Apache 2.0
+license, MetaVoice-1B is particularly well-suited for long-form synthesis, making it a versatile tool for various
+applications.
 
 ### Exploring MetaVoice Architecture
 
-MetaVoice employs a sophisticated architecture to convert text into natural-sounding speech. Here's a breakdown of the process:
+MetaVoice employs a sophisticated architecture to convert text into natural-sounding speech. Here's a breakdown of the
+process:
 
-1. **Token Prediction** The model predicts EnCodec tokens based on input text and speaker information. These tokens are then diffused up to the waveform level, with post-processing applied to enhance audio quality.
-2. **Token Generation** A causal GPT model is used to predict the first two hierarchies of EnCodec tokens. Both text and audio are included in the LLM context, while speaker information is incorporated through conditioning at the token embedding layer. This speaker conditioning is derived from a separate speaker verification network.
-3. **Flattened Interleaved Prediction** The two hierarchies are predicted in a "flattened interleaved" manner. This means the model predicts the first token of the first hierarchy, then the first token of the second hierarchy, followed by the second token of the first hierarchy, and so on.
+1. **Token Prediction** The model predicts EnCodec tokens based on input text and speaker information. These tokens are
+   then diffused up to the waveform level, with post-processing applied to enhance audio quality.
+2. **Token Generation** A causal GPT model is used to predict the first two hierarchies of EnCodec tokens. Both text and
+   audio are included in the LLM context, while speaker information is incorporated through conditioning at the token
+   embedding layer. This speaker conditioning is derived from a separate speaker verification network.
+3. **Flattened Interleaved Prediction** The two hierarchies are predicted in a "flattened interleaved" manner. This
+   means the model predicts the first token of the first hierarchy, then the first token of the second hierarchy,
+   followed by the second token of the first hierarchy, and so on.
 4. **Condition-Free Sampling** To enhance the model's cloning capability, condition-free sampling is employed.
-5. **Tokenization** The text is tokenized using a custom-trained BPE tokenizer with 512 tokens. Notably, the model skips predicting semantic tokens, as this was found to be unnecessary for effective synthesis.
-6. **Non-Causal Transformer** A non-causal (encoder-style) transformer is used to predict the remaining six hierarchies from the first two. This smaller model (~10 million parameters) demonstrates extensive zero-shot generalization to most speakers tested. Being non-causal, it can predict all timesteps in parallel.
-7. **Multi-Band Diffusion** Waveforms are generated from EnCodec tokens using multi-band diffusion. This approach results in clearer speech compared to traditional methods, although it can introduce background artifacts.
-8. **Artifact Removal** DeepFilterNet is utilized to clean up artifacts introduced by multi-band diffusion, ensuring the final output is clear and pleasant to the ear.
+5. **Tokenization** The text is tokenized using a custom-trained BPE tokenizer with 512 tokens. Notably, the model skips
+   predicting semantic tokens, as this was found to be unnecessary for effective synthesis.
+6. **Non-Causal Transformer** A non-causal (encoder-style) transformer is used to predict the remaining six hierarchies
+   from the first two. This smaller model (~10 million parameters) demonstrates extensive zero-shot generalization to
+   most speakers tested. Being non-causal, it can predict all timesteps in parallel.
+7. **Multi-Band Diffusion** Waveforms are generated from EnCodec tokens using multi-band diffusion. This approach
+   results in clearer speech compared to traditional methods, although it can introduce background artifacts.
+8. **Artifact Removal** DeepFilterNet is utilized to clean up artifacts introduced by multi-band diffusion, ensuring the
+   final output is clear and pleasant to the ear.
 
-This architecture allows MetaVoice to produce high-quality, natural-sounding speech with effective speaker cloning and generalization capabilities.
+This architecture allows MetaVoice to produce high-quality, natural-sounding speech with effective speaker cloning and
+generalization capabilities.
 
 ### Handling Text Length Limitations in MetaVoice
 
-During our evaluation of MetaVoice, we encountered limitations regarding the maximum length of text the model could process effectively in one go. Although the default token limit is set to 2048 tokens per batch, we observed that the model's performance began to degrade with even smaller numbers of tokens.
+During our evaluation of MetaVoice, we encountered limitations regarding the maximum length of text the model could
+process effectively in one go. Although the default token limit is set to 2048 tokens per batch, we observed that the
+model's performance began to degrade with even smaller numbers of tokens.
 
-To address this issue, we implemented a preprocessing step to divide the text into smaller segments. Specifically, we found that breaking the text into two-sentence pieces allowed us to stay within the model's processing capabilities without compromising the quality of the generated speech.
+To address this issue, we implemented a preprocessing step to divide the text into smaller segments. Specifically, we
+found that breaking the text into two-sentence pieces allowed us to stay within the model's processing capabilities
+without compromising the quality of the generated speech.
 
-For sentence tokenization, we utilized the Punkt Sentence Tokenizer, which is a part of the Natural Language Toolkit (NLTK). This tokenizer is effective in identifying sentence boundaries, making it a suitable choice for segmenting our text data into manageable pieces for MetaVoice processing.
+For sentence tokenization, we utilized the Punkt Sentence Tokenizer, which is a part of the Natural Language Toolkit
+(NLTK). This tokenizer is effective in identifying sentence boundaries, making it a suitable choice for segmenting our
+text data into manageable pieces for MetaVoice processing.
 
 ### GPU Specifications and Selection for MetaVoice
 
-The official documentation for MetaVoice suggests the use of GPUs with a minimum of 12GB of VRAM to ensure optimal performance. However, during our trials, we explored the use of GPUs with lower VRAM and found that they could still deliver satisfactory results. This necessitated a meticulous selection process from Salad's GPU fleet to identify compatible options that could handle the processing demands of MetaVoice.
+The official documentation for MetaVoice suggests the use of GPUs with a minimum of 12GB of VRAM to ensure optimal
+performance. However, during our trials, we explored the use of GPUs with lower VRAM and found that they could still
+deliver satisfactory results. This necessitated a meticulous selection process from Salad's GPU fleet to identify
+compatible options that could handle the processing demands of MetaVoice.
 
 ## Project Overview: TTS with Voice Cloning using MetaVoice and Salad Cloud
 
-In this project, we aim to deploy a flexible voice solution that enables text-to-speech conversion with addition of a narrator's voice tone. This solution will be accessible as an API.
+In this project, we aim to deploy a flexible voice solution that enables text-to-speech conversion with addition of a
+narrator's voice tone. This solution will be accessible as an API.
 
 **Workflow:**
 
 1. **Request:** The process initiates with an API request.
 2. **Input Data:** Text files and reference voices are stored on Azure.
-3. **TTS and Voice Cloning:** The text file is processed, and an audio file is generated based on the input voice, following MetaVoice's architecture.
+3. **TTS and Voice Cloning:** The text file is processed, and an audio file is generated based on the input voice,
+   following MetaVoice's architecture.
 4. **Storage and Accessibility:** The generated audio file is uploaded back to Azure for easy access and further usage.
 
-Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are not only reserved for large organizations with extensive resources. By leveraging MetaVoice and Salad Cloud, we make cutting-edge voice technology accessible to a wider audience, enabling the creation of realistic and customizable speech with minimal effort. This initiative showcases how cloud computing and AI models can work together to address real-world applications in voice synthesis and cloning, offering value in various scenarios such as content creation, accessibility, and personalized communication.
+Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are not only
+reserved for large organizations with extensive resources. By leveraging MetaVoice and Salad Cloud, we make cutting-edge
+voice technology accessible to a wider audience, enabling the creation of realistic and customizable speech with minimal
+effort. This initiative showcases how cloud computing and AI models can work together to address real-world applications
+in voice synthesis and cloning, offering value in various scenarios such as content creation, accessibility, and
+personalized communication.
 
-For average processing prices, refer to our benchmarks: [MetaVoice AI Text-to-Speech (TTS) Benchmark: Narrate 100,000 words for only $4.29 on Salad](https://blog.salad.com/metavoice-benchmark/)
+For average processing prices, refer to our benchmarks:
+[MetaVoice AI Text-to-Speech (TTS) Benchmark: Narrate 100,000 words for only $4.29 on Salad](https://blog.salad.com/metavoice-benchmark/)
 
 ### Reference Architecture
 
 - **Deployment**:
-  - The FastAPI application is containerized using Docker, providing a consistent and isolated environment for deployment.
+  - The FastAPI application is containerized using Docker, providing a consistent and isolated environment for
+    deployment.
   - The Docker container is then deployed on Salad's compute resources to leverage their processing capabilities.
-  - The Docker image is stored in the Salad Docker Container Registry, ensuring secure and easy access for deployment and updates.
+  - The Docker image is stored in the Salad Docker Container Registry, ensuring secure and easy access for deployment
+    and updates.
 
 ![](https://files.readme.io/160811e-FASTAPI.drawio_3.png)
 
@@ -96,7 +139,11 @@ openvoice-on-salad/
 
 ### Local Development Setup and Testing
 
-For a smooth customization process, we have made our GitHub [repository ](https://github.com/SaladTechnologies/metavoice-on-salad)public. Begin by setting up an efficient local development environment. Execute the setup script to install all dependencies and download the MetaVoice checkpoints. This script ensures that the dependencies function correctly during development. The complete contents of the setup script are provided below.
+For a smooth customization process, we have made our GitHub
+[repository ](https://github.com/SaladTechnologies/metavoice-on-salad)public. Begin by setting up an efficient local
+development environment. Execute the setup script to install all dependencies and download the MetaVoice checkpoints.
+This script ensures that the dependencies function correctly during development. The complete contents of the setup
+script are provided below.
 
 The Setup Script:
 
@@ -135,17 +182,22 @@ pip install --upgrade torch torchaudio
 pip install -e .
 ```
 
-To establish a clean virtual environment and install all the necessary libraries, you simply needs to execute the script using this command:
+To establish a clean virtual environment and install all the necessary libraries, you simply needs to execute the script
+using this command:
 
 ```java bash
 bash dev/setup
 ```
 
-This script will prepare your local development environment for working with MetaVoice, ensuring that you have all the required tools and dependencies to start customizing and testing the application.
+This script will prepare your local development environment for working with MetaVoice, ensuring that you have all the
+required tools and dependencies to start customizing and testing the application.
 
 ### Voice cloning test with MetaVoice on Salad Cloud
 
-To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code as our base: [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts MetaVoice also provides a ready to go fast api that we slightly updated to fit our needs. Here is the base MataVoice Fast API:
+To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code
+as our base: [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts
+MetaVoice also provides a ready to go fast api that we slightly updated to fit our needs. Here is the base MataVoice
+Fast API:
 
 ```python
 import json
@@ -299,9 +351,12 @@ if __name__ == "__main__":
 
 ### Additional Endpoints
 
-Due to the computational needs of MetaVoice, which requires approximately one second per word to convert text to audio, we've introduced two new endpoints to accommodate different text lengths:
+Due to the computational needs of MetaVoice, which requires approximately one second per word to convert text to audio,
+we've introduced two new endpoints to accommodate different text lengths:
 
-**/process_short_text:** This endpoint is designed for processing shorter texts where the response time is not a significant concern. It directly calls the inference function and waits for the processing to complete before returning the result. This synchronous approach is suitable for texts that can be processed relatively quickly.
+**/process_short_text:** This endpoint is designed for processing shorter texts where the response time is not a
+significant concern. It directly calls the inference function and waits for the processing to complete before returning
+the result. This synchronous approach is suitable for texts that can be processed relatively quickly.
 
 ```python
 @app.post("/process_short_text")
@@ -318,7 +373,11 @@ async def process(
 
 ```
 
-**/process_long_text:** This endpoint is tailored for processing longer texts where immediate response is not feasible due to the extended processing time and a big chance of requests timeouts. It leverages FastAPI's BackgroundTasks to execute the inference function asynchronously. This means that the endpoint will initiate the processing task in the background and immediately return a response indicating that the process has started. The actual processing will continue independently, and the results will be stored in Azure Storage once completed.
+**/process_long_text:** This endpoint is tailored for processing longer texts where immediate response is not feasible
+due to the extended processing time and a big chance of requests timeouts. It leverages FastAPI's BackgroundTasks to
+execute the inference function asynchronously. This means that the endpoint will initiate the processing task in the
+background and immediately return a response indicating that the process has started. The actual processing will
+continue independently, and the results will be stored in Azure Storage once completed.
 
 ```python
 @app.post("/process_long_text")
@@ -335,29 +394,41 @@ async def process_long(
     return {"status": "Process started"}
 ```
 
-By distinguishing between short and long texts, these endpoints offer a more efficient way to handle text-to-speech and voice cloning tasks with MetaVoice, ensuring that users get timely request responses.
+By distinguishing between short and long texts, these endpoints offer a more efficient way to handle text-to-speech and
+voice cloning tasks with MetaVoice, ensuring that users get timely request responses.
 
 ### Request Arguments
 
 Here's an explanation of each argument:
 
-**connection_string**: The Azure Storage connection string, which is used to authenticate and connect to your Azure Storage account. It typically includes the account name, account key, and endpoint suffix.
+**connection_string**: The Azure Storage connection string, which is used to authenticate and connect to your Azure
+Storage account. It typically includes the account name, account key, and endpoint suffix.
 
-**input_container_name**: The name of the Azure Blob Storage container where the input text files are stored. The API will fetch the text file from this container for processing.
+**input_container_name**: The name of the Azure Blob Storage container where the input text files are stored. The API
+will fetch the text file from this container for processing.
 
-**output_container_name**: The name of the Azure Blob Storage container where the resulting audio files will be stored. The final voice audio file will be uploaded to this container.
+**output_container_name**: The name of the Azure Blob Storage container where the resulting audio files will be stored.
+The final voice audio file will be uploaded to this container.
 
-**voices_container_name**: The name of the Azure Blob Storage container where the reference voice files are stored. The API will fetch the reference voice file from this container.
+**voices_container_name**: The name of the Azure Blob Storage container where the reference voice files are stored. The
+API will fetch the reference voice file from this container.
 
-**reference_voice**: The name of the reference voice file to be used for voice cloning. The API will attempt to clone the voice from this file.
+**reference_voice**: The name of the reference voice file to be used for voice cloning. The API will attempt to clone
+the voice from this file.
 
-**text_file**: The name of the text file containing the text to be synthesized into speech. The API will read the text from this file and process it using the MetaVoice model.
+**text_file**: The name of the text file containing the text to be synthesized into speech. The API will read the text
+from this file and process it using the MetaVoice model.
 
-When a request is made to this endpoint with the necessary parameters, the API will fetch the text and reference voice files from Azure Storage, perform voice cloning and text-to-speech synthesis, and upload the resulting audio file back to Azure Storage. Live response will include the status of the process and the location of the resulting audio file.
+When a request is made to this endpoint with the necessary parameters, the API will fetch the text and reference voice
+files from Azure Storage, perform voice cloning and text-to-speech synthesis, and upload the resulting audio file back
+to Azure Storage. Live response will include the status of the process and the location of the resulting audio file.
 
 ### Data Preprocessing. Handling Large Text Inputs.
 
-To process larger text inputs with MetaVoice, we need to divide the text into smaller chunks. We chose to split the text into segments of two sentences each for manageable processing. For this task, we employed the Punkt Sentence Tokenizer from the Natural Language Toolkit (NLTK). Once the audio for each chunk is processed, we then need to concatenate the audio files to create the final output.
+To process larger text inputs with MetaVoice, we need to divide the text into smaller chunks. We chose to split the text
+into segments of two sentences each for manageable processing. For this task, we employed the Punkt Sentence Tokenizer
+from the Natural Language Toolkit (NLTK). Once the audio for each chunk is processed, we then need to concatenate the
+audio files to create the final output.
 
 Here's a code snippet that demonstrates how to split the text into sentences and combine the resulting audio files:
 
@@ -388,13 +459,16 @@ In this code:
 
 **split_into_sentences(text)** uses the Punkt Sentence Tokenizer to split the input text into individual sentences.
 
-**combine_wav_files(input_files, output_file)** combines the audio data from a list of input WAV files into a single output WAV file.
+**combine_wav_files(input_files, output_file)** combines the audio data from a list of input WAV files into a single
+output WAV file.
 
-By incorporating these functions into our processing pipeline, we can handle larger text inputs efficiently and produce a seamless final audio output.
+By incorporating these functions into our processing pipeline, we can handle larger text inputs efficiently and produce
+a seamless final audio output.
 
 ### Integrating Azure Storage and Organizing Local Folders
 
-To manage input and output files effectively, we integrate Azure Storage into our solution and create local directories to store temporary data during processing. You can use any other storage provider you prefer.
+To manage input and output files effectively, we integrate Azure Storage into our solution and create local directories
+to store temporary data during processing. You can use any other storage provider you prefer.
 
 Here's how we set up the Azure Storage connection and organize the local folders:
 
@@ -429,15 +503,20 @@ def retrieve_file(container_client, file_name):
     return container_client.get_blob_client(file_name)
 ```
 
-We create local directories for storing output audio files, input voice samples, input text files, and temporary data during processing.
+We create local directories for storing output audio files, input voice samples, input text files, and temporary data
+during processing.
 
-The azure_initiate function establishes a connection to an Azure Storage container using the provided connection string and container name.
+The azure_initiate function establishes a connection to an Azure Storage container using the provided connection string
+and container name.
 
-The retrieve_file function retrieves a specific file from the Azure Storage container, which is useful for fetching input text and voice files for processing.
+The retrieve_file function retrieves a specific file from the Azure Storage container, which is useful for fetching
+input text and voice files for processing.
 
 ### Processing Logic
 
-The inference function orchestrates the entire process of fetching input data from Azure Storage, performing text-to-speech synthesis and voice cloning, and uploading the resulting audio file back to Azure Storage. Here's how it works:
+The inference function orchestrates the entire process of fetching input data from Azure Storage, performing
+text-to-speech synthesis and voice cloning, and uploading the resulting audio file back to Azure Storage. Here's how it
+works:
 
 ```python
 def inference(connection_string: str, input_container_name: str, output_container_name: str, voices_container_name: str, reference_voice: str,  text_file: str = None):
@@ -513,14 +592,19 @@ def inference(connection_string: str, input_container_name: str, output_containe
 
 ```
 
-We authenticate with Azure Storage and fetch the input text and reference voice files.
-The text is split into sentences using the split_into_sentences function to manage the length limitations of MetaVoice.
-Each sentence is processed individually, and the resulting audio files are combined into a final output file using the combine_wav_files function.
-The final audio file is uploaded back to Azure Storage, and the function returns the status, location of the saved file, and processing time.
+We authenticate with Azure Storage and fetch the input text and reference voice files. The text is split into sentences
+using the split_into_sentences function to manage the length limitations of MetaVoice. Each sentence is processed
+individually, and the resulting audio files are combined into a final output file using the combine_wav_files function.
+The final audio file is uploaded back to Azure Storage, and the function returns the status, location of the saved file,
+and processing time.
 
 **Local Testing with Uvicorn:**
 
-MetaVoice provides us with a ready-to-use FastAPI script, so we don't need to create one from scratch. Before deploying our FastAPI application to the cloud, it's crucial to test it locally to ensure everything is functioning as expected. For this purpose, we use Uvicorn, a lightning-fast ASGI server implementation that's ideal for running FastAPI applications. Uvicorn not only serves as a local development server but also plays a key role in running our application in a cloud environment.
+MetaVoice provides us with a ready-to-use FastAPI script, so we don't need to create one from scratch. Before deploying
+our FastAPI application to the cloud, it's crucial to test it locally to ensure everything is functioning as expected.
+For this purpose, we use Uvicorn, a lightning-fast ASGI server implementation that's ideal for running FastAPI
+applications. Uvicorn not only serves as a local development server but also plays a key role in running our application
+in a cloud environment.
 
 If you haven't already installed Uvicorn, you can do so using the following command:
 
@@ -536,17 +620,24 @@ To start the FastAPI application locally with Uvicorn, run the following command
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-After running the command, you should see output in your terminal indicating that Uvicorn is running and serving your FastAPI application.
+After running the command, you should see output in your terminal indicating that Uvicorn is running and serving your
+FastAPI application.
 
 You can then access the interactive API documentation at `http://localhost:8000/docs` to test your endpoints.
 
-By testing locally with Uvicorn, we can ensure our FastAPI application is ready for deployment and can smoothly transition to a cloud environment.
+By testing locally with Uvicorn, we can ensure our FastAPI application is ready for deployment and can smoothly
+transition to a cloud environment.
 
 ### Containerizing the FastAPI Application with Docker
 
-After thoroughly testing our FastAPI application, the next step is to containerize it using Docker. This ensures that our application can be deployed reliably in the cloud. MetaVoice provides a Dockerfile that uses the nvidia/cuda:12.1.0-devel-ubuntu22.04 base image, which is compatible with MetaVoice's requirements.
+After thoroughly testing our FastAPI application, the next step is to containerize it using Docker. This ensures that
+our application can be deployed reliably in the cloud. MetaVoice provides a Dockerfile that uses the
+nvidia/cuda:12.1.0-devel-ubuntu22.04 base image, which is compatible with MetaVoice's requirements.
 
-The Dockerfile sets up the necessary environment variables for NVIDIA compatibility, installs essential packages, and sets the working directory to /app. It also copies the application code into the container and installs specific versions of PyTorch, torchaudio, and other required Python packages. Additionally, it downloads the AzCopy tool for efficient data transfer to and from Azure storage.
+The Dockerfile sets up the necessary environment variables for NVIDIA compatibility, installs essential packages, and
+sets the working directory to /app. It also copies the application code into the container and installs specific
+versions of PyTorch, torchaudio, and other required Python packages. Additionally, it downloads the AzCopy tool for
+efficient data transfer to and from Azure storage.
 
 Here is the Dockerfile:
 
@@ -591,17 +682,23 @@ RUN wget https://myshell-public-repo-hosting.s3.amazonaws.com/checkpoints_1226.z
 CMD ["uvicorn", "fast:app", "--host", "::", "--port", "80"]
 ```
 
-By following this Dockerfile, our FastAPI application is prepared for deployment to a cloud environment with Docker support, ensuring consistent performance and compatibility. We use Docker container registry to store the image, but you can use any container registry you prefer.
+By following this Dockerfile, our FastAPI application is prepared for deployment to a cloud environment with Docker
+support, ensuring consistent performance and compatibility. We use Docker container registry to store the image, but you
+can use any container registry you prefer.
 
 ## Deploying Solution to Salad
 
-We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not making any additional customizations, you can directly proceed to this step.
+We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not
+making any additional customizations, you can directly proceed to this step.
 
-Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
+Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run
+your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
 
 1. **Create an Account:** Sign up for an account on [Salad's Portal](https://portal.salad.com/) if you haven't already.
-2. **Create an Organization:** Once logged in, set up your organization within the Salad platform to manage your deployments and resources.
-3. **Deploy Container Group:** Go to the "Container Groups" section in the Salad portal and select "Deploy a Container Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
+2. **Create an Organization:** Once logged in, set up your organization within the Salad platform to manage your
+   deployments and resources.
+3. **Deploy Container Group:** Go to the "Container Groups" section in the Salad portal and select "Deploy a Container
+   Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
 
 ![](https://mgorkii.atlassian.net/wiki/download/thumbnails/21790721/image-20231110-194241.png?version=1&modificationDate=1710688126907&cacheVersion=1&api=v2&width=741&height=263)
 
@@ -610,48 +707,70 @@ We now need to set up all of our container group parameters:
 **Configure Container Group:**
 
 1. **Create a unique name for your Container group**
-2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0**
-   If you are using your custom solution, specify your image location.
+2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under
+   image name paste the image path: **saladtechnologies/metavoice-api:1.0.0** If you are using your custom solution,
+   specify your image location.
 
 ![](https://files.readme.io/b80f256-image.png)
 
-
 1. **Replica count**: It is recommended to use 3 or more replicas for production. We will use just 1 for testing.
-2. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version best suites your needs.
+2. **Pick compute resources:** Pick how much cpu, ram and gpu you want to allocate to your process. MetaVoice
+   documentation specifies that the models needs at least 12GB GPU RAM. Checkout our benchmark to see what GPU version
+   best suites your needs.
 3. **Networking.** Click “Edit“ next to it, check “Enable Networking“ and set port to 80:
 
 ![](https://files.readme.io/61c8d63-image-20231110-201504.png)
 
-
-1. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing environment variables.
-2. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**. This will make sure our endpoint is accessible with IPv6 and port 80:
+1. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing
+   environment variables.
+2. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under
+   "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**.
+   This will make sure our endpoint is accessible with IPv6 and port 80:
 
 ![](https://files.readme.io/310cb33-image.png.png)
 
-Additionally, for enhanced security, you have the option to enable Authentication under networking. When activated, you'll need to include your personal token with each API call. You can locate your token here: https://portal.salad.com/api-key
+Additionally, for enhanced security, you have the option to enable Authentication under networking. When activated,
+you'll need to include your personal token with each API call. You can locate your token here:
+https://portal.salad.com/api-key
 
-With all configurations complete, deploying your FastAPI application on Salad is a straightforward process. Leveraging Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling demanding tasks cost-effectively.
+With all configurations complete, deploying your FastAPI application on Salad is a straightforward process. Leveraging
+Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling demanding
+tasks cost-effectively.
 
-Finally, ensure the “AutoStart container group once the image is pulled” option is checked, then click “Deploy”. With that, we're ready to go. Let's wait for our solution to deploy and then proceed with testing.
+Finally, ensure the “AutoStart container group once the image is pulled” option is checked, then click “Deploy”. With
+that, we're ready to go. Let's wait for our solution to deploy and then proceed with testing.
 
 ### Advantages of Selecting Salad:
 
-- **Cost-Efficiency**: Salad's GPU cloud services are priced favorably when compared to other cloud providers, allowing you to leverage additional resources for your application while minimizing expenses.
-- **Intuitive Platform**: Salad emphasizes a seamless user experience, providing an easy-to-navigate interface that streamlines the deployment and management of applications in the cloud.
-- **Robust Documentation and Support**: Salad furnishes detailed documentation to facilitate deployment, configuration, and problem-solving, supported by a committed team available to provide assistance as needed.
+- **Cost-Efficiency**: Salad's GPU cloud services are priced favorably when compared to other cloud providers, allowing
+  you to leverage additional resources for your application while minimizing expenses.
+- **Intuitive Platform**: Salad emphasizes a seamless user experience, providing an easy-to-navigate interface that
+  streamlines the deployment and management of applications in the cloud.
+- **Robust Documentation and Support**: Salad furnishes detailed documentation to facilitate deployment, configuration,
+  and problem-solving, supported by a committed team available to provide assistance as needed.
 
 ### Test Full Solution deployed to Salad
 
-Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's infrastructure, just as you would locally.
+Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public
+endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's
+infrastructure, just as you would locally.
 
 ![](https://files.readme.io/0df9964-image.png)
 
-You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace `localhost` in your local URL with the provided deployment URL to access the Swagger page. For example: https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs
+You can use this URL to access your FastAPI application's Swagger page, which is now hosted in the cloud. Replace
+`localhost` in your local URL with the provided deployment URL to access the Swagger page. For example:
+https://tomato-cayenne-zjomiph125nsc021.salad.cloud/docs
 
 You will see your Swagger page similar to this:
 
 ![](https://files.readme.io/bceb94b-image.png)
 
-On the Swagger page, you have the ability to engage with your API by supplying the necessary parameters to initiate the process. Certain parameters are optional, and it may not be necessary to modify them if you're utilizing the default Azure container names. It's important to mention that this solution relies on Azure storage, so ensure that your Azure resources are set up beforehand. If you're considering using a different storage provider, refer to the comprehensive solution documentation for guidance. The complete list of arguments has been provided earlier in the document.
+On the Swagger page, you have the ability to engage with your API by supplying the necessary parameters to initiate the
+process. Certain parameters are optional, and it may not be necessary to modify them if you're utilizing the default
+Azure container names. It's important to mention that this solution relies on Azure storage, so ensure that your Azure
+resources are set up beforehand. If you're considering using a different storage provider, refer to the comprehensive
+solution documentation for guidance. The complete list of arguments has been provided earlier in the document.
 
-You can now use your endpoint with Swagger to interact with your API directly through the browser. Alternatively, you can send requests to your endpoint using tools like curl or Postman for testing and integration into your applications. Enjoy leveraging the power of MetaVoice and Salad Cloud for your text-to-speech and voice cloning needs!
+You can now use your endpoint with Swagger to interact with your API directly through the browser. Alternatively, you
+can send requests to your endpoint using tools like curl or Postman for testing and integration into your applications.
+Enjoy leveraging the power of MetaVoice and Salad Cloud for your text-to-speech and voice cloning needs!

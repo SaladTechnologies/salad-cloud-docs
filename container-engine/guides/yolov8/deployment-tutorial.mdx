@@ -542,9 +542,8 @@ very detailed documentation on how to create a storage account from Microsoft
 [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal)
 
 Next we got our storage connection string. To do that open azure portal and navigate to your storage account. On the
-left click “Access keys“. Click “show“ next to Connection string and save it somewhere.
-Here is a little function we put together to connect to our storage account that uses container name and storage key as
-inputs:
+left click “Access keys“. Click “show“ next to Connection string and save it somewhere. Here is a little function we put
+together to connect to our storage account that uses container name and storage key as inputs:
 
 ```java Python
 from azure.storage.blob import ContainerClient
@@ -750,15 +749,14 @@ We now need to set up all of our container group parameters:
 
 1. **Create a unique name for your Container group**
 2. **Pick the Image Source:** In our case we are using a private Azure Container Registry. Click Edit next to Image
-   source. Now switch to “Private Registry“, under “What Service Are You Using“ pick Azure Container Registry.
-   Now lets get back to our azure portal and find the image name, username and password of our container registry
-   repository.
+   source. Now switch to “Private Registry“, under “What Service Are You Using“ pick Azure Container Registry. Now lets
+   get back to our azure portal and find the image name, username and password of our container registry repository.
    Find your acr in azure and click “repositories“ on the left
 
    <img src="/container-engine/images/1196da2-image-20231110-195239.png" />
 
-   Chose the image repository and click on the version you want to pull.
-   Now under “Manifest“ you will see a Docker pull command in the followings format: `docker pull <image name>`:
+   Chose the image repository and click on the version you want to pull. Now under “Manifest“ you will see a Docker pull
+   command in the followings format: `docker pull <image name>`:
 
    <img src="/container-engine/images/90b2d4d-image-20231110-195608.png" />
 
@@ -777,13 +775,11 @@ We now need to set up all of our container group parameters:
 <img src="/container-engine/images/5b0bbe1-image.png" />
 
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to
-provide your personal token together with the api call. Your token can be found
-[here](https://portal.salad.com/api-key)
+provide your personal token together with the api call. Your token can be found [here](https://portal.salad.com/api-key)
 With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of
 Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle
-intensive tasks at a fraction of the cost.
-Now check “AutoStart container group once image is pulled“ and hit “Deploy“. We are all set let’s wait till our solution
-deploys and test it.
+intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit “Deploy“.
+We are all set let’s wait till our solution deploys and test it.
 
 ## **Benefits of Using Salad:**
 

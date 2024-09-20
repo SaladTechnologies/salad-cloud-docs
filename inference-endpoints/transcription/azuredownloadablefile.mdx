@@ -1,10 +1,12 @@
 ---
-title: "How to Create a Downloadable File from Azure"
+title: 'How to Create a Downloadable File from Azure'
 ---
 
-Azure Blob Storage allows you to generate a Shared Access Signature (SAS) token, which provides secure, time-limited access to your blobs (files) without sharing your account key. This guide will walk you through the steps to create a downloadable link using a SAS token.
+Azure Blob Storage allows you to generate a Shared Access Signature (SAS) token, which provides secure, time-limited
+access to your blobs (files) without sharing your account key. This guide will walk you through the steps to create a
+downloadable link using a SAS token.
 
-**Using Portal:** 
+**Using Portal:**
 
 ### **Step 1: Log in to the Azure Portal**
 
@@ -32,10 +34,13 @@ Azure Blob Storage allows you to generate a Shared Access Signature (SAS) token,
 ### **Step 4: Generate the SAS Token**
 
 1. Inside the container, find and click on the blob (file) you want to share.
-2. At the top of the blob's properties window, click on **"Generate SAS"** (sometimes labeled as **"Shared Access Signature"**).
+2. At the top of the blob's properties window, click on **"Generate SAS"** (sometimes labeled as **"Shared Access
+   Signature"**).
 3. In the SAS token generation window, configure the following options:
-    - **Permissions**: Select the permissions you want to grant. For a downloadable link, you typically need **Read** permissions.
-    - **Start and Expiry Date/Time**: Set the start time and expiry time for the token. This defines how long the link will be valid.
+   - **Permissions**: Select the permissions you want to grant. For a downloadable link, you typically need **Read**
+     permissions.
+   - **Start and Expiry Date/Time**: Set the start time and expiry time for the token. This defines how long the link
+     will be valid.
 4. After configuring the settings, click **"Generate SAS token and URL"**.
 
 ---
@@ -88,4 +93,4 @@ print(f"SAS URL: {blob_url}")
 
 ```
 
-****
+---

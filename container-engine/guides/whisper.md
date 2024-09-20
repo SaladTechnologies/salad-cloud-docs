@@ -1,19 +1,23 @@
 ---
-title: "Whisper"
-slug: "whisper"
-excerpt: "Run Automatic Speed Recognition Tasks easily with Whisper models, including Whisper Large v3 and Distil-Whisper Large v2"
+title: 'Whisper'
+slug: 'whisper'
+excerpt:
+  'Run Automatic Speed Recognition Tasks easily with Whisper models, including Whisper Large v3 and Distil-Whisper Large
+  v2'
 hidden: false
-createdAt: "Thu Nov 30 2023 16:25:17 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Tue Apr 09 2024 16:35:02 GMT+0000 (Coordinated Universal Time)"
+createdAt: 'Thu Nov 30 2023 16:25:17 GMT+0000 (Coordinated Universal Time)'
+updatedAt: 'Tue Apr 09 2024 16:35:02 GMT+0000 (Coordinated Universal Time)'
 ---
 
-We have a ready-to-go inference server for automatic speech recognition tasks, with a super simple API. [Check out the code.](https://github.com/SaladTechnologies/asr-api)
+We have a ready-to-go inference server for automatic speech recognition tasks, with a super simple API.
+[Check out the code.](https://github.com/SaladTechnologies/asr-api)
 
 # Automatic Speech Recognition API
 
 A minimalist, performance-oriented inference server for automatic speech recognition.
 
-Here's some prelimary performance numbers. These numbers are for total round-trip request time, including downloading the audio file, and parsing the response. The default configuration is used for all models.
+Here's some prelimary performance numbers. These numbers are for total round-trip request time, including downloading
+the audio file, and parsing the response. The default configuration is used for all models.
 
 More extensive benchmarks are available here:
 
@@ -60,7 +64,8 @@ This healthcheck will not respond until the server is fully ready to accept requ
 
 #### Request - JSON
 
-URL should be a download link to an audio file. It can also be a local filepath, if the server is running on the same machine as the file.
+URL should be a download link to an audio file. It can also be a local filepath, if the server is running on the same
+machine as the file.
 
 Verified extension support:
 
@@ -126,7 +131,9 @@ Swagger docs for the API.
 
 All configuration is via environment variables.
 
-See documentation for the [ASR Pipeline](https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.AutomaticSpeechRecognitionPipeline) for more information on the model configuration options:
+See documentation for the
+[ASR Pipeline](https://huggingface.co/docs/transformers/main/en/main_classes/pipelines#transformers.AutomaticSpeechRecognitionPipeline)
+for more information on the model configuration options:
 
 | Name                | Description                                                                                                                                                                                          | Default                   |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
@@ -142,14 +149,27 @@ See documentation for the [ASR Pipeline](https://huggingface.co/docs/transformer
 
 ## Docker Images
 
-> Note: The `-fa2` images are larger, and require a GPU with compute capability >= 8.9. If your GPU does not support this, use the non `-fa2` images.
+> Note: The `-fa2` images are larger, and require a GPU with compute capability >= 8.9. If your GPU does not support
+> this, use the non `-fa2` images.
 
-- `saladtechnologies/asr-api:latest`, `saladtechnologies/asr-api:0.0.5` - The base image, no models included. Does not support flash attention 2, but is a smaller base image. Will download the model at runtime.
-- `saladtechnologies/asr-api:latest-fa2` ,`saladtechnologies/asr-api:0.0.5-fa2` - The base image, no models included. Supports flash attention 2, but is a larger base image. Will download the model at runtime.
-- `saladtechnologies/asr-api:latest-openai-whisper-large-v3`, `saladtechnologies/asr-api:0.0.5-openai-whisper-large-v3` - The base image, with the [OpenAI Whisper Large v3](openai/whisper-large-v3) model included. Does not support flash attention 2.
-- `saladtechnologies/asr-api:latest-fa2-openai-whisper-large-v3`, `saladtechnologies/asr-api:0.0.5-fa2-openai-whisper-large-v3` - The base image, with the [OpenAI Whisper Large v3](openai/whisper-large-v3) model included. Supports flash attention 2.
-- `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2`, `saladtechnologies/asr-api:0.0.5-distil-whisper-distil-large-v2` - The base image, with the [Distil Whisper Distil Large v2](https://huggingface.co/distil-whisper/distil-large-v2) model included. Does not support flash attention 2.
-- `saladtechnologies/asr-api:latest-fa2-distil-whisper-distil-large-v2`, `saladtechnologies/asr-api:0.0.5-fa2-distil-whisper-distil-large-v2` - The base image, with the [Distil Whisper Distil Large v2](https://huggingface.co/distil-whisper/distil-large-v2) model included. Supports flash attention 2.
+- `saladtechnologies/asr-api:latest`, `saladtechnologies/asr-api:0.0.5` - The base image, no models included. Does not
+  support flash attention 2, but is a smaller base image. Will download the model at runtime.
+- `saladtechnologies/asr-api:latest-fa2` ,`saladtechnologies/asr-api:0.0.5-fa2` - The base image, no models included.
+  Supports flash attention 2, but is a larger base image. Will download the model at runtime.
+- `saladtechnologies/asr-api:latest-openai-whisper-large-v3`,
+  `saladtechnologies/asr-api:0.0.5-openai-whisper-large-v3` - The base image, with the
+  [OpenAI Whisper Large v3](openai/whisper-large-v3) model included. Does not support flash attention 2.
+- `saladtechnologies/asr-api:latest-fa2-openai-whisper-large-v3`,
+  `saladtechnologies/asr-api:0.0.5-fa2-openai-whisper-large-v3` - The base image, with the
+  [OpenAI Whisper Large v3](openai/whisper-large-v3) model included. Supports flash attention 2.
+- `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2`,
+  `saladtechnologies/asr-api:0.0.5-distil-whisper-distil-large-v2` - The base image, with the
+  [Distil Whisper Distil Large v2](https://huggingface.co/distil-whisper/distil-large-v2) model included. Does not
+  support flash attention 2.
+- `saladtechnologies/asr-api:latest-fa2-distil-whisper-distil-large-v2`,
+  `saladtechnologies/asr-api:0.0.5-fa2-distil-whisper-distil-large-v2` - The base image, with the
+  [Distil Whisper Distil Large v2](https://huggingface.co/distil-whisper/distil-large-v2) model included. Supports flash
+  attention 2.
 
 ## Deploying On Salad
 
@@ -215,7 +235,8 @@ Select or Create the organization and project you want to work with, then click 
 
    ![](https://files.readme.io/8b27841-cg-name.png)
 
-2. Select the `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2` image to deploy distil-whisper large v2, using BetterTransformers.
+2. Select the `saladtechnologies/asr-api:latest-distil-whisper-distil-large-v2` image to deploy distil-whisper large v2,
+   using BetterTransformers.
 
 ![](https://files.readme.io/dfecdb2-img-name.png)
 
@@ -227,15 +248,21 @@ Select or Create the organization and project you want to work with, then click 
 
 ![](https://files.readme.io/86cefa6-cpu-ram.png)
 
-5. Set the GPU to 1x RTX 3080 Ti (Or another GPU. We haven't done comprehensive testing on all GPUs, so your mileage may vary).
+5. Set the GPU to 1x RTX 3080 Ti (Or another GPU. We haven't done comprehensive testing on all GPUs, so your mileage may
+   vary).
 
 ![](https://files.readme.io/1c82ec4-gpu.png)
 
-6. Configure the Startup Probe. This is used to determine when the container is ready to accept requests. Select the HTTP protocol, set the path to `/hc`, and the port to `8000`. Set the initial delay, period, and timeout to `1`. Set the success threshold to `1`, and the failure threshold to `20`. If you are using an image that downloads the model weights at runtime, you should increase intial delay to `10` or more, and a failure threshold of `180` to allow up to 3 minutes for the container to start.
+6. Configure the Startup Probe. This is used to determine when the container is ready to accept requests. Select the
+   HTTP protocol, set the path to `/hc`, and the port to `8000`. Set the initial delay, period, and timeout to `1`. Set
+   the success threshold to `1`, and the failure threshold to `20`. If you are using an image that downloads the model
+   weights at runtime, you should increase intial delay to `10` or more, and a failure threshold of `180` to allow up to
+   3 minutes for the container to start.
 
 ![](https://files.readme.io/943e834-startup-probe.png)
 
-7. Enable the Container Gateway for port `8000`, and choose authenticated or not authenticated. If you choose authenticated, you will need to provide an API key when making requests.
+7. Enable the Container Gateway for port `8000`, and choose authenticated or not authenticated. If you choose
+   authenticated, you will need to provide an API key when making requests.
 
 ![](https://files.readme.io/27736f7-image.png)
 

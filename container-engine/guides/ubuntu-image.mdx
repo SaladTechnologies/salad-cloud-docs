@@ -1,28 +1,40 @@
 ---
-title: "Using our preset Ubuntu image"
+title: 'Using our preset Ubuntu image'
 ---
 
-We offer a 1-click deploy Ubuntu image to let you get quickly up and running on Salad and to test our services. This image includes some basic tools and applications. You can find it [here](ghcr.io/saladtechnologies/recipe-base-ubuntu:0.1), and the open-source repository is available [here](https://github.com/SaladTechnologies/salad-recipes/tree/master/src/base-ubuntu)
+We offer a 1-click deploy Ubuntu image to let you get quickly up and running on Salad and to test our services. This
+image includes some basic tools and applications. You can find it
+[here](ghcr.io/saladtechnologies/recipe-base-ubuntu:0.1), and the open-source repository is available
+[here](https://github.com/SaladTechnologies/salad-recipes/tree/master/src/base-ubuntu)
 
 ## Included tools:
 
 1. **nvidia-smi**: Lets you check the GPU model in the instance.
-2. **neofetch**: Lets you check the hardware you're running on. *Note, neofetch will not display the GPU available in your instance, you'll need to use nvidia-smi for this.*
+2. **neofetch**: Lets you check the hardware you're running on. _Note, neofetch will not display the GPU available in
+   your instance, you'll need to use nvidia-smi for this._
 3. **curl**: Lets you curl websites and download files.
 4. **nano**: Lets you edit any files on the instance..
 5. **ping**: So you can check external networking is working on the instance.
 6. **btop**: Lets you check running processes and stats of the instance.
 
-
 ## Using the image
-The image comes with a readme.sh file which will also contain all the above information, along with instructions to echo any defined Environment Variables.
 
-We configured the image to sleep for a long period of time (approximately 16 years) at startup, this is required in order to keep the instance running on the node. Manually closing this process will cause the instance to shut down and reallocate. 
+The image comes with a readme.sh file which will also contain all the above information, along with instructions to echo
+any defined Environment Variables.
 
-We recommend you to use this image to test Salad is working and you have the right settings configured, or to try a single-use setup to verify your app or program works, without needing to build your final image first.
+We configured the image to sleep for a long period of time (approximately 16 years) at startup, this is required in
+order to keep the instance running on the node. Manually closing this process will cause the instance to shut down and
+reallocate.
 
-Salad Replicas are best used stateless, interacting with a specific replica or deployment via the terminal in stateful manners is not recommended, as replicas can be reallocated at any time due to the spot-instance style of deployment. Once reallocated, you'll be wiped clean with a base Ubuntu image again. The same will happen if you have multiple deployed replicas, only one replica will recieve the changes you make and could be wiped clean without warning. 
+We recommend you to use this image to test Salad is working and you have the right settings configured, or to try a
+single-use setup to verify your app or program works, without needing to build your final image first.
+
+Salad Replicas are best used stateless, interacting with a specific replica or deployment via the terminal in stateful
+manners is not recommended, as replicas can be reallocated at any time due to the spot-instance style of deployment.
+Once reallocated, you'll be wiped clean with a base Ubuntu image again. The same will happen if you have multiple
+deployed replicas, only one replica will recieve the changes you make and could be wiped clean without warning.
 
 ## Additional information
 
-This image is based on Ubuntu 24.04 LTS. Python is not included, but can be installed at runtime if you need it. Any files you want to import can be retrieved using curl.
+This image is based on Ubuntu 24.04 LTS. Python is not included, but can be installed at runtime if you need it. Any
+files you want to import can be retrieved using curl.
