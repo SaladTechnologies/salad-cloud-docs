@@ -1,14 +1,16 @@
 ---
-title: "SDXL"
-slug: "sdxl"
-excerpt: ""
+title: 'SDXL'
+slug: 'sdxl'
+excerpt: ''
 hidden: false
-createdAt: "Tue Dec 12 2023 17:06:04 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Tue Apr 09 2024 16:26:24 GMT+0000 (Coordinated Universal Time)"
+createdAt: 'Tue Dec 12 2023 17:06:04 GMT+0000 (Coordinated Universal Time)'
+updatedAt: 'Tue Apr 09 2024 16:26:24 GMT+0000 (Coordinated Universal Time)'
 ---
+
 # sdnext-dynamic
 
-This wraps our SDNext image with an entrypoint script that downloads a checkpoint at runtime based on an environment variable.
+This wraps our SDNext image with an entrypoint script that downloads a checkpoint at runtime based on an environment
+variable.
 
 You can use the prebuilt docker image at:
 
@@ -20,12 +22,20 @@ The Github Repo is available here: https://github.com/SaladTechnologies/sdnext-d
 
 ### "Baked" Images
 
-If you want an image with the model preloaded, you can use one of the "baked" images. These are built with the `build-baked` script, and will not need to download the models at runtime.
+If you want an image with the model preloaded, you can use one of the "baked" images. These are built with the
+`build-baked` script, and will not need to download the models at runtime.
 
-- `saladtechnologies/sdnext:sdxl1.0` - Preloaded with SDXL [Base](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) and [Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
-- `saladtechnologies/sdnext:dreamshaper8` - Preloaded with [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713)
-- `saladtechnologies/sdnext:rundiffusionxl-beta` - Preloaded with [RunDiffusion XL Beta](https://civitai.com/models/120964?modelVersionId=131579) and [SDXL Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
-- `saladtechnologies/sdnext:dreamshaper8-qr-code` - Preloaded with [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713) and [QR Code Monster](https://civitai.com/models/111006?modelVersionId=122143)
+- `saladtechnologies/sdnext:sdxl1.0` - Preloaded with SDXL
+  [Base](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) and
+  [Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
+- `saladtechnologies/sdnext:dreamshaper8` - Preloaded with
+  [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713)
+- `saladtechnologies/sdnext:rundiffusionxl-beta` - Preloaded with
+  [RunDiffusion XL Beta](https://civitai.com/models/120964?modelVersionId=131579) and
+  [SDXL Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
+- `saladtechnologies/sdnext:dreamshaper8-qr-code` - Preloaded with
+  [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713) and
+  [QR Code Monster](https://civitai.com/models/111006?modelVersionId=122143)
 
 ## Build your own image
 
@@ -96,13 +106,26 @@ Load SDXL Base and Refiner, and push the image to your own repository with a cus
 
 ## Built-in Exec Probes
 
-An exec probe is a command that is run periodically to check the health or readiness of the container. It returns a zero exit code if the container is healthy, and a non-zero exit code if the container is unhealthy. You can configure the maximum number of retries and the interval between retries using either the portal or the [Create Container Group API](https://docs.salad.com/reference/create_container_group). Learn more about health probes in [the docs](https://docs.salad.com/docs/health-probes).
+An exec probe is a command that is run periodically to check the health or readiness of the container. It returns a zero
+exit code if the container is healthy, and a non-zero exit code if the container is unhealthy. You can configure the
+maximum number of retries and the interval between retries using either the portal or the
+[Create Container Group API](https://docs.salad.com/reference/create_container_group). Learn more about health probes in
+[the docs](https://docs.salad.com/docs/health-probes).
 
 ### Startup Probe
 
-This probe will return a zero exit code when the server is ready to accept connections. It will return a non-zero exit code if the server is not ready to accept connections.  Keep in mind it can take quite a while to download the models, so be sure to set a generous number of retries and a long interval, or your container will never start taking traffic, and will be continually reallocated.
+This probe will return a zero exit code when the server is ready to accept connections. It will return a non-zero exit
+code if the server is not ready to accept connections. Keep in mind it can take quite a while to download the models, so
+be sure to set a generous number of retries and a long interval, or your container will never start taking traffic, and
+will be continually reallocated.
 
-For example, SDXL takes quite a while to load the model, and one of the things the startup probe does is enable the refiner (if you've configured the container to do so). Enabling the refiner can take up to 3 minutes in rare circumstances, so the maximum timeout should be at least 180 seconds. The total time required to reach readiness could be quite long, so we want to make sure the failure threshold allows for enough time. In this case, I've set it to 600, which combined with the period, gives us 600 seconds (10 minutes) for the container to come up. For a container using an SD 1.5 model, you could get away with considerably shorter timeouts and failure thresholds. You will want to experiment with your specific model(s) to find the right values.
+For example, SDXL takes quite a while to load the model, and one of the things the startup probe does is enable the
+refiner (if you've configured the container to do so). Enabling the refiner can take up to 3 minutes in rare
+circumstances, so the maximum timeout should be at least 180 seconds. The total time required to reach readiness could
+be quite long, so we want to make sure the failure threshold allows for enough time. In this case, I've set it to 600,
+which combined with the period, gives us 600 seconds (10 minutes) for the container to come up. For a container using an
+SD 1.5 model, you could get away with considerably shorter timeouts and failure thresholds. You will want to experiment
+with your specific model(s) to find the right values.
 
 **Portal**
 
@@ -119,10 +142,7 @@ For example, SDXL takes quite a while to load the model, and one of the things t
 ```json
 {
   "exec": {
-    "command": [
-      "python",
-      "/probes/readiness.py"
-    ]
+    "command": ["python", "/probes/readiness.py"]
   },
   "initial_delay_seconds": 20,
   "period_seconds": 1,
@@ -134,9 +154,12 @@ For example, SDXL takes quite a while to load the model, and one of the things t
 
 ### Liveness Probe
 
-This probe will return a zero exit code when the server has not encountered any memory problems. It will return a non-zero exit code if the server has run out of, or is about to run out of, memory.
+This probe will return a zero exit code when the server has not encountered any memory problems. It will return a
+non-zero exit code if the server has run out of, or is about to run out of, memory.
 
-Since this probe primarily checks for memory issues, it should be configured with a short timeout and a low failure threshold. If the container is running out of memory, it will likely not be able to recover, so we want to fail fast and let the container be reallocated.
+Since this probe primarily checks for memory issues, it should be configured with a short timeout and a low failure
+threshold. If the container is running out of memory, it will likely not be able to recover, so we want to fail fast and
+let the container be reallocated.
 
 **Portal**
 
@@ -151,12 +174,9 @@ Since this probe primarily checks for memory issues, it should be configured wit
 **API**
 
 ```json
- {
+{
   "exec": {
-    "command": [
-      "python",
-      "/probes/healthcheck.py"
-    ]
+    "command": ["python", "/probes/healthcheck.py"]
   },
   "initial_delay_seconds": 600,
   "period_seconds": 30,
@@ -182,8 +202,7 @@ Since this probe primarily checks for memory issues, it should be configured wit
 
 **OR**
 
-1. Copy the link from the download button
-   ![](https://files.readme.io/2ecae2c-image51.png)
+1. Copy the link from the download button ![](https://files.readme.io/2ecae2c-image51.png)
 
 2. Paste the link into a text editor and copy the model version ID from the URL
 
@@ -195,11 +214,9 @@ For this url, the model version id is `128713`.
 
 ## Finding Your Model Version ID (API)
 
-1. Navigate to the Civit.ai page for the model you want to use
-   ![](https://files.readme.io/0522c19-image11.png)
+1. Navigate to the Civit.ai page for the model you want to use ![](https://files.readme.io/0522c19-image11.png)
 
-2. Grab the model ID from the URL
-   ![](https://files.readme.io/7fcd140-image41.png)
+2. Grab the model ID from the URL ![](https://files.readme.io/7fcd140-image41.png)
 
 3. Use the API to get the model versions
 
@@ -246,7 +263,6 @@ As an example, we're going to deploy the Dreamshaper XL model
 ### Create a Deployment
 
 ![](https://files.readme.io/c987955-setup11.png)
-
 
 1. Name your deployment
 2. Select the `saladtechnologies/sdnext:dynamic` image

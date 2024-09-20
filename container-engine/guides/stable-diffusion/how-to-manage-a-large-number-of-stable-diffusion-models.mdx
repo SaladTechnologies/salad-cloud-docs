@@ -1,28 +1,42 @@
 ---
-title: "How to Manage A Large Number of Stable Diffusion Models"
+title: 'How to Manage A Large Number of Stable Diffusion Models'
 ---
 
 ## High Level
 
-Limited local storage (up to 50gb) and the inevitability of node interruptions introduce complexity when managing services that serve inference from hundreds or even thousands of models.
+Limited local storage (up to 50gb) and the inevitability of node interruptions introduce complexity when managing
+services that serve inference from hundreds or even thousands of models.
 
 We can combine 3 techniques to manage that complexity in an arbitrarily scalable way:
 
-1. Preload the container image with the most popular models - This way your container can become productive immediately on start, while it downloads more models in the background.
+1. Preload the container image with the most popular models - This way your container can become productive immediately
+   on start, while it downloads more models in the background.
 2. Local Least-Recently-Used Caching - Only keep the most recently used 50gb of models stored locally on any given node.
 3. Smart Job Scheduling - Assign jobs to nodes in a way that minimizes model downloading and swapping.
 
 ## Pre-loading Popular Models
 
-Your service likely has some models that are significantly more popular than others. Salad allows a maximum container image size of 35gb compressed. Salad also does not charge during the downloading phase, only charging once the instance enters the running state. This means it is often prudent to include some of your most popular models in the container image, as you effectively get that download time for free. Additionally, it means your container can start doing inference work immediately once it’s started, even as it downloads more models in the background. Finally, Salad’s 50gb storage limit is *in addition to* any space taken up by your container, so you can get more total local storage by including models in the container image. The main downside is reduced elasticity in scaling, as the larger images will take longer to download to new nodes.
+Your service likely has some models that are significantly more popular than others. Salad allows a maximum container
+image size of 35gb compressed. Salad also does not charge during the downloading phase, only charging once the instance
+enters the running state. This means it is often prudent to include some of your most popular models in the container
+image, as you effectively get that download time for free. Additionally, it means your container can start doing
+inference work immediately once it’s started, even as it downloads more models in the background. Finally, Salad’s 50gb
+storage limit is _in addition to_ any space taken up by your container, so you can get more total local storage by
+including models in the container image. The main downside is reduced elasticity in scaling, as the larger images will
+take longer to download to new nodes.
 
 ## Local LRU Caching
 
-When you have potentially terabytes of model checkpoints, loras, upscale models, and more, it’s never going to be possible to get it all cached locally on a Salad node, due to storage size restrictions. Beyond that, you wouldn’t want to pay for node uptime while downloading all of those models at start, especially when the node may be interrupted at any time, and the process would need to start over from the beginning on another node.
+When you have potentially terabytes of model checkpoints, loras, upscale models, and more, it’s never going to be
+possible to get it all cached locally on a Salad node, due to storage size restrictions. Beyond that, you wouldn’t want
+to pay for node uptime while downloading all of those models at start, especially when the node may be interrupted at
+any time, and the process would need to start over from the beginning on another node.
 
-You also don’t want to download 2-6gb checkpoints for potentially every single request, as it introduces unacceptable latency to user generation requests. 
+You also don’t want to download 2-6gb checkpoints for potentially every single request, as it introduces unacceptable
+latency to user generation requests.
 
-The solution here is to implement an LRU Cache, keeping only the most recently used 50gb of models, and automatically clearing out others as needed. A simple python implementation may look like this:
+The solution here is to implement an LRU Cache, keeping only the most recently used 50gb of models, and automatically
+clearing out others as needed. A simple python implementation may look like this:
 
 ```python
 import os
@@ -89,7 +103,7 @@ class LRUCacheFileDownloader:
             "num_files": len(self.cache),
             "files": list(self.cache.keys())
         }
-        
+
 # Example usage
 if __name__ == "__main__":
     cache_dir = "/models"
@@ -118,11 +132,19 @@ if __name__ == "__main__":
 
 ## Smart Job Scheduling
 
-Minimizing model downloading and model swapping on any given node is key to maintaining good overall performance, as these processes may take significantly longer than the generations themselves.
+Minimizing model downloading and model swapping on any given node is key to maintaining good overall performance, as
+these processes may take significantly longer than the generations themselves.
 
-Doing this requires using a “pull” method of job distribution, where inference workers request work from an API, rather than “pushing” work to nodes through a load balancer. However, a simple job queue will be insufficient, as nodes are likely to receive requests for models they may not have locally stored yet.
+Doing this requires using a “pull” method of job distribution, where inference workers request work from an API, rather
+than “pushing” work to nodes through a load balancer. However, a simple job queue will be insufficient, as nodes are
+likely to receive requests for models they may not have locally stored yet.
 
-The basic pattern here is that workers should include information about themselves and their cache when they request work. For example, a worker may include every model they have loaded in vram, and also every model they have downloaded locally. Then, the API can use that information to preferentially return inference jobs for models that are already loaded, or at least downloaded. The API response can also include instructions to begin downloading models not required for the currently assigned generation, in order to expand system capacity for a model that may be increasing in popularity.
+The basic pattern here is that workers should include information about themselves and their cache when they request
+work. For example, a worker may include every model they have loaded in vram, and also every model they have downloaded
+locally. Then, the API can use that information to preferentially return inference jobs for models that are already
+loaded, or at least downloaded. The API response can also include instructions to begin downloading models not required
+for the currently assigned generation, in order to expand system capacity for a model that may be increasing in
+popularity.
 
 ### Example Request
 
@@ -136,20 +158,12 @@ The basic pattern here is that workers should include information about themselv
     "vram_gb": 24
   },
   "vram_models": {
-    "checkpoints": [
-      "dreamshaper_8.safetensors",
-     ],
-     "loras": [
-       "add_detail.safetensors"
-     ]
+    "checkpoints": ["dreamshaper_8.safetensors"],
+    "loras": ["add_detail.safetensors"]
   },
   "disk_models": {
-    "checkpoints": [
-      "Juggernaut_X_RunDiffusion_Hyper.safetensors",
-     ],
-     "upscalers": [
-       "nomos8khatLOtf_v20.safetensors"
-     ]
+    "checkpoints": ["Juggernaut_X_RunDiffusion_Hyper.safetensors"],
+    "upscalers": ["nomos8khatLOtf_v20.safetensors"]
   }
 }
 ```
@@ -161,20 +175,23 @@ The basic pattern here is that workers should include information about themselv
   "generation": {
     "checkpoint": "dreamshaper_8.safetensors",
     "params": {
-	    "prompt": "mechanical cat flying a spaceship",
-	    "negative_prompt": "text, watermark",
-	    "cfg": 5.6,
-	    "steps": 20
+      "prompt": "mechanical cat flying a spaceship",
+      "negative_prompt": "text, watermark",
+      "cfg": 5.6,
+      "steps": 20
     }
   },
   "download": {
-    "checkpoints": [
-      "https://civitai.com/api/download/models/132760?type=Model&format=SafeTensor&size=pruned&fp=fp16"
-    ]
+    "checkpoints": ["https://civitai.com/api/download/models/132760?type=Model&format=SafeTensor&size=pruned&fp=fp16"]
   }
 }
 ```
 
-In this way, the API can proactively keep models locally cached on *n* number of nodes, to ensure coverage in case of node interruptions, and to ensure adequate supply of warm inference servers for any given model. It also allows nodes to do other useful work while preparing the local cache for future work. 
+In this way, the API can proactively keep models locally cached on _n_ number of nodes, to ensure coverage in case of
+node interruptions, and to ensure adequate supply of warm inference servers for any given model. It also allows nodes to
+do other useful work while preparing the local cache for future work.
 
-Detecting interrupted nodes typically involves a heartbeat mechanism, where if a node hasn’t requested work within a certain amount of time, assume it’s dead (this can be verified with the [Salad API](https://docs.salad.com/api-reference/container_groups/get-container-group-instance-by-instance-id)), and reassign work as needed.
+Detecting interrupted nodes typically involves a heartbeat mechanism, where if a node hasn’t requested work within a
+certain amount of time, assume it’s dead (this can be verified with the
+[Salad API](https://docs.salad.com/api-reference/container_groups/get-container-group-instance-by-instance-id)), and
+reassign work as needed.

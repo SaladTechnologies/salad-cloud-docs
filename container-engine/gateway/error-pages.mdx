@@ -1,8 +1,10 @@
 ---
-title: "Error Pages"
+title: 'Error Pages'
 ---
 
-When the Container Gateway is configured for a container group, it will be assigned an Access Domain Name URL. If you try to access that URL in your browser, and encounter an error, we provide error messaging to help you understand the nature of the error. Errors can occur, for example, when a container has not been fully set up yet, or has failed.
+When the Container Gateway is configured for a container group, it will be assigned an Access Domain Name URL. If you
+try to access that URL in your browser, and encounter an error, we provide error messaging to help you understand the
+nature of the error. Errors can occur, for example, when a container has not been fully set up yet, or has failed.
 
 ## 400
 
@@ -30,7 +32,8 @@ When the Container Gateway is configured for a container group, it will be assig
 
 ## 413
 
-If you try to send large files over the URL. Currently the maximum request size is set to 1GB by the Containger Gateway and its related services.
+If you try to send large files over the URL. Currently the maximum request size is set to 1GB by the Containger Gateway
+and its related services.
 
 <img src="/container-engine/images/gateway-error-413.png" />
 
@@ -48,14 +51,13 @@ If you try to send large files over the URL. Currently the maximum request size 
 
 ## 503
 
-It is possible to get this 503 error, if you have [health probes](/container-engine/health-probes) configured that are not yet passing
+It is possible to get this 503 error, if you have [health probes](/container-engine/health-probes) configured that are
+not yet passing
 
 If a 503 occurs, check that it is passing on at least 1 instance.
 
 <img src="https://files.readme.io/1de7468-503.png" />
 
-
 ## 504
 
 <img src="/container-engine/images/39c7e0f-504.png" />
-

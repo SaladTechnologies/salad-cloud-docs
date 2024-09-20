@@ -1,14 +1,17 @@
 ---
-title: "Quickstart - API"
+title: 'Quickstart - API'
 ---
 
 ## **Prerequisites**
 
 Before you begin, make sure you have the following:
 
-- An account with Salad Cloud. If you don't have one yet, you can sign up for a free trial at [https://portal.salad.com](https://portal.salad.com)
-- A project in Salad Cloud. If you don't have a project yet, you can create one by following the instructions in the Salad Cloud documentation.
-- A container image that you want to deploy. If you don't have a container image yet, you can build one using a tool like [Docker.](https://www.docker.com/)
+- An account with Salad Cloud. If you don't have one yet, you can sign up for a free trial at
+  [https://portal.salad.com](https://portal.salad.com)
+- A project in Salad Cloud. If you don't have a project yet, you can create one by following the instructions in the
+  Salad Cloud documentation.
+- A container image that you want to deploy. If you don't have a container image yet, you can build one using a tool
+  like [Docker.](https://www.docker.com/)
 
 ## **Step 1: Obtain Your API Key**
 
@@ -20,7 +23,8 @@ To authenticate your API requests, you'll need an API key. To obtain your API ke
 
 ## **Step 2: Deploy the Container Image**
 
-To deploy a container group using the Salad Cloud Public API, you'll need to send a POST request with specific parameters inside the data field along with headers. Here's how to do it:
+To deploy a container group using the Salad Cloud Public API, you'll need to send a POST request with specific
+parameters inside the data field along with headers. Here's how to do it:
 
 Send a POST request to the following URL:
 
@@ -36,7 +40,8 @@ Include the following headers in your request:
 - `accept: application/json`
 - `content-type: application/json`
 
-Include a JSON payload in the data field of the request body with the necessary configuration parameters. Here's an example using curl:
+Include a JSON payload in the data field of the request body with the necessary configuration parameters. Here's an
+example using curl:
 
 ```json curl
 curl --request POST \
@@ -70,7 +75,9 @@ curl --request POST \
 
 ```
 
-In the data field, you can configure various parameters to define your container group's behavior and characteristics. For detailed information on these parameters and their options, please refer to the [Create a Container Group](https://docs.salad.com/reference/create_container_group)
+In the data field, you can configure various parameters to define your container group's behavior and characteristics.
+For detailed information on these parameters and their options, please refer to the
+[Create a Container Group](https://docs.salad.com/reference/create_container_group)
 
 ## **Step 3: Select Multiple GPUs**
 
@@ -83,8 +90,10 @@ To enable the use of multiple GPUs within a container, you'll need to:
         --header 'Salad-Api-Key: {api-key}' \
         --header 'accept: application/json'
    ```
-2. Note GPU IDs : Once you receive the response, identify and make note of the unique IDs corresponding to the GPUs you intend to use.
-3. Configure Your Workload : When setting up your workload, include the GPU IDs in the gpu_classes field. For example, if you plan to utilize GPUs like 3090s, 3090Tis, and 4090s, structure your configuration like this
+2. Note GPU IDs : Once you receive the response, identify and make note of the unique IDs corresponding to the GPUs you
+   intend to use.
+3. Configure Your Workload : When setting up your workload, include the GPU IDs in the gpu_classes field. For example,
+   if you plan to utilize GPUs like 3090s, 3090Tis, and 4090s, structure your configuration like this
 
    ```json json
    "container": {
@@ -105,13 +114,15 @@ _Note: you can also test it on our [API reference page](https://docs.salad.com/r
 
 ## **Step 4: Check the Deployment Status**
 
-After you send the POST request in previous step, Salad Cloud will begin the process of deploying your container image. To check the status of the deployment, you can send a GET request to the following URL.
+After you send the POST request in previous step, Salad Cloud will begin the process of deploying your container image.
+To check the status of the deployment, you can send a GET request to the following URL.
 
 ```json curl
 https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}
 ```
 
-Replace `{organization_name}`,` {project_name}`, and `{container_group_name}` with the name of your organization, project, and the container group you want to check, respectively.
+Replace `{organization_name}`,` {project_name}`, and `{container_group_name}` with the name of your organization,
+project, and the container group you want to check, respectively.
 
 Include the following headers in your GET request:
 
@@ -129,4 +140,6 @@ curl --request GET \
 
 The response will include the current status of the deployment, as well as other details about the container.
 
-_**Note**: By default, when you deploy a container group via the public API, auto-start is set to false. You can start it by either visiting the[ portal](https://portal.salad.com/) or using the [public API ](https://docs.salad.com/reference/start_container_group)itself_
+_**Note**: By default, when you deploy a container group via the public API, auto-start is set to false. You can start
+it by either visiting the[ portal](https://portal.salad.com/) or using the
+[public API ](https://docs.salad.com/reference/start_container_group)itself_

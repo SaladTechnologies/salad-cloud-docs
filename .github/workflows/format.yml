@@ -1,0 +1,14 @@
+name: Prettier
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Prettier
+        run: npx prettier "./**/*.{md,mdx}" --check

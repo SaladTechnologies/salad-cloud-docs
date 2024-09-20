@@ -1,27 +1,29 @@
 ---
-title: "Create Your first \"hello world\""
+title: 'Create Your first "hello world"'
 ---
+
 ## **Creating a _"hello world"_ Node.js Application**
 
-First, we will start by creating a directory for our project and then install some dependencies for our simple “Hello world” app using the command line.
+First, we will start by creating a directory for our project and then install some dependencies for our simple “Hello
+world” app using the command line.
 
 ```shell
 mkdir nodejs-server
- 
+
 cd nodejs-server
 ```
 
 **Install npm And Express Framework: **  
-Install npm and Express, which is a Node.js framework. 
+Install npm and Express, which is a Node.js framework.
 
 **Then, initialize npm** in our directory.  
-Copy or use the command below in your command line or terminal. 
+Copy or use the command below in your command line or terminal.
 
 ```shell
 npm init
 ```
 
-Above, **`npm`** creates a **`package.json`** that holds the dependencies of the app. 
+Above, **`npm`** creates a **`package.json`** that holds the dependencies of the app.
 
 **Next, **install the Express framework dependency.
 
@@ -29,10 +31,10 @@ Above, **`npm`** creates a **`package.json`** that holds the dependencies of the
 npm install express --save
 ```
 
-Codebase should look like this below: 
-
+Codebase should look like this below:
 
 **Create a package.json file with the following content:**
+
 ```json
 {
   "name": "node-app",
@@ -42,29 +44,28 @@ Codebase should look like this below:
     "start": "node app.js"
   },
   "license": "MIT",
-  "dependencies":
-  {
+  "dependencies": {
     "express": "^4.18.2"
   }
 }
 ```
 
-**Create an app.js file with an HTTP server that will return Hello world.** 
+**Create an app.js file with an HTTP server that will return Hello world.**
 
 Here is the code below :
 
 ```javascript
-const express = require('express');
-const app = express();
- 
+const express = require('express')
+const app = express()
+
 // This tells the app which port to listen to
 app.listen(process.env.PORT || 5000, () => {
-    console.log(`Server is running on port`)
+  console.log(`Server is running on port`)
 })
- 
+
 //This shows the response that will sent to the user
-app.get("/", (req,res) => {
-    res.send('Hello World')
+app.get('/', (req, res) => {
+  res.send('Hello World')
 })
 ```
 
@@ -74,14 +75,14 @@ app.get("/", (req,res) => {
 node app.js
 ```
 
-The app is now ready to launch: 
+The app is now ready to launch:
 
-It will show you on your terminal **_`Server is running on port 5000`_** 
+It will show you on your terminal **_`Server is running on port 5000`_**
 
-![](https://files.readme.io/e15a288-node.PNG "node.PNG")
+![](https://files.readme.io/e15a288-node.PNG 'node.PNG')
 
 Go to your browser, copy and paste ** `http://localhost:8080/` ** in your browser to view it.
 
 Here is a **_“Hello world”_** output on my browser :
 
-![](https://files.readme.io/77b4901-hello_world.PNG "hello world.PNG")
+![](https://files.readme.io/77b4901-hello_world.PNG 'hello world.PNG')
