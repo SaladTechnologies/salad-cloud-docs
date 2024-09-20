@@ -1,16 +1,27 @@
 ---
-title: "Run a Python App"
-slug: "run-a-python-app"
-excerpt: ""
+title: 'Run a Python App'
+slug: 'run-a-python-app'
+excerpt: ''
 hidden: false
-createdAt: "Tue Oct 10 2023 20:38:32 GMT+0000 (Coordinated Universal Time)"
-updatedAt: "Tue Apr 09 2024 16:33:13 GMT+0000 (Coordinated Universal Time)"
+createdAt: 'Tue Oct 10 2023 20:38:32 GMT+0000 (Coordinated Universal Time)'
+updatedAt: 'Tue Apr 09 2024 16:33:13 GMT+0000 (Coordinated Universal Time)'
 ---
-The your python application up and running is as simple as packaging up the application into a Docker container. Once you have the Docker container uploaded to a container registry, you can easily deploy that container on 1-100s of fully customizable (# CPUs, # RAM, GPU) instances.
 
-In this guide, we will create a simple `Hello World` python application, but these steps can be used to deploy any new or existing application on Salad.
+The your python application up and running is as simple as packaging up the application into a Docker container. Once
+you have the Docker container uploaded to a container registry, you can easily deploy that container on 1-100s of fully
+customizable (# CPUs, # RAM, GPU) instances.
 
-<iframe src="https://player.vimeo.com/video/918054913?h=00416532b2&title=0&byline=0&portrait=0" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+In this guide, we will create a simple `Hello World` python application, but these steps can be used to deploy any new
+or existing application on Salad.
+
+<iframe
+  src="https://player.vimeo.com/video/918054913?h=00416532b2&title=0&byline=0&portrait=0"
+  width="640"
+  height="360"
+  frameborder="0"
+  allow="autoplay; fullscreen; picture-in-picture"
+  allowfullscreen
+></iframe>
 
 # Creating the Python Container
 
@@ -127,16 +138,19 @@ You should be able to check it in your Docker container's URL, for example:
 You will see something like:
 
 ```json
-{"item_id": 5, "q": "somequery"}
+{ "item_id": 5, "q": "somequery" }
 ```
 
 # Push Container to a Registry
 
-Now that you have a container locally, you will need to push that container image up to a container registry so it can be deployed on Salad. You can push to any of the [supported container registries](/container-engine/container-registries), but for this guide we will use Docker Hub.
+Now that you have a container locally, you will need to push that container image up to a container registry so it can
+be deployed on SaladCloud. You can push to any of the
+[supported container registries](/container-engine/container-registries), but for this guide we will use Docker Hub.
 
 ## Tagging the Image
 
-In order to push the container image to Docker Hub you will first need to tag your image with your Docker username and an unique container name. The format of the image name is `{dockerhubusername}/{imagename}:{version}`
+In order to push the container image to Docker Hub you will first need to tag your image with your Docker username and
+an unique container name. The format of the image name is `{dockerhubusername}/{imagename}:{version}`
 
 At Salad we use the `saladtechnologies` username, but you will need to use your own username.
 
@@ -146,7 +160,8 @@ docker tag myimage saladtechnologies/run-python:0.1
 
 ## Pushing the Image
 
-Now that your container has the proper naming convention, you can push the container to Docker Hub by running the `push` command.
+Now that your container has the proper naming convention, you can push the container to Docker Hub by running the `push`
+command.
 
 ```Text Bash
 docker push saladtechnologies/run-python:0.1
@@ -158,24 +173,26 @@ Once the image is pushed to Docker Hub you can now deploy your container on Sala
 
 ## Creating the Container Group
 
-Now that you have a complete (yet basic) FastAPI application running you can deploy it to Salad via the Portal or the Public API. 
+Now that you have a complete (yet basic) FastAPI application running you can deploy it to Salad via the Portal or the
+Public API.
 
-When you are asked to specify the "Image Source" you simply need to provide the image name you used to push the container up to the registry.
+When you are asked to specify the "Image Source" you simply need to provide the image name you used to push the
+container up to the registry.
 
-<img src="/container-engine/images/5047308-image.png"/>
+<img src="/container-engine/images/5047308-image.png" />
 
-
-Since the FastAPI is listening to port 80, you will need to enable the Container Gateway and configure the port when creating a new container group.
+Since the FastAPI is listening to port 80, you will need to enable the Container Gateway and configure the port when
+creating a new container group.
 
 [Deployment Guide](/container-engine/deploy-containers)
 
-<img src="/container-engine/images/0d2e830-image.png"/>
-
-
+<img src="/container-engine/images/0d2e830-image.png" />
 
 ## Connecting to the Application
 
-Once the container group is up and running, you will be given a static URL that load balances all http requests across the instances of your applications. If you enabled authentication then you will need to include your API key in the `'Salad-Api-Key` header of your http requests.
+Once the container group is up and running, you will be given a static URL that load balances all http requests across
+the instances of your applications. If you enabled authentication then you will need to include your API key in the
+`'Salad-Api-Key` header of your http requests.
 
 Example Request
 

@@ -1,0 +1,4 @@
+* @SaladTechnologies/admins @SaladTechnologies/devops @SaladTechnologies/revops @SaladTechnologies/saladcloud-compute @SaladTechnologies/saladcloud-platform
+
+# Administrators must approve changes to code owners (and other GitHub-specific resources).
+/.github/ @SaladTechnologies/admins

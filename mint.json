@@ -316,7 +316,9 @@
     "linkedin": "https://www.linkedin.com/company/salad-technologies"
   },
   "feedback": {
-    "thumbsRating": true
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
   },
   "search": {
     "prompt": "Search..."

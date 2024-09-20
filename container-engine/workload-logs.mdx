@@ -1,8 +1,13 @@
 ---
-title: "Workload Logs"
+title: 'Workload Logs'
 ---
 
-After you deploy a container group on Salad Cloud, some nodes may experience errors. To detect and diagnose these errors, Salad provides an API endpoint [here ](https://docs.salad.com/reference/get__workload_errors)to access high-level details of recent errors that occurred on a workload. In addition, you may view and download a log of these errors from the portal by clicking the 'Workload Errors' tab on the container group details page. Note that this feature, whether accessed from the portal or the API, only returns up to the 50 most recent errors for a workload which occurred in the last hour.
+After you deploy a container group on Salad Cloud, some nodes may experience errors. To detect and diagnose these
+errors, Salad provides an API endpoint [here ](https://docs.salad.com/reference/get__workload_errors)to access
+high-level details of recent errors that occurred on a workload. In addition, you may view and download a log of these
+errors from the portal by clicking the 'Workload Errors' tab on the container group details page. Note that this
+feature, whether accessed from the portal or the API, only returns up to the 50 most recent errors for a workload which
+occurred in the last hour.
 
 ### Fields
 
@@ -14,7 +19,9 @@ After you deploy a container group on Salad Cloud, some nodes may experience err
 
 `allocatedAt` - The UTC timestamp when your container was allocated to the node.
 
-`startedAt` - The UTC timestamp when your container was started on the node. If this field is `null`, the container failed before reaching a started state. You can learn more about different container states [here](/container-engine/deployment-lifecycle).
+`startedAt` - The UTC timestamp when your container was started on the node. If this field is `null`, the container
+failed before reaching a started state. You can learn more about different container states
+[here](/container-engine/deployment-lifecycle).
 
 ### Error Details
 

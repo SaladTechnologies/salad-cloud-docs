@@ -1,11 +1,15 @@
 ---
-title: "FAQs"
+title: 'FAQs'
 ---
 
 # How do I use SSH with Salad?
 
-Since SCE is a managed container service running on spot instance like infrastructure SSH is not recommended since the session or changes you make could disappear without warning. By putting bundling your application in a container, you will be sure that each replica running on Salad is running in a consistent and reproducible way.
+Since SCE is a managed container service running on spot instance like infrastructure SSH is not recommended since the
+session or changes you make could disappear without warning. By putting bundling your application in a container, you
+will be sure that each replica running on Salad is running in a consistent and reproducible way.
 
 # I need a unique URL for each node. How do I do that?
 
-The best way to accomplish this is to create container groups with the Container Gateway enabled and with 1 replica each, because each container group with the Container Gateway enabled receives a static, unique URL. For large numbers of container groups, we recommend managing these container groups programmatically through the API.
+The best way to accomplish this is to create container groups with the Container Gateway enabled and with 1 replica
+each, because each container group with the Container Gateway enabled receives a static, unique URL. For large numbers
+of container groups, we recommend managing these container groups programmatically through the API.
