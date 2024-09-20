@@ -1,0 +1,209 @@
+---
+title: 'Using IMDS to reallocate a replica'
+---
+
+Using the IMDS, you can reallocate a replica from within the running container. Here, we'll write a python script using
+our SDK that will reallocate the running replica if it fails to meet internet bandwidth expectations. You also can use
+the JSON request endpoint.
+
+## Retrieving the results of the bandwidth test
+
+In this example, we already have the results from a download speed test saved to a file called `result.txt` we can read
+from. This file contains the result of `25`.
+
+```python Python
+#Does nothing if the test succeeds
+def nodeSuccess():
+    print("Passed network check")
+
+#Does nothing if the test fails
+def nodeFail():
+    print("Failed network check")
+
+#Reads the score from the network test file
+with open("result.txt") as read:
+    result = int(read.read())
+    if result >= 30: nodeSuccess()
+    else: nodeFail()
+```
+
+As we would expect, if this runs it will fail as it's below the minimum requirement of 30.
+
+```
+Failed network check
+```
+
+## Using the SDK to reallocate a node
+
+Now, using the IMDS Python SDK we can automatically reallocate this replica to search for a new replica that passes the
+network tests. We'll change the `nodeFail` function to instead call the SDK.
+
+```python Python
+from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
+from salad_cloud_imds_sdk.models import ReallocateContainer
+
+#Does nothing if the test succeeds
+def nodeSuccess():
+    print("Passed network check")
+
+#Reallocates the node if it fails via the Python SDK
+def nodeFail():
+    print("Failed network check")
+
+    sdk = SaladCloudImdsSdk(
+    base_url=Environment.DEFAULT.value,
+    timeout=10000
+    )
+
+    request_body = ReallocateContainer(
+        reason="Failed network check"
+    )
+
+    sdk.metadata.reallocate_container(request_body=request_body)
+
+#Reads the score from the network test file
+with open("result.txt") as read:
+    result = int(read.read())
+    if result >= 30: nodeSuccess()
+    else: nodeFail()
+```
+
+Now, when a replica runs the check and fails, it will call to the SDK and automatically reallocate the replica. Below
+are examples in other languages for the SDK usage.
+
+<CodeGroup>
+```C# C#
+using Salad.Cloud.IMDS.SDK;
+using Salad.Cloud.IMDS.SDK.Models;
+
+var client = new SaladCloudImdsSdkClient();
+
+var input = new ReallocateContainer("laborum culpa");
+
+await client.Metadata.ReallocateContainerAsync(input);
+
+````
+```go Go
+import (
+  "fmt"
+  "encoding/json"
+  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
+)
+
+config := saladcloudimdssdkconfig.NewConfig()
+client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+request := metadata.ReallocateContainer{}
+request.SetReason("Reason")
+
+response, err := client.Metadata.ReallocateContainer(context.Background(), request)
+if err != nil {
+  panic(err)
+}
+
+fmt.Print(response)
+```
+```java Java
+import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+import com.salad.cloud.imdssdk.models.ReallocateContainer;
+
+public class Main {
+
+  public static void main(String[] args) {
+    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+    ReallocateContainer reallocateContainer = ReallocateContainer.builder().reason("laborum culpa").build();
+
+    saladCloudImdsSdk.metadataService.reallocateContainer(reallocateContainer);
+  }
+}
+```
+```typescript typescript
+import { ReallocateContainer, SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+(async () => {
+  const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+  const reallocateContainer: ReallocateContainer = {
+    reason: 'laborum culpa',
+  };
+
+  const { data } = await saladCloudImdsSdk.metadata.reallocateContainer(input);
+
+  console.log(data);
+})();
+```
+```javascript javascript
+const options = {method: 'POST', headers: {'Content-Type': 'application/json'}};
+
+fetch('http://169.254.169.254/v1/reallocate', options)
+  .then(response => response.json())
+  .then(response => console.log(response))
+  .catch(err => console.error(err));
+```
+```php PHP
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => "http://169.254.169.254/v1/reallocate",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_HTTPHEADER => [
+    "Content-Type: application/json"
+  ],
+]);
+
+$response = curl_exec($curl);
+$err = curl_error($curl);
+
+curl_close($curl);
+
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
+```
+</CodeGroup>
+
+## Using the JSON request endpoint to reallocate a node
+
+We also can reallocate the node by sending a POST request to the IMDS reallocate endpoint. Here, we'll use the same
+Python example, but with the POST request instead of the SDK.
+
+```python Python
+import requests
+
+#Does nothing if the test succeeds
+def nodeSuccess():
+    print("Passed network check")
+
+#Reallocates the node if it fails via a JSON post request using the requests library
+def nodeFail():
+    print("Failed network check")
+
+    url = "http://169.254.169.254/v1/reallocate"
+    headers = {'Content-Type': 'application/json'}
+    body = {"Reason": "Failed network check"}
+
+    response = requests.post(url, headers=headers, json=body)
+    print(response)
+
+
+#Reads the score from the network test file
+with open("result.txt") as read:
+    result = int(read.read())
+    if result >= 30: nodeSuccess()
+    else: nodeFail()
+````
+
+Now, when the test fails, the code will send a JSON POST request to the IMDS endpoint to reallocate the node.

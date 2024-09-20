@@ -149,7 +149,9 @@
           "group": "Instance Metadata Service (IMDS)",
           "pages": [
             "container-engine/imds/introduction",
+            "container-engine/imds/Container-status-endpoint",
             "container-engine/imds/obtaining-an-imds-jwt",
+            "container-engine/imds/imds-reallocate",
             {
               "group": "API Reference",
               "pages": [
