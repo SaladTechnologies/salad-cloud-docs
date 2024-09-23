@@ -73,6 +73,7 @@ GPUs and other frequently asked questions.
     requests, and running multiple replicas to provide coverage during automatic fail-overs.
   - Network performance will vary from node to node, due the distributed, residential nature of the network.
   - For Mac developers, be sure to build your containers for amd64, not arm64.
+  - If you're looking to implement networking on your instances within a container group by leveraging [Salad's container gateway](https://docs.salad.com/container-engine/networking), you'll need to [configure IPv6](https://docs.salad.com/container-engine/gateway/enabling-ipv6) within your container image.
 - **What happens if a GPU goes offline?**
   - Salad Container Engine automatically reallocates your workload to another GPU (same type and class) when a resource
     goes offline.
@@ -102,13 +103,17 @@ GPUs and other frequently asked questions.
     <img src="/container-engine/images/startingsalad2.png" />
 
 - **What is the right Salad product for my workload?**
-  - Salad has four product lines: Salad Container Engine (SCE), Salad Gateway Service (SGS), Salad Transcription API and
-    Salad Dreambooth API.
+  - Salad has four product lines: 
+
+    - [Salad Container Engine (SCE)](https://docs.salad.com/container-engine/quickstart): a managed container engine built for deploying GPU-intensive containers at a massive scale.
+    - [Salad Gateway Service (SGS)](https://docs.salad.com/gateway-service/introduction): a proxy service that routes requests from VPN operators or other customers who need distributed residential IP infrastructure to Salad nodes.
+    - [Salad Transcription API](https://docs.salad.com/inference-endpoints/transcription/transcription): the lowest-priced transcription service in the market with unparalleled accuracy.
+    - [Salad Dreambooth API](https://docs.salad.com/inference-endpoints/dreambooth/avatar-video-tutorial): a Stable Diffusion 1.5 and SDXL LoRA model training API with a full suite of tunable parameters.
 - **How does the billing work?**
   - Salad bills per use at the org level. You can view your current bill at the org level.
   - You are billed per-second only for container instances in the “running” state. Instances in other states such as
     “downloading” and “allocating” are not billed.
-  - Bandwidth is not metered.
+  - Bandwidth is not metered, and there are no "stale pod charges" for containers that are not running.
 - **What about compliance on Salad?**
   - We are SOC 2 Type 1 compliant. You can read more about our compliance
     [here](https://blog.salad.com/salad-soc-2-certification/).
