@@ -79,7 +79,21 @@
           "pages": [
             {
               "group": "Stable Diffusion 1.5",
-              "pages": ["reference/dreambooth/sd15/create-a-training-job"]
+              "pages": [
+                "reference/dreambooth/sd15/create-a-training-job",
+                "reference/dreambooth/sd15/get-a-training-job",
+                "reference/dreambooth/sd15/delete-a-training-job",
+                "reference/dreambooth/sd15/list-training-jobs"
+              ]
+            },
+            {
+              "group": "Stable Diffusion XL",
+              "pages": [
+                "reference/dreambooth/sdxl/create-a-training-job",
+                "reference/dreambooth/sdxl/get-a-training-job",
+                "reference/dreambooth/sdxl/delete-a-training-job",
+                "reference/dreambooth/sdxl/list-training-jobs"
+              ]
             }
           ]
         }
