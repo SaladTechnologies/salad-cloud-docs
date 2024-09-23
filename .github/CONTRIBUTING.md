@@ -61,3 +61,12 @@ Etiquette][etiquette-1] and Ilya Grigorik's blog post titled [Don't "Push" Your 
 [support]: https://docs.salad.com/support
 [vscode-dl]: https://code.visualstudio.com/download
 [vscode-extensions]: https://code.visualstudio.com/docs/editor/extension-marketplace#_recommended-extensions
+
+## Adding Endpoints
+
+To add a new endpoint to the documentation, follow these steps:
+
+1. Place the openapi3 compatible input and output json schema for the endpoint in the `api-specs` directory
+2. Place a config file in `scripts/endpoint-schema-configs`, following the existing config files as a template
+3. To run just one config file, use `node scripts/add-inference-endpoint-to-schema.js <config-file-name>`.
+   1. To run all config files, use `./scripts/add-all-endpoints`

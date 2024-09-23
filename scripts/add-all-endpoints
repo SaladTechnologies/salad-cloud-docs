@@ -1,0 +1,7 @@
+#! /usr/bin/bash
+
+endpoints="$(dirname "$0")/endpoint-schema-configs"
+
+for file in $endpoints/*; do
+    node scripts/add-inference-endpoint-to-schema.js $file
+done
