@@ -1,0 +1,8 @@
+{
+  "baseSchema": "api-specs/salad-cloud.json",
+  "inputSchema": "api-specs/dreambooth-sd15-input.json",
+  "outputSchema": "api-specs/dreambooth-output.json",
+  "endpointId": "dreambooth-sd15",
+  "endpointName": "Dreambooth Training API - Stable Diffusion 1.5",
+  "schemaName": "DreamboothSD15Training"
+}
