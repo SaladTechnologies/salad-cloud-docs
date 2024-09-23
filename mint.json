@@ -421,7 +421,11 @@
     },
     {
       "source": "/reference/api-reference",
-      "destination": "/api-reference"
+      "destination": "/reference/public-api"
+    },
+    {
+      "source": "/api-reference",
+      "destination": "/reference/public-api"
     }
   ]
 }
