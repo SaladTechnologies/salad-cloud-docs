@@ -17,53 +17,84 @@
       "pages": ["introduction", "quickstart", "api-usage"]
     },
     {
-      "group": "API Documentation",
+      "group": "Reference",
       "pages": [
         {
-          "group": "Organizations",
-          "pages": ["api-reference/organizations/get-gpu-classes", "api-reference/organizations/get-quotas"]
-        },
-        {
-          "group": "Container Groups",
+          "group": "SaladCloud API",
           "pages": [
-            "api-reference/container_groups/list-container-groups",
-            "api-reference/container_groups/create-a-container-group",
-            "api-reference/container_groups/get-a-container-group",
-            "api-reference/container_groups/update-a-container-group",
-            "api-reference/container_groups/delete-a-container-group",
-            "api-reference/container_groups/start-a-container-group",
-            "api-reference/container_groups/stop-a-container-group",
-            "api-reference/container_groups/get-container-group-errors",
-            "api-reference/container_groups/list-container-group-instances",
-            "api-reference/container_groups/get-a-container-group-instance",
-            "api-reference/container_groups/restart-a-container-group-instance",
-            "api-reference/container_groups/recreate-a-container-group-instance",
-            "api-reference/container_groups/reallocate-a-container-group-instance"
+            {
+              "group": "Organizations",
+              "pages": [
+                "reference/public-api/organizations/get-gpu-classes",
+                "reference/public-api/organizations/get-quotas"
+              ]
+            },
+            {
+              "group": "Container Groups",
+              "pages": [
+                "reference/public-api/container_groups/list-container-groups",
+                "reference/public-api/container_groups/create-a-container-group",
+                "reference/public-api/container_groups/get-a-container-group",
+                "reference/public-api/container_groups/update-a-container-group",
+                "reference/public-api/container_groups/delete-a-container-group",
+                "reference/public-api/container_groups/start-a-container-group",
+                "reference/public-api/container_groups/stop-a-container-group",
+                "reference/public-api/container_groups/get-container-group-errors",
+                "reference/public-api/container_groups/list-container-group-instances",
+                "reference/public-api/container_groups/get-a-container-group-instance",
+                "reference/public-api/container_groups/restart-a-container-group-instance",
+                "reference/public-api/container_groups/recreate-a-container-group-instance",
+                "reference/public-api/container_groups/reallocate-a-container-group-instance"
+              ]
+            },
+            {
+              "group": "Job Queues",
+              "pages": [
+                "reference/public-api/queues/list-queues",
+                "reference/public-api/queues/create-a-queue",
+                "reference/public-api/queues/get-a-queue",
+                "reference/public-api/queues/update-a-queue",
+                "reference/public-api/queues/delete-a-queue",
+                "reference/public-api/queues/list-queue-jobs",
+                "reference/public-api/queues/create-a-queue-job",
+                "reference/public-api/queues/get-a-queue-job",
+                "reference/public-api/queues/delete-a-queue-job"
+              ]
+            },
+            {
+              "group": "Inference Endpoints",
+              "pages": [
+                "reference/public-api/inference_endpoints/list-inference-endpoints",
+                "reference/public-api/inference_endpoints/get-an-inference-endpoint",
+                "reference/public-api/inference_endpoints/list-inference-endpoint-jobs",
+                "reference/public-api/inference_endpoints/create-an-inference-endpoint-job",
+                "reference/public-api/inference_endpoints/get-an-inference-endpoint-job",
+                "reference/public-api/inference_endpoints/delete-an-inference-endpoint-job"
+              ]
+            }
           ]
         },
         {
-          "group": "Job Queues",
+          "group": "Dreambooth Training API",
           "pages": [
-            "api-reference/queues/list-queues",
-            "api-reference/queues/create-a-queue",
-            "api-reference/queues/get-a-queue",
-            "api-reference/queues/update-a-queue",
-            "api-reference/queues/delete-a-queue",
-            "api-reference/queues/list-queue-jobs",
-            "api-reference/queues/create-a-queue-job",
-            "api-reference/queues/get-a-queue-job",
-            "api-reference/queues/delete-a-queue-job"
-          ]
-        },
-        {
-          "group": "Inference Endpoints",
-          "pages": [
-            "api-reference/inference_endpoints/list-inference-endpoints",
-            "api-reference/inference_endpoints/get-an-inference-endpoint",
-            "api-reference/inference_endpoints/list-inference-endpoint-jobs",
-            "api-reference/inference_endpoints/create-an-inference-endpoint-job",
-            "api-reference/inference_endpoints/get-an-inference-endpoint-job",
-            "api-reference/inference_endpoints/delete-an-inference-endpoint-job"
+            {
+              "group": "Stable Diffusion 1.5",
+              "pages": [
+                "reference/dreambooth/sd15/create-a-training-job",
+                "reference/dreambooth/sd15/get-a-training-job",
+                "reference/dreambooth/sd15/delete-a-training-job",
+                "reference/dreambooth/sd15/list-training-jobs"
+              ]
+            },
+            {
+              "group": "Stable Diffusion XL",
+              "pages": [
+                "reference/dreambooth/sdxl/create-a-training-job",
+                "reference/dreambooth/sdxl/get-a-training-job",
+                "reference/dreambooth/sdxl/delete-a-training-job",
+                "reference/dreambooth/sdxl/list-training-jobs"
+              ]
+            }
           ]
         }
       ]
@@ -300,8 +331,8 @@
       "url": "gateway-service"
     },
     {
-      "name": "API Reference",
-      "url": "api-reference"
+      "name": "Reference",
+      "url": "reference"
     }
   ],
   "primaryTab": {
@@ -390,7 +421,11 @@
     },
     {
       "source": "/reference/api-reference",
-      "destination": "/api-reference"
+      "destination": "/reference/public-api"
+    },
+    {
+      "source": "/api-reference",
+      "destination": "/reference/public-api"
     }
   ]
 }

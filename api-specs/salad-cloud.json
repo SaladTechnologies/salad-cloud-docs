@@ -1476,6 +1476,314 @@
           "webhook_secret_key"
         ]
       }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sd15": {
+      "summary": "Inference Endpoints",
+      "description": "Operations for an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint",
+        "summary": "Get Inference Endpoint",
+        "description": "Gets an inference endpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetInferenceEndpoint"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sd15/jobs": {
+      "summary": "Jobs for Dreambooth Training API - Stable Diffusion 1.5",
+      "description": "Operations for Dreambooth Training API - Stable Diffusion 1.5 jobs",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_jobs",
+        "summary": "List jobs for Dreambooth Training API - Stable Diffusion 1.5",
+        "description": "Retrieves a list of jobs for Dreambooth Training API - Stable Diffusion 1.5",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListDreamboothSD15TrainingJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "post": {
+        "operationId": "create_inference_endpoint_job",
+        "summary": "Create a job for Dreambooth Training API - Stable Diffusion 1.5",
+        "description": "Creates a job for Dreambooth Training API - Stable Diffusion 1.5",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateDreamboothSD15TrainingJob"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateDreamboothSD15TrainingJob"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sd15/jobs/{job_id}": {
+      "summary": "Job for Dreambooth Training API - Stable Diffusion 1.5",
+      "description": "Operations for a Dreambooth Training API - Stable Diffusion 1.5 job",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_job_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_job",
+        "summary": "Get job for Dreambooth Training API - Stable Diffusion 1.5",
+        "description": "Retrieves a job for Dreambooth Training API - Stable Diffusion 1.5",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetDreamboothSD15TrainingJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "delete": {
+        "operationId": "delete_inference_endpoint_job",
+        "summary": "Delete job for Dreambooth Training API - Stable Diffusion 1.5",
+        "description": "Deletes an inference endpoint job",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteInferenceEndpointJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sdxl": {
+      "summary": "Inference Endpoints",
+      "description": "Operations for an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint",
+        "summary": "Get Inference Endpoint",
+        "description": "Gets an inference endpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetInferenceEndpoint"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sdxl/jobs": {
+      "summary": "Jobs for Dreambooth Training API - Stable Diffusion XL",
+      "description": "Operations for Dreambooth Training API - Stable Diffusion XL jobs",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_jobs",
+        "summary": "List jobs for Dreambooth Training API - Stable Diffusion XL",
+        "description": "Retrieves a list of jobs for Dreambooth Training API - Stable Diffusion XL",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListDreamboothSDXLTrainingJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "post": {
+        "operationId": "create_inference_endpoint_job",
+        "summary": "Create a job for Dreambooth Training API - Stable Diffusion XL",
+        "description": "Creates a job for Dreambooth Training API - Stable Diffusion XL",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateDreamboothSDXLTrainingJob"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateDreamboothSDXLTrainingJob"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/dreambooth-sdxl/jobs/{job_id}": {
+      "summary": "Job for Dreambooth Training API - Stable Diffusion XL",
+      "description": "Operations for a Dreambooth Training API - Stable Diffusion XL job",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/inference_endpoint_job_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_job",
+        "summary": "Get job for Dreambooth Training API - Stable Diffusion XL",
+        "description": "Retrieves a job for Dreambooth Training API - Stable Diffusion XL",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetDreamboothSDXLTrainingJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "delete": {
+        "operationId": "delete_inference_endpoint_job",
+        "summary": "Delete job for Dreambooth Training API - Stable Diffusion XL",
+        "description": "Deletes an inference endpoint job",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteInferenceEndpointJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
     }
   },
   "components": {
@@ -4636,6 +4944,800 @@
         "required": [
           "secret_key"
         ]
+      },
+      "DreamboothSD15TrainingInput": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "runwayml/stable-diffusion-v1-5",
+              "lykon/absolutereality_v1.6"
+            ]
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "instance_prompt": {
+                "type": "string",
+                "description": "The prompt with identifier specifying the instance, e.g. 'photo of a TOK dog', 'in the style of TOK'"
+              },
+              "instance_images": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "minItems": 1,
+                "maxItems": 100,
+                "description": "List of accessible image URLs to be used as instance images."
+              },
+              "class_preset": {
+                "type": "string",
+                "enum": [
+                  "photo_of_a_man",
+                  "photo_of_a_woman",
+                  "photo_of_a_nonbinary_person",
+                  "photo_of_a_transfeminine_person",
+                  "photo_of_a_trans_man",
+                  "photo_of_a_trans_woman",
+                  "photo_of_a_dog",
+                  "photo_of_a_cat",
+                  "photo_of_a_bird",
+                  "photo_of_a_fish",
+                  "photo_of_a_snake",
+                  "photo_of_a_horse",
+                  "photo_of_a_guinea_pig",
+                  "photo_of_a_hamster",
+                  "photo_of_a_rabbit",
+                  "photo_of_a_house",
+                  "photo_of_a_car",
+                  "photo_of_a_motorcycle",
+                  "photo_of_a_truck",
+                  "photo_of_a_book",
+                  "photo_of_a_bracelet",
+                  "photo_of_a_camera",
+                  "photo_of_a_guitar",
+                  "photo_of_a_handbag",
+                  "photo_of_a_hat",
+                  "photo_of_a_necklace",
+                  "photo_of_a_pen",
+                  "photo_of_a_shirt",
+                  "photo_of_a_television",
+                  "photo_of_a_wallet",
+                  "photo_of_a_watch",
+                  "photo_of_a_water_bottle",
+                  "photo_of_drums",
+                  "photo_of_earrings",
+                  "photo_of_pants",
+                  "photo_of_sneakers",
+                  "photo_of_eyeglasses"
+                ],
+                "description": "One of the image class presets provided by the API."
+              },
+              "class_images": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "minItems": 1,
+                "maxItems": 1000,
+                "description": "List of accessible image URLs to be used as class images. Only required for Prior Preservation."
+              },
+              "class_prompt": {
+                "type": "string",
+                "description": "The prompt to specify images in the same class as provided instance images."
+              },
+              "with_prior_preservation": {
+                "type": "boolean",
+                "default": false,
+                "description": "Flag to add prior preservation loss."
+              },
+              "prior_loss_weight": {
+                "type": "number",
+                "default": 1,
+                "description": "The weight of prior preservation loss."
+              },
+              "seed": {
+                "type": "number",
+                "description": "A seed for reproducible training."
+              },
+              "resolution": {
+                "type": "number",
+                "minimum": 256,
+                "maximum": 1024,
+                "default": 512,
+                "description": "The resolution for input images, all the images in the train/validation dataset will be resized to this resolution"
+              },
+              "center_crop": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to center crop the input images to the resolution. If not set, the images will be randomly cropped. The images will be resized to the resolution first before cropping."
+              },
+              "train_text_encoder": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to train the text encoder along with the model."
+              },
+              "max_train_steps": {
+                "type": "number",
+                "minimum": 500,
+                "maximum": 20000,
+                "default": 500,
+                "description": "Total number of training steps to perform."
+              },
+              "learning_rate": {
+                "type": "number",
+                "minimum": 1e-8,
+                "maximum": 0.01,
+                "default": 0.0005,
+                "description": "Initial learning rate (after the potential warmup period) to use."
+              },
+              "scale_lr": {
+                "type": "boolean",
+                "default": false,
+                "description": "Scale the learning rate by gradient accumulation steps and batch size."
+              },
+              "lr_scheduler": {
+                "type": "string",
+                "enum": [
+                  "linear",
+                  "cosine",
+                  "cosine_with_restarts",
+                  "polynomial",
+                  "constant",
+                  "constant_with_warmup"
+                ],
+                "default": "constant",
+                "description": "The scheduler type to use."
+              },
+              "lr_warmup_steps": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 20000,
+                "default": 500,
+                "description": "Number of steps for the warmup in the lr scheduler."
+              },
+              "lr_num_cycles": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 10,
+                "default": 1,
+                "description": "Number of hard resets of the lr in cosine_with_restarts scheduler."
+              },
+              "lr_power": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5,
+                "default": 1,
+                "description": "Power factor for polynomial scheduler."
+              },
+              "use_8bit_adam": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether or not to use 8-bit Adam from bitsandbytes."
+              },
+              "adam_beta1": {
+                "type": "number",
+                "default": 0.9,
+                "description": "The beta1 parameter for the Adam optimizer."
+              },
+              "adam_beta2": {
+                "type": "number",
+                "default": 0.999,
+                "description": "The beta2 parameter for the Adam optimizer."
+              },
+              "adam_weight_decay": {
+                "type": "number",
+                "default": 0.01,
+                "description": "Weight decay to use for the model params."
+              },
+              "adam_epsilon": {
+                "type": "number",
+                "default": 1e-8,
+                "description": "Epsilon value for the Adam optimizer."
+              },
+              "max_grad_norm": {
+                "type": "number",
+                "default": 1,
+                "description": "Max gradient norm."
+              },
+              "text_encoder_use_attention_mask": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to use attention mask for text encoder."
+              },
+              "class_labels_conditioning": {
+                "type": "string",
+                "enum": [
+                  "timesteps"
+                ],
+                "description": "The optional `class_label` conditioning to pass to the unet"
+              },
+              "rank": {
+                "type": "number",
+                "default": 4,
+                "description": "The dimension of the LoRA update matrices."
+              },
+              "train_batch_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8,
+                "default": 1,
+                "description": "Batch size for the training dataloader."
+              }
+            },
+            "required": [
+              "instance_prompt",
+              "instance_images"
+            ],
+            "additionalProperties": false
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "lora"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "params",
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "DreamboothSD15TrainingJob": {
+        "description": "Job input schema for Dreambooth Training API - Stable Diffusion 1.5",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "$ref": "#/components/schemas/DreamboothSD15TrainingInput"
+          },
+          "inference_endpoint_name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "organization_name": {
+            "description": "The organization name",
+            "type": "string"
+          },
+          "output": {
+            "$ref": "#/components/schemas/DreamboothSD15TrainingOutput"
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time",
+          "inference_endpoint_name",
+          "organization_name"
+        ]
+      },
+      "CreateDreamboothSD15TrainingJob": {
+        "description": "Create a job for Dreambooth Training API - Stable Diffusion 1.5",
+        "type": "object",
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/DreamboothSD15TrainingInput"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "input"
+        ]
+      },
+      "DreamboothSD15TrainingJobList": {
+        "description": "List of jobs for Dreambooth Training API - Stable Diffusion 1.5",
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/DreamboothSD15TrainingJob"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "DreamboothSD15TrainingOutput": {
+        "type": "object",
+        "properties": {
+          "webui": {
+            "type": "string",
+            "format": "uri"
+          },
+          "diffusers": {
+            "type": "string",
+            "format": "uri"
+          },
+          "billed_units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "webui",
+          "diffusers"
+        ],
+        "additionalProperties": false
+      },
+      "DreamboothSDXLTrainingInput": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "stabilityai/stable-diffusion-xl-base-1.0"
+            ]
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "instance_prompt": {
+                "type": "string",
+                "description": "The prompt with identifier specifying the instance, e.g. 'photo of a TOK dog', 'in the style of TOK'"
+              },
+              "instance_images": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "minItems": 1,
+                "maxItems": 100,
+                "description": "List of accessible image URLs to be used as instance images."
+              },
+              "class_preset": {
+                "type": "string",
+                "enum": [
+                  "photo_of_a_man",
+                  "photo_of_a_woman",
+                  "photo_of_a_nonbinary_person",
+                  "photo_of_a_transfeminine_person",
+                  "photo_of_a_trans_man",
+                  "photo_of_a_trans_woman",
+                  "photo_of_a_dog",
+                  "photo_of_a_cat",
+                  "photo_of_a_bird",
+                  "photo_of_a_fish",
+                  "photo_of_a_snake",
+                  "photo_of_a_horse",
+                  "photo_of_a_guinea_pig",
+                  "photo_of_a_hamster",
+                  "photo_of_a_rabbit",
+                  "photo_of_a_house",
+                  "photo_of_a_car",
+                  "photo_of_a_motorcycle",
+                  "photo_of_a_truck",
+                  "photo_of_a_book",
+                  "photo_of_a_bracelet",
+                  "photo_of_a_camera",
+                  "photo_of_a_guitar",
+                  "photo_of_a_handbag",
+                  "photo_of_a_hat",
+                  "photo_of_a_necklace",
+                  "photo_of_a_pen",
+                  "photo_of_a_shirt",
+                  "photo_of_a_television",
+                  "photo_of_a_wallet",
+                  "photo_of_a_watch",
+                  "photo_of_a_water_bottle",
+                  "photo_of_drums",
+                  "photo_of_earrings",
+                  "photo_of_pants",
+                  "photo_of_sneakers",
+                  "photo_of_eyeglasses"
+                ],
+                "description": "One of the image class presets provided by the API."
+              },
+              "class_images": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "minItems": 1,
+                "maxItems": 1000,
+                "description": "List of accessible image URLs to be used as class images. Only required for Prior Preservation."
+              },
+              "class_prompt": {
+                "type": "string",
+                "description": "The prompt to specify images in the same class as provided instance images."
+              },
+              "with_prior_preservation": {
+                "type": "boolean",
+                "default": false,
+                "description": "Flag to add prior preservation loss."
+              },
+              "prior_loss_weight": {
+                "type": "number",
+                "default": 1,
+                "description": "The weight of prior preservation loss."
+              },
+              "seed": {
+                "type": "number",
+                "description": "A seed for reproducible training."
+              },
+              "resolution": {
+                "type": "number",
+                "minimum": 256,
+                "maximum": 1024,
+                "default": 1024,
+                "description": "The resolution for input images, all the images in the train/validation dataset will be resized to this resolution"
+              },
+              "center_crop": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to center crop the input images to the resolution. If not set, the images will be randomly cropped. The images will be resized to the resolution first before cropping."
+              },
+              "train_text_encoder": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to train the text encoder along with the model."
+              },
+              "max_train_steps": {
+                "type": "number",
+                "minimum": 500,
+                "maximum": 20000,
+                "default": 500,
+                "description": "Total number of training steps to perform."
+              },
+              "learning_rate": {
+                "type": "number",
+                "minimum": 1e-8,
+                "maximum": 0.01,
+                "default": 0.0005,
+                "description": "Initial learning rate (after the potential warmup period) to use."
+              },
+              "scale_lr": {
+                "type": "boolean",
+                "default": false,
+                "description": "Scale the learning rate by gradient accumulation steps and batch size."
+              },
+              "lr_scheduler": {
+                "type": "string",
+                "enum": [
+                  "linear",
+                  "cosine",
+                  "cosine_with_restarts",
+                  "polynomial",
+                  "constant",
+                  "constant_with_warmup"
+                ],
+                "default": "constant",
+                "description": "The scheduler type to use."
+              },
+              "lr_warmup_steps": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 20000,
+                "default": 500,
+                "description": "Number of steps for the warmup in the lr scheduler."
+              },
+              "lr_num_cycles": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 10,
+                "default": 1,
+                "description": "Number of hard resets of the lr in cosine_with_restarts scheduler."
+              },
+              "lr_power": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5,
+                "default": 1,
+                "description": "Power factor for polynomial scheduler."
+              },
+              "use_8bit_adam": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether or not to use 8-bit Adam from bitsandbytes."
+              },
+              "adam_beta1": {
+                "type": "number",
+                "default": 0.9,
+                "description": "The beta1 parameter for the Adam optimizer."
+              },
+              "adam_beta2": {
+                "type": "number",
+                "default": 0.999,
+                "description": "The beta2 parameter for the Adam optimizer."
+              },
+              "adam_weight_decay": {
+                "type": "number",
+                "default": 0.01,
+                "description": "Weight decay to use for the model params."
+              },
+              "adam_epsilon": {
+                "type": "number",
+                "default": 1e-8,
+                "description": "Epsilon value for the Adam optimizer."
+              },
+              "max_grad_norm": {
+                "type": "number",
+                "default": 1,
+                "description": "Max gradient norm."
+              },
+              "text_encoder_use_attention_mask": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether to use attention mask for text encoder."
+              },
+              "class_labels_conditioning": {
+                "type": "string",
+                "enum": [
+                  "timesteps"
+                ],
+                "description": "The optional `class_label` conditioning to pass to the unet"
+              },
+              "rank": {
+                "type": "number",
+                "default": 4,
+                "description": "The dimension of the LoRA update matrices."
+              },
+              "train_batch_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1,
+                "default": 1,
+                "description": "Batch size for the training dataloader."
+              },
+              "repeats": {
+                "type": "number",
+                "default": 1
+              },
+              "random_flip": {
+                "type": "boolean",
+                "default": false,
+                "description": "whether to randomly flip images horizontally"
+              },
+              "text_encoder_lr": {
+                "type": "number",
+                "minimum": 1e-8,
+                "maximum": 0.01,
+                "default": 0.000005,
+                "description": "Text encoder learning rate to use."
+              },
+              "snr_gamma": {
+                "type": "number",
+                "description": "SNR weighting gamma to be used if rebalancing the loss. Recommended value is 5.0. More details here: https://arxiv.org/abs/2303.09556."
+              },
+              "optimizer": {
+                "type": "string",
+                "enum": [
+                  "AdamW",
+                  "prodigy"
+                ],
+                "default": "AdamW",
+                "description": "The optimizer to use."
+              },
+              "prodigy_beta3": {
+                "type": "number",
+                "description": "coefficients for computing the Prodidy stepsize using running averages. If null, uses the value of square root of beta2. Ignored if optimizer is adamW"
+              },
+              "prodigy_decouple": {
+                "type": "boolean",
+                "default": true,
+                "description": "Use AdamW style decoupled weight decay"
+              },
+              "adam_weight_decay_text_encoder": {
+                "type": "number",
+                "default": 0.001,
+                "description": "Weight decay to use for text_encoder"
+              },
+              "prodigy_use_bias_correction": {
+                "type": "boolean",
+                "default": true,
+                "description": "Turn on Adam's bias correction. True by default. Ignored if optimizer is adamW"
+              },
+              "prodigy_safeguard_warmup": {
+                "type": "boolean",
+                "default": true,
+                "description": "Remove lr from the denominator of D estimate to avoid issues during warm-up stage. True by default. Ignored if optimizer is adamW"
+              }
+            },
+            "required": [
+              "instance_prompt",
+              "instance_images"
+            ],
+            "additionalProperties": false
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "lora"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "params",
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "DreamboothSDXLTrainingJob": {
+        "description": "Job input schema for Dreambooth Training API - Stable Diffusion XL",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "$ref": "#/components/schemas/DreamboothSDXLTrainingInput"
+          },
+          "inference_endpoint_name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "organization_name": {
+            "description": "The organization name",
+            "type": "string"
+          },
+          "output": {
+            "$ref": "#/components/schemas/DreamboothSDXLTrainingOutput"
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time",
+          "inference_endpoint_name",
+          "organization_name"
+        ]
+      },
+      "DreamboothSDXLTrainingOutput": {
+        "type": "object",
+        "properties": {
+          "webui": {
+            "type": "string",
+            "format": "uri"
+          },
+          "diffusers": {
+            "type": "string",
+            "format": "uri"
+          },
+          "billed_units": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "webui",
+          "diffusers"
+        ],
+        "additionalProperties": false
+      },
+      "CreateDreamboothSDXLTrainingJob": {
+        "description": "Create a job for Dreambooth Training API - Stable Diffusion XL",
+        "type": "object",
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/DreamboothSDXLTrainingInput"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "input"
+        ]
+      },
+      "DreamboothSDXLTrainingJobList": {
+        "description": "List of jobs for Dreambooth Training API - Stable Diffusion XL",
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/DreamboothSDXLTrainingJob"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
       }
     },
     "requestBodies": {
@@ -4779,6 +5881,56 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/CreateInferenceEndpointJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "webhook": "https://webhooks.example.com:8080"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateDreamboothSD15TrainingJob": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateDreamboothSD15TrainingJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "webhook": "https://webhooks.example.com:8080"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateDreamboothSDXLTrainingJob": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateDreamboothSDXLTrainingJob"
             },
             "examples": {
               "jsonExample": {
@@ -6094,6 +7246,226 @@
               "jsonExample": {
                 "value": {
                   "secret_key": "$2a$10$WQ2Tj7v8I3L7pVt6D7Xz/9y0pTcWJg8Bf8TzGdU1l6hXU6XKvYjR4"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListDreamboothSD15TrainingJob": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSD15TrainingJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174001",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetDreamboothSD15TrainingJob": {
+        "description": "Ok",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSD15TrainingJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateDreamboothSD15TrainingJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/inference-endpoints/avatar-generator/jobs/123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSD15TrainingJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListDreamboothSDXLTrainingJob": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSDXLTrainingJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174001",
+                      "inference_endpoint_name": "avatar-generator",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetDreamboothSDXLTrainingJob": {
+        "description": "Ok",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSDXLTrainingJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateDreamboothSDXLTrainingJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/inference-endpoints/avatar-generator/jobs/123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DreamboothSDXLTrainingJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "inference_endpoint_name": "avatar-generator",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
                 }
               }
             }

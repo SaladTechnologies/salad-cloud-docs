@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "webui": {
+      "type": "string",
+      "format": "uri"
+    },
+    "diffusers": {
+      "type": "string",
+      "format": "uri"
+    },
+    "billed_units": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "webui",
+    "diffusers"
+  ],
+  "additionalProperties": false
+}
