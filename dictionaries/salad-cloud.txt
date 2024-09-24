@@ -30,3 +30,7 @@ cuda
 cudnn
 WORKDIR
 numpy
+CivitAI
+Controlnet
+Controlnets
+distil
