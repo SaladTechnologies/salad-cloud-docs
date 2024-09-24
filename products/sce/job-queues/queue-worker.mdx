@@ -199,9 +199,9 @@ Here's how to do it.
       to start your application, it is indicated in either `ENTRYPOINT` or `CMD` directive in the original Dockerfile.
       In our example, we can leave it as-is.
 
-4. Now, build the wrapper image with `docker build -t mycompany/myimage -f docker/Dockerfile .`
-   Note that the the name of the image here is important. That is what you are going to deploy to the Salad Cloud.
-   Replace `mycompany/myimage` with whatever the name you want the resulting image to have.
+4. Now, build the wrapper image with `docker build -t mycompany/myimage -f docker/Dockerfile .` Note that the the name
+   of the image here is important. That is what you are going to deploy to the Salad Cloud. Replace `mycompany/myimage`
+   with whatever the name you want the resulting image to have.
 5. You will need to note the _port_ and _path_ of your application within the container for use in the next step, when
    you're configuring your container group to include a connection to a job queue. This port and path are where the
    queue worker SDK will be sending the jobs to. In our example, we have the following values:

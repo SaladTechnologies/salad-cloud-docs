@@ -24,3 +24,9 @@ SDXL
 ckpt
 ComfyUI
 vCPU
+Uvicorn
+LAVIS
+cuda
+cudnn
+WORKDIR
+numpy

@@ -30,11 +30,9 @@ To deploy image from GitHub Container Registry (GHCR) to Salad Portal, follow th
 You can authenticate to GHCR using either the Docker CLI or the GitHub CLI.
 
 1. Authenticate using the Docker CLI: Open your terminal and run the following command, replacing your_username and
-   your_PAT with your GitHub username and the PAT you generated:
-   `docker login ghcr.io -u your_username -p your_PAT`
+   your_PAT with your GitHub username and the PAT you generated: `docker login ghcr.io -u your_username -p your_PAT`
 2. Authenticate using the GitHub CLI : If you prefer using the GitHub CLI, run this command and replace your_PAT with
-   your PAT:
-   `gh auth login --with-token your_PAT`
+   your PAT: `gh auth login --with-token your_PAT`
 
 ### Step 3: Tag Your Docker Image
 
