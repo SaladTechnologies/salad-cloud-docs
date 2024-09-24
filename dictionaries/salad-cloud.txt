@@ -2,7 +2,7 @@ IMDS
 OpenAPI
 routable
 SaladCloud
-sdnext
+SD.Next
 dreamshaper
 saladtechnologies
 sdapi
@@ -15,3 +15,12 @@ tmin
 firstphase
 upscaler
 alwayson
+Fooocus
+pretrained
+LoRA
+LoRAs
+safetensors
+SDXL
+ckpt
+ComfyUI
+vCPU
