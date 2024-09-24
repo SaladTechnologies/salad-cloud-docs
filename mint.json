@@ -17,145 +17,139 @@
       "pages": ["introduction", "quickstart", "api-usage"]
     },
     {
-      "group": "Products",
+      "group": "Container Engine",
       "pages": [
         {
-          "group": "Container Engine",
+          "group": "Getting Started",
           "pages": [
+            "products/sce/gettingstartedwithsaladcloud",
+            "products/sce/quickstart",
+            "products/sce/quickstart-api"
+          ]
+        },
+        {
+          "group": "Container Groups",
+          "pages": [
+            "products/sce/containers",
+            "products/sce/salad-container-engine",
+            "products/sce/deployment-lifecycle",
+            "products/sce/managing-deployments",
+            "products/sce/environment-variables",
             {
-              "group": "Getting Started",
+              "group": "Container Registries",
               "pages": [
-                "products/sce/gettingstartedwithsaladcloud",
-                "products/sce/quickstart",
-                "products/sce/quickstart-api"
+                "products/sce/container-registries",
+                "products/sce/registries/dockerhub",
+                "products/sce/registries/aws-ecr",
+                "products/sce/registries/azure-acr",
+                "products/sce/registries/gcp-gcr",
+                "products/sce/registries/quay",
+                "products/sce/registries/github-ghcr"
               ]
             },
             {
-              "group": "Container Groups",
+              "group": "External Logging",
               "pages": [
-                "products/sce/containers",
-                "products/sce/salad-container-engine",
-                "products/sce/deployment-lifecycle",
-                "products/sce/managing-deployments",
-                "products/sce/environment-variables",
-                {
-                  "group": "Container Registries",
-                  "pages": [
-                    "products/sce/container-registries",
-                    "products/sce/registries/dockerhub",
-                    "products/sce/registries/aws-ecr",
-                    "products/sce/registries/azure-acr",
-                    "products/sce/registries/gcp-gcr",
-                    "products/sce/registries/quay",
-                    "products/sce/registries/github-ghcr"
-                  ]
-                },
-                {
-                  "group": "External Logging",
-                  "pages": [
-                    "products/sce/external-logging",
-                    "products/sce/external-logging/axiom",
-                    "products/sce/external-logging/new-relic",
-                    "products/sce/external-logging/splunk-logging",
-                    "products/sce/external-logging/tcp-logging",
-                    "products/sce/external-logging/datadog",
-                    "products/sce/external-logging/http"
-                  ]
-                },
-                {
-                  "group": "Health Probes",
-                  "pages": [
-                    "products/sce/health-probes",
-                    "products/sce/health-probes/startup-probes",
-                    "products/sce/health-probes/liveness-probes",
-                    "products/sce/health-probes/readiness-probes",
-                    "products/sce/health-probes/health-probe-examples"
-                  ]
-                },
-                {
-                  "group": "Instance Metadata Service (IMDS)",
-                  "pages": [
-                    "products/sce/imds/introduction",
-                    "products/sce/imds/Container-status-endpoint",
-                    "products/sce/imds/obtaining-an-imds-jwt",
-                    "products/sce/imds/imds-reallocate"
-                  ]
-                },
-                {
-                  "group": "Billing and Pricing",
-                  "pages": ["products/sce/billing", "products/sce/priority-pricing"]
-                },
-                "products/sce/specifying-a-command",
-                "products/sce/disk-space",
-                "products/sce/workload-logs",
-                "products/sce/container-logs",
-                "products/sce/billing",
-                "products/sce/quotas",
-                "products/sce/faqs"
+                "products/sce/external-logging",
+                "products/sce/external-logging/axiom",
+                "products/sce/external-logging/new-relic",
+                "products/sce/external-logging/splunk-logging",
+                "products/sce/external-logging/tcp-logging",
+                "products/sce/external-logging/datadog",
+                "products/sce/external-logging/http"
               ]
             },
             {
-              "group": "Accessing Containers",
+              "group": "Health Probes",
               "pages": [
-                {
-                  "group": "Container Gateway",
-                  "pages": [
-                    "products/sce/networking",
-                    "products/sce/gateway/enabling-ipv6",
-                    "products/sce/gateway/sending-requests",
-                    "products/sce/gateway/websockets",
-                    "products/sce/gateway/error-pages"
-                  ]
-                },
-                {
-                  "group": "Job Queues",
-                  "pages": [
-                    "products/sce/job-queues",
-                    "products/sce/job-queues/creating-a-job-queue",
-                    "products/sce/job-queues/queue-worker",
-                    "products/sce/job-queues/using-queues"
-                  ]
-                }
+                "products/sce/health-probes",
+                "products/sce/health-probes/startup-probes",
+                "products/sce/health-probes/liveness-probes",
+                "products/sce/health-probes/readiness-probes",
+                "products/sce/health-probes/health-probe-examples"
               ]
-            }
-          ]
-        },
-        {
-          "group": "Gateway Service",
-          "pages": [
-            "products/sgs/introduction",
-            "products/sgs/quickstart",
-            "products/sgs/proxy-v2",
-            "products/sgs/node-removals",
-            "products/sgs/approved-domains",
-            "products/sgs/smart-routing",
-            "products/sgs/faqs"
-          ]
-        },
-        {
-          "group": "Transcription API",
-          "pages": [
-            "products/transcription/transcription",
-            "products/transcription/transcriptionfaq",
-            "products/transcription/transcriptionquickstart",
+            },
             {
-              "group": "Transcription Guides",
+              "group": "Instance Metadata Service (IMDS)",
               "pages": [
-                "products/transcription/dropboxdownloadable",
-                "products/transcription/awsdownloadablefile",
-                "products/transcription/azuredownloadablefile",
-                "products/transcription/googledrivedownloadable",
-                "products/transcription/zapiertranscriptionguide",
-                "products/transcription/pabblyintegration"
+                "products/sce/imds/introduction",
+                "products/sce/imds/Container-status-endpoint",
+                "products/sce/imds/obtaining-an-imds-jwt",
+                "products/sce/imds/imds-reallocate"
               ]
-            }
+            },
+            {
+              "group": "Billing and Pricing",
+              "pages": ["products/sce/billing", "products/sce/priority-pricing"]
+            },
+            "products/sce/specifying-a-command",
+            "products/sce/disk-space",
+            "products/sce/workload-logs",
+            "products/sce/container-logs",
+            "products/sce/billing",
+            "products/sce/quotas",
+            "products/sce/faqs"
           ]
         },
         {
-          "group": "Dreambooth Training API",
-          "pages": ["products/dreambooth/avatar-video-tutorial", "products/dreambooth/pet-tutorial"]
+          "group": "Container Gateway",
+          "pages": [
+            "products/sce/networking",
+            "products/sce/gateway/enabling-ipv6",
+            "products/sce/gateway/sending-requests",
+            "products/sce/gateway/websockets",
+            "products/sce/gateway/error-pages"
+          ]
+        },
+        {
+          "group": "Job Queues",
+          "pages": [
+            "products/sce/job-queues",
+            "products/sce/job-queues/creating-a-job-queue",
+            "products/sce/job-queues/queue-worker",
+            "products/sce/job-queues/using-queues"
+          ]
         }
       ]
+    },
+    {
+      "group": "Gateway Service",
+      "pages": [
+        "products/sgs/introduction",
+        "products/sgs/quickstart",
+        "products/sgs/proxy-v2",
+        "products/sgs/node-removals",
+        "products/sgs/approved-domains",
+        "products/sgs/smart-routing",
+        "products/sgs/faqs"
+      ]
+    },
+    {
+      "group": "Transcription API",
+      "pages": [
+        "products/transcription/transcription",
+        "products/transcription/transcriptionfaq",
+        "products/transcription/transcriptionquickstart",
+        {
+          "group": "Transcription Guides",
+          "pages": [
+            "products/transcription/dropboxdownloadable",
+            "products/transcription/awsdownloadablefile",
+            "products/transcription/azuredownloadablefile",
+            "products/transcription/googledrivedownloadable",
+            "products/transcription/zapiertranscriptionguide",
+            "products/transcription/pabblyintegration"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Dreambooth Training API",
+      "pages": ["products/dreambooth/avatar-video-tutorial", "products/dreambooth/pet-tutorial"]
+    },
+    {
+      "group": "S4 - Salad Simple Storage Service",
+      "pages": ["products/s4/salad-simple-storage-service"]
     },
     {
       "group": "Tutorials",
