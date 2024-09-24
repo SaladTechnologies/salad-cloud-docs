@@ -256,8 +256,8 @@ Select or Create the organization and project you want to work with, then click 
 6. Configure the Startup Probe. This is used to determine when the container is ready to accept requests. Select the
    HTTP protocol, set the path to `/hc`, and the port to `8000`. Set the initial delay, period, and timeout to `1`. Set
    the success threshold to `1`, and the failure threshold to `20`. If you are using an image that downloads the model
-   weights at runtime, you should increase intial delay to `10` or more, and a failure threshold of `180` to allow up to
-   3 minutes for the container to start.
+   weights at runtime, you should increase initial delay to `10` or more, and a failure threshold of `180` to allow up
+   to 3 minutes for the container to start.
 
 ![](https://files.readme.io/943e834-startup-probe.png)
 

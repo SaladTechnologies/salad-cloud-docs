@@ -136,7 +136,7 @@ python -m cog.server.http
 
 sh -c "sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.8.13/lib/python3.8/site-packages/cog/server/http.py && python -m cog.server.http"
 
-# '&&' means the 2nd command will only execute if the first command has executed suuccessfully and its exit status is zero.
+# '&&' means the 2nd command will only execute if the first command has executed successfully and its exit status is zero.
 ```
 
 Let’s conduct some tests locally to ensure the workaround works as expected.
@@ -393,7 +393,7 @@ Create the Dockerfile for the BLIP wrapper image:
 ```
 # Dockerfile of the wrapper image
 
-# Use the orginal image as the base image.
+# Use the original image as the base image.
 
 FROM r8.im/salesforce/blip:latest
 
@@ -464,7 +464,7 @@ Create the Dockerfile for the BLIP wrapper image:
 ```
 # Dockerfile of the wrapper image
 
-# Use the orginal image as the base image.
+# Use the original image as the base image.
 
 FROM r8.im/salesforce/blip:latest
 
