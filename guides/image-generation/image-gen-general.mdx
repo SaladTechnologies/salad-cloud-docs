@@ -1,0 +1,120 @@
+---
+title: 'Image Generation On SaladCloud'
+description: 'How to deploy an image generation service on SaladCloud'
+---
+
+SaladCloud is the perfect platform for deploying image generation services. We power some of the most popular image
+generation sites on the internet, like [Civitai](https://blog.salad.com/civitai-salad/) and
+[Blend](https://blog.salad.com/blend-salad/). We've
+[done the math](https://blog.salad.com/stable-diffusion-v1-5-benchmark/) and found that SaladCloud is the
+[most cost-effective](https://blog.salad.com/stable-diffusion-xl-sdxl-benchmark/) way to deploy image generation
+services at scale.
+
+## High Level
+
+Regardless of your choice of stable diffusion inference server, models, or extensions, the basic process is as follows:
+
+1. Get a docker image that runs your inference server
+2. Copy any models and extensions you want into the docker image
+3. Enable some way to access your container group, either through the container gateway, or a job queue.
+4. Push the new image up to a container registry
+5. Deploy the image as a salad container group
+
+## Validated Docker Images
+
+Here are some popular stable diffusion inference servers that we’ve verified work on Salad.
+
+> **Note that you will be interacting with these as an API, and not through their browser user interface.**
+
+1. ComfyUI
+   1. Guide: [ComfyUI](/products/sce/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-comfy)
+   1. Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
+   1. Docker Image: [ghcr.io/ai-dock/comfyui:latest-cuda](http://ghcr.io/ai-dock/comfyui:latest-cuda)
+   1. Model Directory: `/opt/ComfyUI/models`
+   1. Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
+2. Automatic1111
+   1. Guide: [Automatic1111](/products/sce/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-a1111)
+   1. Git Repo:
+      [https://github.com/SaladTechnologies/stable-diffusion-webui-docker](https://github.com/SaladTechnologies/stable-diffusion-webui-docker)
+   1. Docker Image: `saladtechnologies/a1111:ipv6-latest`
+   1. Data Directory: `/data`
+   1. Model Directory: `/data/models`
+   1. Extension Directory: `/data/config/auto/extensions`
+   1. Controlnet Model Directory (If controlnet extension is installed):
+      `/data/config/auto/extensions/sd-webui-controlnet/models`
+3. SD.Next
+   1. Guide: [SD.Next](/products/sce/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-sdnext)
+   1. Git Repo: [https://github.com/SaladTechnologies/sdnext](https://github.com/SaladTechnologies/sdnext)
+   1. Docker Image: `saladtechnologies/sdnext:base`
+   1. Data Directory: `/webui/data`
+   1. Model Directory: `/webui/data/models`
+   1. Extension Directory: `/webui/data/extensions`
+   1. Controlnet Model Directory: `/webui/extensions-builtin/sd-webui-controlnet/models`
+4. Fooocus:
+   1. Guide: [Fooocus](/products/sce/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-fooocus)
+   1. Git Repo: [https://github.com/mrhan1993/Fooocus-API](https://github.com/mrhan1993/Fooocus-API)
+   1. Docker Image: `konieshadow/fooocus-api:v0.4.1.1`
+   1. Model Directory: `/app/repositories/Fooocus/models`
+
+## Container Gateway or Job Queue?
+
+When deploying your stable diffusion inference server, you have two options for how to access it:
+
+1. **Container Gateway**: This is the easiest way to access your container group.
+   1. It can be enabled during container group creation, and maps a public https URL to a specific IPv6 port in your
+      container.
+   1. You can optionally enable auth, which then requires your Salad API Token to access the container group.
+   1. Only requires your server to listen on IPv6, no additional binary.
+   1. Salad's Container Gateway uses least-connection load balancing, so you can scale your container group up or down
+      without needing to change the URL.
+   1. Completed image generations are returned to the client in the response.
+   1. However, it is **not suitable for long-running tasks**, as the container gateway will time out after 100 seconds,
+      a hard limit imposed by Cloudflare on idle connections. For most image generation workloads, this is not a
+      problem, as generations typically take under 30s.
+   1. **Does Not Retry Failed Requests**: If a request fails, the client must retry the request.
+   1. Excess load will result in failed requests, as the container gateway will not queue requests.
+2. **Job Queue**: This is a more resilient way to access your container group.
+   1. You can submit jobs to a queue, and the container group will process them in order.
+   1. You must add a binary to your container image that connects the job queue to your inference server.
+   1. High utililization of the container group will result in longer queue times, but no failed requests.
+   1. **Retries Failed Requests**: If a request fails, the job queue will retry the request 3 times.
+   1. **Long-Running Tasks**: The job queue is suitable for long-running tasks, as it does not have a timeout.
+   1. **Fully asyncronous**: Completed jobs are not returned to the client, but instead must be fetched from the job
+      queue, or received by a webhook.
+
+There are several factors you should consider when choosing between the two options:
+
+1. **How predictable is load?** Scaling services with many gigabytes of models can not be done instantly, so if you
+   expect sudden spikes in traffic, you may want to use a job queue. On the other hand, if you have very predictable
+   load, the container gateway is easier to use, and you can simply scale your container group up or down as needed with
+   about an hour of lead-time.
+1. **How long do you expect your tasks to take?** Most image generation tasks take just a few seconds on a powerful GPU,
+   but if you have a particularly complex multi-modal workflow, and are using older, less expensive GPUs, you may end up
+   with generation times approaching the cloudflare timeout limit of 100s.
+1. **What is the cost structure for your client application?** If you are using a serverless architecture, you should
+   check to see if you are billed for CPU time, or clock time for your function execution. If you are billed for clock
+   time, you will likely want to use the job queue, as you will not be billed for time spent waiting in the queue. If
+   you are billed for CPU time, there will be little difference between the two options.
+
+## Hardware Requirements
+
+The hardware requirements for your stable diffusion inference server will depend on the type of model you are running,
+and to some extent your choice of inference server.
+
+- For models based on Stable Diffusion 1.5, you can get by with as little as 8gb of VRAM, and at least 8gb of system
+  RAM. If you are using multiple LoRAs, ControlNets, etc, you may need more VRAM and system RAM. The only way to be
+  certain is to measure real-world performance.
+- For models based on Stable Diffusion XL, you will need at least 16gb of VRAM, and 24gb if you intend to use the
+  refiner. For SD.Next and Automatic1111, you will need at least 30gb of system RAM if you intend to use the refiner,
+  and 24gb if you do not. For ComfyUI, you will need at least 16gb of system RAM, but may find better performance with
+  more.
+- For models based on Flux1 (fp8 or nf4), you will want 24gb of VRAM and 24gb of system RAM.
+
+## Warming up your server
+
+In most situations, the first request to an inference server will be signficantly slower than subsequent requests. This
+is because the server must load the model into VRAM, and establish its internal kv cache. For this reason, it is often
+desirable to send a dummy request to the server before sending real requests. For Salad, this can be done conveniently
+via the Startup Probe in the container group configuration. You set the startup probe as a `curl` command that submits
+an inference request to the server. This results in the server being warmed up before it is added to the load balancer,
+and can result in a significant performance improvement.

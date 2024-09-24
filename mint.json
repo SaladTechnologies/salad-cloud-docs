@@ -17,6 +17,172 @@
       "pages": ["introduction", "quickstart", "api-usage"]
     },
     {
+      "group": "Products",
+      "pages": [
+        {
+          "group": "Container Engine",
+          "pages": [
+            {
+              "group": "Getting Started",
+              "pages": [
+                "products/sce/gettingstartedwithsaladcloud",
+                "products/sce/quickstart",
+                "products/sce/quickstart-api"
+              ]
+            },
+            {
+              "group": "Container Groups",
+              "pages": [
+                "products/sce/containers",
+                "products/sce/salad-container-engine",
+                "products/sce/deployment-lifecycle",
+                "products/sce/managing-deployments",
+                "products/sce/environment-variables",
+                {
+                  "group": "Container Registries",
+                  "pages": [
+                    "products/sce/container-registries",
+                    "products/sce/registries/dockerhub",
+                    "products/sce/registries/aws-ecr",
+                    "products/sce/registries/azure-acr",
+                    "products/sce/registries/gcp-gcr",
+                    "products/sce/registries/quay",
+                    "products/sce/registries/github-ghcr"
+                  ]
+                },
+                {
+                  "group": "External Logging",
+                  "pages": [
+                    "products/sce/external-logging",
+                    "products/sce/external-logging/axiom",
+                    "products/sce/external-logging/new-relic",
+                    "products/sce/external-logging/splunk-logging",
+                    "products/sce/external-logging/tcp-logging",
+                    "products/sce/external-logging/datadog",
+                    "products/sce/external-logging/http"
+                  ]
+                },
+                {
+                  "group": "Health Probes",
+                  "pages": [
+                    "products/sce/health-probes",
+                    "products/sce/health-probes/startup-probes",
+                    "products/sce/health-probes/liveness-probes",
+                    "products/sce/health-probes/readiness-probes",
+                    "products/sce/health-probes/health-probe-examples"
+                  ]
+                },
+                {
+                  "group": "Instance Metadata Service (IMDS)",
+                  "pages": [
+                    "products/sce/imds/introduction",
+                    "products/sce/imds/Container-status-endpoint",
+                    "products/sce/imds/obtaining-an-imds-jwt",
+                    "products/sce/imds/imds-reallocate"
+                  ]
+                },
+                {
+                  "group": "Billing and Pricing",
+                  "pages": ["products/sce/billing", "products/sce/priority-pricing"]
+                },
+                "products/sce/specifying-a-command",
+                "products/sce/disk-space",
+                "products/sce/workload-logs",
+                "products/sce/container-logs",
+                "products/sce/billing",
+                "products/sce/quotas",
+                "products/sce/faqs"
+              ]
+            },
+            {
+              "group": "Accessing Containers",
+              "pages": [
+                {
+                  "group": "Container Gateway",
+                  "pages": [
+                    "products/sce/networking",
+                    "products/sce/gateway/enabling-ipv6",
+                    "products/sce/gateway/sending-requests",
+                    "products/sce/gateway/websockets",
+                    "products/sce/gateway/error-pages"
+                  ]
+                },
+                {
+                  "group": "Job Queues",
+                  "pages": [
+                    "products/sce/job-queues",
+                    "products/sce/job-queues/creating-a-job-queue",
+                    "products/sce/job-queues/queue-worker",
+                    "products/sce/job-queues/using-queues"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "group": "Gateway Service",
+          "pages": [
+            "products/sgs/introduction",
+            "products/sgs/quickstart",
+            "products/sgs/proxy-v2",
+            "products/sgs/node-removals",
+            "products/sgs/approved-domains",
+            "products/sgs/smart-routing",
+            "products/sgs/faqs"
+          ]
+        },
+        {
+          "group": "Transcription API",
+          "pages": [
+            "products/transcription/transcription",
+            "products/transcription/transcriptionfaq",
+            "products/transcription/transcriptionquickstart",
+            {
+              "group": "Transcription Guides",
+              "pages": [
+                "products/transcription/dropboxdownloadable",
+                "products/transcription/awsdownloadablefile",
+                "products/transcription/azuredownloadablefile",
+                "products/transcription/googledrivedownloadable",
+                "products/transcription/zapiertranscriptionguide",
+                "products/transcription/pabblyintegration"
+              ]
+            }
+          ]
+        },
+        {
+          "group": "Dreambooth Training API",
+          "pages": ["products/dreambooth/avatar-video-tutorial", "products/dreambooth/pet-tutorial"]
+        }
+      ]
+    },
+    {
+      "group": "Tutorials",
+      "pages": [
+        {
+          "group": "Run a Node App",
+          "pages": [
+            "tutorials/how-to-deploy-a-node-app-on-salad/index",
+            "tutorials/how-to-deploy-a-node-app-on-salad/create-your-first-hello-world-1",
+            "tutorials/how-to-deploy-a-node-app-on-salad/create-a-container-1",
+            "tutorials/how-to-deploy-a-node-app-on-salad/save-to-docker-hub",
+            "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-portal",
+            "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
+          ]
+        },
+        "tutorials/using-salad-recipes",
+        "tutorials/howtousethesaladterminal",
+        "tutorials/run-a-python-app",
+        "tutorials/ubuntu-image",
+        "tutorials/example-image",
+        "tutorials/run-triton-server",
+        "tutorials/jupyterlab",
+        "tutorials/run-cog",
+        "tutorials/long-running-jobs"
+      ]
+    },
+    {
       "group": "Reference",
       "pages": [
         {
@@ -108,193 +274,46 @@
       ]
     },
     {
-      "group": "Getting Started",
-      "pages": ["inference-endpoints/introduction"]
-    },
-    {
-      "group": "Transcription",
+      "group": "How-to Guides",
       "pages": [
-        "inference-endpoints/transcription/transcription",
-        "inference-endpoints/transcription/transcriptionfaq",
-        "inference-endpoints/transcription/transcriptionquickstart",
         {
-          "group": "Transcription Guides",
+          "group": "Image Generation",
           "pages": [
-            "inference-endpoints/transcription/dropboxdownloadable",
-            "inference-endpoints/transcription/awsdownloadablefile",
-            "inference-endpoints/transcription/azuredownloadablefile",
-            "inference-endpoints/transcription/googledrivedownloadable",
-            "inference-endpoints/transcription/zapiertranscriptionguide",
-            "inference-endpoints/transcription/pabblyintegration"
+            "guides/image-generation/image-gen-general",
+            "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
+            "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+            "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+            "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+            "guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
+            "guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy"
           ]
+        },
+        {
+          "group": "Large Language Models",
+          "pages": [
+            "guides/llm/llm-general",
+            "guides/llm/run-tgi-text-generation-interface-by-huggingface",
+            "guides/llm/run-ollama"
+          ]
+        },
+        {
+          "group": "Computer Vision",
+          "pages": [
+            {
+              "group": "YOLOv8",
+              "pages": [
+                "guides/computer-vision/yolov8/deployment-tutorial",
+                "guides/computer-vision/yolov8/batch-processing",
+                "guides/computer-vision/yolov8/model-training-guide"
+              ]
+            },
+            "guides/computer-vision/deploy-blip-with-cog"
+          ]
+        },
+        {
+          "group": "Transcription",
+          "pages": ["guides/transcription/youtube"]
         }
-      ]
-    },
-    {
-      "group": "Dreambooth",
-      "pages": ["inference-endpoints/dreambooth/avatar-video-tutorial", "inference-endpoints/dreambooth/pet-tutorial"]
-    },
-    {
-      "group": "Getting Started",
-      "pages": [
-        "container-engine/gettingstartedwithsaladcloud",
-        "container-engine/quickstart",
-        "container-engine/quickstart-api"
-      ]
-    },
-    {
-      "group": "Container Groups",
-      "pages": [
-        "container-engine/containers",
-        "container-engine/salad-container-engine",
-        "container-engine/deployment-lifecycle",
-        "container-engine/managing-deployments",
-        "container-engine/environment-variables",
-        {
-          "group": "Container Registries",
-          "pages": [
-            "container-engine/container-registries",
-            "container-engine/registries/dockerhub",
-            "container-engine/registries/aws-ecr",
-            "container-engine/registries/azure-acr",
-            "container-engine/registries/gcp-gcr",
-            "container-engine/registries/quay",
-            "container-engine/registries/github-ghcr"
-          ]
-        },
-        {
-          "group": "External Logging",
-          "pages": [
-            "container-engine/external-logging",
-            "container-engine/external-logging/axiom",
-            "container-engine/external-logging/new-relic",
-            "container-engine/external-logging/splunk-logging",
-            "container-engine/external-logging/tcp-logging",
-            "container-engine/external-logging/datadog",
-            "container-engine/external-logging/http"
-          ]
-        },
-        {
-          "group": "Health Probes",
-          "pages": [
-            "container-engine/health-probes",
-            "container-engine/health-probes/startup-probes",
-            "container-engine/health-probes/liveness-probes",
-            "container-engine/health-probes/readiness-probes",
-            "container-engine/health-probes/health-probe-examples"
-          ]
-        },
-        {
-          "group": "Instance Metadata Service (IMDS)",
-          "pages": [
-            "container-engine/imds/introduction",
-            "container-engine/imds/Container-status-endpoint",
-            "container-engine/imds/obtaining-an-imds-jwt",
-            "container-engine/imds/imds-reallocate"
-          ]
-        },
-        {
-          "group": "Billing and Pricing",
-          "pages": ["container-engine/billing", "container-engine/priority-pricing"]
-        },
-        "container-engine/specifying-a-command",
-        "container-engine/disk-space",
-        "container-engine/workload-logs",
-        "container-engine/container-logs",
-        "container-engine/billing",
-        "container-engine/quotas",
-        "container-engine/faqs"
-      ]
-    },
-    {
-      "group": "Accessing Containers",
-      "pages": [
-        {
-          "group": "Container Gateway",
-          "pages": [
-            "container-engine/networking",
-            "container-engine/gateway/enabling-ipv6",
-            "container-engine/gateway/sending-requests",
-            "container-engine/gateway/websockets",
-            "container-engine/gateway/error-pages"
-          ]
-        },
-        {
-          "group": "Job Queues",
-          "pages": [
-            "container-engine/job-queues",
-            "container-engine/job-queues/creating-a-job-queue",
-            "container-engine/job-queues/queue-worker",
-            "container-engine/job-queues/using-queues"
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Guides & FAQ",
-      "pages": [
-        "container-engine/guides/using-salad-recipes",
-        "container-engine/guides/howtousethesaladterminal",
-        {
-          "group": "Stable Diffusion",
-          "pages": [
-            "container-engine/guides/stable-diffusion/image-gen-general",
-            "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
-            "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
-            "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
-            "container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-            "container-engine/guides/stable-diffusion/how-to-manage-a-large-number-of-stable-diffusion-models",
-            "container-engine/guides/stable-diffusion/basic-how-to-deploy-flux-on-salad-comfy"
-          ]
-        },
-        {
-          "group": "LLM",
-          "pages": [
-            "container-engine/guides/llm/llm-general",
-            "container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface",
-            "container-engine/guides/llm/run-ollama"
-          ]
-        },
-        "container-engine/guides/run-a-python-app",
-        "container-engine/guides/ubuntu-image",
-        "container-engine/guides/example-image",
-        "container-engine/guides/run-triton-server",
-        {
-          "group": "Run a Node App",
-          "pages": [
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad",
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad/create-your-first-hello-world-1",
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad/create-a-container-1",
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad/save-to-docker-hub",
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad/deploy-via-portal",
-            "container-engine/guides/how-to-deploy-a-node-app-on-salad/deploy-via-api"
-          ]
-        },
-        "container-engine/guides/jupyterlab",
-        "container-engine/guides/youtube",
-        "container-engine/guides/deploy-blip-with-cog",
-        "container-engine/guides/run-cog",
-        {
-          "group": "YOLOv8",
-          "pages": [
-            "container-engine/guides/yolov8/deployment-tutorial",
-            "container-engine/guides/yolov8/batch-processing",
-            "container-engine/guides/yolov8/model-training-guide"
-          ]
-        },
-        "container-engine/guides/long-running-jobs"
-      ]
-    },
-    {
-      "group": "Getting Started",
-      "pages": [
-        "gateway-service/introduction",
-        "gateway-service/quickstart",
-        "gateway-service/proxy-v2",
-        "gateway-service/node-removals",
-        "gateway-service/approved-domains",
-        "gateway-service/smart-routing",
-        "gateway-service/faqs"
       ]
     }
   ],
@@ -319,16 +338,16 @@
   },
   "tabs": [
     {
-      "name": "Container Engine",
-      "url": "container-engine"
+      "name": "Products",
+      "url": "products"
     },
     {
-      "name": "Inference Endpoints",
-      "url": "inference-endpoints"
+      "name": "Tutorials",
+      "url": "tutorials"
     },
     {
-      "name": "Gateway Service",
-      "url": "gateway-service"
+      "name": "How-to Guides",
+      "url": "guides"
     },
     {
       "name": "Reference",
@@ -365,55 +384,55 @@
   "redirects": [
     {
       "source": "/docs/yolov8-deployment-tutorial",
-      "destination": "/container-engine/guides/yolov8/deployment-tutorial"
+      "destination": "/products/sce/guides/yolov8/deployment-tutorial"
     },
     {
       "source": "/docs/yolov8-batch",
-      "destination": "/container-engine/guides/yolov8/batch-processing"
+      "destination": "/products/sce/guides/yolov8/batch-processing"
     },
     {
       "source": "/docs/yolov8-model-training-guide",
-      "destination": "/container-engine/guides/yolov8/model-training-guide"
+      "destination": "/products/sce/guides/yolov8/model-training-guide"
     },
     {
       "source": "/docs.salad.com/docs/openvoice-api",
-      "destination": "/container-engine/guides/openvoice-api"
+      "destination": "/products/sce/guides/openvoice-api"
     },
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface"
+      "destination": "/products/sce/guides/llm/run-tgi-text-generation-interface-by-huggingface"
     },
     {
-      "source": "/container-engine/guides/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/guides/llm/run-tgi-text-generation-interface-by-huggingface"
+      "source": "/products/sce/guides/run-tgi-text-generation-interface-by-huggingface",
+      "destination": "/products/sce/guides/llm/run-tgi-text-generation-interface-by-huggingface"
     },
     {
       "source": "/docs/run-ollama",
-      "destination": "/container-engine/guides/llm/run-ollama"
+      "destination": "/products/sce/guides/llm/run-ollama"
     },
     {
-      "source": "/container-engine/guides/run-ollama",
-      "destination": "/container-engine/guides/llm/run-ollama"
+      "source": "/products/sce/guides/run-ollama",
+      "destination": "/products/sce/guides/llm/run-ollama"
     },
     {
       "source": "/docs/youtube",
-      "destination": "/container-engine/guides/youtube"
+      "destination": "/products/sce/guides/youtube"
     },
     {
       "source": "/docs/jupyterlab",
-      "destination": "/container-engine/guides/jupyterlab"
+      "destination": "/products/sce/guides/jupyterlab"
     },
     {
       "source": "/docs/sdxl",
-      "destination": "/container-engine/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
+      "destination": "/products/sce/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
     },
     {
       "source": "/docs/enabling-ipv6",
-      "destination": "/container-engine/gateway/enabling-ipv6"
+      "destination": "/products/sce/gateway/enabling-ipv6"
     },
     {
       "source": "/docs/billing",
-      "destination": "/container-engine/billing"
+      "destination": "/products/sce/billing"
     },
     {
       "source": "/docs/deploy-containers",
