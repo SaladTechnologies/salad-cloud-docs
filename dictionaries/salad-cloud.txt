@@ -2,3 +2,16 @@ IMDS
 OpenAPI
 routable
 SaladCloud
+sdnext
+dreamshaper
+saladtechnologies
+sdapi
+encodedimage
+subseed
+denoising
+uncond
+tmax
+tmin
+firstphase
+upscaler
+alwayson
