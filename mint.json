@@ -96,6 +96,14 @@
               ]
             }
           ]
+        },
+        {
+          "group": "Instance Metadata Service",
+          "pages": [
+            "reference/imds/get-container-status",
+            "reference/imds/get-container-token",
+            "reference/imds/reallocate-container"
+          ]
         }
       ]
     },
@@ -182,19 +190,11 @@
             "container-engine/imds/introduction",
             "container-engine/imds/Container-status-endpoint",
             "container-engine/imds/obtaining-an-imds-jwt",
-            "container-engine/imds/imds-reallocate",
-            {
-              "group": "API Reference",
-              "pages": [
-                "container-engine/imds/api-reference/get-container-status",
-                "container-engine/imds/api-reference/get-container-token",
-                "container-engine/imds/api-reference/reallocate-container"
-              ]
-            }
+            "container-engine/imds/imds-reallocate"
           ]
         },
         {
-          "group": "Biling and Pricing",
+          "group": "Billing and Pricing",
           "pages": ["container-engine/billing", "container-engine/priority-pricing"]
         },
         "container-engine/specifying-a-command",
