@@ -26,4 +26,4 @@ To run the documentation locally, you need to have [Node.js](https://nodejs.org/
 ## Contributing
 
 We welcome contributions to the SaladCloud documentation. Please see the
-[contributing guidelines](./github/CONTRIBUTING.md) for more information.
+[contributing guidelines](./.github/CONTRIBUTING.md) for more information.
