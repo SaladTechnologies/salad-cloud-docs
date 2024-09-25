@@ -325,6 +325,10 @@
           "pages": ["guides/transcription/youtube"]
         }
       ]
+    },
+    {
+      "group": "SaladCloud Support",
+      "pages": ["support/status", "support/sales", "support/contact", "support/abuse"]
     }
   ],
   "topbarLinks": [
@@ -338,7 +342,7 @@
     },
     {
       "name": "Support",
-      "url": "/support"
+      "url": "support"
     }
   ],
   "topbarCtaButton": {
