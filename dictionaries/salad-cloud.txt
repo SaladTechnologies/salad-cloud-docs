@@ -9,6 +9,7 @@ cudnn
 denoising
 Diátaxis
 distil
+dreambooth
 dreamshaper
 encodedimage
 firstphase
@@ -17,6 +18,7 @@ IMDS
 LAVIS
 LoRA
 LoRAs
+mintlify
 numpy
 OpenAPI
 pretrained
