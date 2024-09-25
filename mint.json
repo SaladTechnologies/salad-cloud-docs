@@ -13,8 +13,8 @@
   },
   "navigation": [
     {
-      "group": "Get Started",
-      "pages": ["introduction", "quickstart", "api-usage"]
+      "group": "SaladCloud",
+      "pages": ["products/documentation", "products/quickstart", "products/api-usage"]
     },
     {
       "group": "Container Engine",
