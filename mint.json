@@ -264,6 +264,22 @@
             "reference/imds/get-container-token",
             "reference/imds/reallocate-container"
           ]
+        },
+        {
+          "group": "Recipes",
+          "pages": [
+            {
+              "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/flux1-schnell-fp8-comfyui/get-health",
+                "reference/recipes/flux1-schnell-fp8-comfyui/get-ready",
+                "reference/recipes/flux1-schnell-fp8-comfyui/get-models",
+                "reference/recipes/flux1-schnell-fp8-comfyui/post-prompt",
+                "reference/recipes/flux1-schnell-fp8-comfyui/post-workflowfluximg2img",
+                "reference/recipes/flux1-schnell-fp8-comfyui/post-workflowfluxtxt2img"
+              ]
+            }
+          ]
         }
       ]
     },
