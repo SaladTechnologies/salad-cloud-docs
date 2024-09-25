@@ -5,8 +5,8 @@ This repository contains the Markdown files and media assets for the SaladCloud 
 
 ## Licenses
 
-The SaladCloud product documentation's Markdown files and supporting media assets in this repository are © 2024 by
-Salad Technologies, Inc. and licensed under a [Creative Commons Attribution 4.0 International License](./LICENSE).
+The SaladCloud product documentation's Markdown files and supporting media assets in this repository are © 2024 by Salad
+Technologies, Inc. and licensed under a [Creative Commons Attribution 4.0 International License](./LICENSE).
 
 All other source code in this repository, including example and sample source code embedded in the Markdown files, is ©
 2024 by Salad Technologies, Inc. and licensed under the [MIT license](./LICENSE-CODE).
@@ -22,3 +22,8 @@ To run the documentation locally, you need to have [Node.js](https://nodejs.org/
 
 1. Clone the repository
 2. Run `npx mintlify dev` in the root directory
+
+## Contributing
+
+We welcome contributions to the SaladCloud documentation. Please see the
+[contributing guidelines](./github/CONTRIBUTING.md) for more information.

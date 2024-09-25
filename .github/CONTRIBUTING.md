@@ -4,6 +4,26 @@ Thanks for being here and for being awesome! 👍
 
 The following sections outline the different ways to contribute to the project.
 
+## Repository Organization
+
+SaladCloud documentation follows [Diátaxis](https://diataxis.fr/) principles.
+
+![Diataxis framework](diataxis.png)
+
+In our documentation, we label the "Explanation" section "Products", but otherwise, the structure is the same.
+
+- **Products**: Information about the products, what they do, what they cost, and how to use them.
+- **Tutorials**: Step-by-step guides which teach how to use the products. These do not try to achieve a particular
+  outcome, but rather to teach a particular skill. They do not assume background knowledge.
+- **How-to Guides**: Guides that explain how to do something of practical value, using the products. They assume some
+  background knowledge.
+- **Reference**: API documentation for the products.
+
+### Directory Structure
+
+- The directory structure should match the final website structure.
+- Images should be placed in a sibling directory to the markdown file that references them, named `images`.
+
 ## Discussing
 
 The easiest way to contribute to the project is by participating in community discussions on the [Salad Discord
