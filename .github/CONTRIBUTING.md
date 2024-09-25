@@ -84,9 +84,23 @@ Etiquette][etiquette-1] and Ilya Grigorik's blog post titled [Don't "Push" Your 
 
 ## Adding Endpoints
 
-To add a new endpoint to the documentation, follow these steps:
+To add a new endpoint (like dreambooth or transcription) to the documentation, follow these steps:
 
 1. Place the openapi3 compatible input and output json schema for the endpoint in the `api-specs` directory
 2. Place a config file in `scripts/endpoint-schema-configs`, following the existing config files as a template
 3. To run just one config file, use `node scripts/add-inference-endpoint-to-schema.js <config-file-name>`.
    1. To run all config files, use `./scripts/add-all-endpoints`
+
+## Adding Recipes
+
+To add a new recipe to the documentation, follow these steps:
+
+1. Place the openapi3 spec for the recipe in the `api-specs` directory, named for the recipe. It should match the
+   directory name in the `salad-recipes` repository.
+2. Create a new directory in the `recipes` directory with the same name as the recipe api spec file.
+3. Run `npx @mintlify/scraping@latest openapi-file api-specs/<your-api-name>.json -o reference/recipes/<your-api-name>`
+   to generate the MDX files for all your endpoints. It will also output an array of pages you can use to add to the
+   navigation.
+4. Add the recipe to the navigation in `mint.json`. Find the `navigation` array in `mint.json`, and add your recipe
+   pages to the appropriate section.
+5. Go add titles or descriptions to the generated MDX files as needed.

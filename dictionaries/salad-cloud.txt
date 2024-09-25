@@ -14,6 +14,7 @@ dreamshaper
 encodedimage
 firstphase
 Fooocus
+Healthcheck
 IMDS
 LAVIS
 LoRA
@@ -26,6 +27,7 @@ routable
 safetensors
 SaladCloud
 saladtechnologies
+schnell
 SD.Next
 sdapi
 SDXL
