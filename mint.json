@@ -271,12 +271,12 @@
             {
               "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
               "pages": [
-                "reference/recipes/flux1-schnell-fp8-comfyui/get-health",
-                "reference/recipes/flux1-schnell-fp8-comfyui/get-ready",
-                "reference/recipes/flux1-schnell-fp8-comfyui/get-models",
-                "reference/recipes/flux1-schnell-fp8-comfyui/post-prompt",
-                "reference/recipes/flux1-schnell-fp8-comfyui/post-workflowfluximg2img",
-                "reference/recipes/flux1-schnell-fp8-comfyui/post-workflowfluxtxt2img"
+                "reference/recipes/flux1-schnell-fp8-comfyui/health-probe",
+                "reference/recipes/flux1-schnell-fp8-comfyui/readiness-probe",
+                "reference/recipes/flux1-schnell-fp8-comfyui/list-models",
+                "reference/recipes/flux1-schnell-fp8-comfyui/submit-prompt",
+                "reference/recipes/flux1-schnell-fp8-comfyui/image-to-image",
+                "reference/recipes/flux1-schnell-fp8-comfyui/text-to-image"
               ]
             }
           ]
