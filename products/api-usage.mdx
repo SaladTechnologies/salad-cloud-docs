@@ -12,15 +12,21 @@ Each API request is authenticated with an API access token that can be accessed 
 unique API token that grants API access to any Organization, Project, or Container group that the user has access to. If
 you need to get a new API Token, you are able to refresh API tokens directly from the Web Portal.
 
+This API token should be included in the `Salad-Api-Key` header of each request.
+
+```http
+Salad-Api-Key: YOUR_API_KEY
+```
+
 ## Get your SaladCloud API Key
 
 Navigate to the `API Access` section under the account drop down
 
-<img src="/images/account-dropdown.png" alt="Account Drop Down Menu" />
+<img src="/products/images/account-dropdown.png" alt="Account Drop Down Menu" />
 
 Your account's API is what you need to utilize all SaladCloud APIs.
 
-<img src="/images/api-access-key.png" alt="Account Drop Down Menu" />
+<img src="/products/images/api-access-key.png" alt="Account Drop Down Menu" />
 
 ## Refreshing API Keys
 

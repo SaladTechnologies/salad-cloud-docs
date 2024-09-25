@@ -22,3 +22,8 @@ To run the documentation locally, you need to have [Node.js](https://nodejs.org/
 
 1. Clone the repository
 2. Run `npx mintlify dev` in the root directory
+
+## Contributing
+
+We welcome contributions to the SaladCloud documentation. Please see the
+[contributing guidelines](./github/CONTRIBUTING.md) for more information.
