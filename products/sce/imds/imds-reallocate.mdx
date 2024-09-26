@@ -2,53 +2,61 @@
 title: 'Using IMDS to reallocate a replica'
 ---
 
-Using the IMDS, you can reallocate a replica from within the running container. Here, we'll write a python script using
-our SDK that will reallocate the running replica if it fails to meet internet bandwidth expectations. You also can use
-the JSON request endpoint.
+Using the IMDS, you can reallocate a replica from within the running container. Here, we'll write a Python script using
+our IMDS SDK that will reallocate the running replica if it doesn't have enough VRAM free. You also can use the JSON
+request endpoint.
 
-## Retrieving the results of the bandwidth test
+## Running NVIDIA-SMI retrieving the free VRAM
 
-In this example, we already have the results from a download speed test saved to a file called `result.txt` we can read
-from. This file contains the result of `25`.
+In this example, we're running `nvidia-smi` to check how much VRAM is available and piping the output to a log file.
+Then, we parse it and compare. If it doesn't have enough free VRAM (we're choosing 2GB must be free here), it'll fail
+the test.
 
 ```python Python
+import subprocess
+
 #Does nothing if the test succeeds
 def nodeSuccess():
-    print("Passed network check")
+    print("Passed VRAM check")
 
 #Does nothing if the test fails
 def nodeFail():
-    print("Failed network check")
+    print("Failed VRAM check, only", result, "MB free.")
 
-#Reads the score from the network test file
-with open("result.txt") as read:
+#Runs NVIDIA SMI to check how much VRAM is free
+subprocess.call("nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits > output.log")
+
+#Reads the score from the VRAM usage log file
+with open("output.log") as read:
     result = int(read.read())
-    if result >= 30: nodeSuccess()
+    if result <= 2048: nodeSuccess()
     else: nodeFail()
 ```
 
-As we would expect, if this runs it will fail as it's below the minimum requirement of 30.
+In this example, the machine has only 500MB of VRAM free. A we would expect, if this runs it will fail as it's below the
+minimum requirement of 2048MB.
 
 ```
-Failed network check
+Failed VRAM check, only 500 MB free.
 ```
 
-## Using the SDK to reallocate a node
+## Using the IMDS SDK to reallocate a node
 
-Now, using the IMDS Python SDK we can automatically reallocate this replica to search for a new replica that passes the
-network tests. We'll change the `nodeFail` function to instead call the SDK.
+Now, using the Python IMDS SDK we can automatically reallocate this replica to search for a new replica that has free
+VRAM. We'll change the `nodeFail` function to instead call the IMDS SDK.
 
 ```python Python
 from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
 from salad_cloud_imds_sdk.models import ReallocateContainer
+import subprocess
 
 #Does nothing if the test succeeds
 def nodeSuccess():
-    print("Passed network check")
+    print("Passed VRAM check")
 
-#Reallocates the node if it fails via the Python SDK
+#Reallocates if the test fails
 def nodeFail():
-    print("Failed network check")
+    print("Failed VRAM check, only", result, "MB free.")
 
     sdk = SaladCloudImdsSdk(
     base_url=Environment.DEFAULT.value,
@@ -56,20 +64,24 @@ def nodeFail():
     )
 
     request_body = ReallocateContainer(
-        reason="Failed network check"
+        reason="NotEnoughVRAM"
     )
 
     sdk.metadata.reallocate_container(request_body=request_body)
 
-#Reads the score from the network test file
-with open("result.txt") as read:
+
+#Runs NVIDIA SMI to check how much VRAM is free
+subprocess.call("nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits > output.log")
+
+#Reads the score from the VRAM usage log file
+with open("output.log") as read:
     result = int(read.read())
-    if result >= 30: nodeSuccess()
+    if result >= 2048: nodeSuccess()
     else: nodeFail()
 ```
 
-Now, when a replica runs the check and fails, it will call to the SDK and automatically reallocate the replica. Below
-are examples in other languages for the SDK usage.
+Now, when a replica runs the check and fails, it will call to the IMDS SDK and automatically reallocate the replica.
+Below are examples in other languages for the IMDS SDK usage.
 
 <CodeGroup>
 ```C# C#
@@ -178,31 +190,35 @@ if ($err) {
 ## Using the JSON request endpoint to reallocate a node
 
 We also can reallocate the node by sending a POST request to the IMDS reallocate endpoint. Here, we'll use the same
-Python example, but with the POST request instead of the SDK.
+Python example, but with the POST request instead of the IMDS SDK.
 
 ```python Python
 import requests
+import subprocess
 
 #Does nothing if the test succeeds
 def nodeSuccess():
-    print("Passed network check")
+    print("Passed VRAM check")
 
-#Reallocates the node if it fails via a JSON post request using the requests library
+#Does nothing if the test fails
 def nodeFail():
-    print("Failed network check")
+    print("Failed VRAM check, only", result, "MB free.")
 
     url = "http://169.254.169.254/v1/reallocate"
     headers = {'Content-Type': 'application/json'}
-    body = {"Reason": "Failed network check"}
+    body = {"Reason": "NotEnoughVRAM"}
 
     response = requests.post(url, headers=headers, json=body)
     print(response)
 
 
-#Reads the score from the network test file
-with open("result.txt") as read:
+#Runs NVIDIA SMI to check how much VRAM is free
+subprocess.call("nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits > output.log")
+
+#Reads the score from the VRAM usage log file
+with open("output.log") as read:
     result = int(read.read())
-    if result >= 30: nodeSuccess()
+    if result >= 2048: nodeSuccess()
     else: nodeFail()
 ````
 
