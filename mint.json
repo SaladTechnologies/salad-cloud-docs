@@ -165,7 +165,6 @@
             "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
           ]
         },
-        "tutorials/using-salad-recipes",
         "tutorials/howtousethesaladterminal",
         "tutorials/run-a-python-app",
         "tutorials/ubuntu-image",
@@ -431,10 +430,6 @@
     {
       "source": "/docs/jupyterlab",
       "destination": "/products/sce/guides/jupyterlab"
-    },
-    {
-      "source": "/docs/sdxl",
-      "destination": "/products/sce/guides/how-to-deploy-and-use-stable-diffusion-xl-recipe"
     },
     {
       "source": "/docs/enabling-ipv6",
