@@ -26,4 +26,6 @@ for file in $endpoints/*; do
     echo "============================"
 done
 
+npx prettier --write .
+
 echo "Done adding all endpoints. Make sure to update mint.json with the new pages."

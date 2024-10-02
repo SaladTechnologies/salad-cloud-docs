@@ -3,9 +3,7 @@
   "properties": {
     "model": {
       "type": "string",
-      "enum": [
-        "stabilityai/stable-diffusion-xl-base-1.0"
-      ]
+      "enum": ["stabilityai/stable-diffusion-xl-base-1.0"]
     },
     "params": {
       "type": "object",
@@ -133,14 +131,7 @@
         },
         "lr_scheduler": {
           "type": "string",
-          "enum": [
-            "linear",
-            "cosine",
-            "cosine_with_restarts",
-            "polynomial",
-            "constant",
-            "constant_with_warmup"
-          ],
+          "enum": ["linear", "cosine", "cosine_with_restarts", "polynomial", "constant", "constant_with_warmup"],
           "default": "constant",
           "description": "The scheduler type to use."
         },
@@ -202,9 +193,7 @@
         },
         "class_labels_conditioning": {
           "type": "string",
-          "enum": [
-            "timesteps"
-          ],
+          "enum": ["timesteps"],
           "description": "The optional `class_label` conditioning to pass to the unet"
         },
         "rank": {
@@ -241,10 +230,7 @@
         },
         "optimizer": {
           "type": "string",
-          "enum": [
-            "AdamW",
-            "prodigy"
-          ],
+          "enum": ["AdamW", "prodigy"],
           "default": "AdamW",
           "description": "The optimizer to use."
         },
@@ -273,23 +259,14 @@
           "description": "Remove lr from the denominator of D estimate to avoid issues during warm-up stage. True by default. Ignored if optimizer is adamW"
         }
       },
-      "required": [
-        "instance_prompt",
-        "instance_images"
-      ],
+      "required": ["instance_prompt", "instance_images"],
       "additionalProperties": false
     },
     "type": {
       "type": "string",
-      "enum": [
-        "lora"
-      ]
+      "enum": ["lora"]
     }
   },
-  "required": [
-    "model",
-    "params",
-    "type"
-  ],
+  "required": ["model", "params", "type"],
   "additionalProperties": false
 }

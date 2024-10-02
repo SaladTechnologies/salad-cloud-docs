@@ -13,9 +13,6 @@
       "type": "number"
     }
   },
-  "required": [
-    "webui",
-    "diffusers"
-  ],
+  "required": ["webui", "diffusers"],
   "additionalProperties": false
 }

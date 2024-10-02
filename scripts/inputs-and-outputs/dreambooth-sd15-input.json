@@ -3,10 +3,7 @@
   "properties": {
     "model": {
       "type": "string",
-      "enum": [
-        "runwayml/stable-diffusion-v1-5",
-        "lykon/absolutereality_v1.6"
-      ]
+      "enum": ["runwayml/stable-diffusion-v1-5", "lykon/absolutereality_v1.6"]
     },
     "params": {
       "type": "object",
@@ -134,14 +131,7 @@
         },
         "lr_scheduler": {
           "type": "string",
-          "enum": [
-            "linear",
-            "cosine",
-            "cosine_with_restarts",
-            "polynomial",
-            "constant",
-            "constant_with_warmup"
-          ],
+          "enum": ["linear", "cosine", "cosine_with_restarts", "polynomial", "constant", "constant_with_warmup"],
           "default": "constant",
           "description": "The scheduler type to use."
         },
@@ -203,9 +193,7 @@
         },
         "class_labels_conditioning": {
           "type": "string",
-          "enum": [
-            "timesteps"
-          ],
+          "enum": ["timesteps"],
           "description": "The optional `class_label` conditioning to pass to the unet"
         },
         "rank": {
@@ -221,23 +209,14 @@
           "description": "Batch size for the training dataloader."
         }
       },
-      "required": [
-        "instance_prompt",
-        "instance_images"
-      ],
+      "required": ["instance_prompt", "instance_images"],
       "additionalProperties": false
     },
     "type": {
       "type": "string",
-      "enum": [
-        "lora"
-      ]
+      "enum": ["lora"]
     }
   },
-  "required": [
-    "model",
-    "params",
-    "type"
-  ],
+  "required": ["model", "params", "type"],
   "additionalProperties": false
 }
