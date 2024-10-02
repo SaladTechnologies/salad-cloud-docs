@@ -239,19 +239,21 @@
             {
               "group": "Stable Diffusion 1.5",
               "pages": [
-                "reference/dreambooth/sd15/create-a-training-job",
-                "reference/dreambooth/sd15/get-a-training-job",
-                "reference/dreambooth/sd15/delete-a-training-job",
-                "reference/dreambooth/sd15/list-training-jobs"
+                "reference/dreambooth/sd15/get-inference-endpoint",
+                "reference/dreambooth/sd15/list-jobs-for-dreambooth-training-api--stable-diffusion-15",
+                "reference/dreambooth/sd15/create-a-job-for-dreambooth-training-api--stable-diffusion-15",
+                "reference/dreambooth/sd15/get-job-for-dreambooth-training-api--stable-diffusion-15",
+                "reference/dreambooth/sd15/delete-job-for-dreambooth-training-api--stable-diffusion-15"
               ]
             },
             {
               "group": "Stable Diffusion XL",
               "pages": [
-                "reference/dreambooth/sdxl/create-a-training-job",
-                "reference/dreambooth/sdxl/get-a-training-job",
-                "reference/dreambooth/sdxl/delete-a-training-job",
-                "reference/dreambooth/sdxl/list-training-jobs"
+                "reference/dreambooth/sdxl/get-inference-endpoint",
+                "reference/dreambooth/sdxl/list-jobs-for-dreambooth-training-api--stable-diffusion-xl",
+                "reference/dreambooth/sdxl/create-a-job-for-dreambooth-training-api--stable-diffusion-xl",
+                "reference/dreambooth/sdxl/get-job-for-dreambooth-training-api--stable-diffusion-xl",
+                "reference/dreambooth/sdxl/delete-job-for-dreambooth-training-api--stable-diffusion-xl"
               ]
             }
           ]
