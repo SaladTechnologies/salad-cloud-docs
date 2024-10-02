@@ -277,6 +277,17 @@
                 "reference/recipes/flux1-schnell-fp8-comfyui/image-to-image",
                 "reference/recipes/flux1-schnell-fp8-comfyui/text-to-image"
               ]
+            },
+            {
+              "group": "Dreamshaper 8 - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/dreamshaper8-comfyui/health-probe",
+                "reference/recipes/dreamshaper8-comfyui/readiness-probe",
+                "reference/recipes/dreamshaper8-comfyui/list-models",
+                "reference/recipes/dreamshaper8-comfyui/submit-prompt",
+                "reference/recipes/dreamshaper8-comfyui/image-to-image",
+                "reference/recipes/dreamshaper8-comfyui/text-to-image"
+              ]
             }
           ]
         }
