@@ -20,6 +20,10 @@ for file in $endpoints/*; do
         sed -i "s/^openapi: \(.*\)$/openapi: $apiSpecName \1/" "$page"
     done
 
+    echo "============================"
     echo "Pages for $apiDocPath:"
     echo "$pages" | jq .
+    echo "============================"
 done
+
+echo "Done adding all endpoints. Make sure to update mint.json with the new pages."
