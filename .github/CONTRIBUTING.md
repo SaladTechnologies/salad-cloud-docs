@@ -97,7 +97,7 @@ To add a new recipe to the documentation, follow these steps:
 
 1. Place the openapi3 spec for the recipe in the `api-specs` directory, named for the recipe. It should match the
    directory name in the `salad-recipes` repository.
-2. Create a new directory in the `recipes` directory with the same name as the recipe api spec file.
+2. Create a new directory in the `reference/recipes` directory with the same name as the recipe api spec file.
 3. Run `npx @mintlify/scraping@latest openapi-file api-specs/<your-api-name>.json -o reference/recipes/<your-api-name>`
    to generate the MDX files for all your endpoints. It will also output an array of pages you can use to add to the
    navigation.
