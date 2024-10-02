@@ -35,6 +35,7 @@ subseed
 tmax
 tmin
 uncond
+underperform
 upscaler
 Uvicorn
 vCPU
