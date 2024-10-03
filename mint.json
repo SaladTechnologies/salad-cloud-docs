@@ -86,7 +86,6 @@
             "products/sce/disk-space",
             "products/sce/workload-logs",
             "products/sce/container-logs",
-            "products/sce/billing",
             "products/sce/quotas",
             "products/sce/faqs"
           ]
