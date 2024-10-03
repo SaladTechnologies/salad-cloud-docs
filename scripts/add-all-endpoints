@@ -2,7 +2,7 @@
 
 endpoints="$(dirname "$0")/endpoint-schema-configs"
 
-for file in $endpoints/*; do
+for file in $endpoints/*.json; do
     node scripts/create-api-spec-for-endpoint.js $file
 
     apiSpecName=$(jq -r '.endpointId' $file)
