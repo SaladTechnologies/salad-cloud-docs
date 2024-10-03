@@ -1,9 +1,0 @@
-{
-  "baseSchema": "api-specs/salad-cloud.json",
-  "inputSchema": "scripts/inputs-and-outputs/dreambooth-sdxl-input.json",
-  "outputSchema": "scripts/inputs-and-outputs/dreambooth-output.json",
-  "endpointId": "dreambooth-sdxl",
-  "endpointName": "Dreambooth Training API - Stable Diffusion XL",
-  "schemaName": "DreamboothSDXLTraining",
-  "apiDocPath": "reference/dreambooth/sdxl"
-}

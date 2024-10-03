@@ -88,7 +88,18 @@ To add a new endpoint (like dreambooth or transcription) to the documentation, f
 
 1. Place the openapi3 compatible input and output json schema for the endpoint in the `scripts/inputs-and-outputs`
    directory
-2. Place a config file in `scripts/endpoint-schema-configs`, following the existing config files as a template
+2. Place a config file in `scripts/endpoint-schema-configs`, with the following structure:
+   ```json
+   {
+     "baseSchema": "api-specs/salad-cloud.json",
+     "inputSchema": "scripts/inputs-and-outputs/dreambooth-sd15-input.json",
+     "outputSchema": "scripts/inputs-and-outputs/dreambooth-output.json",
+     "endpointId": "dreambooth-sd15",
+     "endpointName": "Dreambooth Training API - Stable Diffusion 1.5",
+     "schemaName": "DreamboothSD15Training",
+     "apiDocPath": "reference/dreambooth/sd15"
+   }
+   ```
 3. To run all config files, use `./scripts/add-all-endpoints`
 
 ## Adding Recipes

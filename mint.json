@@ -144,10 +144,6 @@
       ]
     },
     {
-      "group": "Dreambooth Training API",
-      "pages": ["products/dreambooth/avatar-video-tutorial", "products/dreambooth/pet-tutorial"]
-    },
-    {
       "group": "S4 - Salad Simple Storage Service",
       "pages": ["products/s4/salad-simple-storage-service"]
     },
@@ -182,18 +178,11 @@
           "group": "SaladCloud API",
           "pages": [
             {
-              "group": "Organizations",
-              "pages": [
-                "reference/saladcloud-api/organizations/get-gpu-classes",
-                "reference/saladcloud-api/organizations/get-quotas"
-              ]
-            },
-            {
               "group": "Container Groups",
               "pages": [
-                "reference/saladcloud-api/container_groups/list-container-groups",
                 "reference/saladcloud-api/container_groups/create-a-container-group",
                 "reference/saladcloud-api/container_groups/get-a-container-group",
+                "reference/saladcloud-api/container_groups/list-container-groups",
                 "reference/saladcloud-api/container_groups/update-a-container-group",
                 "reference/saladcloud-api/container_groups/delete-a-container-group",
                 "reference/saladcloud-api/container_groups/start-a-container-group",
@@ -230,30 +219,12 @@
                 "reference/saladcloud-api/inference_endpoints/get-an-inference-endpoint-job",
                 "reference/saladcloud-api/inference_endpoints/delete-an-inference-endpoint-job"
               ]
-            }
-          ]
-        },
-        {
-          "group": "Dreambooth Training API",
-          "pages": [
-            {
-              "group": "Stable Diffusion 1.5",
-              "pages": [
-                "reference/dreambooth/sd15/get-inference-endpoint",
-                "reference/dreambooth/sd15/list-jobs-for-dreambooth-training-api--stable-diffusion-15",
-                "reference/dreambooth/sd15/create-a-job-for-dreambooth-training-api--stable-diffusion-15",
-                "reference/dreambooth/sd15/get-job-for-dreambooth-training-api--stable-diffusion-15",
-                "reference/dreambooth/sd15/delete-job-for-dreambooth-training-api--stable-diffusion-15"
-              ]
             },
             {
-              "group": "Stable Diffusion XL",
+              "group": "Organizations",
               "pages": [
-                "reference/dreambooth/sdxl/get-inference-endpoint",
-                "reference/dreambooth/sdxl/list-jobs-for-dreambooth-training-api--stable-diffusion-xl",
-                "reference/dreambooth/sdxl/create-a-job-for-dreambooth-training-api--stable-diffusion-xl",
-                "reference/dreambooth/sdxl/get-job-for-dreambooth-training-api--stable-diffusion-xl",
-                "reference/dreambooth/sdxl/delete-job-for-dreambooth-training-api--stable-diffusion-xl"
+                "reference/saladcloud-api/organizations/get-gpu-classes",
+                "reference/saladcloud-api/organizations/get-quotas"
               ]
             }
           ]
