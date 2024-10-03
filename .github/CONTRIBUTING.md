@@ -86,21 +86,10 @@ Etiquette][etiquette-1] and Ilya Grigorik's blog post titled [Don't "Push" Your 
 
 To add a new endpoint (like dreambooth or transcription) to the documentation, follow these steps:
 
-1. Place the openapi3 compatible input and output json schema for the endpoint in the `scripts/inputs-and-outputs`
-   directory
-2. Place a config file in `scripts/endpoint-schema-configs`, with the following structure:
-   ```json
-   {
-     "baseSchema": "api-specs/salad-cloud.json",
-     "inputSchema": "scripts/inputs-and-outputs/dreambooth-sd15-input.json",
-     "outputSchema": "scripts/inputs-and-outputs/dreambooth-output.json",
-     "endpointId": "dreambooth-sd15",
-     "endpointName": "Dreambooth Training API - Stable Diffusion 1.5",
-     "schemaName": "DreamboothSD15Training",
-     "apiDocPath": "reference/dreambooth/sd15"
-   }
-   ```
-3. To run all config files, use `./scripts/add-all-endpoints`
+1. Place the openapi3 compatible input and output json schema for the endpoint in the `api-specs` directory
+2. Place a config file in `scripts/endpoint-schema-configs`, following the existing config files as a template
+3. To run just one config file, use `node scripts/add-inference-endpoint-to-schema.js <config-file-name>`.
+   1. To run all config files, use `./scripts/add-all-endpoints`
 
 ## Adding Recipes
 
@@ -108,7 +97,7 @@ To add a new recipe to the documentation, follow these steps:
 
 1. Place the openapi3 spec for the recipe in the `api-specs` directory, named for the recipe. It should match the
    directory name in the `salad-recipes` repository.
-2. Create a new directory in the `reference/recipes` directory with the same name as the recipe api spec file.
+2. Create a new directory in the `recipes` directory with the same name as the recipe api spec file.
 3. Run `npx @mintlify/scraping@latest openapi-file api-specs/<your-api-name>.json -o reference/recipes/<your-api-name>`
    to generate the MDX files for all your endpoints. It will also output an array of pages you can use to add to the
    navigation.
