@@ -1,0 +1,31 @@
+#! /usr/bin/bash
+
+# path to the schema
+schema=$1
+
+# schema required
+if [ -z "$schema" ]; then
+    echo "Usage: $0 <schema>"
+    exit 1
+fi
+
+# the recipe name is the schema filename without the extension
+recipeName=$(basename $schema .json)
+
+docsPath=reference/recipes/$recipeName
+mkdir -p $docsPath
+
+menu=$(npx --yes @mintlify/scraping@latest openapi-file $schema -o $docsPath | sed -n '/navigation object suggestion:/,$ p' | sed '1d')
+
+# change the value of .group to the recipe name
+menu=$(echo "$menu" | jq '.[0].group = "'$recipeName'"')
+
+# For each .mdx in the doc path, add the spec name to the frontmatter
+for page in $docsPath/*.mdx; do
+    sed -i "s/^openapi: \(.*\)$/openapi: $recipeName \1/" "$page"
+done
+
+echo "============================"
+echo "Add this to mint.json:"
+echo "$menu" | jq .
+echo "============================"
