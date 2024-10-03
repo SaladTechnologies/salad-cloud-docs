@@ -25,6 +25,8 @@ for page in $docsPath/*.mdx; do
     sed -i "s/^openapi: \(.*\)$/openapi: $recipeName \1/" "$page"
 done
 
+npx prettier --write .
+
 echo "============================"
 echo "Add this to mint.json:"
 echo "$menu" | jq .
