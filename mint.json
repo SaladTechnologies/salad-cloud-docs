@@ -251,6 +251,18 @@
               ]
             },
             {
+              "group": "SDXL with Refiner - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/sdxl-with-refiner-comfyui/health-probe",
+                "reference/recipes/sdxl-with-refiner-comfyui/readiness-probe",
+                "reference/recipes/sdxl-with-refiner-comfyui/list-models",
+                "reference/recipes/sdxl-with-refiner-comfyui/submit-prompt",
+                "reference/recipes/sdxl-with-refiner-comfyui/image-to-image",
+                "reference/recipes/sdxl-with-refiner-comfyui/text-to-image-+refiner",
+                "reference/recipes/sdxl-with-refiner-comfyui/text-to-image"
+              ]
+            },
+            {
               "group": "Dreamshaper 8 - ComfyUI (API)",
               "pages": [
                 "reference/recipes/dreamshaper8-comfyui/health-probe",

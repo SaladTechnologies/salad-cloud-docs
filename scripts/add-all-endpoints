@@ -9,7 +9,7 @@ for file in $endpoints/*.json; do
     apiSpecPath="api-specs/$apiSpecName.json"
     apiDocPath=$(jq -r '.apiDocPath' $file)
 
-    menu=$(npx @mintlify/scraping@latest openapi-file $apiSpecPath -o $apiDocPath | sed -n '/navigation object suggestion:/,$ p' | sed '1d')
+    menu=$(npx --yes @mintlify/scraping@latest openapi-file $apiSpecPath -o $apiDocPath | sed -n '/navigation object suggestion:/,$ p' | sed '1d')
     pages=$(echo "$menu" | jq '.[0].pages | map(sub("inference_endpoints/"; ""))')
 
     mv $apiDocPath/inference_endpoints/* $apiDocPath/
