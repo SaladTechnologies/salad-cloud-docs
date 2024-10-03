@@ -12,6 +12,7 @@ distil
 dreambooth
 dreamshaper
 encodedimage
+Falco
 firstphase
 Fooocus
 Healthcheck
