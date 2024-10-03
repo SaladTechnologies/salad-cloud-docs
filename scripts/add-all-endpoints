@@ -3,5 +3,29 @@
 endpoints="$(dirname "$0")/endpoint-schema-configs"
 
 for file in $endpoints/*; do
-    node scripts/add-inference-endpoint-to-schema.js $file
+    node scripts/create-api-spec-for-endpoint.js $file
+
+    apiSpecName=$(jq -r '.endpointId' $file)
+    apiSpecPath="api-specs/$apiSpecName.json"
+    apiDocPath=$(jq -r '.apiDocPath' $file)
+
+    menu=$(npx @mintlify/scraping@latest openapi-file $apiSpecPath -o $apiDocPath | sed -n '/navigation object suggestion:/,$ p' | sed '1d')
+    pages=$(echo "$menu" | jq '.[0].pages | map(sub("inference_endpoints/"; ""))')
+
+    mv $apiDocPath/inference_endpoints/* $apiDocPath/
+    rm -r $apiDocPath/inference_endpoints
+
+    # For each .mdx in the doc path, add the spec name to the frontmatter
+    for page in $apiDocPath/*.mdx; do
+        sed -i "s/^openapi: \(.*\)$/openapi: $apiSpecName \1/" "$page"
+    done
+
+    echo "============================"
+    echo "Pages for $apiDocPath:"
+    echo "$pages" | jq .
+    echo "============================"
 done
+
+npx prettier --write .
+
+echo "Done adding all endpoints. Make sure to update mint.json with the new pages."
