@@ -19,6 +19,7 @@ Falco
 fastapi
 firstphase
 Fooocus
+getsize
 Healthcheck
 IMDS
 imdssdk
@@ -34,6 +35,7 @@ makedirs
 mintlify
 neofetch
 nomos8khatLOtf_v20.safetensors
+noproxy
 numpy
 OpenAPI
 popitem
