@@ -109,21 +109,21 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
 
    1. Go to [http://localhost:8188/](http://localhost:8188/) in your browser. You should see something like this:
 
-      ![Default Comfy UI Interface](/products/sce/images/stable-diffusion/comfy-default-view.png)
+      ![Default Comfy UI Interface](/guides/image-generation/images/comfy-default-view.png)
 
    2. Click “Queue Prompt” to generate an image. Mine came out like this.
 
-      ![Purple galaxy landscape inside a glass bottle on an outdoor table](/products/sce/images/stable-diffusion/comfy-image-1.png)
+      ![Purple galaxy landscape inside a glass bottle on an outdoor table](/guides/image-generation/images/comfy-image-1.png)
 
    3. Enable Dev Mode Options via the settings menu
 
-      ![Click the gear to open the settings menu](/products/sce/images/stable-diffusion/comfy-settings-menu-1.png)
+      ![Click the gear to open the settings menu](/guides/image-generation/images/comfy-settings-menu-1.png)
 
-      ![Check the box labeled "Enable Dev mode Options"](/products/sce/images/stable-diffusion/comfy-settings-menu-2.png)
+      ![Check the box labeled "Enable Dev mode Options"](/guides/image-generation/images/comfy-settings-menu-2.png)
 
       You should see a new option in the menu, “Save (API Format)”:
 
-      ![Notice the new button labeled "Save (API Format)"](/products/sce/images/stable-diffusion/comfy-settings-menu-3.png)
+      ![Notice the new button labeled "Save (API Format)"](/guides/image-generation/images/comfy-settings-menu-3.png)
 
    4. Click the “Save (API Format)” button, and save it. You’ll get a file called “workflow_api.json” that contains
       everything ComfyUI needs to run that prompt again.
@@ -217,7 +217,7 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
 
    5. Submit the prompt to the wrapper API on port 3000, using Postman or any http request tool of your choice.
 
-      ![Submitting the request via Postman](/products/sce/images/stable-diffusion/comfy-submit-prompt-1.png)
+      ![Submitting the request via Postman](/guides/image-generation/images/comfy-submit-prompt-1.png)
 
       You should submit a POST request to [`http://localhost:3000/prompt`](http://localhost:3000/prompt) with a JSON
       request body like this, where the value of “prompt” is that workflow json we created previously.
@@ -241,7 +241,7 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
    7. Decode the base64 encoded string into your image. You can do this in a free browser tool such as
       https://codebeautify.org/base64-to-image-converter
 
-      ![Decoding the returned base64 image](/products/sce/images/stable-diffusion/comfy-decoded-image-1.png)
+      ![Decoding the returned base64 image](/guides/image-generation/images/comfy-decoded-image-1.png)
 
       or using CLI tools like `jq` and `base64`. For this method, first save your response to a file called
       `response.json`. Then, run the following command:
@@ -261,24 +261,24 @@ docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the
    [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
-![Untitled](/products/sce/images/stable-diffusion/salad-create-container-group.png)
+![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
 We’re going to name our container group something obvious, and fill in the configuration form. Since this is a stable
 diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vcpus, 12GB ram, an RTX 3060 Ti GPU,
 and a reserved 1 GB of local storage for temporary storage of images as they are being generated. We’re going to use 3
 replicas, to ensure coverage during node interruptions and reallocations.
 
-![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-1.png)
+![Untitled](/guides/image-generation/images/deploy-comfy-1.png)
 
-![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-2.png)
+![Untitled](/guides/image-generation/images/deploy-comfy-2.png)
 
-![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-3.png)
+![Untitled](/guides/image-generation/images/deploy-comfy-3.png)
 
 Additionally, we will want to configure our startup and readiness probes (endpoints provided by the wrapper), and enable
 the container gateway on port 3000. We’ve disabled authentication for this example, but you may want to enable it. If
 you enable authentication, requests must be submitted with your Salad API Key in the `Salad-Api-Key` header.
 
-![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-4.png)
+![Untitled](/guides/image-generation/images/deploy-comfy-4.png)
 
 Click Deploy, and wait for the deployment to come up.
 
@@ -288,15 +288,15 @@ Click Deploy, and wait for the deployment to come up.
 
    1. First, Salad pulls your container image into our own internal high-performance cache.
 
-      ![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-5.png)
+      ![Untitled](/guides/image-generation/images/deploy-comfy-5.png)
 
    2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
 
-      ![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-6.png)
+      ![Untitled](/guides/image-generation/images/deploy-comfy-6.png)
 
    3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
 
-      ![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-7.png)
+      ![Untitled](/guides/image-generation/images/deploy-comfy-7.png)
 
       This step can take tens of minutes in some cases, depending on the size of the image, and the internet speed of
       the individual nodes. Note that our progress bars are only estimates, and do not necessarily reflect real-time
@@ -305,9 +305,9 @@ Click Deploy, and wait for the deployment to come up.
 
    4. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
 
-      ![Untitled](/products/sce/images/stable-diffusion/deploy-comfy-8.png)
+      ![Untitled](/guides/image-generation/images/deploy-comfy-8.png)
 
 2. Submit your prompt to the provided Access Domain Name. You will get back a json response within a few seconds. See
    [above](#build-and-test-your-docker-image) for how to submit the request and process the response.
 
-   ![Untitled](/products/sce/images/stable-diffusion/comfy-submit-prompt-2.png)
+   ![Untitled](/guides/image-generation/images/comfy-submit-prompt-2.png)
