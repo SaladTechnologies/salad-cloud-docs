@@ -69,7 +69,7 @@ ENV MODEL_DIR=/opt/ComfyUI/models
 COPY dreamshaper_8.safetensors ${MODEL_DIR}/checkpoints/dreamshaper_8.safetensors
 
 # We also need to copy the comfyui-api binary into the image, since ComfyUI
-# is fully asyncronous by default, and has no convenient way to retrieve
+# is fully asynchronous by default, and has no convenient way to retrieve
 # generated images.
 ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.4.0/comfyui-api .
 RUN chmod +x comfyui-api

@@ -76,10 +76,10 @@ When deploying your stable diffusion inference server, you have two options for 
 2. **Job Queue**: This is a more resilient way to access your container group.
    1. You can submit jobs to a queue, and the container group will process them in order.
    1. You must add a binary to your container image that connects the job queue to your inference server.
-   1. High utililization of the container group will result in longer queue times, but no failed requests.
+   1. High utilization of the container group will result in longer queue times, but no failed requests.
    1. **Retries Failed Requests**: If a request fails, the job queue will retry the request 3 times.
    1. **Long-Running Tasks**: The job queue is suitable for long-running tasks, as it does not have a timeout.
-   1. **Fully asyncronous**: Completed jobs are not returned to the client, but instead must be fetched from the job
+   1. **Fully asynchronous**: Completed jobs are not returned to the client, but instead must be fetched from the job
       queue, or received by a webhook.
 
 There are several factors you should consider when choosing between the two options:
@@ -112,7 +112,7 @@ and to some extent your choice of inference server.
 
 ## Warming up your server
 
-In most situations, the first request to an inference server will be signficantly slower than subsequent requests. This
+In most situations, the first request to an inference server will be significantly slower than subsequent requests. This
 is because the server must load the model into VRAM, and establish its internal kv cache. For this reason, it is often
 desirable to send a dummy request to the server before sending real requests. For Salad, this can be done conveniently
 via the Startup Probe in the container group configuration. You set the startup probe as a `curl` command that submits

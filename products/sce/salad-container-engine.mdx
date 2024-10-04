@@ -77,7 +77,7 @@ workloads, and boot true Linux kernels from the Windows Subsystem for Linux (WSL
 ### Stateless Execution
 
 Active SCE container instances are treated as stateless workloads. Whenever the virtual execution context closes
-(through downscaling, batch job termination, or failure), the container image is purged from the host machine's local
+(through down-scaling, batch job termination, or failure), the container image is purged from the host machine's local
 memory. While running, the Salad container orchestrator uses heartbeat monitoring to assess potential interruptions or
 other failures, and determine when and how best to dynamically fail over to another dedicated node to maximize resource
 availability.
