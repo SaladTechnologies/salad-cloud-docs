@@ -8,7 +8,7 @@ The following sections outline the different ways to contribute to the project.
 
 SaladCloud documentation follows [Diátaxis](https://diataxis.fr/) principles.
 
-![Diataxis framework](diataxis.png)
+![Diataxis framework](./diataxis.png)
 
 In our documentation, we label the "Explanation" section "Products", but otherwise, the structure is the same.
 

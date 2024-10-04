@@ -115,7 +115,7 @@ Now that all the files are in place, let's build the container image.
 - Build your FastAPI image:
 
 ```Text Bash
-docker build -t myimage .
+docker build -t my-image:latest .
 ```
 
 ## Test the Container Locally
@@ -125,7 +125,7 @@ docker build -t myimage .
 Run a container based on your image on your local machine:
 
 ```Text Bash
-docker run -d --name mycontainer -p 80:80 myimage
+docker run -d --name my-container -p 80:80 my-image:latest
 ```
 
 ### Check the API
@@ -138,7 +138,7 @@ You should be able to check it in your Docker container's URL, for example:
 You will see something like:
 
 ```json
-{ "item_id": 5, "q": "somequery" }
+{ "item_id": 5, "q": "some-query" }
 ```
 
 # Push Container to a Registry
@@ -150,12 +150,12 @@ be deployed on SaladCloud. You can push to any of the
 ## Tagging the Image
 
 In order to push the container image to Docker Hub you will first need to tag your image with your Docker username and
-an unique container name. The format of the image name is `{dockerhubusername}/{imagename}:{version}`
+an unique container name. The format of the image name is `{docker-hub-username}/{image-name}:{version}`
 
 At Salad we use the `saladtechnologies` username, but you will need to use your own username.
 
 ```Text Bash
-docker tag myimage saladtechnologies/run-python:0.1
+docker tag my-image saladtechnologies/run-python:0.1
 ```
 
 ## Pushing the Image
@@ -184,7 +184,7 @@ container up to the registry.
 Since the FastAPI is listening to port 80, you will need to enable the Container Gateway and configure the port when
 creating a new container group.
 
-[Deployment Guide](/products/sce/deploy-containers)
+[Deployment Guide](/products/sce/containers)
 
 <img src="/products/sce/images/0d2e830-image.png" />
 
