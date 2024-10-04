@@ -17,6 +17,7 @@ firstphase
 Fooocus
 Healthcheck
 IMDS
+interruptible
 LAVIS
 LoRA
 LoRAs
