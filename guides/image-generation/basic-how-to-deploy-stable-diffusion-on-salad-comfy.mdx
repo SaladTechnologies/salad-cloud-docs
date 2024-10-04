@@ -232,7 +232,7 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
 
       ```json
       {
-         "id": "randomuuid",
+         "id": "random-uuid",
          "prompt": { ... },
          "images": ["base64encodedimage"]
       }
@@ -264,7 +264,7 @@ docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
 ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
 We’re going to name our container group something obvious, and fill in the configuration form. Since this is a stable
-diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vcpus, 12GB ram, an RTX 3060 Ti GPU,
+diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vCPUs, 12GB ram, an RTX 3060 Ti GPU,
 and a reserved 1 GB of local storage for temporary storage of images as they are being generated. We’re going to use 3
 replicas, to ensure coverage during node interruptions and reallocations.
 

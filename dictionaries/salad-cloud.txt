@@ -6,6 +6,7 @@ Controlnet
 Controlnets
 cuda
 cudnn
+denoise
 denoising
 Diátaxis
 distil
@@ -17,6 +18,7 @@ firstphase
 Fooocus
 Healthcheck
 IMDS
+inpainting
 LAVIS
 LoRA
 LoRAs
@@ -31,6 +33,7 @@ saladtechnologies
 schnell
 SD.Next
 sdapi
+sdnext
 SDXL
 subseed
 tmax
@@ -41,4 +44,6 @@ unet
 upscaler
 Uvicorn
 vCPU
+webui
 WORKDIR
+xformers
