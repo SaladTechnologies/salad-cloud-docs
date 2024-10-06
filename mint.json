@@ -149,6 +149,7 @@
     {
       "group": "Tutorials",
       "pages": [
+        "tutorials/docker-run",
         {
           "group": "Run a Node App",
           "pages": [
