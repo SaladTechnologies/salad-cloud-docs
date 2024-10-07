@@ -147,6 +147,10 @@
       "pages": ["products/s4/salad-simple-storage-service"]
     },
     {
+      "group": "Recipes",
+      "pages": ["products/recipes/flux1-schnell-fp8-comfyui"]
+    },
+    {
       "group": "Tutorials",
       "pages": [
         {
