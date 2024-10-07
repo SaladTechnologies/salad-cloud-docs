@@ -8,19 +8,23 @@ between multiple languages, and translate SRT files for captions and subtitles."
 
 ## Introduction
 
-Salad Transcription API not only transcribes audio and video content with high accuracy but also offers exceptional translation capabilities. Our service enables you to:
+Salad Transcription API not only transcribes audio and video content with high accuracy but also offers exceptional
+translation capabilities. Our service enables you to:
 
-- **Translate from 99 languages to English**: Seamlessly transcribe and translate content from virtually any language into English.
-- **Full translation between multiple languages**: Utilize our Large Language Model (LLM) integration to translate between English, French, German, Italian, Portuguese, Hindi, Spanish, and Thai.
+- **Translate from 99 languages to English**: Seamlessly transcribe and translate content from virtually any language
+  into English.
+- **Full translation between multiple languages**: Utilize our Large Language Model (LLM) integration to translate
+  between English, French, German, Italian, Portuguese, Hindi, Spanish, and Thai.
 - **Translating SRT files into different languages.**
-- **Multi-language translation in a single request**: Transcribe content and translate it into multiple languages simultaneously.
-
+- **Multi-language translation in a single request**: Transcribe content and translate it into multiple languages
+  simultaneously.
 
 ## Translation Features
 
 ### Translate to English
 
-Automatically translate your transcriptions into English using the `"translate": "to_eng"` parameter. This is especially useful when working with content in other languages that you want to transcribe and understand in English.
+Automatically translate your transcriptions into English using the `"translate": "to_eng"` parameter. This is especially
+useful when working with content in other languages that you want to transcribe and understand in English.
 
 **Example:**
 
@@ -30,11 +34,14 @@ Automatically translate your transcriptions into English using the `"translate":
   "translate": "to_eng"
 }
 ```
-**Note**: if `"translate": "to_eng"`  is set, the translation will be returned instead of the original transcription. All additional parameters (like timestamps, diarization, etc.) can also be used in conjunction with translation.
+
+**Note**: if `"translate": "to_eng"` is set, the translation will be returned instead of the original transcription. All
+additional parameters (like timestamps, diarization, etc.) can also be used in conjunction with translation.
 
 ### LLM-Driven Translation
 
-Leverage our Large Language Model (LLM) integration to translate transcriptions into multiple languages. Specify the target languages using the `"llm_translation"` parameter.
+Leverage our Large Language Model (LLM) integration to translate transcriptions into multiple languages. Specify the
+target languages using the `"llm_translation"` parameter.
 
 **Supported languages for LLM translation:**
 
@@ -48,13 +55,16 @@ Leverage our Large Language Model (LLM) integration to translate transcriptions 
 - Thai
 
 **Example:**
+
 ```json
 "input": {
   "url": "https://example.com/path/to/file.mp3",
   "llm_translation": "german, italian, french"
 }
 ```
-**Note**: When using "llm_translation", the original transcription will be returned as normal, along with the translations into the specified languages.
+
+**Note**: When using "llm_translation", the original transcription will be returned as normal, along with the
+translations into the specified languages.
 
 **Example Response**:
 
@@ -69,18 +79,20 @@ Leverage our Large Language Model (LLM) integration to translate transcriptions 
     }
   }
 }
-
 ```
-The `segments` field contains the original transcription in the source language (English in this case).
-The `llm_translation` object contains translations into the specified languages.
 
-No need to send a request per language, you can translate your transcription to all supported languages at one operation. 
+The `segments` field contains the original transcription in the source language (English in this case). The
+`llm_translation` object contains translations into the specified languages.
+
+No need to send a request per language, you can translate your transcription to all supported languages at one
+operation.
 
 Need output example and a note that original transciption will be return as normal
 
 ### SRT Translation
 
-To translate your SRT captions into multiple languages, use the `"srt_translation"` parameter with a comma-separated list of target languages.
+To translate your SRT captions into multiple languages, use the `"srt_translation"` parameter with a comma-separated
+list of target languages.
 
 **Example Request:**
 
@@ -92,7 +104,8 @@ To translate your SRT captions into multiple languages, use the `"srt_translatio
 }
 ```
 
-**Note**: When using "srt_translation", the original transcription and SRT content will be returned as normal, along with the translated SRT files.
+**Note**: When using "srt_translation", the original transcription and SRT content will be returned as normal, along
+with the translated SRT files.
 
 **Example Response:**
 
@@ -109,15 +122,17 @@ To translate your SRT captions into multiple languages, use the `"srt_translatio
 }
 ```
 
-The `srt_content` field contains the original SRT captions in the source language.
-The `srt_translation` object contains the SRT captions translated into the specified languages.
-
+The `srt_content` field contains the original SRT captions in the source language. The `srt_translation` object contains
+the SRT captions translated into the specified languages.
 
 ### Combining Translation Features
 
-- ** Combining Features**: You can use translation features alongside other parameters like `"diarization"`, `"word_level_timestamps"`, `"custom_prompt"`, `"summarize"` and others.
-- ** Original Transcription**: When using `"llm_translation"` or `"srt_translation"`, the original transcription and SRT content will be included in the response.
-- ** Translation to English**: When using `"translate": "to_eng"`, the transcription is provided directly in English, replacing the original language transcription.
+- ** Combining Features**: You can use translation features alongside other parameters like `"diarization"`,
+  `"word_level_timestamps"`, `"custom_prompt"`, `"summarize"` and others.
+- ** Original Transcription**: When using `"llm_translation"` or `"srt_translation"`, the original transcription and SRT
+  content will be included in the response.
+- ** Translation to English**: When using `"translate": "to_eng"`, the transcription is provided directly in English,
+  replacing the original language transcription.
 
 **Full Request Example:**
 
@@ -143,63 +158,58 @@ curl -X POST salad_url \
 
 ```json
 {
-    "id": "b4ed4d73-df5c-43fa-8d2b-b77e57ce5cfc",
-    "input": {
-        "url": "https://example.com/path/to/french_audio.mp3",
-        "language_code": "en",
-        "return_as_file": false,
-        "diarization": false,
-        "sentence_diarization": true,
-        "srt": true,
-        "sentence_level_timestamps": true,
-        "llm_translation": "french, german, portuguese",
-        "srt_translation": "spanish"
+  "id": "b4ed4d73-df5c-43fa-8d2b-b77e57ce5cfc",
+  "input": {
+    "url": "https://example.com/path/to/french_audio.mp3",
+    "language_code": "en",
+    "return_as_file": false,
+    "diarization": false,
+    "sentence_diarization": true,
+    "srt": true,
+    "sentence_level_timestamps": true,
+    "llm_translation": "french, german, portuguese",
+    "srt_translation": "spanish"
+  },
+  "inference_endpoint_name": "transcribe",
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2024-10-03T13:58:52.3339361+00:00"
     },
-    "inference_endpoint_name": "transcribe",
-    "status": "succeeded",
-    "events": [
-        {
-            "action": "created",
-            "time": "2024-10-03T13:58:52.3339361+00:00"
-        },
-        {
-            "action": "started",
-            "time": "2024-10-03T13:58:52.417207+00:00"
-        },
-        {
-            "action": "succeeded",
-            "time": "2024-10-03T13:59:10.6424658+00:00"
-        }
+    {
+      "action": "started",
+      "time": "2024-10-03T13:58:52.417207+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2024-10-03T13:59:10.6424658+00:00"
+    }
+  ],
+  "output": {
+    "sentence_level_timestamps": [
+      {
+        "text": "It always seems like time stands still when I'm with you.",
+        "timestamp": [29.98, 30.98],
+        "start": 29.98,
+        "end": 30.98
+      }
     ],
-    "output": {
-        "sentence_level_timestamps": [
-            {
-                "text": "It always seems like time stands still when I'm with you.",
-                "timestamp": [
-                    29.98,
-                    30.98
-                ],
-                "start": 29.98,
-                "end": 30.98
-            }
-        ],
-        "srt_content": "1\n00:00:29,980 --> 00:00:30,980\nIt always seems like time stands still when I'm with you.\n\n",
-        "summary": "Time stands still in love.",
-        "llm_translations": {
-            "French": "Le temps semble s'arrêter chaque fois que je suis avec toi.",
-            "German": "Es scheint immer so, als ob die Zeit stehen geblieben ist, wenn ich bei dir bin.",
-            "Portuguese": "Sempre parece que o tempo se detém quando estou com você."
-        },
-        "srt_translation": {
-            "Spanish": "1\n00:00:29,980 --> 00:00:30,980\nSiempre parece que el tiempo se para cuando estoy contigo."
-        },
-        "text": " It always seems like time stands still when I'm with you.",
-        "duration": 0.1,
-        "processing_time": 17.778546571731567
+    "srt_content": "1\n00:00:29,980 --> 00:00:30,980\nIt always seems like time stands still when I'm with you.\n\n",
+    "summary": "Time stands still in love.",
+    "llm_translations": {
+      "French": "Le temps semble s'arrêter chaque fois que je suis avec toi.",
+      "German": "Es scheint immer so, als ob die Zeit stehen geblieben ist, wenn ich bei dir bin.",
+      "Portuguese": "Sempre parece que o tempo se detém quando estou com você."
     },
-    "create_time": "2024-10-03T13:58:52.3339361+00:00",
-    "update_time": "2024-10-03T13:59:10.6424658+00:00"
+    "srt_translation": {
+      "Spanish": "1\n00:00:29,980 --> 00:00:30,980\nSiempre parece que el tiempo se para cuando estoy contigo."
+    },
+    "text": " It always seems like time stands still when I'm with you.",
+    "duration": 0.1,
+    "processing_time": 17.778546571731567
+  },
+  "create_time": "2024-10-03T13:58:52.3339361+00:00",
+  "update_time": "2024-10-03T13:59:10.6424658+00:00"
 }
 ```
-
-

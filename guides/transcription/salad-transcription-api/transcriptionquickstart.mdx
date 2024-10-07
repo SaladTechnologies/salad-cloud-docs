@@ -1,9 +1,9 @@
 ---
 title: 'Transcription API Quickstart'
 description:
-  "Get started with Salad Transcription API here. This step by step guide will walk you through setting up
-  your Salad Portal account and running your first Transcription API job. Alternatively, [Fork this PostMan.com
-  collection.](https://www.postman.com/salad-apis/workspace/salad/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac)"
+  'Get started with Salad Transcription API here. This step by step guide will walk you through setting up your Salad
+  Portal account and running your first Transcription API job. Alternatively, [Fork this PostMan.com
+  collection.](https://www.postman.com/salad-apis/workspace/salad/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac)'
 ---
 
 ## Accounts & Credentials
@@ -24,7 +24,10 @@ this Organization_ for the org you want to use.
 
 _Then,_ click on _Inference Endpoints_ in the left-hand nav and open up the Transcription API.
 
-<img src="/guides/transcription/salad-transcription-api/images/managed_services.png" alt="Access Salad Transcription API" />
+<img
+  src="/guides/transcription/salad-transcription-api/images/managed_services.png"
+  alt="Access Salad Transcription API"
+/>
 
 Copy your Transcription API URL
 
@@ -98,7 +101,10 @@ Update the JSON input parameters to customize your transcription output.
 
 #### "url"
 
-The url parameter should be a downloadable link to your audio or video file. We recommend using a file service like AWS S3, Azure Blob Storage, Dropbox, or Google Drive that offers secure, downloadable links. For instructions on how to generate downloadable links for these services, please refer to [How to Create Downloadable File Links](https://docs.salad.com/guides/transcription/salad-transcription-api/awsdownloadablefile)
+The url parameter should be a downloadable link to your audio or video file. We recommend using a file service like AWS
+S3, Azure Blob Storage, Dropbox, or Google Drive that offers secure, downloadable links. For instructions on how to
+generate downloadable links for these services, please refer to
+[How to Create Downloadable File Links](https://docs.salad.com/guides/transcription/salad-transcription-api/awsdownloadablefile)
 
 Send media in any of these formats.
 
@@ -106,7 +112,9 @@ Send media in any of these formats.
     	*Video:* MKV, MOV, WEBM, WMA, MP4 (most codecs), AVI
 
 #### "return_as_file"
-Set to true to receive the transcription output as a downloadable file URL. This is useful for large outputs. Default is false.
+
+Set to true to receive the transcription output as a downloadable file URL. This is useful for large outputs. Default is
+false.
 
 #### “language_code”
 
@@ -125,7 +133,7 @@ Set to "true" for word level timestamps. Set to "false” on default.
 
 Set to _"true"_ for speaker separation and identification. If you don't require it, set it to _"false”_.
 
-Diarization requires the `language_code` to be defined. By default, it is set to `"en"`  (English).
+Diarization requires the `language_code` to be defined. By default, it is set to `"en"` (English).
 
 You can also diarize in _"fr"_ (French), _"de"_ (German), _"es"_ (Spanish), _"it"_ (Italian), _"ja"_ (Japanese), _"zh"_
 (Chinese), _"nl"_ (Dutch), _"uk"_ (Ukrainian), _"pt"_ (Portuguese), _"ar"_ (Arabic), _"cs”_ (Czech), _"ru"_ (Russian),
@@ -134,30 +142,41 @@ _"pl"_ (Polish), _"hu"_ (Hungarian), _"fi"_ (Finnish), _"fa"_ (Persian), _"el"_ 
 (Catalan), _"ml"_ (Malayalam).
 
 #### "sentence_diarization"
-Set to `true` to include speaker information at the sentence level. Requires language_code to be specified. Default is `false`.
+
+Set to `true` to include speaker information at the sentence level. Requires language_code to be specified. Default is
+`false`.
 
 #### "translate"
-Set `"translate": "to_eng"` to translate the transcription into English. This replaces the original transcription with the English translation. All additional parameters may also be used alongside translation.
+
+Set `"translate": "to_eng"` to translate the transcription into English. This replaces the original transcription with
+the English translation. All additional parameters may also be used alongside translation.
 
 #### "llm_translation"
-Provide a comma-separated list of target languages to translate the transcription into multiple languages using our LLM integration. The original transcription will be returned as normal, along with the translations.
-**Supported languages:** English, French, German, Italian, Portuguese, Hindi, Spanish, Thai
+
+Provide a comma-separated list of target languages to translate the transcription into multiple languages using our LLM
+integration. The original transcription will be returned as normal, along with the translations. **Supported
+languages:** English, French, German, Italian, Portuguese, Hindi, Spanish, Thai
 
 #### “srt”
 
 Set to _"true"_ to generate a .srt output for caption and subtitles. If you don't require it, set it to _"false"_.
 
 #### "srt_translation"
-Provide a comma-separated list of target languages to translate the generated SRT captions into multiple languages. The original transcription and SRT content will be returned as normal.
-**Supported languages:** English, French, German, Italian, Portuguese, Hindi, Spanish, Thai
+
+Provide a comma-separated list of target languages to translate the generated SRT captions into multiple languages. The
+original transcription and SRT content will be returned as normal. **Supported languages:** English, French, German,
+Italian, Portuguese, Hindi, Spanish, Thai
 
 #### "summarize"
+
 Set to an integer value representing the maximum number of words for the summary of the transcription.
 
 #### "custom_vocabulary" (preview)
+
 Provide a comma-separated list of custom words or phrases to improve transcription accuracy for domain-specific terms.
 
 #### "custom_prompt" (preview)
+
 Provide a custom instruction to perform specific analyses on the transcription using our LLM integration.
 
 ### "webhook"
