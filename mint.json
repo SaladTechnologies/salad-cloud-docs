@@ -22,7 +22,7 @@
         {
           "group": "Getting Started",
           "pages": [
-            "products/sce/gettingstartedwithsaladcloud",
+            "products/sce/getting-started-with-saladcloud",
             "products/sce/quickstart",
             "products/sce/quickstart-api"
           ]
