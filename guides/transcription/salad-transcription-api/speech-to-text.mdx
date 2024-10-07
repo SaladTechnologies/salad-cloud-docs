@@ -1,0 +1,257 @@
+---
+title: 'Speech-to-Text Guide'
+description: "Discover the core transcription features of Salad's Managed Transcription API. Learn how to utilize parameters like `return_as_file`, `sentence_level_timestamps`, `word_level_timestamps`, `diarization`, `sentence_diarization`, and how to specify `language_code` for optimal performance."
+---
+
+# Transcription API Features Guide
+
+## Introduction
+
+Salad's Managed Transcription API offers a suite of powerful features to help you get the most out of your audio and video content. This guide covers the key transcription parameters you can use to customize your transcription outputs:
+
+- **Transcription Output Options**:
+  - `return_as_file`
+  - `sentence_level_timestamps`
+  - `word_level_timestamps`
+- **Speaker Identification**:
+  - `diarization`
+  - `sentence_diarization`
+- **Language Specification**:
+  - `language_code`
+
+By properly utilizing these parameters, you can enhance the accuracy, efficiency, and usability of your transcriptions.
+
+## Transcription Parameters
+
+### 1. `return_as_file`
+
+#### Description
+
+The `return_as_file` parameter allows you to receive your transcription output as a downloadable file URL. This is particularly useful when dealing with large responses, as it helps avoid issues with response size limitations.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+Set `"return_as_file": true` in your request to receive the transcription output as a file URL.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "return_as_file": true
+}
+```
+
+**Note:**
+- If the response size exceeds **1 MB**, the output will automatically be returned as a file URL, even if return_as_file is set to false.
+- This helps ensure reliable delivery of large transcription outputs.
+
+### 2. sentence_level_timestamps
+
+#### Description
+
+Include timestamps at the sentence level in your transcription output.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+Set `"sentence_level_timestamps": true` to include sentence-level timestamps. Set to false if you do not need them.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "sentence_level_timestamps": true
+}
+```
+
+**Output Format**
+
+```json
+"sentence_level_timestamps": [
+    {
+        "text": "Welcome to our presentation.",
+        "timestamp": [
+            29.98,
+            29.98
+        ],
+        "start": 29.98,
+        "end": 29.98,
+    }
+],
+```
+### 3. word_level_timestamps
+
+#### Description
+
+Include timestamps for each word in your transcription output.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+Set `"word_level_timestamps": true` to include word-level timestamps.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "word_level_timestamps": true
+}
+```
+
+**Output Format**
+Word-level timestamps are provided in the word_segments array of the output.
+
+
+```json
+"word_segments": [
+    {
+        "word": "I",
+        "start": 4.963,
+        "end": 5.024,
+        "score": 0.597,
+    },
+    {
+        "word": "understand",
+        "start": 5.084,
+        "end": 5.548,
+        "score": 0.471,
+    },
+    {
+        "word": "something.",
+        "start": 6.073,
+        "end": 6.376,
+        "score": 0.295,
+    }
+]
+```
+
+### 4. diarization
+
+#### Description
+
+Enable speaker separation and identification at the word level.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "diarization": true
+}
+```
+
+**Output Format**
+Speaker labels are included in both segments and word_segments when diarization is enabled.
+
+```json
+"word_segments": [
+    {
+        "word": "I",
+        "start": 4.963,
+        "end": 5.024,
+        "score": 0.597,
+        "speaker": "SPEAKER_00"
+    },
+    {
+        "word": "understand",
+        "start": 5.084,
+        "end": 5.548,
+        "score": 0.471,
+        "speaker": "SPEAKER_00"
+    },
+    {
+        "word": "something.",
+        "start": 6.073,
+        "end": 6.376,
+        "score": 0.295,
+        "speaker": "SPEAKER_00"
+    }
+]
+```
+
+### 5. sentence_diarization
+
+#### Description
+
+Include speaker information at the sentence level.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "sentence_diarization": true
+}
+```
+
+**Output Format**
+Speaker labels are included in the segments array when sentence_diarization is enabled.
+
+
+```json
+"sentence_level_timestamps": [
+    {
+        "text": "I understand something.",
+        "timestamp": [
+            4.64,
+            6.82
+        ],
+        "start": 4.64,
+        "end": 6.82,
+        "speaker": "SPEAKER_00"
+    }
+]
+```
+**Note:**
+If several speakers are identified in one sentence the most appearing one will be returned.
+
+### 6. language_code
+
+#### Description
+
+Specify the language of the transcription to improve diarization and timestamps accuracy performance.
+
+- **Default**: `en` (English)
+- **Type**: `string`
+
+#### Usage
+
+Set `"language_code": language_code` to specify the language of the audio content.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/french_audio.mp3",
+  "language_code": "fr"
+}
+```
+
+**Supported Languages**
+Providing the correct language_code enhances transcription accuracy, especially for features like diarization. Below is a list of supported language codes:
+"fr" (French), "de" (German), "es" (Spanish), "it" (Italian), "ja" (Japanese), "zh" (Chinese), "nl" (Dutch), "uk" (Ukrainian), "pt" (Portuguese), "ar" (Arabic), "cs” (Czech), "ru" (Russian), "pl" (Polish), "hu" (Hungarian), "fi" (Finnish), "fa" (Persian), "el" (Greek), "tr" (Turkish), "da" (Danish), "he" (Hebrew), "vi" (Vietnamese), "ko" (Korean), "ur" (Urdu), "te" (Telugu), "hi" (Hindi), "ca" (Catalan), "ml" (Malayalam)
+If the language you use is not in the list, just skip that parameter.
+
+**Note:**
+Mandatory for Diarization: When using diarization or sentence_diarization, specifying language_code is required for better performance.
+Default Language: If language_code is not specified, it defaults to English ("en").
