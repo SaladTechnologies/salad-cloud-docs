@@ -22,6 +22,7 @@ Fooocus
 getsize
 Healthcheck
 IMDS
+interruptible
 imdssdk
 infotexts
 inpainting
