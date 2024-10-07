@@ -459,6 +459,18 @@
     {
       "source": "/api-reference",
       "destination": "/reference/saladcloud-api"
+    },
+    {
+      "source": "/gateway-service/introduction",
+      "destination": "/products/sgs/introduction"
+    },
+    {
+      "source": "/container-engine/guides/deploying-blip-with-cog",
+      "destination": "/guides/computer-vision/deploy-blip-with-cog"
+    },
+    {
+      "source": "/container-engine/health-probes/liveness-probe",
+      "destination": "/products/sce/health-probes/liveness-probes"
     }
   ]
 }
