@@ -403,43 +403,43 @@
   "redirects": [
     {
       "source": "/docs/yolov8-deployment-tutorial",
-      "destination": "/products/sce/guides/yolov8/deployment-tutorial"
+      "destination": "/guides/computer-vision/yolov8/deployment-tutorial"
     },
     {
       "source": "/docs/yolov8-batch",
-      "destination": "/products/sce/guides/yolov8/batch-processing"
+      "destination": "/guides/computer-vision/yolov8/batch-processing"
     },
     {
       "source": "/docs/yolov8-model-training-guide",
-      "destination": "/products/sce/guides/yolov8/model-training-guide"
+      "destination": "/guides/computer-vision/yolov8/model-training-guide"
     },
     {
-      "source": "/docs.salad.com/docs/openvoice-api",
+      "source": "/docs/openvoice-api",
       "destination": "/products/sce/guides/openvoice-api"
     },
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/products/sce/guides/llm/run-tgi-text-generation-interface-by-huggingface"
+      "destination": "/guides/llm/run-tgi-text-generation-interface-by-huggingface"
     },
     {
       "source": "/products/sce/guides/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/products/sce/guides/llm/run-tgi-text-generation-interface-by-huggingface"
+      "destination": "/guides/llm/run-tgi-text-generation-interface-by-huggingface"
     },
     {
       "source": "/docs/run-ollama",
-      "destination": "/products/sce/guides/llm/run-ollama"
+      "destination": "/guides/llm/run-ollama"
     },
     {
       "source": "/products/sce/guides/run-ollama",
-      "destination": "/products/sce/guides/llm/run-ollama"
+      "destination": "/guides/llm/run-ollama"
     },
     {
       "source": "/docs/youtube",
-      "destination": "/products/sce/guides/youtube"
+      "destination": "/guides/transcription/youtube"
     },
     {
       "source": "/docs/jupyterlab",
-      "destination": "/products/sce/guides/jupyterlab"
+      "destination": "/tutorials/jupyterlab"
     },
     {
       "source": "/docs/enabling-ipv6",
@@ -451,7 +451,7 @@
     },
     {
       "source": "/docs/deploy-containers",
-      "destination": "/container-engine"
+      "destination": "/products/sce/salad-container-engine"
     },
     {
       "source": "/reference/api-reference",
@@ -460,6 +460,18 @@
     {
       "source": "/api-reference",
       "destination": "/reference/saladcloud-api"
+    },
+    {
+      "source": "/gateway-service/introduction",
+      "destination": "/products/sgs/introduction"
+    },
+    {
+      "source": "/container-engine/guides/deploying-blip-with-cog",
+      "destination": "/guides/computer-vision/deploy-blip-with-cog"
+    },
+    {
+      "source": "/container-engine/health-probes/liveness-probe",
+      "destination": "/products/sce/health-probes/liveness-probes"
     }
   ]
 }
