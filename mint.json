@@ -476,6 +476,10 @@
     {
       "source": "/products/sce/quickstart-api",
       "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/products/sce/gettingstartedwithsaladcloud",
+      "destination": "/products/sce/getting-started-with-saladcloud"
     }
   ]
 }
