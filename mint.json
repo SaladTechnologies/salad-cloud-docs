@@ -474,7 +474,7 @@
       "destination": "/products/sce/health-probes/liveness-probes"
     },
     {
-      "source": "/products/sce/quickstart-api",
+      "source": "/products/api-usage",
       "destination": "/reference/api-usage"
     },
     {
