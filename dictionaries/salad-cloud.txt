@@ -71,3 +71,7 @@ webui
 WORKDIR
 xformers
 xlvaeapp
+getenv
+timeframe
+azcopy
+gsutil
