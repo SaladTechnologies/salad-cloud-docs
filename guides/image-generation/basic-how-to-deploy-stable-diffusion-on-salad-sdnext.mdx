@@ -174,7 +174,7 @@ You will receive back a response in JSON format, including the generated image i
 4. Decode the base64 encoded string into your image. You can do this in a free browser tool such as
    https://codebeautify.org/base64-to-image-converter
 
-![Example Image](/products/sce/images/stable-diffusion/sunset-base64-2.png)
+![Example Image](/guides/image-generation/images/sunset-base64-2.png)
 
 or using CLI tools like `jq` and `base64`. For this method, first save your response to a file called `response.json`.
 Then, run the following command:
@@ -193,36 +193,36 @@ docker push saladtechnologies/sdnext:dreamshaper-8
 
     2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
-        ![Untitled](/products/sce/images/stable-diffusion/salad-create-container-group.png)
+        ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
         We’re going to name our container group something obvious, and fill in the configuration form.
         We’re going to use 3 replicas, to ensure coverage during node interruptions and reallocations.
 
-        ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-1.png)
+        ![Untitled](/guides/image-generation/images/deploy-sdnext-1.png)
 
-        Since this is a stable diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vcpus, 12GB ram, and an RTX 3060 Ti GPU.
-        ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-2.png)
+        Since this is a stable diffusion 1.5 based model, we’re gong to give ourselves fairly modest hardware: 4 vCPUs, 12GB ram, and an RTX 3060 Ti GPU.
+        ![Untitled](/guides/image-generation/images/deploy-sdnext-2.png)
 
         We want to add the container gateway to our deployment, so that we will get a URL we can use to access it. Make sure to set the port to 7860, or whatever you set the PORT environment variable to in your Dockerfile.
-        ![Untitled](/products/sce/images/stable-diffusion/deploy-a1111-3.png)
+        ![Untitled](/guides/image-generation/images/deploy-a1111-3.png)
 
         We need to enable a startup probe and a liveness probe, to make sure the container gateway only routes requests to nodes that are ready for them.
-        ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-3.png)
+        ![Untitled](/guides/image-generation/images/deploy-sdnext-3.png)
 
 ## Interact with Your Deployment
 
     1. Wait for the deployment to be ready.
         1. First, Salad pulls your container image into our own internal high-performance cache.
 
-            ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-4.png)
+            ![Untitled](/guides/image-generation/images/deploy-sdnext-4.png)
 
         2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
 
-            ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-5.png)
+            ![Untitled](/guides/image-generation/images/deploy-sdnext-5.png)
 
         3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
 
-            ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-6.png)
+            ![Untitled](/guides/image-generation/images/deploy-sdnext-6.png)
 
             This step can take tens of minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes.
             Note that our progress bars are only estimates, and do not necessarily reflect real-time download status.
@@ -230,8 +230,8 @@ docker push saladtechnologies/sdnext:dreamshaper-8
 
         4. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
 
-            ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-7.png)
+            ![Untitled](/guides/image-generation/images/deploy-sdnext-7.png)
 
     2. Submit your prompt to the provided Access Domain Name. You will get back a json response within a few seconds. See [above](#build-and-test-your-docker-image) for how to submit the request and process the response.
 
-        ![Untitled](/products/sce/images/stable-diffusion/deploy-sdnext-8.png)
+        ![Untitled](/guides/image-generation/images/deploy-sdnext-8.png)
