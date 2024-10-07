@@ -22,11 +22,11 @@ Fooocus
 getsize
 Healthcheck
 IMDS
-interruptible
 imdssdk
 infotexts
 inpainting
 INSTALLDIR
+interruptible
 konieshadow
 LAVIS
 listdir
@@ -43,6 +43,7 @@ popitem
 pretrained
 println
 pydantic
+Quickstart
 routable
 Rundiffusion
 safetensors

@@ -14,7 +14,7 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": ["products/documentation", "products/quickstart", "products/api-usage"]
+      "pages": ["products/documentation", "products/quickstart"]
     },
     {
       "group": "Container Engine",
@@ -22,7 +22,7 @@
         {
           "group": "Getting Started",
           "pages": [
-            "products/sce/gettingstartedwithsaladcloud",
+            "products/sce/getting-started-with-saladcloud",
             "products/sce/quickstart",
             "products/sce/quickstart-api"
           ]
@@ -178,6 +178,7 @@
     {
       "group": "Reference",
       "pages": [
+        "reference/api-usage",
         {
           "group": "SaladCloud API",
           "pages": [
@@ -472,6 +473,14 @@
     {
       "source": "/container-engine/health-probes/liveness-probe",
       "destination": "/products/sce/health-probes/liveness-probes"
+    },
+    {
+      "source": "/products/api-usage",
+      "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/products/sce/gettingstartedwithsaladcloud",
+      "destination": "/products/sce/getting-started-with-saladcloud"
     }
   ]
 }
