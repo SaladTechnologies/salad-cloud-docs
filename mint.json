@@ -14,7 +14,7 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": ["products/documentation", "products/quickstart", "products/api-usage"]
+      "pages": ["products/documentation", "products/quickstart"]
     },
     {
       "group": "Container Engine",
@@ -177,6 +177,7 @@
     {
       "group": "Reference",
       "pages": [
+        "reference/api-usage",
         {
           "group": "SaladCloud API",
           "pages": [
@@ -471,6 +472,10 @@
     {
       "source": "/container-engine/health-probes/liveness-probe",
       "destination": "/products/sce/health-probes/liveness-probes"
+    },
+    {
+      "source": "/products/sce/quickstart-api",
+      "destination": "/reference/api-usage"
     }
   ]
 }
