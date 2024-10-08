@@ -153,6 +153,7 @@
     {
       "group": "Tutorials",
       "pages": [
+        "tutorials/docker-run",
         {
           "group": "Run a Node App",
           "pages": [
@@ -164,7 +165,7 @@
             "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
           ]
         },
-        "tutorials/howtousethesaladterminal",
+        "tutorials/interactive-terminal",
         "tutorials/run-a-python-app",
         "tutorials/ubuntu-image",
         "tutorials/example-image",
