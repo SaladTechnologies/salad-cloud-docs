@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",
-  "language": "en,en-US",
-  "dictionaries": ["salad-cloud"],
+  "language": "en,en-US,de,fr,it,es,hi",
+  "dictionaries": ["salad-cloud", "softwareTerms"],
   "dictionaryDefinitions": [
     {
       "name": "salad-cloud",
