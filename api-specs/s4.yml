@@ -1,0 +1,191 @@
+openapi: 3.0.0
+info:
+  title: Salad Simple Storage Service
+  version: 1.1.0
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Salad-Api-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+  - url: https://storage-api.salad.com
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+paths:
+  /organizations/{organization_name}/files/{filename+}:
+    put:
+      summary: Upload a file
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: organization_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename+
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload
+                mimeType:
+                  type: string
+                  description: The MIME type of the file
+                sign:
+                  type: string
+                  description: '"true" to return a signed url'
+                signatureExp:
+                  type: string
+                  description: The expiration ttl of the signature in seconds. Default is 30 days.
+      responses:
+        200:
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+    get:
+      summary: Download a file
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: organization_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename+
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: File retrieved successfully
+          content:
+            "*/*":
+              schema:
+                type: string
+                format: binary
+        404:
+          description: File not found
+    delete:
+      summary: Delete a file
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: organization_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename+
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: File deleted successfully
+  /organizations/{organization_name}/files:
+    get:
+      summary: List all files
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: organization_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of files retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          format: uri
+                        mimeType:
+                          type: string
+                        size:
+                          type: integer
+                        uploaded:
+                          type: string
+                          format: date-time
+
+  /organizations/{organization_name}/file_tokens/{filename+}:
+    post:
+      summary: Sign a file and return a signed URL
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: organization_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: filename+
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method:
+                  type: string
+                  example: "GET"
+                  description: The HTTP method to sign the URL for. Currently only supports GET
+                exp:
+                  type: string
+                  example: "3600"
+                  description: The expiration ttl of the signed URL in seconds
+      responses:
+        200:
+          description: Signed URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
