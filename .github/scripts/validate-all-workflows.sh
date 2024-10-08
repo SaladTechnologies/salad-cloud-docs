@@ -1,4 +1,5 @@
 #! /usr/bin/bash
+set -e
 
 api_spec_dir="api-specs"
 
