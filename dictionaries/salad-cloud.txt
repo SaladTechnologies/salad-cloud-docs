@@ -27,6 +27,7 @@ infotexts
 inpainting
 INSTALLDIR
 interruptible
+italian
 konieshadow
 LAVIS
 listdir
@@ -56,6 +57,7 @@ SD.Next
 sdapi
 sdnext
 SDXL
+spanish
 subseed
 subseeds
 tmax
