@@ -77,3 +77,7 @@ xlvaeapp
 Pytube
 zapier
 clid
+getenv
+timeframe
+azcopy
+gsutil
