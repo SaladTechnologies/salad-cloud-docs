@@ -325,7 +325,7 @@
             {
               "group": "Salad Transcription API",
               "pages": [
-                "guides/transcription/salad-transcription-api/transcriptionquickstart",
+                "guides/transcription/salad-transcription-api/transcription-quick-start",
                 {
                   "group": "Features",
                   "pages":[
