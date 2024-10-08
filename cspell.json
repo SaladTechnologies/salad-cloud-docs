@@ -1,12 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",
-  "language": "en,en-US,de,de-DE,fr-FR,it-IT,es,es-419,es-ES,hi-IN",
+  "language": "en,en-US,fr,fr-FR,de,de-DE,it,it-IT,es,es-ES,es-419,hi,hi-IN",
   "dictionaries": ["salad-cloud", "softwareTerms"],
   "dictionaryDefinitions": [
     {
       "name": "salad-cloud",
       "path": "./dictionaries/salad-cloud.txt"
     }
+  ],
+  "import": [
+    "@cspell/dict-fr-fr/cspell-ext.json",
+    "@cspell/dict-de-de/cspell-ext.json",
+    "@cspell/dict-it-it/cspell-ext.json",
+    "@cspell/dict-es-es/cspell-ext.json"
   ]
 }
