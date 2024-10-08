@@ -74,3 +74,6 @@ webui
 WORKDIR
 xformers
 xlvaeapp
+Pytube
+zapier
+clid
