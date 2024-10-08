@@ -148,7 +148,11 @@
     },
     {
       "group": "Recipes",
-      "pages": ["products/recipes/flux1-schnell-fp8-comfyui"]
+      "pages": [
+        "products/recipes/dreamshaper8-comfyui",
+        "products/recipes/flux1-schnell-fp8-comfyui",
+        "products/recipes/sdxl-with-refiner-comfyui"
+      ]
     },
     {
       "group": "Tutorials",
