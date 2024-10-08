@@ -76,4 +76,3 @@ getenv
 timeframe
 azcopy
 gsutil
-howtousethesaladterminal
