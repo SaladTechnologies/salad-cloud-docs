@@ -333,7 +333,7 @@
                 "guides/transcription/salad-transcription-api/transcription-quick-start",
                 {
                   "group": "Features",
-                  "pages":[
+                  "pages": [
                     "guides/transcription/salad-transcription-api/speech-to-text",
                     "guides/transcription/salad-transcription-api/translation",
                     "guides/transcription/salad-transcription-api/captions"
@@ -341,16 +341,16 @@
                 },
                 {
                   "group": "Downloadable Files",
-                  "pages":[
+                  "pages": [
                     "guides/transcription/salad-transcription-api/awsdownloadablefile",
-                    "guides/transcription/salad-transcription-api/azuredownloadablefile", 
+                    "guides/transcription/salad-transcription-api/azuredownloadablefile",
                     "guides/transcription/salad-transcription-api/dropboxdownloadable",
                     "guides/transcription/salad-transcription-api/googledrivedownloadable"
                   ]
                 },
                 {
                   "group": "Integrations",
-                  "pages":[
+                  "pages": [
                     "guides/transcription/salad-transcription-api/pabblyintegration",
                     "guides/transcription/salad-transcription-api/zapiertranscriptionguide"
                   ]
@@ -360,9 +360,7 @@
             },
             {
               "group": "SCE",
-              "pages": [
-                "guides/transcription/sce/youtube"
-              ]
+              "pages": ["guides/transcription/sce/youtube"]
             }
           ]
         }
@@ -512,7 +510,11 @@
     },
     {
       "source": "/products/sce/gettingstartedwithsaladcloud",
-      "destination": "/products/sce/getting-started-with-saladcloud"
+      "destination": "/products/sce/getting-started-with-SaladCloud"
+    },
+    {
+      "source": "/products/sce/getting-started-with-saladcloud",
+      "destination": "/products/sce/getting-started-with-SaladCloud"
     }
   ]
 }
