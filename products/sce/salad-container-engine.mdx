@@ -1,19 +1,19 @@
 ---
-title: 'Salad Container Engine (SCE)'
+title: 'SaladCloud Container Engine (SCE)'
 description: ''
 ---
 
 Containers provide a portable and immutable format for packaging, deploying, and managing cloud-native applications at
-scale. **Salad Container Engine (SCE)** offers fully managed container orchestration, dynamically distributes workloads
-to optimal hardware cohorts in accordance with technical requirements, and features 3D-accelerated GPU processing on
-every available node instance.
+scale. **SaladCloud Container Engine (SCE)** offers fully managed container orchestration, dynamically distributes
+workloads to optimal hardware cohorts in accordance with technical requirements, and features 3D-accelerated GPU
+processing on every available node instance.
 
 It's the fastest, simplest, and most affordable way to run containerized workloads—without managing virtual machines or
 underlying compute infrastructure.
 
 # Supported Workflows
 
-To more easily integrate with your existing workflows, Salad offers two methods of creating and managing your
+To more easily integrate with your existing workflows, SaladCloud offers two methods of creating and managing your
 deployments:
 
 ### Portal
@@ -22,16 +22,16 @@ The **Portal** is a browser-based UI at [https://portal.salad.com](https://porta
 control over your deployments, including create, read, update, and delete functionality. The Portal also provides access
 to organization management, billing, and support.
 
-### Salad API
+### SaladCloud API
 
-When you are ready for a deeper integration, the **Salad API** also offers full control over your deployments.
+When you are ready for a deeper integration, the **SaladCloud API** also offers full control over your deployments.
 Occasionally, new features are made available from the API before they are visible in the Portal. You can dive directly
 into our API documentation [here](/reference/saladcloud-api).
 
 # Defining Workloads
 
-In the Salad Container Engine lexicon, container deployments are known as **Container Groups.** Each Container Group
-represents a set of "identical" **Container Instances** that each run on dedicated hardware.
+In the SaladCloud Container Engine lexicon, container deployments are known as **Container Groups.** Each Container
+Group represents a set of "identical" **Container Instances** that each run on dedicated hardware.
 
 ### Container Groups
 
@@ -45,18 +45,18 @@ Scaling beyond a single node not only increases fault tolerance but also optimiz
 balancing across our distributed cloud infrastructure. Start with 2 or more replicas to unlock the full potential of our
 platform and experience seamless scaling and improved uptime for your containers.
 
-Container Groups can be created, started, stopped, or scaled via the Salad API and UI, giving you direct control over
-your workloads before and after deployment.
+Container Groups can be created, started, stopped, or scaled via the SaladCloud API and UI, giving you direct control
+over your workloads before and after deployment.
 
 ### Container Instances
 
 A Container Instance represents a single instantiation of a container on a dedicated host connected to the Salad
-network. Each time a container is deployed to a Salad machine node, a new Container Instance is created with a unique id
-and discrete logs.
+network. Each time a container is deployed to a SaladCloud machine node, a new Container Instance is created with a
+unique id and discrete logs.
 
 # Compute Environment
 
-Salad leverages hardware-native virtualization and industry-standard container runtimes to standardize the compute
+SaladCloud leverages hardware-native virtualization and industry-standard container runtimes to standardize the compute
 environment across a distributed network of heterogeneous hardware.
 
 Once a container image has been deployed, SCE instantiates replicas on a predetermined number of available physical
@@ -65,8 +65,8 @@ devices as stateless processes within virtual Linux subsystems.
 ### Host Environment
 
 All SCE container instances deploy to consumer-owned hardware running modern Windows NT operating systems (Windows 10 or
-later). This allows the Salad desktop client to leverage Microsoft Hyper-V virtualization features, manage and monitor
-workloads, and boot true Linux kernels from the Windows Subsystem for Linux (WSL2).
+later). This allows the SaladCloud desktop client to leverage Microsoft Hyper-V virtualization features, manage and
+monitor workloads, and boot true Linux kernels from the Windows Subsystem for Linux (WSL2).
 
 > 📘 Supported Containers
 >
@@ -78,16 +78,16 @@ workloads, and boot true Linux kernels from the Windows Subsystem for Linux (WSL
 
 Active SCE container instances are treated as stateless workloads. Whenever the virtual execution context closes
 (through down-scaling, batch job termination, or failure), the container image is purged from the host machine's local
-memory. While running, the Salad container orchestrator uses heartbeat monitoring to assess potential interruptions or
-other failures, and determine when and how best to dynamically fail over to another dedicated node to maximize resource
-availability.
+memory. While running, the SaladCloud container orchestrator uses heartbeat monitoring to assess potential interruptions
+or other failures, and determine when and how best to dynamically fail over to another dedicated node to maximize
+resource availability.
 
 ### Open-source Dependencies
 
-Salad incorporates battle-tested and incrementally developed tooling for reliable performance and replicable results.
-The Salad API conforms to **[OpenAPI](https://www.openapis.org/)** specifications and generates templates in various
-coding languages to facilitate testing and development. When deployed from the Salad API or the SaladCloud UI, SCE
-container instances are automatically executed in the latest stable version of the open-source
+SaladCloud incorporates battle-tested and incrementally developed tooling for reliable performance and replicable
+results. The SaladCloud API conforms to **[OpenAPI](https://www.openapis.org/)** specifications and generates templates
+in various coding languages to facilitate testing and development. When deployed from the SaladCloud API or the
+SaladCloud UI, SCE container instances are automatically executed in the latest stable version of the open-source
 **[containerd](https://containerd.io/)** container runtime.
 
 # Use Cases
@@ -116,7 +116,7 @@ can introduce modest overhead in terms of cold-start time, but should not impact
 ### Data-sensitivity Compliance
 
 Customers in specialized industries may be legally obligated to protect sensitive data such as medical records or
-private financial information. While Salad takes precautions to secure every workload on our network, we cannot
+private financial information. While SaladCloud takes precautions to secure every workload on our network, we cannot
 guarantee that our solutions are considered compliant with requirements outlined by select regulatory commissions or
 legislative authorities (including but not limited to HIPAA and the Financial Modernization Act of 1999).
 
@@ -124,11 +124,11 @@ legislative authorities (including but not limited to HIPAA and the Financial Mo
 
 While SCE does maintain a stable replica count within a given Container Group, SCE deployments do not currently
 auto-scale Container Groups based on performance. Container Groups must be scaled up or down on demand through the
-Portal, or by direct request via the Salad API.
+Portal, or by direct request via the SaladCloud API.
 
 ### Performance Variability
 
-Because Salad nodes are individual residential gaming PCs, there is some expected performance variability. Your
+Because SaladCloud nodes are individual residential gaming PCs, there is some expected performance variability. Your
 container group may request 3 nodes with 2 vCPU, 12gb RAM, and an RTX 4090, but within that criteria, there can still be
 significant variability in network, compute, and storage performance. It is important to monitor the performance of your
 application over time so that you can detect anomalous behavior and reallocate under-performing nodes.

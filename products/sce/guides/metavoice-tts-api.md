@@ -16,7 +16,7 @@ scenarios, including voice assistants, audiobook narration, and accessibility to
 impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice,
 and demonstrate how to leverage its features on SaladCloud in a cloud-based environment.
 
-** If you are looking for fast deployment of MetaVoice Endpoint on Salad move to
+** If you are looking for fast deployment of MetaVoice Endpoint on SaladCloud move to
 [Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
 
 ### Discover MetaVoice: The Open-Source Voice Cloning Tool
@@ -108,8 +108,8 @@ For average processing prices, refer to our benchmarks:
   - The FastAPI application is containerized using Docker, providing a consistent and isolated environment for
     deployment.
   - The Docker container is then deployed on Salad's compute resources to leverage their processing capabilities.
-  - The Docker image is stored in the Salad Docker Container Registry, ensuring secure and easy access for deployment
-    and updates.
+  - The Docker image is stored in the SaladCloud Docker Container Registry, ensuring secure and easy access for
+    deployment and updates.
 
 ![](https://files.readme.io/160811e-FASTAPI.drawio_3.png)
 
@@ -692,13 +692,13 @@ We've reached the final and most exciting stage of our project: deploying our so
 making any additional customizations, you can directly proceed to this step.
 
 Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run
-your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
+your text-to-speech solutions. Here's how to deploy the solution using the SaladCloud portal:
 
 1. **Create an Account:** Sign up for an account on [Salad's Portal](https://portal.salad.com/) if you haven't already.
-2. **Create an Organization:** Once logged in, set up your organization within the Salad platform to manage your
+2. **Create an Organization:** Once logged in, set up your organization within the SaladCloud platform to manage your
    deployments and resources.
-3. **Deploy Container Group:** Go to the "Container Groups" section in the Salad portal and select "Deploy a Container
-   Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
+3. **Deploy Container Group:** Go to the "Container Groups" section in the SaladCloud portal and select "Deploy a
+   Container Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
 
 ![](https://mgorkii.atlassian.net/wiki/download/thumbnails/21790721/image-20231110-194241.png?version=1&modificationDate=1710688126907&cacheVersion=1&api=v2&width=741&height=263)
 
@@ -707,9 +707,9 @@ We now need to set up all of our container group parameters:
 **Configure Container Group:**
 
 1. **Create a unique name for your Container group**
-2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under
-   image name paste the image path: **saladtechnologies/metavoice-api:1.0.0** If you are using your custom solution,
-   specify your image location.
+2. **Pick the Image Source:** In our case we are using a public SaladCloud registry. Click Edit next to Image source.
+   Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0** If you are using your custom
+   solution, specify your image location.
 
 ![](https://files.readme.io/b80f256-image.png)
 
@@ -721,7 +721,7 @@ We now need to set up all of our container group parameters:
 
 ![](https://files.readme.io/61c8d63-image-20231110-201504.png)
 
-1. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing
+1. **Optional Settings**: SaladCloud gives you some great options like health check probe, external logging and passing
    environment variables.
 2. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under
    "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**.
@@ -733,9 +733,9 @@ Additionally, for enhanced security, you have the option to enable Authenticatio
 you'll need to include your personal token with each API call. You can locate your token here:
 https://portal.salad.com/api-key
 
-With all configurations complete, deploying your FastAPI application on Salad is a straightforward process. Leveraging
-Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling demanding
-tasks cost-effectively.
+With all configurations complete, deploying your FastAPI application on SaladCloud is a straightforward process.
+Leveraging Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling
+demanding tasks cost-effectively.
 
 Finally, ensure the “AutoStart container group once the image is pulled” option is checked, then click “Deploy”. With
 that, we're ready to go. Let's wait for our solution to deploy and then proceed with testing.
@@ -744,15 +744,15 @@ that, we're ready to go. Let's wait for our solution to deploy and then proceed 
 
 - **Cost-Efficiency**: Salad's GPU cloud services are priced favorably when compared to other cloud providers, allowing
   you to leverage additional resources for your application while minimizing expenses.
-- **Intuitive Platform**: Salad emphasizes a seamless user experience, providing an easy-to-navigate interface that
+- **Intuitive Platform**: SaladCloud emphasizes a seamless user experience, providing an easy-to-navigate interface that
   streamlines the deployment and management of applications in the cloud.
-- **Robust Documentation and Support**: Salad furnishes detailed documentation to facilitate deployment, configuration,
-  and problem-solving, supported by a committed team available to provide assistance as needed.
+- **Robust Documentation and Support**: SaladCloud furnishes detailed documentation to facilitate deployment,
+  configuration, and problem-solving, supported by a committed team available to provide assistance as needed.
 
 ### Test Full Solution deployed to Salad
 
 Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public
-endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's
+endpoint. SaladCloud provides you with a deployment URL, which allows you to send requests to your API using Salad's
 infrastructure, just as you would locally.
 
 ![](https://files.readme.io/0df9964-image.png)

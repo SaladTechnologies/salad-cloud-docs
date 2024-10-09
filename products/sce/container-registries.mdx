@@ -6,11 +6,11 @@ A container registry is a collection of repositories designed to efficiently sto
 integrates with the most popular container registries, allowing you to use your existing build pipelines to create and
 manage your container images.
 
-When a Container Group is created, Salad will automatically pull the image from your registry into a private container
-registry that is managed by Salad, allowing us to generate 1-time access tokens that are only distributed to specific
-machines that are designated to run your application.
+When a Container Group is created, SaladCloud will automatically pull the image from your registry into a private
+container registry that is managed by Salad, allowing us to generate 1-time access tokens that are only distributed to
+specific machines that are designated to run your application.
 
-Salad supports both Public and Private Registries, many providers offer both options depending on your specific
+SaladCloud supports both Public and Private Registries, many providers offer both options depending on your specific
 requirements. A private registry allows users to store and distribute container images without making them publicly
 accessible. This allows for better control over the distribution of images, as well as the ability to keep proprietary
 or sensitive information secure.
@@ -68,8 +68,8 @@ To use a registry, an image must first be pushed to the registry. This can be do
 specifying the registry URL and the image name. Once the image is in the registry, it can be pulled and used to create a
 new Container Group through the Portal or the Public API.
 
-- Salad requires authentication details to pull images, but authentication details are only stored long enough to pull
-  the image and place it into encrypted storage for distribution to the Salad Network.
+- SaladCloud requires authentication details to pull images, but authentication details are only stored long enough to
+  pull the image and place it into encrypted storage for distribution to the SaladCloud Network.
 - When we distribute a workload to a node, we generate a 1 time access token, allowing only specific node(s) to download
   and run the container image
 - There currently a max **image size of 20 GB (note: subject to change)**

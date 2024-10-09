@@ -372,7 +372,7 @@ Failure Threshold: 3
 
 <img src="/products/sce/images/llm-general/llmgeneral1.jpg" />
 
-You don’t need to add double or single quotes in the Argument 2 of Command for Readiness on Salad Portal:
+You don’t need to add double or single quotes in the Argument 2 of Command for Readiness on SaladCloud Portal:
 
 <img src="/products/sce/images/llm-general/llmgeneral2.jpg" />
 
@@ -459,20 +459,20 @@ Argument2: text-generation-launcher --model-id $MODEL_ID --max-total-tokens 4096
 # The other configurations remain the same as in Scenario 1.
 ```
 
-You don’t need to add double or single quotes in the Argument 2 of Command on Salad Portal, but you do need to add them
-when running the ‘docker run’ command locally:
+You don’t need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
+them when running the ‘docker run’ command locally:
 
 <img src="/products/sce/images/llm-general/llmgeneral3.jpg" />
 
 ## Scenario 3: Run the TGI server interactively.
 
-Salad Portal provides an interactive terminal for each instance in SCE deployments, allowing you to interact directly
-with each instance to troubleshoot issues or reconfigure your application after deployment.
+SaladCloud Portal provides an interactive terminal for each instance in SCE deployments, allowing you to interact
+directly with each instance to troubleshoot issues or reconfigure your application after deployment.
 
 If you don't have access to a local test environment with a GPU, you can use the interactive terminal on SaladCloud to
 test your image, check its resource usage, fine-tune and finalize server settings. Keep in mind that this is just a
-complement and cannot fully replace your local R&D environments for daily tasks, as Salad nodes are interruptible and
-may experience cold starts and occasional downtime.
+complement and cannot fully replace your local R&D environments for daily tasks, as SaladCloud nodes are interruptible
+and may experience cold starts and occasional downtime.
 
 ```
 # Override both the ENTRYPOINT and CMD in the image.
@@ -512,8 +512,8 @@ Argument2: sleep infinity
 # The other configurations remain the same as in Scenario 1.
 ```
 
-You don’t need to add double or single quotes in the Argument 2 of Command on Salad Portal, but you do need to add them
-when running the ‘docker run’ command locally:
+You don’t need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
+them when running the ‘docker run’ command locally:
 
 <img src="/products/sce/images/llm-general/llmgeneral4.jpg" />
 
@@ -535,7 +535,7 @@ building a custom wrapper image with the following features:
 - Pre-load the model parameters into the image to reduce costs, as there’s no charge when nodes are downloading your
   images.
 - Implement initial and real-time performance checks to ensure that nodes remain in an optimal state for application
-  execution, as the performance of Salad nodes may fluctuate over time due to their shared nature. If a node's
+  execution, as the performance of SaladCloud nodes may fluctuate over time due to their shared nature. If a node's
   performance falls below a predefined threshold, the code should exit with a status of 1, triggering a reallocation.
   These functions can also be achieved by deploying Startup Probes and Liveness Probes.
 

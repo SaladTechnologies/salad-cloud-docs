@@ -3,7 +3,7 @@ title: 'Workload Logs'
 ---
 
 After you deploy a container group on SaladCloud , some nodes may experience errors. To detect and diagnose these
-errors, Salad provides an API endpoint [here ](https://docs.salad.com/reference/get__workload_errors)to access
+errors, SaladCloud provides an API endpoint [here ](https://docs.salad.com/reference/get__workload_errors)to access
 high-level details of recent errors that occurred on a workload. In addition, you may view and download a log of these
 errors from the portal by clicking the 'Workload Errors' tab on the container group details page. Note that this
 feature, whether accessed from the portal or the API, only returns up to the 50 most recent errors for a workload which
@@ -27,9 +27,9 @@ failed before reaching a started state. You can learn more about different conta
 
 These are the possible `detail`s which can be returned, what they mean, and what you can do to fix them.
 
-| Detail               | Cause                                  | How to fix                                                                                                                                                                                                                                |
-| :------------------- | :------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| RunFailure           | The container exited after it started. | This indicates a likely issue with the container itself. If you have configured an external logging service, investigate the logs returned from the container to diagnose the issue.                                                      |
-| StartFailure         | The container failed to start.         | This indicates either an issue while starting the container itself or with the node. If a command was provided, check it can be executed successfully in the container. If start failures are occurring regularly, contact Salad support. |
-| StartupProbeFailure  | The configured startup probe failed.   | Check startup probe parameters. Ensure that you are providing enough time for the container to start before failing the probe.                                                                                                            |
-| LivenessProbeFailure | The configured liveness probe failed.  | Check liveness probe parameters. Ensure that you are providing enough time for the probed application to reach the desired state before failing the probe.                                                                                |
+| Detail               | Cause                                  | How to fix                                                                                                                                                                                                                                     |
+| :------------------- | :------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RunFailure           | The container exited after it started. | This indicates a likely issue with the container itself. If you have configured an external logging service, investigate the logs returned from the container to diagnose the issue.                                                           |
+| StartFailure         | The container failed to start.         | This indicates either an issue while starting the container itself or with the node. If a command was provided, check it can be executed successfully in the container. If start failures are occurring regularly, contact SaladCloud support. |
+| StartupProbeFailure  | The configured startup probe failed.   | Check startup probe parameters. Ensure that you are providing enough time for the container to start before failing the probe.                                                                                                                 |
+| LivenessProbeFailure | The configured liveness probe failed.  | Check liveness probe parameters. Ensure that you are providing enough time for the probed application to reach the desired state before failing the probe.                                                                                     |

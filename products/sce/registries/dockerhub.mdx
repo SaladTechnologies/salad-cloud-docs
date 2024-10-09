@@ -4,7 +4,7 @@ title: 'Dockerhub'
 
 Dockerhub Private Registry is a secure platform for hosting and managing container images. With this registry, you can
 store and manage Docker images while keeping them private. This guide will walk you through the process of deploying
-containers from Dockerhub Private Registry to the Salad Portal.
+containers from Dockerhub Private Registry to the SaladCloud Portal.
 
 ### Step 1: Generate a Dockerhub Access Token
 
@@ -24,10 +24,10 @@ containers from Dockerhub Private Registry to the Salad Portal.
 For detail information, please follow official documentation
 to[ Generate A Dockerhub Access Token](https://docs.docker.com/security/for-developers/access-tokens/).
 
-### Step 2: Configure Salad Container Environment (SCE)
+### Step 2: Configure SaladCloud Container Environment (SCE)
 
-Access the Salad portal, Set up your SCE by selecting the private registry tab when setting the image source. In the
-service dropdown option, choose "Docker Hub" and provide the following information:
+Access the SaladCloud portal, Set up your SCE by selecting the private registry tab when setting the image source. In
+the service dropdown option, choose "Docker Hub" and provide the following information:
 
 - Image name (example: `docker.io/{username}/{my-container-image}:{version/latest}`)
 - Username and Personal Access Token(PAT).

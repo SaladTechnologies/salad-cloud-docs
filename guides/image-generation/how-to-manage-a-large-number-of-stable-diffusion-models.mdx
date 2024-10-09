@@ -16,21 +16,21 @@ We can combine 3 techniques to manage that complexity in an arbitrarily scalable
 
 ## Pre-loading Popular Models
 
-Your service likely has some models that are significantly more popular than others. Salad allows a maximum container
-image size of 35gb compressed. Salad also does not charge during the downloading phase, only charging once the instance
-enters the running state. This means it is often prudent to include some of your most popular models in the container
-image, as you effectively get that download time for free. Additionally, it means your container can start doing
-inference work immediately once it’s started, even as it downloads more models in the background. Finally, Salad’s 50gb
-storage limit is _in addition to_ any space taken up by your container, so you can get more total local storage by
-including models in the container image. The main downside is reduced elasticity in scaling, as the larger images will
-take longer to download to new nodes.
+Your service likely has some models that are significantly more popular than others. SaladCloud allows a maximum
+container image size of 35gb compressed. SaladCloud also does not charge during the downloading phase, only charging
+once the instance enters the running state. This means it is often prudent to include some of your most popular models
+in the container image, as you effectively get that download time for free. Additionally, it means your container can
+start doing inference work immediately once it’s started, even as it downloads more models in the background. Finally,
+Salad’s 50gb storage limit is _in addition to_ any space taken up by your container, so you can get more total local
+storage by including models in the container image. The main downside is reduced elasticity in scaling, as the larger
+images will take longer to download to new nodes.
 
 ## Local LRU Caching
 
 When you have potentially terabytes of model checkpoints, loras, upscale models, and more, it’s never going to be
-possible to get it all cached locally on a Salad node, due to storage size restrictions. Beyond that, you wouldn’t want
-to pay for node uptime while downloading all of those models at start, especially when the node may be interrupted at
-any time, and the process would need to start over from the beginning on another node.
+possible to get it all cached locally on a SaladCloud node, due to storage size restrictions. Beyond that, you wouldn’t
+want to pay for node uptime while downloading all of those models at start, especially when the node may be interrupted
+at any time, and the process would need to start over from the beginning on another node.
 
 You also don’t want to download 2-6gb checkpoints for potentially every single request, as it introduces unacceptable
 latency to user generation requests.
@@ -193,4 +193,5 @@ do other useful work while preparing the local cache for future work.
 
 Detecting interrupted nodes typically involves a heartbeat mechanism, where if a node hasn’t requested work within a
 certain amount of time, assume it’s dead (this can be verified with the
-[Salad API](/reference/saladcloud-api/container_groups/get-a-container-group-instance)), and reassign work as needed.
+[SaladCloud API](/reference/saladcloud-api/container_groups/get-a-container-group-instance)), and reassign work as
+needed.

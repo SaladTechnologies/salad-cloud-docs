@@ -7,7 +7,7 @@ createdAt: 'Wed May 01 2024 14:20:34 GMT+0000 (Coordinated Universal Time)'
 updatedAt: 'Wed May 01 2024 19:22:37 GMT+0000 (Coordinated Universal Time)'
 ---
 
-Salad is capable of running all kinds of long-running compute-intensive jobs, from fine tuning SDXL to molecular
+SaladCloud is capable of running all kinds of long-running compute-intensive jobs, from fine tuning SDXL to molecular
 simulations, with the following restrictions:
 
 - One job/block must be completed on a single GPU with up to 24gb vram. Typically very large simulations are broken up
@@ -20,15 +20,15 @@ simulations, with the following restrictions:
 
 [Kelpie](https://github.com/SaladTechnologies/kelpie) is an open-source framework for managing long-running jobs across
 interruptible hardware. It coordinates with the [Kelpie API](https://github.com/SaladTechnologies/kelpie-api) (free for
-Salad customers) to ensure maximum utilization of your container group, and to ensure that jobs succeed despite node
-interruptions.
+SaladCloud customers) to ensure maximum utilization of your container group, and to ensure that jobs succeed despite
+node interruptions.
 
 ## Preparing Your Job
 
 ### Make it a Docker container
 
-The first step to preparing any workload for Salad is to get it packaged up as a Docker container. If you are unfamiliar
-with Docker, I recommend checking out this
+The first step to preparing any workload for SaladCloud is to get it packaged up as a Docker container. If you are
+unfamiliar with Docker, I recommend checking out this
 [guide to Docker for Data Science](https://www.datacamp.com/tutorial/docker-for-data-science-introduction).
 
 In addition, your job will need a very small amount of instrumentation to be fully compatible with Kelpie. You can find
@@ -49,7 +49,7 @@ Note you also need to override your `CMD` directive to launch kelpie instead of 
 
 ## Deploy Your Container Group
 
-Navigate to the [Salad Portal](https://portal.salad.com/), creating a user account, organization, and project if
+Navigate to the [SaladCloud Portal](https://portal.salad.com/), creating a user account, organization, and project if
 necessary.
 
 ![](https://files.readme.io/dd1b98c-image.png)
@@ -68,7 +68,7 @@ has integrated logging to help with debugging, but it is not as full featured as
 
 You will need to set up some environment variables to enable Kelpie to interact with the Kelpie API, and to enable it to
 sync your checkpoints and outputs to your preferred s3-compatible storage provider. Your `KELPIE_API_KEY` will be
-provided by Salad upon request. Note that it **is not** your Salad API Key.
+provided by SaladCloud upon request. Note that it **is not** your SaladCloud API Key.
 
 ![](https://files.readme.io/f6bfba0-image.png)
 
@@ -81,7 +81,7 @@ where it is pulling your docker image into our cache.
 
 ![](https://files.readme.io/33f3fc2-image.png)
 
-### (Optional) Add Kelpie to your Salad Organization
+### (Optional) Add Kelpie to your SaladCloud Organization
 
 Kelpie can start, stop, and scale your container group in response to job volume. It can also automatically reallocate
 nodes that fail too many jobs. In order to take advantage of these features, you must add the Kelpie user to your Salad

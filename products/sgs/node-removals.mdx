@@ -1,14 +1,14 @@
 ---
 title: 'Node Removals'
-description: 'How to request removal of a Salad Node from your SGS server'
+description: 'How to request removal of a SaladCloud Node from your SGS server'
 ---
 
 ## When to request a node removal
 
-Salad makes a best effort to identify and remove underperforming Salad nodes. However, in the event that a SaladCloud
-node becomes blocked by a content provider, or for any other reason fails to meet your requirements, you can request
-that it be removed from the list of available IPs and replaced with a fresh node. At the time that the request is
-received, the node which is connected to the session ID in the request body will be removed.
+SaladCloud makes a best effort to identify and remove underperforming SaladCloud nodes. However, in the event that a
+SaladCloud node becomes blocked by a content provider, or for any other reason fails to meet your requirements, you can
+request that it be removed from the list of available IPs and replaced with a fresh node. At the time that the request
+is received, the node which is connected to the session ID in the request body will be removed.
 
 If a node becomes unavailable, it will automatically be replaced with a fresh node. For this reason, we recommend that
 you submit the node removal request as soon as possible after detecting an underperforming node to avoid inadvertently
@@ -44,8 +44,8 @@ The JWT will be shared with you before the trial period begins.
 </AccordionGroup>
 
 <Note>
-  This should be in the format application/json. Fields marked as optional are useful for Salad in preventing the use of
-  nodes that may trigger a node removal request in the future.
+  This should be in the format application/json. Fields marked as optional are useful for SaladCloud in preventing the
+  use of nodes that may trigger a node removal request in the future.
 </Note>
 
 ## Example Request

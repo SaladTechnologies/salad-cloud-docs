@@ -85,7 +85,7 @@ saladtechnologies/sdnext:dreamshaper-8
 Navigate to [http://localhost:7860/docs](http://localhost:7860/docs) in your browser to see the API docs for SD.Next.
 
 Note that we set the `HOST` environment variable to `0.0.0.0` for local development. The default value of `HOST` is
-`[::]`, which is the ipv6 address that Salad uses to route traffic to your container.
+`[::]`, which is the ipv6 address that SaladCloud uses to route traffic to your container.
 
 3. Test a Text-to-Image request
 
@@ -191,7 +191,7 @@ jq -r '.images[0]' response.json | base64 -d > image.png
 docker push saladtechnologies/sdnext:dreamshaper-8
 ```
 
-    2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
+    2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
         ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
@@ -212,15 +212,15 @@ docker push saladtechnologies/sdnext:dreamshaper-8
 ## Interact with Your Deployment
 
     1. Wait for the deployment to be ready.
-        1. First, Salad pulls your container image into our own internal high-performance cache.
+        1. First, SaladCloud pulls your container image into our own internal high-performance cache.
 
             ![Untitled](/guides/image-generation/images/deploy-sdnext-4.png)
 
-        2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
+        2. Next, SaladCloud locates eligible nodes for your workload, based on the configuration you provided.
 
             ![Untitled](/guides/image-generation/images/deploy-sdnext-5.png)
 
-        3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
+        3. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your workload.
 
             ![Untitled](/guides/image-generation/images/deploy-sdnext-6.png)
 

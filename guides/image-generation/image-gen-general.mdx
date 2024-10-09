@@ -63,7 +63,7 @@ When deploying your stable diffusion inference server, you have two options for 
 1. **Container Gateway**: This is the easiest way to access your container group.
    1. It can be enabled during container group creation, and maps a public https URL to a specific IPv6 port in your
       container.
-   1. You can optionally enable auth, which then requires your Salad API Token to access the container group.
+   1. You can optionally enable auth, which then requires your SaladCloud API Token to access the container group.
    1. Only requires your server to listen on IPv6, no additional binary.
    1. Salad's Container Gateway uses least-connection load balancing, so you can scale your container group up or down
       without needing to change the URL.

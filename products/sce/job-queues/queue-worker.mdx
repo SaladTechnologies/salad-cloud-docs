@@ -4,10 +4,10 @@ title: 'Job Queue Worker'
 
 # Overview
 
-To work with a job queue, you'll need to customize the container that you deploy on Salad to include some way to receive
-jobs from the Job Queue, pass them to your application, then receive the results from your application and return them
-to the Queue. For this purpose, we provide a Job Queue Worker as a precompiled go binary which can be included and run
-inside your container. You can download it from
+To work with a job queue, you'll need to customize the container that you deploy on SaladCloud to include some way to
+receive jobs from the Job Queue, pass them to your application, then receive the results from your application and
+return them to the Queue. For this purpose, we provide a Job Queue Worker as a precompiled go binary which can be
+included and run inside your container. You can download it from
 [Github](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker). Note that the binary will work for any
 Linux-based image.
 
@@ -212,15 +212,15 @@ Here's how to do it.
 
 Regardless of which path you chose, you should now have an image built with your application, the Job Queue Worker, and
 some way of managing both processes. It's time to push it to the container registry of your choice. Learn more about the
-registries supported by Salad at [Container Registries](/products/sce/container-registries).
+registries supported by SaladCloud at [Container Registries](/products/sce/container-registries).
 
-# Additional notes about the Salad Job Queue Worker;
+# Additional notes about the SaladCloud Job Queue Worker;
 
 - The Worker needs to connect to a local HTTP server running inside of SEL, our special version of Linux running on the
   host machine behind your container replica. This means you won’t be able to test the Job Queue Worker locally.
 - By default, the Worker logging level is set to ‘error’. Logs will be sent to the
-  [Salad Container Logs](/products/sce/container-logs) or your [external logging](/products/sce/external-logging) tools.
-  You can adjust the logging level by adding a 'SALAD_QUEUE_WORKER_LOG_LEVEL'
+  [SaladCloud Container Logs](/products/sce/container-logs) or your [external logging](/products/sce/external-logging)
+  tools. You can adjust the logging level by adding a 'SALAD_QUEUE_WORKER_LOG_LEVEL'
   [environment variable](/products/sce/environment-variables).
 
 <img src="/products/sce/images/08bfbc2-image.png" />

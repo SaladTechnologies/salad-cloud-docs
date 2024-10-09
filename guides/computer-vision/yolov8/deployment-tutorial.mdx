@@ -83,7 +83,7 @@ Here’s an outline of the architecture for each solution:
   - Upon receiving a stop API call, the process concludes, and the results are stored in an Azure storage container.
 - **Deployment**:
   - The Fast API is containerized using Docker, ensuring a consistent and isolated environment for deployment.
-  - This Docker container is then deployed on Salad compute resources to utilize processing capabilities.
+  - This Docker container is then deployed on SaladCloud compute resources to utilize processing capabilities.
   - The Docker image itself is housed in Azure Container Registry for secure and convenient access.
 
 <img src="/products/sce/images/0b3502a-6ab72e2-image.png" />
@@ -95,7 +95,7 @@ Here’s an outline of the architecture for each solution:
   - Video stream links are saved in an Azure storage container.
   - An event grid with subscriptions is configured to monitor the storage container and trigger a message in a storage
     queue whenever a new file is added.
-  - A Python script for batch processing is containerized and deployed across multiple Salad compute nodes.
+  - A Python script for batch processing is containerized and deployed across multiple SaladCloud compute nodes.
   - This batch process routinely checks the storage queue. When a new message appears, it picks up the corresponding
     stream for processing.
 
@@ -762,39 +762,39 @@ We now need to set up all of our container group parameters:
 
    Copy the “image name“ and paste back to SaladCloud portal. Now let’s find acr username and password back in azure
    portal. Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
-   enabled, do so. Now copy the username and password and pass it back to Salad portal.
+   enabled, do so. Now copy the username and password and pass it back to SaladCloud portal.
 
 3. **Replica count**: I will pick for now, since our process is kind of “sunchromious“. We will use the second replica
    as a backup.
 4. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your
    process. The prices are very low in comparison to all the other cloud solutions, so be creative.
-5. **Optional Settings**: Salad gives you some pretty cool options like health check probe, external logging and passing
-   environment variables. For our solution the one parameter that we have to pass is **the Container Gateway.** Click
-   “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
+5. **Optional Settings**: SaladCloud gives you some pretty cool options like health check probe, external logging and
+   passing environment variables. For our solution the one parameter that we have to pass is **the Container Gateway.**
+   Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
 <img src="/products/sce/images/5b0bbe1-image.png" />
 
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to
 provide your personal token together with the api call. Your token can be found [here](https://portal.salad.com/api-key)
-With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of
-Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle
-intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit “Deploy“.
-We are all set let’s wait till our solution deploys and test it.
+With everything in place, deploying your FastAPI application on SaladCloud is just a few clicks away. By taking
+advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that
+can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit
+“Deploy“. We are all set let’s wait till our solution deploys and test it.
 
 ## **Benefits of Using Salad:**
 
-- **Cost-Effectiveness**: Salad offers GPU cloud solutions at a more affordable rate than many other cloud providers,
-  allowing you to allocate more resources to your application for less.
+- **Cost-Effectiveness**: SaladCloud offers GPU cloud solutions at a more affordable rate than many other cloud
+  providers, allowing you to allocate more resources to your application for less.
 - **Ease of Use**: With a focus on user experience, Salad's interface is designed to be intuitive, removing the
   complexity from deploying and managing cloud-based applications.
-- **Documentation and Support**: Salad provides detailed documentation to assist with deployment, configuration, and
-  troubleshooting, backed by a support team to help you when needed.
+- **Documentation and Support**: SaladCloud provides detailed documentation to assist with deployment, configuration,
+  and troubleshooting, backed by a support team to help you when needed.
 
 ## Test Full Solution deployed to Salad
 
 With your solution deployed on Salad, the next step is to interact with your FastAPI application using its public
-endpoint. Salad provides you with a deployment URL, which you can use to send requests to your API in the same way you
-would locally, but now through Salad's infrastructure.
+endpoint. SaladCloud provides you with a deployment URL, which you can use to send requests to your API in the same way
+you would locally, but now through Salad's infrastructure.
 
 <img src="/products/sce/images/649634f-image-20231110-202228.png" />
 
@@ -844,7 +844,7 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 
 #### Percentage Cost Difference for General Compute
 
-- **Salad is approximately 83% cheaper than Azure for general compute configurations.**
+- **SaladCloud is approximately 83% cheaper than Azure for general compute configurations.**
 
 #### 2. Processing with GPU Support. This is the GPU Azure recommends for yolov5.
 
@@ -855,7 +855,7 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 
 #### Percentage Cost Difference for GPU Compute
 
-- **Salad is approximately 73% cheaper than Azure for similar GPU configurations.**
+- **SaladCloud is approximately 73% cheaper than Azure for similar GPU configurations.**
 
 ---
 
@@ -863,7 +863,7 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 
 Our journey into the realm of object detection using YOLOv8 and deploying it on Salad's GPU cloud has been both
 challenging and rewarding. We've successfully navigated through all stages of development and deployment of our
-solution. Our deployment on Salad has demonstrated not just the viability of such a system for real-time object
+solution. Our deployment on SaladCloud has demonstrated not just the viability of such a system for real-time object
 detection in live video streams, but also its cost-effectiveness.
 
 The testing phase on Salad's platform has validated our application's functionality, providing a clear path from request
