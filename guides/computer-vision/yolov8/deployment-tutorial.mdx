@@ -690,8 +690,8 @@ solution, ready to be deployed efficiently across various cloud infrastructures.
 
 When creating the Dockerfile, it's crucial to select a base image that includes all the necessary system dependencies,
 because that might cause some networking issues. We’ve tested our solution with “python3.9“ base image, so if possible
-stick to it. If you have to use a different base image for any reason check out salad documentation on networking. We
-should also keep in mind our earlier issues with the libraries. Here is the full Dockerfile we will use to build an
+stick to it. If you have to use a different base image for any reason check out SaladCloud documentation on networking.
+We should also keep in mind our earlier issues with the libraries. Here is the full Dockerfile we will use to build an
 image:
 
 ```java Python
@@ -734,7 +734,7 @@ We finally got to the last and most exiting part of our project. We will now dep
 
 Deploying your containerized FastAPI application to Salad's GPU Cloud can is a very efficient and cost-effective way to
 run your object detection solution. Salad's has a very user-friendly interface as well as an API for deployment. Let’s
-deploy our solution using salad portal.
+deploy our solution using SaladCloud portal.
 
 First create your account and log into the [portal](https://portal.salad.com/) Create your organization and let’s deploy
 our container app.
@@ -760,8 +760,8 @@ We now need to set up all of our container group parameters:
 
    <img src="/products/sce/images/90b2d4d-image-20231110-195608.png" />
 
-   Copy the “image name“ and paste back to salad portal. Now let’s find acr username and password back in azure portal.
-   Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
+   Copy the “image name“ and paste back to SaladCloud portal. Now let’s find acr username and password back in azure
+   portal. Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
    enabled, do so. Now copy the username and password and pass it back to Salad portal.
 
 3. **Replica count**: I will pick for now, since our process is kind of “sunchromious“. We will use the second replica
@@ -830,7 +830,7 @@ Let’s start with the first use case: **live stream**
 #### **Azure Pricing Overview**
 
 We will now compare the compute prices in Azure and SaladCloud. Note that in Azure you can not pick ram, vCpu and GPU
-memory separately. You can only pick preconfigured computes. With salad you can pick exactly what you need.
+memory separately. You can only pick preconfigured computes. With SaladCloud you can pick exactly what you need.
 
 - **Lowest GPU Compute in Azure**: For our price comparison, we'll start by looking at Azure's lowest GPU compute price,
   keeping in mind the closest model to our solution is YOLOv5.

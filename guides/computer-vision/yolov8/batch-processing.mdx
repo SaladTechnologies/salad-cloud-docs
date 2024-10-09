@@ -173,7 +173,7 @@ is the YOLOv8 Nano model known for its speed and efficiency.
 
 Here's the starting code snippet provided by Ultralytics for running inference on a video:
 
-```java Python
+```python
 from ultralytics import YOLO
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n.pt')
@@ -188,7 +188,7 @@ computer vision tasks. This setup will allow us to visualize object detection as
 ensure that you have installed the necessary packages, **opencv-python**, **ultralytics**, and **cap_from_youtube**, the
 last of which addresses OpenCV's current limitations with YouTube video streams.
 
-```java Python
+```python
 from ultralytics import YOLO
 import cv2
 from cap_from_youtube import cap_from_youtube
@@ -239,7 +239,7 @@ earlier. To make the process easier for you run the dev/setup file we also menti
 Pafy allows us to access the stream URL, which we can then pass to OpenCV for real-time processing. Here's how we can
 use Pafy to open a live YouTube stream:
 
-```java Python
+```python
 import pafy
 
 # Open youtube video with a live stream
@@ -257,7 +257,7 @@ will run at batch-size 8, otherwise single streams will run at batch-size 1. We 
 Based on specific link parameters our process will pick which way to process the link. You can check that in the full
 script
 
-```java Python
+```python
 from ultralytics import YOLO
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n.pt')
@@ -286,7 +286,7 @@ To utilize the tracking functionality, we simply need to modify our inference ca
 call and setting **persist=True**, we instruct the model to maintain object identities consistently over time. This
 addition to the code will look like this:
 
-```java Python
+```python
 results = model.track(frame, persist=True)
 ```
 
@@ -303,7 +303,7 @@ are using Jupyter in vscode and pandas. Let’s check what results object is:
 We can see that results object has some metadata and all the detections. Let’s only keep the detections and convert them
 to a more readable format:
 
-```java Python
+```python
 json.loads(results[0].tojson())
 ```
 
@@ -320,7 +320,7 @@ record the video link, frame timestamp, original frame shape, and the processing
 
 Here's how we'll assemble our results into a DataFrame and enrich it with the additional data:
 
-```java Python
+```python
 import datetime
 import json
 import pandas as pd
@@ -395,7 +395,7 @@ across frames, and calculate the average size of the object within the frame.
 
 The **summary** function will perform these operations and output a readable string
 
-```java Python
+```python
 def summary(df, filename, result_blob):
     if (
         "track_id" in df.columns
@@ -458,7 +458,7 @@ impressive, but we can do better. To unlock the full potential of our solution, 
 device detection. With just a few lines of code, our process now intelligently determines if a CUDA-compatible GPU is
 available and adjusts accordingly.:
 
-```java Python
+```python
 # Check for CUDA device and set it
 device = "0" if torch.cuda.is_available() else "cpu"
 if device == "0":
@@ -490,7 +490,7 @@ part of the incoming link. That helps us easily identify where the stream is com
 
 Function to save our Dataframe to Azure container:
 
-```java Python
+```Python
 def save_df(df, filename, result_blob):
     results_csv_file_name = f"{filename}.csv"
     results_blob_client = result_blob.get_blob_client(results_csv_file_name)
@@ -503,7 +503,7 @@ def save_df(df, filename, result_blob):
 
 Add this part of code to the summary function to save the summary results to azure:
 
-```java Python
+```python
     results_txt_file_name = f"{filename}.txt"
     results_blob_client_txt = result_blob.get_blob_client(results_txt_file_name)
     results_blob_client_txt.upload_blob(output_string, overwrite=True)
@@ -514,12 +514,12 @@ Add this part of code to the summary function to save the summary results to azu
 To enable efficient batch processing using YOLO on Salad, establishing a connection between the Python code and Azure
 Storage resources is crucial. We will start with initiating and maintaining connections to containers and storage queue:
 
-```java Python
+```python
 from azure.storage.blob import ContainerClient
 from azure.storage.queue import QueueClient
 
 def connect_to_storage(storage_type: str, name: str, connection_str: str):
-    """Connect to Azure Storage Container or Queue.
+    """Connect to Azure Storage Container or Queue."""
     if storage_type.lower() == "container":
         client = ContainerClient
     elif storage_type.lower() == "queue":
@@ -541,16 +541,16 @@ To ensure continuous monitoring of the queue for new messages, we implement an i
 script. This loop will periodically check the queue for new messages, process them if available, and wait before
 checking again if the queue is empty:
 
-```java Python
+```Python
 while True:
-            queue_length = (
-                request_queue_client.get_queue_properties().approximate_message_count
-            )
-            if queue_length > 0:
-                queue_messages = request_queue_client.receive_messages()
-            ...
-            else:
-                time.sleep(args.queue_check_timer)
+    queue_length = (
+        request_queue_client.get_queue_properties().approximate_message_count
+    )
+    if queue_length > 0:
+        queue_messages = request_queue_client.receive_messages()
+    ...
+    else:
+        time.sleep(args.queue_check_timer)
 ```
 
 Next our script will loop through messages in the Azure storage queue, decode the message, remove the message from queue
@@ -570,7 +570,7 @@ secure way to configure your application. These variables can be defined during 
 within your container. Here's how you can integrate environment variables into your Python script for key
 configurations:
 
-```java Python
+```Python
 import argparse
 parser = argparse.ArgumentParser()
         parser.add_argument(
@@ -611,10 +611,10 @@ developed and tested.
 
 When creating the Dockerfile, it's crucial to select a base image that includes all the necessary system dependencies,
 because that might cause some networking issues. We’ve tested our solution with “python3.9“ base image, so if possible
-stick to it. If you have to use a different base image for any reason check out salad documentation on networking. Here
-is the full Dockerfile we will use to build an image:
+stick to it. If you have to use a different base image for any reason check out SaladCloud documentation on networking.
+Here is the full Dockerfile we will use to build an image:
 
-```java Dockerfile
+```Dockerfile
 # Use the official Python image as the base image
 FROM python:3.9
 
@@ -643,7 +643,7 @@ ENTRYPOINT ["python3.9", "batch.py"]
 We’ve also put together a bash script to easily publish your image to azure container registry. The script is located
 side by side with the Dockerfile in the git repo. You can use the following command to build and deploy your image:
 
-```java bash
+```bash
 bash docker.sh <image name> <image version> <acr name>
 ```
 
@@ -653,7 +653,7 @@ We finally got to the last and most exiting part of our project. We will now dep
 
 Deploying your containerized application to Salad's GPU Cloud is a very efficient and cost-effective way to run your
 object detection solution. Salad has a very user-friendly interface as well as an API for deployment. Let’s deploy our
-solution using salad portal.
+solution using SaladCloud portal.
 
 First create your account and log into https://portal.salad.com/ Create your organization and let’s deploy our container
 app.
@@ -679,8 +679,8 @@ We now need to set up all of our container group parameters:
 
    <img src="/products/sce/images/f99f106-image-20231110-195608.png" />
 
-   Copy the “image name“ and paste back to salad portal. Now let’s find acr username and password back in azure portal.
-   Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
+   Copy the “image name“ and paste back to SaladCloud portal. Now let’s find acr username and password back in azure
+   portal. Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
    enabled, do so. Now copy the username and password and pass it back to Salad portal.
 
 3. **Replica count**: This will define how many videos can be processed simultaneously. For example if we have 10
@@ -732,5 +732,5 @@ file:
 Here is a link to the multi-threading
 [code](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch-multi-thread.py)
 
-If you are going to deploy the milti-threading solution, remember to change the python script name in the Dockerfile.
+If you are going to deploy the multi-threading solution, remember to change the python script name in the Dockerfile.
 Also make sure you have right hardware configurations for the number of threads you want to run.
