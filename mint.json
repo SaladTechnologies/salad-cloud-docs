@@ -126,20 +126,10 @@
     {
       "group": "Transcription API",
       "pages": [
-        "products/transcription/transcription",
-        "products/transcription/transcriptionfaq",
-        "products/transcription/transcriptionquickstart",
-        {
-          "group": "Transcription Guides",
-          "pages": [
-            "products/transcription/dropboxdownloadable",
-            "products/transcription/awsdownloadablefile",
-            "products/transcription/azuredownloadablefile",
-            "products/transcription/googledrivedownloadable",
-            "products/transcription/zapiertranscriptionguide",
-            "products/transcription/pabblyintegration"
-          ]
-        }
+        "products/transcription/transcription-overview",
+        "products/transcription/speech-to-text",
+        "products/transcription/translation",
+        "products/transcription/captions"
       ]
     },
     {
@@ -336,7 +326,45 @@
         },
         {
           "group": "Transcription",
-          "pages": ["guides/transcription/youtube"]
+          "pages": [
+            {
+              "group": "Salad Transcription API",
+              "pages": [
+                "guides/transcription/salad-transcription-api/transcription-quick-start",
+                {
+                  "group": "Features",
+                  "pages":[
+                    "guides/transcription/salad-transcription-api/speech-to-text",
+                    "guides/transcription/salad-transcription-api/translation",
+                    "guides/transcription/salad-transcription-api/captions"
+                  ]
+                },
+                {
+                  "group": "Downloadable Files",
+                  "pages":[
+                    "guides/transcription/salad-transcription-api/awsdownloadablefile",
+                    "guides/transcription/salad-transcription-api/azuredownloadablefile", 
+                    "guides/transcription/salad-transcription-api/dropboxdownloadable",
+                    "guides/transcription/salad-transcription-api/googledrivedownloadable"
+                  ]
+                },
+                {
+                  "group": "Integrations",
+                  "pages":[
+                    "guides/transcription/salad-transcription-api/pabblyintegration",
+                    "guides/transcription/salad-transcription-api/zapiertranscriptionguide"
+                  ]
+                },
+                "guides/transcription/salad-transcription-api/transcriptionfaq"
+              ]
+            },
+            {
+              "group": "SCE",
+              "pages": [
+                "guides/transcription/sce/youtube"
+              ]
+            }
+          ]
         }
       ]
     }

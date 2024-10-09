@@ -90,7 +90,7 @@ Now, let's calculate the quota cost for collecting video URLs from a search on a
 | Get 2,000,000 video URLs from the 10,000 playlists of the 100 channels, assuming each playlist contains 200 videos | 40,000     | Executing a video.list requires 1 unit and it can return a maximum of 50 items: 100 x 100 x 1 x 4 |
 
 The default quota allocation of 10,000 units per day may prove insufficient if we need to collect numerous video URLs in
-a short timeframe. We can create several GCP projects with each providing 10,000 units per day, or we could also
+a short time frame. We can create several GCP projects with each providing 10,000 units per day, or we could also
 complete [an audit](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits) and request an
 additional quota following the process. Here we provide a combined solution by using both YouTube Data API and Pytube.
 
@@ -217,7 +217,7 @@ massive influx of new ones.
 
 For time-sensitive tasks, implementing autoscaling is also beneficial. By continually monitoring the job count in the
 queue, the job filler dynamically adjusts the number of Salad node groups. This adaptive approach ensures that specific
-quantities of tasks can be completed within a predefined timeframe while also offering the flexibility to manage costs
+quantities of tasks can be completed within a predefined time frame while also offering the flexibility to manage costs
 efficiently during periods of reduced demand.
 
 ### The reference design for the job filler

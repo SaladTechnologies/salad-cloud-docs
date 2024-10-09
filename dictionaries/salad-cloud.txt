@@ -31,6 +31,7 @@ infotexts
 inpainting
 INSTALLDIR
 interruptible
+italian
 konieshadow
 LAVIS
 listdir
@@ -61,6 +62,7 @@ SD.Next
 sdapi
 sdnext
 SDXL
+spanish
 subseed
 subseeds
 timeframe
@@ -78,3 +80,12 @@ webui
 WORKDIR
 xformers
 xlvaeapp
+Pytube
+zapier
+clid
+getenv
+timeframe
+azcopy
+gsutil
+Pabbly’s
+Pabbly
