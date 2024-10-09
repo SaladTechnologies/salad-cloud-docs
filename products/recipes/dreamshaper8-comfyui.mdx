@@ -1,41 +1,39 @@
 ---
-title: FLUX.1-Schnell (FP8) - ComfyUI (API)
+title: Dreamshaper 8 - ComfyUI (API)
 ---
 
-This recipe creates an inference API for the [FLUX.1-schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
-image generation model by Black Forest Labs, specifically
-[this FP8 version](https://huggingface.co/Comfy-Org/flux1-schnell) provided by the Comfy Org. Inference is powered by
+This recipe creates an inference API for the [Dreamshaper 8](https://civitai.com/models/4384/dreamshaper) image
+generation model by Lykon, fine-tuned from
+[Stable Diffusion 1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5). Inference is powered by
 [ComfyUI](https://github.com/comfyanonymous/ComfyUI/), exposed via
 [a simple HTTP API](https://github.com/SaladTechnologies/comfyui-api) to facilitate scalable stateless operation. Users
 can make an HTTP request to the provided endpoints and get back one or more images in base64 encoded form. Optionally,
 users can receive completed images via a webhook.
 
-FLUX.1-Schnell is notable for several features:
+Dreamshaper 8 is notable for a number of reasons:
 
-- High quality outputs in only 4 steps
-- Commercial-friendly Apache 2 license
-- Can generate legible text
-- Can generate HD images in a variety of styles
-- Has best-in-class prompt adherence, even for complex prompts
+- Great quality images, very low hardware requirements
+- Supports many different art styles
+- Commercial-friendly license
 
-### Example Output
+![](/products/recipes/images/dreamshaper-image-1.png)
 
-![](/products/recipes/images/flux-image-1.png)
+![](/products/recipes/images/dreamshaper-image-2.png)
 
-![](/products/recipes/images/flux-image-2.png)
+![](/products/recipes/images/dreamshaper-image-3.png)
 
-![](/products/recipes/images/flux-image-3.png)
-
-![](/products/recipes/images/flux-image-4.png)
+![](/products/recipes/images/dreamshaper-image-4.png)
 
 ```bash
 curl -X 'POST' \
-  "$access_domain_name/workflow/flux/txt2img" \
+  "$access_domain_name/workflow/sd1.5/txt2img" \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
   "input": {
-    "prompt": "8-bit video game art of a salad"
+    "prompt": "8-bit video game art of a salad",
+    "negative_prompt": "",
+    "steps": 25
   }
 }' | jq -r '.images[0]' | base64 -d > image.png
 ```
@@ -52,7 +50,7 @@ authentication, all requests to your API will need to include your Salad API key
 
 The recipe is configured for 3 replicas by default, and we recommend using at least 3 for testing, and at least 5 for
 production workloads. Salad’s distributed GPU cloud is powered by idle gaming PCs around the world, in private
-residences, gaming cafes, and eSports arenas. A consequence of this unique infrastructure is that all nodes must be
+residences, gaming cafes, and esports arenas. A consequence of this unique infrastructure is that all nodes must be
 considered interruptible without warning. If a Chef (a compute host) decides they want to use their GPU to play a video
 game, or their dog trips on the power cord, or their Wi-Fi goes out, the instance of your workload running on that node
 will be interrupted, and a new instance will be allocated to a different node. This means you will want to slightly
@@ -68,8 +66,8 @@ container group creation.
 ### Deploy It And Wait
 
 When you deploy the recipe, Salad will find the desired number of qualified nodes, and begin the process of downloading
-the container image to the host machine. This particular image is quite large (~16 GB), and it may take up to tens of
-minutes to download to some machines, depending on the network conditions of that particular node. Remember, these are
+the container image to the host machine. This image is relatively large (~6 GB), and it may take up to tens of minutes
+to download to some machines, depending on the network conditions of that particular node. Remember, these are
 residential PCs with residential internet connections, and performance will vary across different nodes.
 
 Eventually, you will see instances enter the running state, and show a green checkmark in the “Ready” column, indicating
@@ -77,45 +75,39 @@ the workload is passing its readiness probe. Once at least 1 instance is running
 running, but for production you will want to wait until an adequate number of nodes have become ready before moving
 traffic over.
 
-![](/products/recipes/images/deploy-flux-1.png)
+![](/products/recipes/images/deploy-dreamshaper-1.png)
 
 ### Visit The Docs
 
 Once at least one instance is running, you can navigate to the `/docs` endpoint at the Access Domain Name provided in
-the portal. In the above example that URL is `https://melon-herbs-w0fu2k40b131y19k.salad.cloud/docs` . You’ll see the
-swagger documentation that looks something like this:
+the portal. In the above example that URL is `https://nectarine-frisee-3lk3jgv5cdo50mso.salad.cloud/docs` . You’ll see
+the swagger documentation that looks something like this:
 
-![](/products/recipes/images/flux-docs.png)
+![](/products/recipes/images/dreamshaper-docs-1.png)
 
 ## Workload Customizations
 
-### Hardware Considerations
+### **Hardware Considerations**
 
-We recommend at least 24gb of system ram for this. When lowered to 16gb, we saw significantly increased variability in
-response times, and a slightly elevated error rate. This is likely because the workload uses almost exactly 16gb ram,
-occasionally going over and causing the generation to fail. The default system ram in this recipe is 30gb for optimal
-performance.
-
-We used the RTX 4090 with 24gb vRAM for optimal performance, but it will run on many other GPUs as well, although with
-lower performance. If your workflow includes more models, such as an upscale model, you should choose a GPU with 24gb
-vRAM.
-
-You should conduct your own performance testing for your specific workload and hardware configuration.
+Since this model is fine-tuned from stable diffusion 1.5, it can be run on a wide variety of hardware. We chose the RTX
+3060 Ti with 8gb vRAM for the default recipe configuration because it performs well enough for many applications, and is
+a very good value. You should run your own performance testing to determine the hardware configuration that is right for
+your specific workload.
 
 ### Custom Models And Nodes
 
 To use a different model, you would follow
-[this guide](/guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy) but copy in your custom model instead of
-the default one, and ensure your warmup workflow references the correct checkpoint name. You’d push up the new image to
-the image registry of your choice, and edit the container group to reference the new image.
+[this guide](/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy) but copy in your custom model
+instead of the default one, and ensure your warmup workflow references the correct checkpoint name. You’d push up the
+new image to the image registry of your choice, and edit the container group to reference the new image.
 
 ### Custom Endpoints
 
 To add custom endpoints or other custom functionality to the API server, you can add javascript or typescript files to
 the docker image
-[following this example](https://github.com/SaladTechnologies/salad-recipes/tree/master/src/flux1-schnell-fp8-comfyui).
+[following this example](https://github.com/SaladTechnologies/salad-recipes/tree/master/src/dreamshaper8-comfyui).
 
 ## API Reference
 
 You can see the full API documentation at the `/docs` endpoint at the Access Domain Name of your container group. They
-can also be found in the [API Reference](/reference/recipes/flux1-schnell-fp8-comfyui/).
+can also be found in the [API Reference](/reference/recipes/dreamshaper8-comfyui/).
