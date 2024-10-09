@@ -13,7 +13,7 @@ Text-to-speech (TTS) technology has undergone significant advancements in recent
 efficient than ever before. Modern TTS models leverage deep learning and artificial intelligence to produce
 natural-sounding speech with remarkable accuracy. These models find applications in various real-life scenarios, such as
 voice assistants, audiobook narration, and accessibility tools for those with visual impairments or reading
-difficulties. In this article, we will focus on using one such TTS model, Open Voice, on Salad Cloud, demonstrating how
+difficulties. In this article, we will focus on using one such TTS model, Open Voice, on SaladCloud , demonstrating how
 to harness its capabilities in a cloud-based environment.
 
 ** If you are looking for fast deployment of OpenVoice on Salad move to
@@ -52,17 +52,17 @@ and personalized voice output. Here’s a closer look at the OpenVoice framework
 
 ### Exploring Open Voice Capabilities
 
-In our benchmarking efforts, we discovered that OpenVoice can be executed on any GPU available on Salad Cloud, including
+In our benchmarking efforts, we discovered that OpenVoice can be executed on any GPU available on SaladCloud , including
 those with lower memory capacities. However, when it comes to voice cloning, there is an exception; it cannot be run on
 40x series GPUs due to current driver/library incompatibilities, which are expected to be resolved soon.
 
 Based on our analysis, the RTX 2070 emerges as the best choice for balancing cost and performance. Our benchmarks reveal
-that when using the RTX 2070 on Salad Cloud GPUs, OpenVoice can process an impressive 4 million words per dollar for
+that when using the RTX 2070 on SaladCloud GPUs, OpenVoice can process an impressive 4 million words per dollar for
 text-to-speech plus cloning, and over 6 million words per dollar for text-to-speech alone, making it an efficient and
 economical option for voice synthesis and cloning tasks. You can check our benchmark here:
 [https://blog.salad.com/openvoice/](https://blog.salad.com/openvoice/)
 
-## Project Overview: TTS and Voice Cloning using Open Voice and Salad Cloud
+## Project Overview: TTS and Voice Cloning using Open Voice and SaladCloud
 
 In this project, our aim is to deploy an open voice solution that offers the flexibility to choose between transferring
 text to speech and adding narrator’s voice tone. This solution will be deployed as an API.
@@ -80,7 +80,7 @@ text to speech and adding narrator’s voice tone. This solution will be deploye
 6. **Storage and Accessibility:** The resulting audio file is uploaded back to Azure for accessibility and further use.
 
 Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are accessible to a
-broader audience, not just large organizations with significant resources. By combining OpenVoice with Salad Cloud, we
+broader audience, not just large organizations with significant resources. By combining OpenVoice with SaladCloud , we
 democratize access to state-of-the-art voice technology, enabling users to create realistic and customizable speech with
 minimal effort. This initiative highlights the synergy between cloud computing and AI models in addressing real-world
 applications in voice synthesis and cloning, providing value in various scenarios such as content creation,
@@ -172,13 +172,13 @@ using this command:
 bash dev/setup
 ```
 
-### Voice cloning test with OpenVoice on Salad Cloud
+### Voice cloning test with OpenVoice on SaladCloud
 
 To explore the capabilities of OpenVoice, we followed the instructions provided in the
 [Open Voice documentation](https://github.com/myshell-ai/OpenVoice/blob/main/docs/USAGE.md) and conducted our
-experiments on Salad Cloud using [Salad Jupyter Lab](https://docs.salad.com/docs/jupyterlab). This same experiment can
-be run on a local machine. We adapted the code to run as a single script. The code snippet below outlines the process,
-from initialization to inference, demonstrating how to control voice style and speed:
+experiments on SaladCloud using [Salad Jupyter Lab](https://docs.salad.com/docs/jupyterlab). This same experiment can be
+run on a local machine. We adapted the code to run as a single script. The code snippet below outlines the process, from
+initialization to inference, demonstrating how to control voice style and speed:
 
 ```python
 import os
@@ -555,7 +555,7 @@ full list of the arguments:
 - `text_file`: Text file to be used for TTS
 
 By providing these parameters, you can run the TTS or voice cloning process through your FastAPI application deployed on
-Salad Cloud. Now hit “execute” and wait for a reply.
+SaladCloud . Now hit “execute” and wait for a reply.
 
 ![](https://files.readme.io/b43170e-image.png)
 

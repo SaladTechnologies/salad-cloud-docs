@@ -7,7 +7,7 @@ createdAt: 'Sat Nov 11 2023 15:46:02 GMT+0000 (Coordinated Universal Time)'
 updatedAt: 'Mon Nov 20 2023 21:26:56 GMT+0000 (Coordinated Universal Time)'
 ---
 
-In this guide, we will go through deploying YOLOv8 applications using Salad cloud.
+In this guide, we will go through deploying YOLOv8 applications using SaladCloud .
 
 ## **What is Yolo?**
 

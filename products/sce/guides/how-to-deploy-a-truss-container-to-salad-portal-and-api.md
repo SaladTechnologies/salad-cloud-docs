@@ -10,21 +10,21 @@ createdAt: 'Wed Mar 01 2023 16:44:54 GMT+0000 (Coordinated Universal Time)'
 updatedAt: 'Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)'
 ---
 
-**Introduction**  
+**Introduction**
 Truss is a Python library that simplifies the deployment of machine learning models by creating containerized models
 that can be served via HTTP requests. This guide will show you how to deploy a Truss container to
 **[Salad Portal ](http://portal.salad.com)** and ** [Salad API](https://docs.salad.com/reference/api-reference)** so
 that your model can be accessed from anywhere.
 
-Prerequisites  
+Prerequisites
 Before you begin, you will need the following:
 
-- A [Salad Cloud account](http://portal.salad.com)
-- [A project in Salad Cloud](https://docs.salad.com/docs/set-up-a-project)
+- A [SaladCloud account](http://portal.salad.com)
+- [A project in SaladCloud ](https://docs.salad.com/docs/set-up-a-project)
 - A container image built using [Truss](https://truss.baseten.co/)
 - The Truss library installed.
 
-Truss requires Python >=3.7 and \<3.11. To install Truss from PyPi,  
+Truss requires Python >=3.7 and \<3.11. To install Truss from PyPi,
 To install Truss, run this command:
 
 ```text
@@ -33,14 +33,14 @@ pip install truss
 
 Here is a complete [guide and docs to guide you through Truss ](https://truss.baseten.co)
 
-**Step 1: Obtain Your API Key**  
+**Step 1: Obtain Your API Key**
 To authenticate your API requests, you'll need an API key. To obtain your API key, follow these steps:
 
-- Log in to your Salad Cloud account at [https://portal.salad.com](https://portal.salad.com)
+- Log in to your SaladCloud account at [https://portal.salad.com](https://portal.salad.com)
 - Click on your profile in the top right corner of the page, then click API Key.
 - Copy the API key that is displayed. You'll need this in the next step.
 
-**Step 2: Package Your Model**  
+**Step 2: Package Your Model**
 Before deploying your model to Salad Portal and API, you need to package it as a Truss container. Follow these steps:
 
 - Install the required dependencies for your model. For example, if you used `scikit-learn` to create your model, run:
@@ -80,7 +80,7 @@ The container will start running on port `8080.`
 curl -X POST http://127.0.0.1:8080/v1/models/model:predict -d '{"inputs": [[0, 0, 0, 0]]}'
 ```
 
-- Configure Your Model for Deployment :  
+- Configure Your Model for Deployment :
   To configure your Truss, include a file **config.yaml** in the root directory of your Truss. Configuration is
   optional, as every configurable value has a sensible default. The Truss we generated in the quickstart sample provides
   a good example of a typical Truss config:
@@ -100,10 +100,10 @@ requirements:
 ```
 
 - Create a Docker image for your Truss model by following the steps outlined in the
-  [Quickstart: making a Truss" section of the Truss documentation guide](https://truss.baseten.co/).  
+  [Quickstart: making a Truss" section of the Truss documentation guide](https://truss.baseten.co/).
   Make sure to replace "iris_rfc_truss" with a name that reflects your model.
 
-- Upload your container to Dockerhub  
+- Upload your container to Dockerhub
   First, ensure that you have a DockerHub account. If you don't, create one at
   [https://hub.docker.com/signup](https://hub.docker.com/signup).
 
@@ -139,11 +139,11 @@ docker run -p 8080:8080 <your_username>/<image_name>:<tag>
 docker stop $(docker ps -q)
 ```
 
-**Step 3: Deploy the Container Image to Salad Portal. **  
+**Step 3: Deploy the Container Image to Salad Portal. **
 Follow this step-by-step guide to deploy a container to
 [ Salad Portal here ](https://docs.salad.com/docs/how-to-deploy-a-container-using-salad-portal)
 
-**Step 4: Deploy the Container Image to Salad API**  
+**Step 4: Deploy the Container Image to Salad API**
 To deploy your container image to Salad API, follow these steps:
 
 - Send a POST request to the following URL:
@@ -155,7 +155,7 @@ https://api.salad.com/api/public/organizations/{organization_name}/projects/{pro
 Replace `organization_name}` and `{project_name}` with the name of your organization and project, respectively.
 
 - In the headers of the POST request, include `accept: application/json` and `content-type: application/json`.
-- In the body of the POST request, include the following JSON data, replacing `{API_KEY}` with your Salad Cloud API key
+- In the body of the POST request, include the following JSON data, replacing `{API_KEY}` with your SaladCloud API key
   and `{CONTAINER_IMAGE_URL}` with the URL of your container image:
 
 ```json

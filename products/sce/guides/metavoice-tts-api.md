@@ -14,7 +14,7 @@ efficient. Contemporary TTS models utilize deep learning and artificial intellig
 natural-sounding and highly accurate. These advancements have led to widespread applications in various real-life
 scenarios, including voice assistants, audiobook narration, and accessibility tools for individuals with visual
 impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice,
-and demonstrate how to leverage its features on Salad Cloud in a cloud-based environment.
+and demonstrate how to leverage its features on SaladCloud in a cloud-based environment.
 
 ** If you are looking for fast deployment of MetaVoice Endpoint on Salad move to
 [Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
@@ -79,7 +79,7 @@ performance. However, during our trials, we explored the use of GPUs with lower 
 deliver satisfactory results. This necessitated a meticulous selection process from Salad's GPU fleet to identify
 compatible options that could handle the processing demands of MetaVoice.
 
-## Project Overview: TTS with Voice Cloning using MetaVoice and Salad Cloud
+## Project Overview: TTS with Voice Cloning using MetaVoice and SaladCloud
 
 In this project, we aim to deploy a flexible voice solution that enables text-to-speech conversion with addition of a
 narrator's voice tone. This solution will be accessible as an API.
@@ -93,7 +93,7 @@ narrator's voice tone. This solution will be accessible as an API.
 4. **Storage and Accessibility:** The generated audio file is uploaded back to Azure for easy access and further usage.
 
 Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are not only
-reserved for large organizations with extensive resources. By leveraging MetaVoice and Salad Cloud, we make cutting-edge
+reserved for large organizations with extensive resources. By leveraging MetaVoice and SaladCloud , we make cutting-edge
 voice technology accessible to a wider audience, enabling the creation of realistic and customizable speech with minimal
 effort. This initiative showcases how cloud computing and AI models can work together to address real-world applications
 in voice synthesis and cloning, offering value in various scenarios such as content creation, accessibility, and
@@ -192,7 +192,7 @@ bash dev/setup
 This script will prepare your local development environment for working with MetaVoice, ensuring that you have all the
 required tools and dependencies to start customizing and testing the application.
 
-### Voice cloning test with MetaVoice on Salad Cloud
+### Voice cloning test with MetaVoice on SaladCloud
 
 To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code
 as our base: [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts
@@ -773,4 +773,4 @@ solution documentation for guidance. The complete list of arguments has been pro
 
 You can now use your endpoint with Swagger to interact with your API directly through the browser. Alternatively, you
 can send requests to your endpoint using tools like curl or Postman for testing and integration into your applications.
-Enjoy leveraging the power of MetaVoice and Salad Cloud for your text-to-speech and voice cloning needs!
+Enjoy leveraging the power of MetaVoice and SaladCloud for your text-to-speech and voice cloning needs!
