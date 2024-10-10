@@ -1,6 +1,5 @@
 ---
-title: 'TCP'
-slug: 'tcp-logging'
+title: TCP
 ---
 
 # Overview
@@ -32,7 +31,7 @@ To generate self-signed certificate you can use OpenSSL.
 
 1. Generate a CA (Certificate Authority) Certificate and Key:
 
-```Text shell
+```shell
 # Generate CA private key
 openssl genpkey -algorithm RSA -out ca-key.pem
 
@@ -42,7 +41,7 @@ openssl req -x509 -new -key ca-key.pem -out ca-certificate.pem
 
 2. Generate Logstash Server Certificate and Key:
 
-```Text shell
+```shell
 # Generate Logstash server private key
 openssl genpkey -algorithm RSA -out logstash-private-key.pem
 
@@ -52,7 +51,7 @@ openssl req -new -key logstash-private-key.pem -out logstash-csr.pem
 
 3. Sign the Logstash server CSR with the CA Certificate:
 
-```Text shell
+```shell
 # Sign the Logstash server CSR with the CA certificate
 openssl x509 -req -in logstash-csr.pem -CA ca-certificate.pem -CAkey ca-key.pem -CAcreateserial -out logstash-certificate.pem
 ```
@@ -62,7 +61,7 @@ openssl x509 -req -in logstash-csr.pem -CA ca-certificate.pem -CAkey ca-key.pem 
 With the certificates ready, it's time to configure Logstash to accept secure log connections from SCE. Create a
 Logstash configuration file, typically named logstash.conf, and add the following content:
 
-```Text shell
+```shell
 input {
   tcp {
     host => "0.0.0.0" # listen on all available network interfaces
@@ -95,7 +94,7 @@ your Logstash TLS/SSL certificates. For more information about the logstash conf
 
 # Starting Logstash
 
-```Text shell
+```shell
 $ bin/logstash -f logstash.conf
 ```
 

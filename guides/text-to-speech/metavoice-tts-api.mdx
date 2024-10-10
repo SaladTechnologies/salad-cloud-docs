@@ -1,10 +1,5 @@
 ---
 title: 'MetaVoice TTS with Voice Cloning Guide'
-slug: 'metavoice-tts-api'
-excerpt: ''
-hidden: true
-createdAt: 'Mon Mar 25 2024 20:38:14 GMT+0000 (Coordinated Universal Time)'
-updatedAt: 'Sat Mar 30 2024 14:23:52 GMT+0000 (Coordinated Universal Time)'
 ---
 
 ## Introduction
@@ -16,8 +11,8 @@ scenarios, including voice assistants, audiobook narration, and accessibility to
 impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice,
 and demonstrate how to leverage its features on SaladCloud in a cloud-based environment.
 
-** If you are looking for fast deployment of MetaVoice Endpoint on SaladCloud move to
-[Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
+**If you are looking for fast deployment of MetaVoice Endpoint on SaladCloud move to
+[Deploying MetaVoice Endpoint to Salad](#deploying-solution-to-salad)**
 
 ### Discover MetaVoice: The Open-Source Voice Cloning Tool
 
@@ -147,7 +142,7 @@ script are provided below.
 
 The Setup Script:
 
-```bash Bash
+```bash
 set -e
 echo "setup the curent environment"
 CURRENT_DIRECTORY="$( dirname "${BASH_SOURCE[0]}" )"
@@ -185,7 +180,7 @@ pip install -e .
 To establish a clean virtual environment and install all the necessary libraries, you simply needs to execute the script
 using this command:
 
-```java bash
+```bash
 bash dev/setup
 ```
 
@@ -520,7 +515,7 @@ works:
 
 ```python
 def inference(connection_string: str, input_container_name: str, output_container_name: str, voices_container_name: str, reference_voice: str,  text_file: str = None):
-    # authentiacate in azure
+    # authenticate in azure
 
     input_blob = azure_initiate(input_container_name, connection_string)
     result_blob = azure_initiate(output_container_name, connection_string)
@@ -641,7 +636,7 @@ efficient data transfer to and from Azure storage.
 
 Here is the Dockerfile:
 
-```java Dockerfile
+```dockerfile
 FROM nvidia/cuda:11.7.1-devel-ubuntu22.04 as cuda-base
 # Set some environment variable for better NVIDIA compatibility
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}

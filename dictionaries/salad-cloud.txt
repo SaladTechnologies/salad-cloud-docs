@@ -2,6 +2,7 @@ alwayson
 ASGI
 azcopy
 btop
+buildx
 Civitai
 CivitAI
 ckpt
@@ -15,6 +16,7 @@ cuda
 cudnn
 denoise
 denoising
+devel
 dewdney
 Diátaxis
 distil
@@ -24,10 +26,12 @@ encodedimage
 esports
 Falco
 fastapi
+ffprobe
 firstphase
 Flickr
 fooocus
 Fooocus
+genpkey
 getenv
 getsize
 gsutil
@@ -54,6 +58,7 @@ LoRA
 LoRAs
 Lykon
 makedirs
+metavoiceio
 mintlify
 neofetch
 nomos8khatLOtf_v20.safetensors

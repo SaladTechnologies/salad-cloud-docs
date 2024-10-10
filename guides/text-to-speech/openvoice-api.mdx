@@ -1,10 +1,5 @@
 ---
 title: 'OpenVoice Text-to-Speech and Voice Cloning Guide'
-slug: 'openvoice-api'
-excerpt: ''
-hidden: false
-createdAt: 'Mon Mar 18 2024 18:55:37 GMT+0000 (Coordinated Universal Time)'
-updatedAt: 'Tue Apr 09 2024 16:23:12 GMT+0000 (Coordinated Universal Time)'
 ---
 
 ## Introduction
@@ -418,7 +413,7 @@ transfer to and from Azure storage, and the OpenVoice cloning model from a publi
 
 Here is the Dockerfile:
 
-```java Dockerfile
+```dockerfile
 FROM nvidia/cuda:11.7.1-devel-ubuntu22.04 as cuda-base
 # Set some environment variable for better NVIDIA compatibility
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}

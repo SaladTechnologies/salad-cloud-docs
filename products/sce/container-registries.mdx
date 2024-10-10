@@ -1,5 +1,5 @@
 ---
-title: 'Container Registries'
+title: Container Registries
 ---
 
 A container registry is a collection of repositories designed to efficiently store and distribute container images. SCE
@@ -23,13 +23,13 @@ another registry, such as GitHub Container Registry, you'll need to include the 
 URL, but doesn't contain a protocol specifier (e.g. `https://`). You may optionally append a tag, as well. Note that if
 no tag is supplied, the `:latest` tag will be used by default.
 
-> ```Text shell
+> ```shell
 > docker manifest inspect $REMOTEIMAGESOURCE
 > ```
 >
 > If you're building using Docker, you can specify the output manifest spec using `buildx`:
 >
-> ```Text shell
+> ```shell
 > docker buildx build \
 > -t $LOCALIMAGESOURCE \
 > --provenance=false \
@@ -40,9 +40,9 @@ no tag is supplied, the `:latest` tag will be used by default.
 ### Examples
 
 - Image hosted on Docker Hub, with the tag `v1` -
-  - Full URL: `docker.io/myname/imagename:v1`
-  - Shortened URL: `myname/myimagename:v1`
-- Image hosted on GHCR, latest version - `ghcr.io/myorg/imagename`
+  - Full URL: `docker.io/my-name/imagename:v1`
+  - Shortened URL: `my-name/imagename:v1`
+- Image hosted on GHCR, latest version - `ghcr.io/my-org/imagename`
 
 # Supported Registries
 
@@ -72,7 +72,7 @@ new Container Group through the Portal or the Public API.
   pull the image and place it into encrypted storage for distribution to the SaladCloud Network.
 - When we distribute a workload to a node, we generate a 1 time access token, allowing only specific node(s) to download
   and run the container image
-- There currently a max **image size of 20 GB (note: subject to change)**
+- There currently a max **image size of 35 GB (note: subject to change)**
 - We pull and store images at moment of container group creation, so if the image is modified you will have to create a
   new container group
 
