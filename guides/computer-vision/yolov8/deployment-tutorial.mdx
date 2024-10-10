@@ -691,7 +691,7 @@ stick to it. If you have to use a different base image for any reason check out 
 We should also keep in mind our earlier issues with the libraries. Here is the full Dockerfile we will use to build an
 image:
 
-```python
+```dockerfile
 # Use the official Python image as the base image
 FROM python:3.9
 
@@ -721,7 +721,7 @@ CMD ["uvicorn", "fast_multi:app", "--host", "::", "--port", "80"]
 I've also put together a bash script to easily publish your image to azure container registry. The script is located
 side by side with the Dockerfile in the git repo. You can use the following command to build and deploy your image:
 
-```python
+```shell
 bash docker.sh <image name> <image version> <acr name>
 ```
 
@@ -798,7 +798,7 @@ you would locally, but now through Salad's infrastructure.
 This url will be used instead of the localhost we used to send requests to while testing our FastApi locally, so if we
 replace local host with the link and keep the /docs we will get to our swagger page, but now living in the cloud:
 
-```python
+```http
 https://tamarind-navybean-2kln8fkx9xruvxa2.salad.cloud/docs
 ```
 
