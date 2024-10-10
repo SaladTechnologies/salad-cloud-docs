@@ -370,11 +370,11 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-<img src="/guide/llm/images/llm-general1.jpg" />
+<img src="/guides/llm/images/llm-general1.jpg" />
 
 You don't need to add double or single quotes in the Argument 2 of Command for Readiness on SaladCloud Portal:
 
-<img src="/guide/llm/images/llm-general2.jpg" />
+<img src="/guides/llm/images/llm-general2.jpg" />
 
 After the instances are running and have passed the readiness probes, we can perform some test using the generated
 access domain name:
@@ -462,7 +462,7 @@ Argument2: text-generation-launcher --model-id $MODEL_ID --max-total-tokens 4096
 You don't need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
 them when running the ‘docker run' command locally:
 
-<img src="/guide/llm/images/llm-general3.jpg" />
+<img src="/guides/llm/images/llm-general3.jpg" />
 
 ## Scenario 3: Run the TGI server interactively.
 
@@ -515,14 +515,14 @@ Argument2: sleep infinity
 You don't need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
 them when running the ‘docker run' command locally:
 
-<img src="/guide/llm/images/llm-general4.jpg" />
+<img src="/guides/llm/images/llm-general4.jpg" />
 
 Once the instances are running (sleeping), you can use the interactive terminal to manually run tasks, perform various
 tests, and troubleshoot issues:
 
-<img src="/guide/llm/images/llm-general5.jpg" />
+<img src="/guides/llm/images/llm-general5.jpg" />
 
-<img src="/guide/llm/images/llm-general6.jpg" />
+<img src="/guides/llm/images/llm-general6.jpg" />
 
 # Recommendation for Production
 
@@ -544,7 +544,7 @@ time can also vary significantly depending on the length of the generated text a
 successfully run LLM using the container gateway on SaladCloud, the system requirements, capabilities and parameters
 must be clearly defined, planned, tested and deployed.** Here are some examples:
 
-<img src="/guide/llm/images/llm-general7.jpg" />
+<img src="/guides/llm/images/llm-general7.jpg" />
 
 Context length and batch size can significantly impact system performance, throughput, and cost-effectiveness. To
 utilize resources efficiently, several container groups can be deployed for different scenarios, such as short and long
@@ -562,4 +562,4 @@ The system capacities need to be carefully calculated and provisioned, or adjust
 system requirements. Since instances require time to download images and start up, we recommend adjusting the container
 group to the expected capacity 30 minutes before peak traffic.
 
-<img src="/guide/llm/images/llm-general8.jpg" />
+<img src="/guides/llm/images/llm-general8.jpg" />
