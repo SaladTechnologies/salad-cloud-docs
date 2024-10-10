@@ -21,9 +21,9 @@ container image size of 35gb compressed. SaladCloud also does not charge during 
 once the instance enters the running state. This means it is often prudent to include some of your most popular models
 in the container image, as you effectively get that download time for free. Additionally, it means your container can
 start doing inference work immediately once it’s started, even as it downloads more models in the background. Finally,
-Salad’s 50gb storage limit is _in addition to_ any space taken up by your container, so you can get more total local
-storage by including models in the container image. The main downside is reduced elasticity in scaling, as the larger
-images will take longer to download to new nodes.
+SaladCloud's 50gb storage limit is _in addition to_ any space taken up by your container, so you can get more total
+local storage by including models in the container image. The main downside is reduced elasticity in scaling, as the
+larger images will take longer to download to new nodes.
 
 ## Local LRU Caching
 
