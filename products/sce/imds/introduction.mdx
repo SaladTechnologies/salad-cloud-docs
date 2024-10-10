@@ -6,8 +6,8 @@ The SaladCloud Instance Metadata Service (IMDS) provides your container instance
 use to configure and manage your applications.
 
 IMDS is a REST API available at the non-routable IPv4 address `169.254.169.254` on port `80`. IMDS is only accessible
-from within a running container instance on SaladCloud, and the requests never leave the Salad Node. HTTP clients in
-your container instances must bypass any web proxies when calling IMDS.
+from within a running container instance on SaladCloud, and the requests never leave the SaladCloud Node. HTTP clients
+in your container instances must bypass any web proxies when calling IMDS.
 
 ## Access IMDS
 
@@ -36,7 +36,7 @@ pretty-printed for readability.
 ```
 
 Other endpoints are provided to get an identity token for the running container instance and to reallocate the container
-instance to another Salad Node. Refer to the [IMDS API Reference](/reference/imds/) for more details.
+instance to another SaladCloud Node. Refer to the [IMDS API Reference](/reference/imds/) for more details.
 
 ## IMDS SDKs
 
