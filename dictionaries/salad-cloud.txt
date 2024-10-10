@@ -29,11 +29,13 @@ gsutil
 Healthcheck
 IMDS
 imdssdk
+imshow
 infotexts
 inpainting
 INSTALLDIR
 interruptible
 italian
+iterrows
 konieshadow
 LAVIS
 libgl1-mesa-dev
@@ -49,6 +51,7 @@ mintlify
 neofetch
 nomos8khatLOtf_v20.safetensors
 noproxy
+notna
 numpy
 OpenAPI
 Pabbly
@@ -101,5 +104,5 @@ webui
 WORKDIR
 xformers
 xlvaeapp
-yolov8n
+yolov8
 zapier

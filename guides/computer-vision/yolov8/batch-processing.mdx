@@ -22,7 +22,7 @@ You can check more detailed project overview in our previous guide **Fast API fo
   - This batch process routinely checks the storage queue. When a new message appears, it picks up the corresponding
     stream for processing.
 
-<img src="/products/sce/images/ee8c70e-image-20231110-144732.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-batch-architecture.png" />
 
 ## Folder Structure
 
@@ -101,7 +101,7 @@ Here’s a step-by-step guide to deploying these resources:
      ```
 4. **Check resources**:
    - Open your resource group in azure and check the resources. You should see something similar to this:
-     <img src="/products/sce/images/95c899c-image-20231129-004732.png" />
+     <img src="/guides/computer-vision/yolov8/images/yolov8-azure-resource-group-preview.png" />
 
 ## Local Environment
 
@@ -159,7 +159,7 @@ As we delve into the practicalities of implementing YOLOv8 for object detection,
 range of its capabilities and the types of data it can process effectively. This knowledge will shape our approach to
 solving the problem at hand. Here is a list of possible inputs:
 
-<img src="/products/sce/images/6ca37bc-image-20231110-144807.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-inputs.png" />
 
 Our project's scope now narrows to the realm of video processing, with a particular focus on YouTube videos and live
 stream data.
@@ -226,7 +226,7 @@ With this script, as YOLO processes the video frames and identifies objects, bou
 You'll see a display window pop up showing the video feed with the detections overlaid. Pay attention to the output
 displayed at the bottom of the screen for additional insights. Let’s run our code and see what happens.
 
-<img src="/products/sce/images/eed5878-ezgif.com-video-to-gif.gif" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-video-stream-1.gif" />
 
 ## Processing Live Video Stream from Youtube
 
@@ -292,13 +292,13 @@ results = model.track(frame, persist=True)
 
 Let’s try it:
 
-<img src="/products/sce/images/2023-11-07-13-14-30.gif" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-video-stream-2.gif" />
 
 That is great, but our main goal is to get a summary of how long an object was present on the video. I will now remove
 the appearing window with the bounding boxes and we will pay more attention to the data. For this part of the project we
 are using Jupyter in vscode and pandas. Let’s check what results object is:
 
-<img src="/products/sce/images/a58bc5f-image-20231110-164853.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-results-object.png" />
 
 We can see that results object has some metadata and all the detections. Let’s only keep the detections and convert them
 to a more readable format:
@@ -307,7 +307,7 @@ to a more readable format:
 json.loads(results[0].tojson())
 ```
 
-<img src="/products/sce/images/8497acf-image-20231110-164932.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-json-results-object.png" />
 
 To get a detailed summary of object detections, we'll collate all the individual detection data into a pandas DataFrame.
 We will not only include the basic detection details provided by YOLOv8, such as bounding box coordinates, class ID,
@@ -370,7 +370,7 @@ data points we've calculated.
 
 Let’s see what we’ve got.
 
-<img src="/products/sce/images/78982db-image-20231110-165537.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-dataframe-results-object.png" />
 
 ## Readable summary
 
@@ -473,7 +473,7 @@ observed a dramatic improvement in processing speed. The times dropped to a stun
 This enhancement means our YOLOv8 solution is now processing frames up to 10 times faster on a GPU compared to CPU
 processing.
 
-<img src="/products/sce/images/0213756-image-20231117-201658.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-gpu-vs-cpu-table.png" />
 
 **Files format and naming**
 
@@ -558,7 +558,7 @@ to ensure that multiple containers do not process the same message and read the 
 container. We'll specifically handle JSON files containing video links, along with metadata indicating whether each
 video is pre-recorded or live:
 
-<img src="/products/sce/images/e59bab5-image-20231129-014434.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-youtube-metadata.png" />
 
 Here is a link to the
 [full script](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch.py)
@@ -570,7 +570,7 @@ secure way to configure your application. These variables can be defined during 
 within your container. Here's how you can integrate environment variables into your Python script for key
 configurations:
 
-```Python
+```python
 import argparse
 parser = argparse.ArgumentParser()
         parser.add_argument(
@@ -658,7 +658,7 @@ app.
 
 Under container groups click “Deploy a Container Group“:
 
-<img src="/products/sce/images/3a503c3-image-20231110-194241.png" />
+<img src="/guides/computer-vision/yolov8/images/create-container-group.png" />
 
 We now need to set up all of our container group parameters:
 
@@ -670,12 +670,12 @@ We now need to set up all of our container group parameters:
    to your azure portal and find the image name, username and password of our container registry repository. Find your
    acr in azure and click “repositories“ on the left
 
-   <img src="/products/sce/images/84b5723-image-20231110-195239.png" />
+   <img src="/guides/computer-vision/yolov8/images/azure-container-registry-repositories.png" />
 
    Chose the image repository and click on the version you want to pull. Now under “Manifest“ you will see a Docker pull
    command in the followings format: `docker pull {image name}`:
 
-   <img src="/products/sce/images/f99f106-image-20231110-195608.png" />
+   <img src="/guides/computer-vision/yolov8/images/yolov8-azure-container-image-name.png" />
 
    Copy the “image name“ and paste back to SaladCloud portal. Now let’s find acr username and password back in azure
    portal. Get back to your azure container registry page and click Access keys on the left. If your “Admin user” is not
@@ -688,7 +688,7 @@ We now need to set up all of our container group parameters:
 5. **Environment variables:** This is where we need to add our environment variables we went through above. Specify them
    in a key-value format:
 
-   <img src="/products/sce/images/907ff99-image-20231129-020041.png" />
+   <img src="/guides/computer-vision/yolov8/images/environment-variables-portal.png" />
 
 With everything in place, deploying your application on SaladCloud is just a few clicks away. By taking advantage of
 Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle
@@ -710,7 +710,7 @@ Once your solution deployed on SaladCloud you can put a file in the requests con
 
 Ones the video is processed 2 files will be saved to results container:
 
-<img src="/products/sce/images/a13d2b6-image-20231110-145135.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-azure-results-blob.png" />
 
 And our solution is now deployed to cloud compute and successful writes the results to our storage account.
 
@@ -725,7 +725,7 @@ For those who might be interested we’ve also implemented **multithreading func
 multithreading you can process several streams simultaneously at one node by providing multiple links in the request
 file:
 
-<img src="/products/sce/images/2c460d2-image-20231129-020724.png" />
+<img src="/guides/computer-vision/yolov8/images/yolov8-batch-youtube-submit.png" />
 
 Here is a link to the multi-threading
 [code](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch-multi-thread.py)
