@@ -2,6 +2,13 @@ const { parse, stringify } = require('yaml')
 const fs = require('fs')
 const path = require('path')
 
+const usage = `
+Usage: node scripts/add-security-to-schema.js <schema-to-modify>
+
+This script adds the security schema from the base schema to the schema to modify, and enables it for every endpoint.
+Base schema and schema to modify can be in either JSON or YAML format.
+`
+
 /**
  * Load the base schema
  */
@@ -16,6 +23,10 @@ const schemaObj = schema.endsWith('.json') ? JSON.parse(schemaFile) : parse(sche
  * Load the schema to modify
  */
 const schemaToModify = process.argv[2]
+if (!schemaToModify) {
+    console.error(usage)
+    process.exit(1)
+}
 const schemaToModifyFile = fs.readFileSync(schemaToModify, 'utf8')
 const outputIsJson = schemaToModify.endsWith('.json')
 const schemaToModifyObj = outputIsJson ? JSON.parse(schemaToModifyFile) : parse(schemaToModifyFile)
