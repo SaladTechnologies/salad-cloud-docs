@@ -1,6 +1,7 @@
 -Jxpf
 alwayson
 ASGI
+astype
 azcopy
 btop
 buildx
@@ -35,6 +36,7 @@ Fooocus
 genpkey
 getenv
 getsize
+gevent
 gsutil
 Healthcheck
 httpie
@@ -67,15 +69,19 @@ nomos8khatLOtf_v20.safetensors
 noproxy
 notna
 numpy
+nvcr
 Ollama
+ONNX
 OpenAPI
 Pabbly
 Pabbly’s
 pafy
 Pafy
+pbtxt
 popitem
 pretrained
 println
+proxied
 pt
 pydantic
 pytorch

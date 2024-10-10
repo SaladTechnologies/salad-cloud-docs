@@ -2,7 +2,7 @@
 title: 'Quickstart - API'
 ---
 
-## **Prerequisites**
+## Prerequisites
 
 Before you begin, make sure you have the following:
 
@@ -13,7 +13,7 @@ Before you begin, make sure you have the following:
 - A container image that you want to deploy. If you don't have a container image yet, you can build one using a tool
   like [Docker.](https://www.docker.com/)
 
-## **Step 1: Obtain Your API Key**
+## Step 1: Obtain Your API Key
 
 To authenticate your API requests, you'll need an API key. To obtain your API key, follow these steps:
 
@@ -21,7 +21,7 @@ To authenticate your API requests, you'll need an API key. To obtain your API ke
 - Click on your profile in the top right corner of the page, then click API Keys.
 - Copy the API key that is displayed. You'll need this in the next step.
 
-## **Step 2: Deploy the Container Image**
+## Step 2: Deploy the Container Image
 
 To deploy a container group using the SaladCloud Public API, you'll need to send a POST request with specific parameters
 inside the data field along with headers. Here's how to do it:
@@ -79,12 +79,12 @@ In the data field, you can configure various parameters to define your container
 For detailed information on these parameters and their options, please refer to the
 [Create a Container Group](https://docs.salad.com/reference/create_container_group)
 
-## **Step 3: Select Multiple GPUs**
+## Step 3: Select Multiple GPUs
 
 To enable the use of multiple GPUs within a container, you'll need to:
 
 1. Retrieve GPU IDs : Begin by obtaining the list of available GPUs. To do this, execute the following curl command
-   ```json curl
+   ```shell
    curl --request GET \
         --url https://api.salad.com/api/public/organizations/organization-name/gpu-classes \
         --header 'Salad-Api-Key: {api-key}' \
@@ -95,14 +95,14 @@ To enable the use of multiple GPUs within a container, you'll need to:
 3. Configure Your Workload : When setting up your workload, include the GPU IDs in the gpu_classes field. For example,
    if you plan to utilize GPUs like 3090s, 3090Tis, and 4090s, structure your configuration like this
 
-   ```json json
+   ```json
    "container": {
      "resources": {
        "cpu": 1,
        "memory": 1024,
        "gpu_classes": [
-         "ed563892-aacd-example-90c9be6c759b",  // ID for 3090s
-         "a5db5c50-cbcb-example-6a0c8090d80f",  // ID for 3090Tis
+         "ed563892-ae4f-example-90c9be6c759b",  // ID for 3090s
+         "a5db5c50-asd9-example-6a0c8090d80f",  // ID for 3090Tis
          "9998fe42-04a5-example-849943f16c38"  // ID for 4090s
        ]
      }
