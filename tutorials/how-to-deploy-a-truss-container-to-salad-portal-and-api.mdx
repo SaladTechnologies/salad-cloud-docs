@@ -162,7 +162,7 @@ Replace `organization_name}` and `{project_name}` with the name of your organiza
 
 - Send a POST request using `curl`
 
-```json
+```shell
 curl --request POST \
      --url https://api.salad.com/api/public/organizations/organization_name/projects/project_name/containers \
      --header 'accept: application/json' \
@@ -177,7 +177,7 @@ curl --request POST \
 
 - Check the status of the deployment by sending a GET request to the following URL:
 
-```json
+```shell
 curl --request GET \
      --url https://api.salad.com/api/public/organizations/organization_name/projects/project_name/containers/container_group_name \
      --header 'accept: application/json'
