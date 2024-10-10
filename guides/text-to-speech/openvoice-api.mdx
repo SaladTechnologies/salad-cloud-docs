@@ -366,7 +366,8 @@ async def process(
   to accept requests.
 
 ```python
-@app.get("/hc") async def health_check(): return {"status": "healthy"}
+@app.get("/hc")
+async def health_check(): return {"status": "healthy"}
 ```
 
 **Local Testing with Uvicorn:**
@@ -386,7 +387,7 @@ If you used our setup script to install all the dependencies, Uvicorn should alr
 
 To start the FastAPI application locally with Uvicorn, run the following command in your terminal:
 
-```python
+```shell
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
