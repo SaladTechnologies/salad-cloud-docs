@@ -14,7 +14,10 @@
     "german",
     "italian",
     "spanish",
-    "portuguese"
+    "portuguese",
+    "companies",
+    "filetypes",
+    "npm"
   ],
   "dictionaryDefinitions": [
     {
