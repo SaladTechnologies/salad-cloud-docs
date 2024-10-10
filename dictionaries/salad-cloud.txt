@@ -36,6 +36,10 @@ interruptible
 italian
 konieshadow
 LAVIS
+libgl1-mesa-dev
+libsm6
+libxext6
+libxrender1
 listdir
 LoRA
 LoRAs
@@ -49,14 +53,20 @@ numpy
 OpenAPI
 Pabbly
 Pabbly’s
+pafy
+Pafy
 popitem
 pretrained
 println
+pt
 pydantic
 pytorch
 Pytube
 Quickstart
 routable
+RTMP
+rtsp
+RTSP
 Rundiffusion
 safetensors
 SaladCloud
@@ -76,6 +86,9 @@ subseeds
 timeframe
 tmax
 tmin
+tojson
+ultralytics
+Ultralytics
 uncond
 underperform
 unet
@@ -88,4 +101,5 @@ webui
 WORKDIR
 xformers
 xlvaeapp
+yolov8n
 zapier

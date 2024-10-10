@@ -2,7 +2,7 @@
 title: 'Batch Processing'
 ---
 
-## **Introduction**
+## Introduction
 
 This guide is a continuation of our previous article, focusing on deploying the YOLO model for batch processing on
 SaladCloud. This approach is ideal for processing large volumes of data where real-time analysis is not required, or if
@@ -11,7 +11,7 @@ you want to process multiple streams not worrying’s which node will pick the j
 You can check more detailed project overview in our previous guide **Fast API for Real-Time Processing**
 [here](https://docs.salad.com/docs/yolov8-step-by-step-deployment).
 
-## **Reference Architecture for Batch Processing for Asynchronous Workloads**
+## Reference Architecture for Batch Processing for Asynchronous Workloads
 
 - **Objective**: Set up a batch processing system that reacts to new video stream links stored in Azure.
 - **Process Flow**:
@@ -48,8 +48,8 @@ yolo8-video-stream/
 │  │  │  ├─ inference/
 │  │  │  │  ├─ dev/
 │  │  │  │  │  ├─ setup
-│  │  │  │  ├─ batch.py (Batch processsing script)
-│  │  │  │  ├─ batch-multi-thread.py (Batch processsing script with multi threading)
+│  │  │  │  ├─ batch.py (Batch processing script)
+│  │  │  │  ├─ batch-multi-thread.py (Batch processing script with multi threading)
 │  │  │  │  ├─ requirements.txt
 │  │  │  ├─ .dockerignore
 │  │  │  ├─ docker.sh
@@ -57,7 +57,7 @@ yolo8-video-stream/
 
 ```
 
-## **Deploy Azure Resources**
+## Deploy Azure Resources
 
 It's essential to first deploy the necessary infrastructure on Azure.
 
@@ -66,7 +66,7 @@ We will deploy:
 - Storage Account for storing input and output data
   - Blob Containers for organizing the data within the Storage Account (default names: requests, yolo-results,
     failed-requests)
-  - Storage Queue for storing messages (default names: requestqueue, poison-requestqueue). Our batch process will be
+  - Storage Queue for storing messages (default names: `requestqueue`, `poison-requestqueue`). Our batch process will be
     checking if there are any new messages in the queue.
   - Event Grid System Topic and Event Subscription for triggering events when new blobs are created in the input
     container. Every time a new file is created in the requests container a message will be created in the queue.
@@ -78,37 +78,37 @@ Here’s a step-by-step guide to deploying these resources:
 2. **Login to Azure**:
    - Open your command line interface (CLI).
    - Use the Azure CLI command to log in:
-     ```java
+     ```shell
      az login --tenant <tenant_id>
      ```
    - Set your subscription:
-     ```java
+     ```shell
      az account set --subscription <subscription_name>
      ```
 3. **Deploy resources**:
    - Navigate to the main.bicep file inside of infrastructure folder and run the following command:
-     ```java az cli
+     ```shell
      az deployment group create \
        --resource-group <resource group name> \
        --template-file main.bicep
      ```
    - All resource names are set as parameters, so you can override them:
-     ```java az cli
+     ```shell
       az deployment group create \
        --resource-group <resource group name> \
        --template-file main.bicep \
        --parameters RequestsQueueName=<NewName>
      ```
 4. **Check resources**:
-   - Open your resource group in azure and check the resources. You should see something similar to this: {' '}
+   - Open your resource group in azure and check the resources. You should see something similar to this:
      <img src="/products/sce/images/95c899c-image-20231129-004732.png" />
 
-## **Local Environment**
+## Local Environment
 
 Before we deploy solution on Salad's cloud infrastructure, it's crucial to evaluate YOLOv8's capabilities in a local
 setting. This allows us to troubleshoot any issues and make any make our solution meet our needs.
 
-### **Local Development Setup: Installing Necessary Libraries**
+### Local Development Setup: Installing Necessary Libraries
 
 Setting up an efficient local development environment is essential for a smooth workflow. We ensure this by preparing
 [setup](https://github.com/SaladTechnologies/yolov8-on-salad/tree/main/src/python/batch/inference/dev) and
@@ -119,7 +119,7 @@ below.
 
 The Setup Script:
 
-```java bash
+```bash
 #! /bin/bash
 
 set -e
@@ -149,11 +149,11 @@ echo "installing dependencies ..."
 To establish a clean virtual environment and install all the necessary libraries, you simply need to execute the script
 using following command:
 
-```java bash
+```bash
 bash dev/setup
 ```
 
-## **Exploring YOLOv8's Capabilities and Data Compatibility**
+## Exploring YOLOv8's Capabilities and Data Compatibility
 
 As we delve into the practicalities of implementing YOLOv8 for object detection, a fundamental step is to understand the
 range of its capabilities and the types of data it can process effectively. This knowledge will shape our approach to
@@ -164,7 +164,7 @@ solving the problem at hand. Here is a list of possible inputs:
 Our project's scope now narrows to the realm of video processing, with a particular focus on YouTube videos and live
 stream data.
 
-## **Video processing**
+## Video processing
 
 We'll begin by experimenting with an example straight from the
 [Ultralytics documentation](https://docs.ultralytics.com/modes/predict/#inference-sources), which illustrates how to
@@ -228,7 +228,7 @@ displayed at the bottom of the screen for additional insights. Let’s run our c
 
 <img src="/products/sce/images/eed5878-ezgif.com-video-to-gif.gif" />
 
-## **Processing Live Video Stream from Youtube**
+## Processing Live Video Stream from Youtube
 
 Now we move on to the task of processing live video streams. While **cap_from_youtube** works well for YouTube videos by
 loading them into memory, live streams require a different approach due to their continuous and unbounded nature.
@@ -249,7 +249,7 @@ best = video.getbest(preftype="mp4")
 cap = cv2.VideoCapture(best.url)
 ```
 
-## **Processing Live Video Stream (RTSP, RTMP, TCP, IP address)**
+## Processing Live Video Stream (RTSP, RTMP, TCP, IP address)
 
 Ultralytics gives us an example of running inference on remote streaming sources using RTSP, RTMP, TCP and IP address
 protocols. If multiple streams are provided in a `*.streams` text file then batched inference will run, i.e. 8 streams
@@ -273,7 +273,7 @@ results = model(source, stream=True)  # generator of Results objects
 
 ```
 
-## **Implementing Object Tracking**
+## Implementing Object Tracking
 
 Having established the method to process live streams, the next crucial feature of our project is to track the
 identified objects. YOLOv8 comes equipped with a built-in tracking system that assigns unique IDs to each detected
@@ -372,7 +372,7 @@ Let’s see what we’ve got.
 
 <img src="/products/sce/images/78982db-image-20231110-165537.png" />
 
-## **Readable summary**
+## Readable summary
 
 With the DataFrame populated with tracking and detection data, we're now ready to create a summary that achieves our
 main goal: calculating the duration each object was present in the video. We'll start by filtering out any irrelevant
@@ -450,7 +450,7 @@ car with id 8.0 was present in the video for 0 days 00:00:05.370814 from 2023-11
 car with id 9.0 was present in the video for 0 days 00:00:01.655127 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:24:57.521157 and was taking  2.39% of the screen
 ```
 
-## **Run process on GPU**
+## Run process on GPU
 
 In our metadata Dataframe the last column “full_process_speed“ reflects a combination of preprocessing, inference and
 post-processing time. We can see that now we have the processing speed from 60 to 400 milliseconds per frame which is
@@ -509,7 +509,7 @@ Add this part of code to the summary function to save the summary results to azu
     results_blob_client_txt.upload_blob(output_string, overwrite=True)
 ```
 
-## **Integrating with Azure for batch processing**
+## Integrating with Azure for batch processing
 
 To enable efficient batch processing using YOLO on Salad, establishing a connection between the Python code and Azure
 Storage resources is crucial. We will start with initiating and maintaining connections to containers and storage queue:
@@ -563,7 +563,7 @@ video is pre-recorded or live:
 Here is a link to the
 [full script](https://github.com/SaladTechnologies/yolov8-on-salad/blob/main/src/python/batch/inference/batch.py)
 
-## **Environment Variables**
+## Environment Variables
 
 When deploying a batch processing solution using YOLO on Salad, leveraging environment variables provides a flexible and
 secure way to configure your application. These variables can be defined during the deployment process and accessed
@@ -600,9 +600,7 @@ This table provides an overview of the environment variables used in the script,
 are mandatory, and their default values if not explicitly set. This setup ensures that your batch processing application
 can be tailored to specific needs and conditions of the deployment environment on Salad.
 
-##
-
-**Containerizing code with Docker**
+## Containerizing code with Docker
 
 The next crucial step is to package our solution into a Docker image. This approach is key to facilitating deployment to
 our cloud clusters. Containerizing with Docker not only streamlines the deployment process but also ensures that our
@@ -647,7 +645,7 @@ side by side with the Dockerfile in the git repo. You can use the following comm
 bash docker.sh <image name> <image version> <acr name>
 ```
 
-## **Deploying Solution to Salad**
+## Deploying Solution to Salad
 
 We finally got to the last and most exiting part of our project. We will now deploy our full solution to the cloud.
 
@@ -697,7 +695,7 @@ Salad's platform, you can ensure that your object detection API is running on re
 intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit “Deploy“.
 We are all set let’s wait till our solution deploys and test it.
 
-## **Benefits of Using Salad:**
+## Benefits of Using Salad
 
 - **Cost-Effectiveness**: SaladCloud offers GPU cloud solutions at a more affordable rate than many other cloud
   providers, allowing you to allocate more resources to your application for less.
@@ -716,7 +714,7 @@ Ones the video is processed 2 files will be saved to results container:
 
 And our solution is now deployed to cloud compute and successful writes the results to our storage account.
 
-##  **Conclusions**
+## Conclusions
 
 Our journey into the realm of object detection using YOLOv8 and deploying it on Salad's GPU cloud has been both
 challenging and rewarding. We've successfully navigated through all stages of development and deployment of our
