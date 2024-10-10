@@ -39,6 +39,8 @@ getsize
 gevent
 gsutil
 Healthcheck
+healthz
+heygordian
 httpie
 imds
 IMDS
