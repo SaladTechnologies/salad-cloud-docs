@@ -22,7 +22,7 @@
         {
           "group": "Getting Started",
           "pages": [
-            "products/sce/getting-started-with-saladcloud",
+            "products/sce/getting-started-with-SaladCloud",
             "products/sce/quickstart",
             "products/sce/quickstart-api"
           ]
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "group": "S4 - Salad Simple Storage Service",
+      "group": "S4 - SaladCloud Simple Storage Service",
       "pages": ["products/s4/salad-simple-storage-service"]
     },
     {
@@ -166,7 +166,8 @@
         "tutorials/run-triton-server",
         "tutorials/jupyterlab",
         "tutorials/run-cog",
-        "tutorials/long-running-jobs"
+        "tutorials/long-running-jobs",
+        "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api"
       ]
     },
     {
@@ -237,7 +238,7 @@
           ]
         },
         {
-          "group": "S4 - Salad Simple Storage Service",
+          "group": "S4 - SaladCloud Simple Storage Service",
           "pages": [
             "reference/s4/upload-a-file",
             "reference/s4/download-a-file",
@@ -316,6 +317,8 @@
             {
               "group": "YOLOv8",
               "pages": [
+                "guides/computer-vision/yolov8/yolov8",
+                "guides/computer-vision/yolov8/quickstart",
                 "guides/computer-vision/yolov8/deployment-tutorial",
                 "guides/computer-vision/yolov8/batch-processing",
                 "guides/computer-vision/yolov8/model-training-guide"
@@ -363,6 +366,10 @@
               "pages": ["guides/transcription/sce/youtube"]
             }
           ]
+        },
+        {
+          "group": "Text To Speech",
+          "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
         }
       ]
     }

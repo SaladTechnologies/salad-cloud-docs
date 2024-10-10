@@ -11,7 +11,7 @@ Regardless of your choice of stable diffusion inference server, models, or exten
 2. Copy any models and extensions you want into the docker image
 3. Ensure the container is listening on an ipv6 address
 4. Push the new image up to a container registry
-5. Deploy the image as a salad container group
+5. Deploy the image as a SaladCloud container group
 
 ## Find a Docker Image
 
@@ -188,7 +188,7 @@ jq -r '.images[0]' response.json | base64 -d > image.png
 docker push saladtechnologies/a1111:dreamshaper-8
 ```
 
-    2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
+    2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
         ![Create a Container Group](/guides/image-generation/images/salad-create-container-group.png)
 
@@ -209,15 +209,15 @@ docker push saladtechnologies/a1111:dreamshaper-8
 ## Interact with Your Deployment
 
     1. Wait for the deployment to be ready.
-        1. First, Salad pulls your container image into our own internal high-performance cache.
+        1. First, SaladCloud pulls your container image into our own internal high-performance cache.
 
             ![The container group is preparing](/guides/image-generation/images/deploy-a1111-5.png)
 
-        2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
+        2. Next, SaladCloud locates eligible nodes for your workload, based on the configuration you provided.
 
             ![Container group is deploying, instances are allocating](/guides/image-generation/images/deploy-a1111-6.png)
 
-        3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
+        3. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your workload.
 
             ![Container group is deploying, instances are downloading](/guides/image-generation/images/deploy-a1111-7.png)
 

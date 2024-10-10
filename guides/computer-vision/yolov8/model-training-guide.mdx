@@ -7,10 +7,10 @@ description:
 ### Introduction: Training a Custom YOLO Model for Logo Detection\*\*
 
 In the realm of AI and machine learning, the power of customization cannot be overstated. Our previous article covered
-deploying a pre-trained YOLOv8 model using Salad's cloud infrastructure. During that journey we did real-time object
+deploying a pre-trained YOLOv8 model using SaladCloud's infrastructure. During that journey we did real-time object
 tracking and analysis. In the landscape of AI and machine learning, the ability to train custom models for specific
 tasks opens up a world of possibilities. And now, we're taking a step further: training a custom YOLO (You Only Look
-Once) model using Salad cloud.
+Once) model using SaladCloud .
 
 Running inference with pre-trained models, as we've previously seen, can be relatively less dependent on computational
 resources. However, when it comes to training custom models that changes significantly. Training is much more
@@ -25,7 +25,7 @@ will be focusing on three critical aspects:
 1. **Processing Times**: We will monitor the duration taken by each model to train, providing insights into the
    efficiency of different YOLO configurations.
 2. **Cost Analysis**: Given that training is a resource-heavy task, understanding the financial implications is crucial.
-   We will compare the costs of training each model on Salad's cloud platform, offering a clear perspective on the
+   We will compare the costs of training each model on SaladCloud's platform, offering a clear perspective on the
    budgetary requirements for such tasks.
 3. **Model Accuracy**: The ultimate test of any model is its performance. We will evaluate the accuracy of each trained
    model, understanding how the training complexity translates into detection precision.
@@ -119,7 +119,7 @@ Training models requires careful selection of hyperparameters. Here are the choi
 
 Here's how you can initiate training using the YOLOv8 model with Python:
 
-```java Python
+```python
 from ultralytics import YOLO
 # Load the YOLOv8 Nano model
 model = YOLO('yolov8n.pt')
@@ -146,7 +146,7 @@ We will replace all the values with arguments so that we can easily switch them 
 
 We will also run the validation command in order to check our model performance:
 
-```java Python
+```python
 model.val()
 ```
 
@@ -164,7 +164,7 @@ To resume training you simply need to use the `resume` argument within the train
 `.pt` file containing the partially trained model weights. We will slightly modify the code checking if the intermediate
 weight is available and start from where it stopped:
 
-```java Python
+```python
 last_model_path = f"runs/detect/{output_model_name}/weights/last.pt"
 if os.path.isfile(last_model_path):
     model = YOLO(last_model_path)
@@ -175,7 +175,7 @@ Keep in mind that checkpoints in Ultralytics YOLO are automatically saved at the
 interval if the `save_period` argument is used. Therefore, to successfully resume a training session, you need to have
 at least one completed epoch.
 
-### Creating a Persistent Training Environment with Salad and Azure File Shares
+### Creating a Persistent Training Environment with SaladCloud and Azure File Shares
 
 To ensure a smooth and uninterrupted training process on Salad, especially when dealing with containerized environments,
 it's crucial to have a persistent storage solution. Azure File Shares provide an ideal way to maintain and access
@@ -281,7 +281,7 @@ We will now upload the medium model into our inference code and run it on a Coca
 specify the model path in our script. Check out our previous article and step by step guide on how to deploy an
 inference using Salad
 
-```java Python
+```python
 # Load the model
 model = YOLO("yolob8m-custom.pt")
 results = model.track(image, persist=True)
@@ -294,10 +294,10 @@ Let’s check the results:
 As a result we can see that we not only can use our custom trained model on images, but even on videos adding tracking
 possibilities.
 
-### Conclusion: Streamlined Training and Deployment of YOLOv8 Models on Salad cloud
+### Conclusion: Streamlined Training and Deployment of YOLOv8 Models on SaladCloud
 
 In a concise and cost-effective operation, we successfully trained three YOLOv8 models of varying sizes on a custom
 dataset and put the medium model to the test in real-world scenario. Attaining these training results in approximately
-40 minutes and at a cost of only about a quarter of a dollar on Salad cloud highlights the efficiency and
-cost-effectiveness of advanced model training using Salad's cloud environment. Training custom computer vision models
-has never been that accessible.
+40 minutes and at a cost of only about a quarter of a dollar on SaladCloud highlights the efficiency and
+cost-effectiveness of advanced model training using SaladCloud's environment. Training custom computer vision models has
+never been that accessible.

@@ -13,9 +13,9 @@ Data Collection from YouTube: Gather relevant video URLs from specific channels 
 video metadata files. These files include essential details such as video title, URL, duration and codec, etc.
 
 Data Processing on SaladCloud: Input the gathered video URLs into a transcription pipeline, comprising a job queue such
-as AWS SQS, accompanied by a job filler that monitors progress and injects jobs regularly, and numerous Salad nodes,
-each equipped with dedicated GPUs for transcribing. Additionally, utilize a NoSQL database like AWS DynamoDB to store
-job results, while generated assets can be stored in Cloud Storage platforms such as Cloudflare R2.
+as AWS SQS, accompanied by a job filler that monitors progress and injects jobs regularly, and numerous SaladCloud
+nodes, each equipped with dedicated GPUs for transcribing. Additionally, utilize a NoSQL database like AWS DynamoDB to
+store job results, while generated assets can be stored in Cloud Storage platforms such as Cloudflare R2.
 
 Validation, Analysis and Delivery: Validate outcomes using both the metadata files and the job results. The videos that
 failed to be transcribed can be further analyzed and may be refilled to the pipeline for reprocessing. Then, deliver the
@@ -33,7 +33,7 @@ improved by exclusively downloading its audio. This approach not only reduces ba
 saves time, considering that video sizes are typically ten times larger than their corresponding audio files.
 
 By leveraging the solution outlined in the documentation, we've managed to transcribe over 1 million hours of YouTube
-videos in just a week. This was made possible by utilizing a resource group of 100 low to mid-end Salad nodes, each
+videos in just a week. This was made possible by utilizing a resource group of 100 low to mid-end SaladCloud nodes, each
 equipped with 2vCPU, 12GB RAM, and a GPU with 8GB or more VRAM.
 
 # STEP 1: Data Collection from YouTube
@@ -64,7 +64,7 @@ the channel's size. Additionally, there are constraints on concurrent access fro
 Through testing, we've implemented and executed the job generator on a standard computer, achieving a collection rate of
 approximately 1 million video URLs per day using combined solutions over a single IP address. To exceed this limit or to
 further optimize time efficiency, leveraging the global distributed network provided by SaladCloud is recommended.
-Building a job generation pipeline over a small pool of Salad nodes distributed across the global Internet can
+Building a job generation pipeline over a small pool of SaladCloud nodes distributed across the global Internet can
 significantly accelerate the process.
 
 ## Build the Job Generator
@@ -159,7 +159,7 @@ Channel Collector: This component gathers relevant channels based on specific to
 Manager to verify the existence of a channel and creates a new record if it doesn’t already exist. Once validated, it
 sends the channel URL to the job queue, such as AWS SQS, for further processing.
 
-Metadata Downloader: This component runs on a pool of Salad nodes distributed across the global Internet. Each node
+Metadata Downloader: This component runs on a pool of SaladCloud nodes distributed across the global Internet. Each node
 retrieves a channel URL from the job queue, gathers all playlists within the channel, and downloads video metadata from
 these playlists using the multiprocessing approach. Upon completion, it creates the channel metadata file in Cloudflare,
 updates the corresponding record through the Channel Manager, and removes the processed job from the queue.
@@ -177,13 +177,13 @@ YouTube and its CDN: YouTube utilizes a Global Content Delivery Network (CDN) to
 edge servers are strategically dispersed across various geographical locations, serving content in close proximity to
 users, and enhancing the speed and performance of applications.
 
-GPU Resource Pool and Global Distributed Network: Hundreds of Salad nodes, equipped with dedicated GPUs, are utilized
-for tasks such as downloading/uploading, pre-processing/post-processing and transcribing. These nodes assigned to GPU
-workloads are positioned within a global, high-speed distributed network infrastructure, and can effectively align with
-YouTube’s Global CDN, ensuring optimal system throughput.
+GPU Resource Pool and Global Distributed Network: Hundreds of SaladCloud nodes, equipped with dedicated GPUs, are
+utilized for tasks such as downloading/uploading, pre-processing/post-processing and transcribing. These nodes assigned
+to GPU workloads are positioned within a global, high-speed distributed network infrastructure, and can effectively
+align with YouTube’s Global CDN, ensuring optimal system throughput.
 
-Job Queue System: The Salad nodes retrieve jobs via the message queue like AWS SQS, providing the video URLs and where
-to store the generated assets (Cloudflare URLs).
+Job Queue System: The SaladCloud nodes retrieve jobs via the message queue like AWS SQS, providing the video URLs and
+where to store the generated assets (Cloudflare URLs).
 
 Job Filler: It generates jobs based on the index file and metadata files during the STEP 1, monitors the transcription
 pipeline process and ensures a consistent supply of tasks by replenishing them regularly.
@@ -216,9 +216,9 @@ massive influx of new ones.
 <img src="/products/sce/images/youtube/6a9c6fc-8.jpg" />
 
 For time-sensitive tasks, implementing autoscaling is also beneficial. By continually monitoring the job count in the
-queue, the job filler dynamically adjusts the number of Salad node groups. This adaptive approach ensures that specific
-quantities of tasks can be completed within a predefined time frame while also offering the flexibility to manage costs
-efficiently during periods of reduced demand.
+queue, the job filler dynamically adjusts the number of SaladCloud node groups. This adaptive approach ensures that
+specific quantities of tasks can be completed within a predefined time frame while also offering the flexibility to
+manage costs efficiently during periods of reduced demand.
 
 ### The reference design for the job filler
 
@@ -333,7 +333,7 @@ utilization can be optimized, while preventing low-performance nodes from impedi
 ## Single Node Test
 
 Before deploying the application container image on a large scale on SaladCloud, we can build a specialized application
-image with JupyterLab and conduct the single-node test across various types of Salad nodes.
+image with JupyterLab and conduct the single-node test across various types of SaladCloud nodes.
 
 With JupyterLab’s terminal, we can log into a container instance running on SaladCloud, gaining OS-level access. This
 enables us to conduct various tests and optimize the configurations and parameters of the model and application. These

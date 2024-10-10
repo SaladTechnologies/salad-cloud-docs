@@ -1,10 +1,5 @@
 ---
 title: 'OpenVoice Text-to-Speech and Voice Cloning Guide'
-slug: 'openvoice-api'
-excerpt: ''
-hidden: false
-createdAt: 'Mon Mar 18 2024 18:55:37 GMT+0000 (Coordinated Universal Time)'
-updatedAt: 'Tue Apr 09 2024 16:23:12 GMT+0000 (Coordinated Universal Time)'
 ---
 
 ## Introduction
@@ -13,11 +8,11 @@ Text-to-speech (TTS) technology has undergone significant advancements in recent
 efficient than ever before. Modern TTS models leverage deep learning and artificial intelligence to produce
 natural-sounding speech with remarkable accuracy. These models find applications in various real-life scenarios, such as
 voice assistants, audiobook narration, and accessibility tools for those with visual impairments or reading
-difficulties. In this article, we will focus on using one such TTS model, Open Voice, on Salad Cloud, demonstrating how
+difficulties. In this article, we will focus on using one such TTS model, Open Voice, on SaladCloud , demonstrating how
 to harness its capabilities in a cloud-based environment.
 
-** If you are looking for fast deployment of OpenVoice on Salad move to
-[Deploying OpenVoice Application to Salad](https://docs.salad.com/docs/openvoice-text-to-speech-and-voice-cloning-guide#deploying-openvoice-application-to-salad)**
+** If you are looking for fast deployment of OpenVoice on SaladCloud move to
+[Deploying OpenVoice Application to Salad](/guides/text-to-speech/openvoice-api.mdx#deploying-openvoice-application-to-salad)**
 
 ### Discover OpenVoice: The Open-Source Voice Cloning Tool
 
@@ -52,17 +47,17 @@ and personalized voice output. Here’s a closer look at the OpenVoice framework
 
 ### Exploring Open Voice Capabilities
 
-In our benchmarking efforts, we discovered that OpenVoice can be executed on any GPU available on Salad Cloud, including
+In our benchmarking efforts, we discovered that OpenVoice can be executed on any GPU available on SaladCloud , including
 those with lower memory capacities. However, when it comes to voice cloning, there is an exception; it cannot be run on
 40x series GPUs due to current driver/library incompatibilities, which are expected to be resolved soon.
 
 Based on our analysis, the RTX 2070 emerges as the best choice for balancing cost and performance. Our benchmarks reveal
-that when using the RTX 2070 on Salad Cloud GPUs, OpenVoice can process an impressive 4 million words per dollar for
+that when using the RTX 2070 on SaladCloud GPUs, OpenVoice can process an impressive 4 million words per dollar for
 text-to-speech plus cloning, and over 6 million words per dollar for text-to-speech alone, making it an efficient and
 economical option for voice synthesis and cloning tasks. You can check our benchmark here:
 [https://blog.salad.com/openvoice/](https://blog.salad.com/openvoice/)
 
-## Project Overview: TTS and Voice Cloning using Open Voice and Salad Cloud
+## Project Overview: TTS and Voice Cloning using Open Voice and SaladCloud
 
 In this project, our aim is to deploy an open voice solution that offers the flexibility to choose between transferring
 text to speech and adding narrator’s voice tone. This solution will be deployed as an API.
@@ -80,7 +75,7 @@ text to speech and adding narrator’s voice tone. This solution will be deploye
 6. **Storage and Accessibility:** The resulting audio file is uploaded back to Azure for accessibility and further use.
 
 Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are accessible to a
-broader audience, not just large organizations with significant resources. By combining OpenVoice with Salad Cloud, we
+broader audience, not just large organizations with significant resources. By combining OpenVoice with SaladCloud , we
 democratize access to state-of-the-art voice technology, enabling users to create realistic and customizable speech with
 minimal effort. This initiative highlights the synergy between cloud computing and AI models in addressing real-world
 applications in voice synthesis and cloning, providing value in various scenarios such as content creation,
@@ -100,8 +95,8 @@ Average processing price can be found in our benchmarks:
     access and retrieval.
 - **Deployment**:
   - The Fast API is containerized using Docker, ensuring a consistent and isolated environment for deployment.
-  - This Docker container is then deployed on Salad compute resources to utilize processing capabilities.
-  - The Docker image itself is housed in open Salad Docker Container Registry for secure and convenient access.
+  - This Docker container is then deployed on SaladCloud compute resources to utilize processing capabilities.
+  - The Docker image itself is housed in open SaladCloud Docker Container Registry for secure and convenient access.
 
 ![](https://files.readme.io/160811e-FASTAPI.drawio_3.png)
 
@@ -172,13 +167,13 @@ using this command:
 bash dev/setup
 ```
 
-### Voice cloning test with OpenVoice on Salad Cloud
+### Voice cloning test with OpenVoice on SaladCloud
 
 To explore the capabilities of OpenVoice, we followed the instructions provided in the
 [Open Voice documentation](https://github.com/myshell-ai/OpenVoice/blob/main/docs/USAGE.md) and conducted our
-experiments on Salad Cloud using [Salad Jupyter Lab](https://docs.salad.com/docs/jupyterlab). This same experiment can
-be run on a local machine. We adapted the code to run as a single script. The code snippet below outlines the process,
-from initialization to inference, demonstrating how to control voice style and speed:
+experiments on SaladCloud using [SaladCloud Jupyter Lab](https://docs.salad.com/docs/jupyterlab). This same experiment
+can be run on a local machine. We adapted the code to run as a single script. The code snippet below outlines the
+process, from initialization to inference, demonstrating how to control voice style and speed:
 
 ```python
 import os
@@ -371,7 +366,8 @@ async def process(
   to accept requests.
 
 ```python
-@app.get("/hc") async def health_check(): return {"status": "healthy"}
+@app.get("/hc")
+async def health_check(): return {"status": "healthy"}
 ```
 
 **Local Testing with Uvicorn:**
@@ -391,7 +387,7 @@ If you used our setup script to install all the dependencies, Uvicorn should alr
 
 To start the FastAPI application locally with Uvicorn, run the following command in your terminal:
 
-```python
+```shell
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -418,7 +414,7 @@ transfer to and from Azure storage, and the OpenVoice cloning model from a publi
 
 Here is the Dockerfile:
 
-```java Dockerfile
+```dockerfile
 FROM nvidia/cuda:11.7.1-devel-ubuntu22.04 as cuda-base
 # Set some environment variable for better NVIDIA compatibility
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
@@ -468,14 +464,15 @@ can use any container registry you prefer.
 We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not
 making any additional customizations, you can directly proceed to this step.
 
-Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run
-your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
+Deploying your containerized FastAPI application to SaladCloud's GPU Cloud is a very efficient and cost-effective way to
+run your text-to-speech solutions. Here's how to deploy the solution using the SaladCloud portal:
 
-1. **Create an Account:** Sign up for an account on [Salad's Portal](https://portal.salad.com/) if you haven't already.
-2. **Create an Organization:** Once logged in, set up your organization within the Salad platform to manage your
+1. **Create an Account:** Sign up for an account on [SaladCloud's Portal](https://portal.salad.com/) if you haven't
+   already.
+2. **Create an Organization:** Once logged in, set up your organization within the SaladCloud platform to manage your
    deployments and resources.
-3. **Deploy Container Group:** Go to the "Container Groups" section in the Salad portal and select "Deploy a Container
-   Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
+3. **Deploy Container Group:** Go to the "Container Groups" section in the SaladCloud portal and select "Deploy a
+   Container Group" to begin deploying your FastAPI application to SaladCloud's infrastructure.
 
 ![](https://mgorkii.atlassian.net/wiki/download/thumbnails/21790721/image-20231110-194241.png?version=1&modificationDate=1710688126907&cacheVersion=1&api=v2&width=741&height=263)
 
@@ -484,9 +481,9 @@ We now need to set up all of our container group parameters:
 **Configure Container Group:**
 
 1. **Create a unique name for your Container group**
-2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under
-   image name paste the image path: saladtechnologies/openvoice-api:1.0.0 If you are using your custom solution, specify
-   your image location.
+2. **Pick the Image Source:** In our case we are using a public SaladCloud registry. Click Edit next to Image source.
+   Under image name paste the image path: saladtechnologies/openvoice-api:1.0.0 If you are using your custom solution,
+   specify your image location.
 
 ![](https://files.readme.io/e934a91-Screenshot_2024-03-17_200414.png)
 
@@ -494,7 +491,7 @@ We now need to set up all of our container group parameters:
 2. **Pick compute resources:** That is the best part. Pick how much cpu, ram and gpu you want to allocate to your
    process. The prices are very low in comparison to all the other cloud solutions, so be creative. TTS process can be
    run on any GPU. Check out our benchmark to choose which GPU is better for your needs.
-3. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing
+3. **Optional Settings**: SaladCloud gives you some great options like health check probe, external logging and passing
    environment variables.
 4. **Container Gateway.** Click “Edit“ next to it, check “Enable Container Gateway“ and set port to 80:
 
@@ -502,25 +499,26 @@ We now need to set up all of our container group parameters:
 
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to
 provide your personal token together with the api call. Your token can be found here: https://portal.salad.com/api-key
-With everything in place, deploying your FastAPI application on Salad is just a few clicks away. By taking advantage of
-Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that can handle
-intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit “Deploy“.
-We are all set let’s wait till our solution deploys and test it.
+With everything in place, deploying your FastAPI application on SaladCloud is just a few clicks away. By taking
+advantage of SaladCloud's platform, you can ensure that your object detection API is running on reliable infrastructure
+that can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“
+and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.
 
 ### Benefits of Using Salad:
 
-- **Affordability:** Salad's GPU cloud solutions are competitively priced compared to other cloud providers, enabling
-  you to access more resources for your application at a lower cost.
-- **User-Friendly Interface:** Salad prioritizes user experience, offering an intuitive interface that simplifies the
-  deployment and management of cloud-based applications.
-- **Comprehensive Documentation and Support:** Salad offers extensive documentation to guide you through deployment,
-  configuration, and troubleshooting, complemented by a dedicated support team ready to assist you whenever required.
+- **Affordability:** SaladCloud's GPU cloud solutions are competitively priced compared to other cloud providers,
+  enabling you to access more resources for your application at a lower cost.
+- **User-Friendly Interface:** SaladCloud prioritizes user experience, offering an intuitive interface that simplifies
+  the deployment and management of cloud-based applications.
+- **Comprehensive Documentation and Support:** SaladCloud offers extensive documentation to guide you through
+  deployment, configuration, and troubleshooting, complemented by a dedicated support team ready to assist you whenever
+  required.
 
 ### Test Full Solution deployed to Salad
 
 Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public
-endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's
-infrastructure, just as you would locally.
+endpoint. SaladCloud provides you with a deployment URL, which allows you to send requests to your API using
+SaladCloud's infrastructure, just as you would locally.
 
 ![](https://files.readme.io/0df9964-image.png)
 
@@ -555,7 +553,7 @@ full list of the arguments:
 - `text_file`: Text file to be used for TTS
 
 By providing these parameters, you can run the TTS or voice cloning process through your FastAPI application deployed on
-Salad Cloud. Now hit “execute” and wait for a reply.
+SaladCloud . Now hit “execute” and wait for a reply.
 
 ![](https://files.readme.io/b43170e-image.png)
 

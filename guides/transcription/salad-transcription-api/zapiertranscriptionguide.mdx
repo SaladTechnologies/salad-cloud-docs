@@ -6,9 +6,9 @@ This guide will show you how to use Zapier to automate transcription with Salad,
 process for efficient audio file handling. This workflow will consist of two Zaps:
 
 1. **Request Zap**: This Zap will trigger when a Google Form (or any other app of your choice) is submitted, sending a
-   transcription request to the Salad service.
-2. **Response Zap**: This Zap will catch the response from the Salad service and send the transcription result via email
-   (use any app you like).
+   transcription request to the SaladCloud service.
+2. **Response Zap**: This Zap will catch the response from the SaladCloud service and send the transcription result via
+   email (use any app you like).
 
 # **Step 1 Create the response Zap**
 
@@ -46,7 +46,7 @@ Create a New Zap for API Call Automation
 12. **Configure the Action:**
     1. Fill in the required fields:
        1. **Method**: Select "POST" from the dropdown.
-       2. **URL**: Enter your Salad API endpoint URL. For example:
+       2. **URL**: Enter your SaladCloud API endpoint URL. For example:
           https://api.salad.com/api/public/organizations/{your_organization_name}/inference-endpoints/transcribe/jobs.
           Replace {your_organization_name} with the name of your organization in Salad.
        3. **Data**: In the "Data" field, configure it as follows:
@@ -77,7 +77,7 @@ Create a New Zap for API Call Automation
 
    1. Under “Headers" enter the following key-value pairs:
 
-      **Key**: Salad-Api-Key, Value: (your Salad API key)
+      **Key**: Salad-Api-Key, Value: (your SaladCloud API key)
 
       **Key**: Content-Type, Value: application/json
 
@@ -123,9 +123,9 @@ sent upon completion.
 _Here's a summary of the final Step_
 
 1. **Submit the Google Form**: When you submit the form with the audio file link, it triggers the Request Zap, which
-   sends the transcription request to the Salad service.
-2. **Transcription Process**: The Salad service processes the transcription request.
-3. **Receive Transcription Result**: The Response Zap catches the result from the Salad service.
+   sends the transcription request to the SaladCloud service.
+2. **Transcription Process**: The SaladCloud service processes the transcription request.
+3. **Receive Transcription Result**: The Response Zap catches the result from the SaladCloud service.
 4. **Send Email with Result**: The Response Zap then sends an email with the transcription result to the specified
    recipient.
 

@@ -155,7 +155,7 @@ docker push docker.io/saladtechnologies/misc:test
 
 Now we can run some tests. In this scenario, you are building a batch-processing system using a group of GPU-powered
 container instances to handle thousands of jobs within a specified timeframe. Each instance retrieves its task inputs
-from a job queue, such as AWS SQS, Salad Job Queue, or Salad Kelpie.
+from a job queue, such as AWS SQS, SaladCloud Job Queue, or SaladCloud Kelpie.
 
 Each job includes instructions on whether to download the input, how to process the data, and where to upload the
 output. After completing the job, an instance must upload the output and return either SUCCESS or FAILURE to the job
@@ -204,8 +204,8 @@ credentials will be used by SaladCloud to pull the image.
 <img src="/tutorials/images/docker_run/docker_run4.png" />
 
 After pulling the image from the designated repository, SaladCloud will store it in its own repository, from which the
-image will be delivered to the Salad nodes running your instances. When the container group is stopped, all Salad nodes
-will be released and the images on these nodes will be also removed.
+image will be delivered to the SaladCloud nodes running your instances. When the container group is stopped, all
+SaladCloud nodes will be released and the images on these nodes will be also removed.
 
 If your image has changed since the container group was created, you will need to
 [update the image source](/products/sce/managing-deployments#editing-your-container-group-deployment) to run the new
@@ -217,13 +217,14 @@ ensures a smoother transition from local testing to deployment on SaladCloud.
 
 ### Replica Count
 
-Your container group consists of multiple replicas or instances, with each instance running on a separate Salad node.
+Your container group consists of multiple replicas or instances, with each instance running on a separate SaladCloud
+node.
 
 SaladCloud operates on a foundation of distributed and interruptible nodes, meaning that a node running your instance
 may go down at any time without prior notice. In such cases, a new node will be allocated to run the instance. There are
 no charges incurred during the reallocation process and until the instance is back up and running.
 
-Additionally, downloading your image and starting the instance on these Salad nodes may take some time, potentially
+Additionally, downloading your image and starting the instance on these SaladCloud nodes may take some time, potentially
 ranging from a few minutes to longer, depending on the image size and the network conditions of the nodes. Some nodes
 may download the image faster than others, leading to earlier startup times.
 
@@ -246,7 +247,7 @@ process, you would only be charged for the running time of a single replica.
 The --gpus all option in the command allocates all available GPUs on the host to the container, enabling GPU support for
 applications running inside it. SaladCloud currently supports only one GPU per container. When creating a container
 group, you can select multiple GPU types at a priority level [(Batch/Low/Medium/High)](/products/sce/priority-pricing),
-along with the required vCPU, memory and disk space. SaladCloud will then allocate the appropriate Salad nodes that
+along with the required vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that
 match these selections to run the container group.
 
 <img src="/tutorials/images/docker_run/docker_run7.png" />
@@ -256,11 +257,11 @@ when higher-priority workloads become available on SaladCloud. If you notice tha
 are being reallocated too frequently for your needs, you can edit the running container group to select a higher
 priority level.
 
-### Salad Job Queue
+### SaladCloud Job Queue
 
-If you are using the Salad Job Queue to manage the tasks for your container group, you can use Salad Job Queue Worker
-(an executable binary) to replace io_worker.py in the example. This worker is designed to handle input/output operations
-and interact with your inference server. For more information about Salad Job Queue, please refer to
+If you are using the SaladCloud Job Queue to manage the tasks for your container group, you can use SaladCloud Job Queue
+Worker (an executable binary) to replace io_worker.py in the example. This worker is designed to handle input/output
+operations and interact with your inference server. For more information about SaladCloud Job Queue, please refer to
 [this link](/products/sce/job-queues).
 
 ### Substitutes

@@ -13,7 +13,7 @@ Before you begin, make sure you have the following:
 - A Docker image that you want to publish to GHCR
 - Docker installed on your local machine
 
-To deploy image from GitHub Container Registry (GHCR) to Salad Portal, follow these steps:
+To deploy image from GitHub Container Registry (GHCR) to SaladCloud Portal, follow these steps:
 
 ### Step 1 : Create a [Personal Access Token ](https://docs.github.com/en/enterprise-server@3.6/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)(PAT)
 
@@ -47,9 +47,9 @@ Now that your image is tagged correctly, you can push it to GHCR:
 
 `docker push ghcr.io/your_username/your_repo:tag_name`
 
-### Step 5: Configure Salad Container Environment (SCE)
+### Step 5: Configure SaladCloud Container Environment (SCE)
 
-Access the Salad portal and configure your SCE with the following information:
+Access the SaladCloud portal and configure your SCE with the following information:
 
 1. Username and Personal Access Token that we generated in the beginning.
 2. Image name from your private registry.
@@ -58,7 +58,7 @@ Access the Salad portal and configure your SCE with the following information:
 
 ### Step 6 : Start the Container
 
-With all configurations in place, click the "Start" button in the Salad portal to launch your container using the
+With all configurations in place, click the "Start" button in the SaladCloud portal to launch your container using the
 private Github registry image.
 
 <img src="/products/sce/images/72229ad-image.png" />

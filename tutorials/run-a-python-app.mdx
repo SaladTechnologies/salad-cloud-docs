@@ -152,7 +152,7 @@ be deployed on SaladCloud. You can push to any of the
 In order to push the container image to Docker Hub you will first need to tag your image with your Docker username and
 an unique container name. The format of the image name is `{docker-hub-username}/{image-name}:{version}`
 
-At Salad we use the `saladtechnologies` username, but you will need to use your own username.
+At SaladCloud we use the `saladtechnologies` username, but you will need to use your own username.
 
 ```Text Bash
 docker tag my-image saladtechnologies/run-python:0.1
@@ -173,8 +173,8 @@ Once the image is pushed to Docker Hub you can now deploy your container on Sala
 
 ## Creating the Container Group
 
-Now that you have a complete (yet basic) FastAPI application running you can deploy it to Salad via the Portal or the
-Public API.
+Now that you have a complete (yet basic) FastAPI application running you can deploy it to SaladCloud via the Portal or
+the Public API.
 
 When you are asked to specify the "Image Source" you simply need to provide the image name you used to push the
 container up to the registry.

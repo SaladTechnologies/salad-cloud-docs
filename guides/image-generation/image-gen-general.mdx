@@ -18,7 +18,7 @@ Regardless of your choice of stable diffusion inference server, models, or exten
 2. Copy any models and extensions you want into the docker image
 3. Enable some way to access your container group, either through the container gateway, or a job queue.
 4. Push the new image up to a container registry
-5. Deploy the image as a salad container group
+5. Deploy the image as a SaladCloud container group
 
 ## Validated Docker Images
 
@@ -63,10 +63,10 @@ When deploying your stable diffusion inference server, you have two options for 
 1. **Container Gateway**: This is the easiest way to access your container group.
    1. It can be enabled during container group creation, and maps a public https URL to a specific IPv6 port in your
       container.
-   1. You can optionally enable auth, which then requires your Salad API Token to access the container group.
+   1. You can optionally enable auth, which then requires your SaladCloud API Token to access the container group.
    1. Only requires your server to listen on IPv6, no additional binary.
-   1. Salad's Container Gateway uses least-connection load balancing, so you can scale your container group up or down
-      without needing to change the URL.
+   1. SaladCloud's Container Gateway uses least-connection load balancing, so you can scale your container group up or
+      down without needing to change the URL.
    1. Completed image generations are returned to the client in the response.
    1. However, it is **not suitable for long-running tasks**, as the container gateway will time out after 100 seconds,
       a hard limit imposed by Cloudflare on idle connections. For most image generation workloads, this is not a
