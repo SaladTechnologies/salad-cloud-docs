@@ -13,6 +13,8 @@ description:
 
 ## Endpoints
 
+See the [API Reference](/reference/s4/) for detailed information on the available endpoints.
+
 ### Authorization
 
 Requests to the S4 service must include either:
@@ -38,7 +40,7 @@ Uploads a file to the specified organization.
 ```bash
 curl  -X PUT \
   'https://storage-api.salad.com/organizations/salad-benchmarking/files/path/to/my/file.tar.gz' \
-  --header 'Salad-Api-Key: YOURAPIKEY' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
   --form 'mimeType="application/tar+gzip"' \
   --form 'file=@/path/to/my/file.tar.gz'
 ```
@@ -59,7 +61,7 @@ the file without needing to include the `Salad-Api-Key` header.
 ```bash
 curl  -X PUT \
   'https://storage-api.salad.com/organizations/salad-benchmarking/files/path/to/my/file.tar.gz' \
-  --header 'Salad-Api-Key: YOURAPIKEY' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
   --form 'mimeType="application/tar+gzip"' \
   --form 'file=@/path/to/my/file.tar.gz' \
   --form 'sign=true' \
@@ -92,7 +94,7 @@ Downloads a file from the specified organization.
 ```bash
 curl -X GET \
   'https://storage-api.salad.com/organizations/salad-benchmarking/files/path/to/my/file.tar.gz' \
-  --header 'Salad-Api-Key: YOURAPIKEY' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
   --output file.tar.gz
 ```
 
@@ -114,7 +116,7 @@ Deletes a file from the specified organization.
 ```bash
 curl -X DELETE \
   'https://storage-api.salad.com/organizations/salad-benchmarking/files/path/to/my/file.tar.gz' \
-  --header 'Salad-Api-Key: YOURAPIKEY'
+  --header 'Salad-Api-Key: YOUR_API_KEY'
 ```
 
 ---
@@ -134,7 +136,7 @@ Lists all files within the specified organization.
 ```bash
 curl -X GET \
   'https://storage-api.salad.com/organizations/salad-benchmarking/files' \
-  --header 'Salad-Api-Key: YOURAPIKEY'
+  --header 'Salad-Api-Key: YOUR_API_KEY'
 ```
 
 **Example Response:**
@@ -169,7 +171,7 @@ Creates a signed URL for a file in the specified organization.
 ```bash
 curl -X POST \
   'https://storage-api.salad.com/organizations/salad-benchmarking/file_tokens/path/to/my/file.tar.gz' \
-  --header 'Salad-Api-Key: YOURAPIKEY' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
   --data '{"method": "GET", "expires": 86400}'
 ```
 
