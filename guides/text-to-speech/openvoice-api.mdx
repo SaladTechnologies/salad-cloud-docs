@@ -464,14 +464,15 @@ can use any container registry you prefer.
 We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not
 making any additional customizations, you can directly proceed to this step.
 
-Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run
-your text-to-speech solutions. Here's how to deploy the solution using the SaladCloud portal:
+Deploying your containerized FastAPI application to SaladCloud's GPU Cloud is a very efficient and cost-effective way to
+run your text-to-speech solutions. Here's how to deploy the solution using the SaladCloud portal:
 
-1. **Create an Account:** Sign up for an account on [Salad's Portal](https://portal.salad.com/) if you haven't already.
+1. **Create an Account:** Sign up for an account on [SaladCloud's Portal](https://portal.salad.com/) if you haven't
+   already.
 2. **Create an Organization:** Once logged in, set up your organization within the SaladCloud platform to manage your
    deployments and resources.
 3. **Deploy Container Group:** Go to the "Container Groups" section in the SaladCloud portal and select "Deploy a
-   Container Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
+   Container Group" to begin deploying your FastAPI application to SaladCloud's cloud infrastructure.
 
 ![](https://mgorkii.atlassian.net/wiki/download/thumbnails/21790721/image-20231110-194241.png?version=1&modificationDate=1710688126907&cacheVersion=1&api=v2&width=741&height=263)
 
@@ -499,14 +500,14 @@ We now need to set up all of our container group parameters:
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to
 provide your personal token together with the api call. Your token can be found here: https://portal.salad.com/api-key
 With everything in place, deploying your FastAPI application on SaladCloud is just a few clicks away. By taking
-advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that
-can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit
-“Deploy“. We are all set let’s wait till our solution deploys and test it.
+advantage of SaladCloud's platform, you can ensure that your object detection API is running on reliable infrastructure
+that can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“
+and hit “Deploy“. We are all set let’s wait till our solution deploys and test it.
 
 ### Benefits of Using Salad:
 
-- **Affordability:** Salad's GPU cloud solutions are competitively priced compared to other cloud providers, enabling
-  you to access more resources for your application at a lower cost.
+- **Affordability:** SaladCloud's GPU cloud solutions are competitively priced compared to other cloud providers,
+  enabling you to access more resources for your application at a lower cost.
 - **User-Friendly Interface:** SaladCloud prioritizes user experience, offering an intuitive interface that simplifies
   the deployment and management of cloud-based applications.
 - **Comprehensive Documentation and Support:** SaladCloud offers extensive documentation to guide you through
@@ -516,8 +517,8 @@ can handle intensive tasks at a fraction of the cost. Now check “AutoStart con
 ### Test Full Solution deployed to Salad
 
 Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public
-endpoint. SaladCloud provides you with a deployment URL, which allows you to send requests to your API using Salad's
-infrastructure, just as you would locally.
+endpoint. SaladCloud provides you with a deployment URL, which allows you to send requests to your API using
+SaladCloud's infrastructure, just as you would locally.
 
 ![](https://files.readme.io/0df9964-image.png)
 

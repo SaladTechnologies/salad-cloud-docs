@@ -1,8 +1,8 @@
 ---
 title: 'Deployment Guide'
 description:
-  "In this step-by-step guide, we share how to deploy YOLOv8 on Salad's distributed cloud infrastructure for real-time
-  object detection."
+  "In this step-by-step guide, we share how to deploy YOLOv8 on SaladCloud's distributed cloud infrastructure for
+  real-time object detection."
 ---
 
 # YOLOv8 on Salad
@@ -19,9 +19,9 @@ during sporting event, monitoring items on an assembly line, or inspecting the i
 maintenance. YOLOv8 offers a lens through which the world can be quantified in motion, without the need for extensive
 model training from the end user.
 
-Deploying YOLOv8 on SaladCloud results in a practical and efficient solution. Salad's infrastructure democratizes the
-power of YOLOv8, allowing users to deploy sophisticated object detection systems without heavy investment in physical
-hardware. Whether you're a developer or a business looking to integrate cutting-edge object detection into your
+Deploying YOLOv8 on SaladCloud results in a practical and efficient solution. SaladCloud's infrastructure democratizes
+the power of YOLOv8, allowing users to deploy sophisticated object detection systems without heavy investment in
+physical hardware. Whether you're a developer or a business looking to integrate cutting-edge object detection into your
 operations, YOLOv8 paired with SaladCloud offers a viable and scalable solution.
 
 Stay tuned as we dive into creating our object detection solution with Yolov8 within the environment of SaladCloud ,
@@ -133,8 +133,8 @@ yolo8-video-stream/
 
 ## Local Environment Testing
 
-Before we deploy these solutions on Salad's cloud infrastructure, it's crucial to evaluate YOLOv8's capabilities in a
-local setting. This allows us to troubleshoot any issues and make any make our solution meet our needs.
+Before we deploy these solutions on SaladCloud's cloud infrastructure, it's crucial to evaluate YOLOv8's capabilities in
+a local setting. This allows us to troubleshoot any issues and make any make our solution meet our needs.
 
 ### Local Development Setup: Installing Necessary Libraries
 
@@ -492,16 +492,22 @@ def summary(df, filename, result_blob):
 
 Executing the function will produce output like the following:
 
-person with id 1.0 was present in the video for 0 days 00:01:34.273634 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:26:30.139664 and was taking  8.28% of the screen
-person with id 2.0 was present in the video for 0 days 00:00:52.874862 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:48.740892 and was taking  3.87% of the screen
-person with id 3.0 was present in the video for 0 days 00:01:02.194742 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:58.060772 and was taking  6.97% of the screen
-person with id 4.0 was present in the video for 0 days 00:00:13.343196 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:09.209226 and was taking  1.07% of the screen
-person with id 5.0 was present in the video for 0 days 00:00:12.491371 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:08.357401 and was taking  1.42% of the screen
-person with id 6.0 was present in the video for 0 days 00:00:37.937545 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:33.803575 and was taking  1.60% of the screen
-person with id 7.0 was present in the video for 0 days 00:00:12.994483 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:08.860513 and was taking  2.12% of the screen
-car with id 8.0 was present in the video for 0 days 00:00:05.370814 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:01.236844 and was taking  3.89% of the screen
-car with id 9.0 was present in the video for 0 days 00:00:01.655127 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:24:57.521157 and was taking  2.39% of the screen
-```
+person with id 1.0 was present in the video for 0 days 00:01:34.273634 from 2023-11-08 03:24:55.866030 to 2023-11-08
+03:26:30.139664 and was taking 8.28% of the screen person with id 2.0 was present in the video for 0 days
+00:00:52.874862 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:48.740892 and was taking 3.87% of the screen person
+with id 3.0 was present in the video for 0 days 00:01:02.194742 from 2023-11-08 03:24:55.866030 to 2023-11-08
+03:25:58.060772 and was taking 6.97% of the screen person with id 4.0 was present in the video for 0 days
+00:00:13.343196 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:09.209226 and was taking 1.07% of the screen person
+with id 5.0 was present in the video for 0 days 00:00:12.491371 from 2023-11-08 03:24:55.866030 to 2023-11-08
+03:25:08.357401 and was taking 1.42% of the screen person with id 6.0 was present in the video for 0 days
+00:00:37.937545 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:33.803575 and was taking 1.60% of the screen person
+with id 7.0 was present in the video for 0 days 00:00:12.994483 from 2023-11-08 03:24:55.866030 to 2023-11-08
+03:25:08.860513 and was taking 2.12% of the screen car with id 8.0 was present in the video for 0 days 00:00:05.370814
+from 2023-11-08 03:24:55.866030 to 2023-11-08 03:25:01.236844 and was taking 3.89% of the screen car with id 9.0 was
+present in the video for 0 days 00:00:01.655127 from 2023-11-08 03:24:55.866030 to 2023-11-08 03:24:57.521157 and was
+taking 2.39% of the screen
+
+````
 
 ## Run process on GPU
 
@@ -516,7 +522,7 @@ available and adjusts accordingly.:
 device = "0" if torch.cuda.is_available() else "cpu"
 if device == "0":
     torch.cuda.set_device(0)
-```
+````
 
 This adjustment ensures that if the system has the capability, it will leverage the GPU, thus significantly boosting the
 processing speed.
@@ -729,9 +735,9 @@ bash docker.sh <image name> <image version> <acr name>
 
 We finally got to the last and most exiting part of our project. We will now deploy our full solution to the cloud.
 
-Deploying your containerized FastAPI application to Salad's GPU Cloud can is a very efficient and cost-effective way to
-run your object detection solution. Salad's has a very user-friendly interface as well as an API for deployment. Let's
-deploy our solution using SaladCloud portal.
+Deploying your containerized FastAPI application to SaladCloud's GPU Cloud can is a very efficient and cost-effective
+way to run your object detection solution. SaladCloud's has a very user-friendly interface as well as an API for
+deployment. Let's deploy our solution using SaladCloud portal.
 
 First create your account and log into the [portal](https://portal.salad.com/) Create your organization and let's deploy
 our container app.
@@ -774,15 +780,15 @@ We now need to set up all of our container group parameters:
 In addition you can set an extra layer of security by turning Authentication on. If you turn it on you will need to
 provide your personal token together with the api call. Your token can be found [here](https://portal.salad.com/api-key)
 With everything in place, deploying your FastAPI application on SaladCloud is just a few clicks away. By taking
-advantage of Salad's platform, you can ensure that your object detection API is running on reliable infrastructure that
-can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“ and hit
-“Deploy“. We are all set let's wait till our solution deploys and test it.
+advantage of SaladCloud's platform, you can ensure that your object detection API is running on reliable infrastructure
+that can handle intensive tasks at a fraction of the cost. Now check “AutoStart container group once image is pulled“
+and hit “Deploy“. We are all set let's wait till our solution deploys and test it.
 
 ## Benefits of Using Salad:
 
 - **Cost-Effectiveness**: SaladCloud offers GPU cloud solutions at a more affordable rate than many other cloud
   providers, allowing you to allocate more resources to your application for less.
-- **Ease of Use**: With a focus on user experience, Salad's interface is designed to be intuitive, removing the
+- **Ease of Use**: With a focus on user experience, SaladCloud's interface is designed to be intuitive, removing the
   complexity from deploying and managing cloud-based applications.
 - **Documentation and Support**: SaladCloud provides detailed documentation to assist with deployment, configuration,
   and troubleshooting, backed by a support team to help you when needed.
@@ -791,7 +797,7 @@ can handle intensive tasks at a fraction of the cost. Now check “AutoStart con
 
 With your solution deployed on Salad, the next step is to interact with your FastAPI application using its public
 endpoint. SaladCloud provides you with a deployment URL, which you can use to send requests to your API in the same way
-you would locally, but now through Salad's infrastructure.
+you would locally, but now through SaladCloud's infrastructure.
 
 <img src="/products/sce/images/649634f-image-20231110-202228.png" />
 
@@ -845,10 +851,10 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 
 #### 2. Processing with GPU Support. This is the GPU Azure recommends for YOLOv5.
 
-| Service   | Configuration                            | Cost Per Hour | Remarks                         |
-| --------- | ---------------------------------------- | ------------- | ------------------------------- |
-| **Azure** | NC16as_T4_v3 (16 vCPU, 110GB RAM, 1 GPU) | $1.20         | Recommended for YOLOv5          |
-| **Salad** | Equivalent GPU Configuration             | $0.326        | Salad's equivalent GPU offering |
+| Service   | Configuration                            | Cost Per Hour | Remarks                              |
+| --------- | ---------------------------------------- | ------------- | ------------------------------------ |
+| **Azure** | NC16as_T4_v3 (16 vCPU, 110GB RAM, 1 GPU) | $1.20         | Recommended for YOLOv5               |
+| **Salad** | Equivalent GPU Configuration             | $0.326        | SaladCloud's equivalent GPU offering |
 
 #### Percentage Cost Difference for GPU Compute
 
@@ -858,13 +864,13 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 
 ## Conclusions
 
-Our journey into the realm of object detection using YOLOv8 and deploying it on Salad's GPU cloud has been both
+Our journey into the realm of object detection using YOLOv8 and deploying it on SaladCloud's GPU cloud has been both
 challenging and rewarding. We've successfully navigated through all stages of development and deployment of our
 solution. Our deployment on SaladCloud has demonstrated not just the viability of such a system for real-time object
 detection in live video streams, but also its cost-effectiveness.
 
-The testing phase on Salad's platform has validated our application's functionality, providing a clear path from request
-to result, proving that advanced machine learning tasks can be both accessible and efficient.
+The testing phase on SaladCloud's platform has validated our application's functionality, providing a clear path from
+request to result, proving that advanced machine learning tasks can be both accessible and efficient.
 
 For those who might be interested we've also implemented **multi-threading functionality** to our solution. With
 multithreading you can process several streams simultaneously by providing your api with a list of links. Here is the
