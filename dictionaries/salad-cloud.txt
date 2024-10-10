@@ -2,6 +2,7 @@ alwayson
 ASGI
 azcopy
 btop
+Civitai
 CivitAI
 ckpt
 clid
@@ -14,6 +15,7 @@ cuda
 cudnn
 denoise
 denoising
+dewdney
 Diátaxis
 distil
 dreambooth
@@ -23,6 +25,8 @@ esports
 Falco
 fastapi
 firstphase
+Flickr
+fooocus
 Fooocus
 getenv
 getsize
@@ -31,6 +35,7 @@ Healthcheck
 httpie
 IMDS
 imdssdk
+imgsz
 imshow
 infotexts
 inpainting
@@ -55,6 +60,7 @@ nomos8khatLOtf_v20.safetensors
 noproxy
 notna
 numpy
+Ollama
 OpenAPI
 Pabbly
 Pabbly’s
@@ -92,6 +98,8 @@ timeframe
 tmax
 tmin
 tojson
+TPOT
+TTFT
 ultralytics
 Ultralytics
 uncond
@@ -103,9 +111,11 @@ uvicorn
 Uvicorn
 vaeapp
 vCPU
+vram
 webui
 WORKDIR
 xformers
 xlvaeapp
+yolob8m-custom
 yolov8
 zapier

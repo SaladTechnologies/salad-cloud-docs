@@ -70,7 +70,7 @@ Typically, the prefill stage is brief because the prompt is processed in paralle
 longer since tokens are generated one at a time. For the same context length, the longer the generated text, the greater
 the total processing time.
 
-Here is the test data for Llama 3.1 8B Instruct using Hugging Face’s TGI, from a PC equipped with an RTX 3090 running
+Here is the test data for Llama 3.1 8B Instruct using Hugging Face's TGI, from a PC equipped with an RTX 3090 running
 Windows WSL:
 
 - Processing Time = TPOT x Number of Generated Tokens
@@ -92,12 +92,12 @@ user experience, and helping to avoid the timeout errors.
 When more VRAM is available, batched inference can significantly increase throughput by effectively leveraging GPU cache
 and parallel processing, while only slightly increasing the processing time. Here is the test data from the same PC:
 
-| Context Length: 4096 （2048+2048） | Prefill: TTFT | Decode: TPOT | Decode: Processing Time | Decode: Throughput | Total Time |
-| :--------------------------------- | :------------ | :----------- | :---------------------- | :----------------- | :--------- |
-| Batch Size 1                       | 459.07 ms     | 21.15 ms     | 43288 ms                | 47.29 tokens/sec   | 43746 ms   |
-| Batch Size 2                       | 882.91 ms     | 22.35 ms     | 45756 ms                | 89.47 tokens/sec   | 46639 ms   |
-| Batch Size 3                       | 1326.06 ms    | 23.06 ms     | 47553 ms                | 129.14 tokens/sec  | 48880 ms   |
-| Batch Size 4                       | 1731.33 ms    | 23.96 ms     | 49046 ms                | 166.94 tokens/sec  | 50778 ms   |
+| Context Length: 4096 (2048+2048) | Prefill: TTFT | Decode: TPOT | Decode: Processing Time | Decode: Throughput | Total Time |
+| :------------------------------- | :------------ | :----------- | :---------------------- | :----------------- | :--------- |
+| Batch Size 1                     | 459.07 ms     | 21.15 ms     | 43288 ms                | 47.29 tokens/sec   | 43746 ms   |
+| Batch Size 2                     | 882.91 ms     | 22.35 ms     | 45756 ms                | 89.47 tokens/sec   | 46639 ms   |
+| Batch Size 3                     | 1326.06 ms    | 23.06 ms     | 47553 ms                | 129.14 tokens/sec  | 48880 ms   |
+| Batch Size 4                     | 1731.33 ms    | 23.96 ms     | 49046 ms                | 166.94 tokens/sec  | 50778 ms   |
 
 Compared to batched inference, concurrent inference using multiprocessing or multithreading on a single GPU might limit
 optimal GPU cache utilization and significantly impact performance, and is generally not recommended. This occurs
@@ -174,7 +174,7 @@ An ideal testing environment is a Windows PC with an NVIDIA GPU, WSL2 and Docker
 access to this setup, you can perform a similar test on SaladCloud using the interactive shell (refer to Scenario 3)
 before proceeding with a full deployment.
 
-Let’s use LLaMA 3.1 8B Instruct and Hugging Face’s TGI inference server as examples to guide the deployment and testing
+Let's use LLaMA 3.1 8B Instruct and Hugging Face's TGI inference server as examples to guide the deployment and testing
 process for different scenarios. Once the local testing is complete, we can easily translate the local deployment
 settings to the configurations on SaladCloud.
 
@@ -234,7 +234,7 @@ ubuntu@server:~$ curl http://127.0.0.1:8080/v1/chat/completions     -X POST     
   "max_tokens": 512
 }'     -H 'Content-Type: application/json'
 
-# Test the inference (token streaming）from the host.
+# Test the inference (token streaming)from the host.
 
 ubuntu@server:~$ curl http://127.0.0.1:8080/v1/chat/completions     -X POST     -d '{
   "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -350,7 +350,7 @@ MAX_BATCH_SIZE 4
 # Container Gateway
 # The port must match the IPv6 port used by the server.
 
-Enbaled, Port 80
+Enabled, Port 80
 
 # Readiness Probe
 # The probe is essential to ensure that requests are only forwarded to containers when they are ready.
@@ -370,11 +370,11 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-<img src="/products/sce/images/llm-general/llmgeneral1.jpg" />
+<img src="/guide/llm/images/llm-general1.jpg" />
 
-You don’t need to add double or single quotes in the Argument 2 of Command for Readiness on SaladCloud Portal:
+You don't need to add double or single quotes in the Argument 2 of Command for Readiness on SaladCloud Portal:
 
-<img src="/products/sce/images/llm-general/llmgeneral2.jpg" />
+<img src="/guide/llm/images/llm-general2.jpg" />
 
 After the instances are running and have passed the readiness probes, we can perform some test using the generated
 access domain name:
@@ -402,7 +402,7 @@ curl https://pomelo-turnip-ztmw72fai31is8bp.salad.cloud/v1/chat/completions     
   "max_tokens": 512
 }'     -H 'Content-Type: application/json'
 
-# Test the inference（token streaming）
+# Test the inference(token streaming)
 
 curl https://pomelo-turnip-ztmw72fai31is8bp.salad.cloud/v1/chat/completions     -X POST     -d '{
   "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -430,7 +430,7 @@ easily accommodates this requirement.
 ```
 # Override both the ENTRYPOINT and CMD in the image.
 
-# Start the TGI server with addtional parameters using specific values and environment variables.
+# Start the TGI server with additional parameters using specific values and environment variables.
 # The environment variables MAX_TOTAL_TOKENS and MAX_INPUT_TOKENS can be removed, because these parameters are explicitly provided when starting the TGI server.
 
 ubuntu@server:~$ docker run -it --rm --gpus all -p 8080:80 -v $volume:/data \
@@ -459,10 +459,10 @@ Argument2: text-generation-launcher --model-id $MODEL_ID --max-total-tokens 4096
 # The other configurations remain the same as in Scenario 1.
 ```
 
-You don’t need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
-them when running the ‘docker run’ command locally:
+You don't need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
+them when running the ‘docker run' command locally:
 
-<img src="/products/sce/images/llm-general/llmgeneral3.jpg" />
+<img src="/guide/llm/images/llm-general3.jpg" />
 
 ## Scenario 3: Run the TGI server interactively.
 
@@ -512,17 +512,17 @@ Argument2: sleep infinity
 # The other configurations remain the same as in Scenario 1.
 ```
 
-You don’t need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
-them when running the ‘docker run’ command locally:
+You don't need to add double or single quotes in the Argument 2 of Command on SaladCloud Portal, but you do need to add
+them when running the ‘docker run' command locally:
 
-<img src="/products/sce/images/llm-general/llmgeneral4.jpg" />
+<img src="/guide/llm/images/llm-general4.jpg" />
 
 Once the instances are running (sleeping), you can use the interactive terminal to manually run tasks, perform various
 tests, and troubleshoot issues:
 
-<img src="/products/sce/images/llm-general/llmgeneral5.jpg" />
+<img src="/guide/llm/images/llm-general5.jpg" />
 
-<img src="/products/sce/images/llm-general/llmgeneral6.jpg" />
+<img src="/guide/llm/images/llm-general6.jpg" />
 
 # Recommendation for Production
 
@@ -532,7 +532,7 @@ building a custom wrapper image with the following features:
 - Install the necessary softwares and tools, such as monitoring, troubleshooting and logging.
 - Add an I/O worker to the inference server for pulling jobs, uploading generated texts and returning job results,
   especially if you're building a batch processing system.
-- Pre-load the model parameters into the image to reduce costs, as there’s no charge when nodes are downloading your
+- Pre-load the model parameters into the image to reduce costs, as there's no charge when nodes are downloading your
   images.
 - Implement initial and real-time performance checks to ensure that nodes remain in an optimal state for application
   execution, as the performance of SaladCloud nodes may fluctuate over time due to their shared nature. If a node's
@@ -544,7 +544,7 @@ time can also vary significantly depending on the length of the generated text a
 successfully run LLM using the container gateway on SaladCloud, the system requirements, capabilities and parameters
 must be clearly defined, planned, tested and deployed.** Here are some examples:
 
-<img src="/products/sce/images/llm-general/llmgeneral7.jpg" />
+<img src="/guide/llm/images/llm-general7.jpg" />
 
 Context length and batch size can significantly impact system performance, throughput, and cost-effectiveness. To
 utilize resources efficiently, several container groups can be deployed for different scenarios, such as short and long
@@ -562,4 +562,4 @@ The system capacities need to be carefully calculated and provisioned, or adjust
 system requirements. Since instances require time to download images and start up, we recommend adjusting the container
 group to the expected capacity 30 minutes before peak traffic.
 
-<img src="/products/sce/images/llm-general/llmgeneral8.jpg" />
+<img src="/guide/llm/images/llm-general8.jpg" />

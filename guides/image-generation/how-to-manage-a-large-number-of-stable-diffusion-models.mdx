@@ -140,7 +140,7 @@ than “pushing” work to nodes through a load balancer. However, a simple job 
 likely to receive requests for models they may not have locally stored yet.
 
 The basic pattern here is that workers should include information about themselves and their cache when they request
-work. For example, a worker may include every model they have loaded in vram, and also every model they have downloaded
+work. For example, a worker may include every model they have loaded in VRAM, and also every model they have downloaded
 locally. Then, the API can use that information to preferentially return inference jobs for models that are already
 loaded, or at least downloaded. The API response can also include instructions to begin downloading models not required
 for the currently assigned generation, in order to expand system capacity for a model that may be increasing in
