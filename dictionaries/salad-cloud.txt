@@ -108,9 +108,11 @@ sdapi
 sdnext
 sdxl
 SDXL
+sklearn
 spanish
 subseed
 subseeds
+threadpoolctl
 timeframe
 tlsv
 tmax

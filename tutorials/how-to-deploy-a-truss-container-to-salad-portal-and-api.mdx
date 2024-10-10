@@ -1,17 +1,11 @@
 ---
 title: 'Truss Deployment Guide to SaladCloud Portal and API'
-slug: 'how-to-deploy-a-truss-container-to-salad-portal-and-api'
-excerpt: ''
-hidden: true
-metadata:
-  image: []
-  robots: 'index'
-createdAt: 'Wed Mar 01 2023 16:44:54 GMT+0000 (Coordinated Universal Time)'
-updatedAt: 'Fri Oct 20 2023 07:49:20 GMT+0000 (Coordinated Universal Time)'
 ---
 
-**Introduction** Truss is a Python library that simplifies the deployment of machine learning models by creating
-containerized models that can be served via HTTP requests. This guide will show you how to deploy a Truss container to
+## Introduction
+
+Truss is a Python library that simplifies the deployment of machine learning models by creating containerized models
+that can be served via HTTP requests. This guide will show you how to deploy a Truss container to
 **[SaladCloud Portal ](http://portal.salad.com)** and **
 [SaladCloud API](https://docs.salad.com/reference/api-reference)** so that your model can be accessed from anywhere.
 
@@ -24,21 +18,24 @@ Prerequisites Before you begin, you will need the following:
 
 Truss requires Python >=3.7 and \<3.11. To install Truss from PyPi, To install Truss, run this command:
 
-```text
+```shell
 pip install truss
 ```
 
 Here is a complete [guide and docs to guide you through Truss ](https://truss.baseten.co)
 
-**Step 1: Obtain Your API Key** To authenticate your API requests, you'll need an API key. To obtain your API key,
-follow these steps:
+## Step 1: Obtain Your API Key
+
+To authenticate your API requests, you'll need an API key. To obtain your API key, follow these steps:
 
 - Log in to your SaladCloud account at [https://portal.salad.com](https://portal.salad.com)
 - Click on your profile in the top right corner of the page, then click API Key.
 - Copy the API key that is displayed. You'll need this in the next step.
 
-**Step 2: Package Your Model** Before deploying your model to SaladCloud Portal and API, you need to package it as a
-Truss container. Follow these steps:
+## Step 2: Package Your Model
+
+Before deploying your model to SaladCloud Portal and API, you need to package it as a Truss container. Follow these
+steps:
 
 - Install the required dependencies for your model. For example, if you used `scikit-learn` to create your model, run:
   `pip install --upgrade scikit-learn truss`
@@ -134,16 +131,19 @@ docker run -p 8080:8080 <your_username>/<image_name>:<tag>
 docker stop $(docker ps -q)
 ```
 
-**Step 3: Deploy the Container Image to SaladCloud Portal. ** Follow this step-by-step guide to deploy a container to
+## Step 3: Deploy the Container Image to SaladCloud Portal.
+
+Follow this step-by-step guide to deploy a container to
 [ SaladCloud Portal here ](https://docs.salad.com/docs/how-to-deploy-a-container-using-salad-portal)
 
-**Step 4: Deploy the Container Image to SaladCloud API** To deploy your container image to SaladCloud API, follow these
-steps:
+## Step 4: Deploy the Container Image to SaladCloud API
+
+To deploy your container image to SaladCloud API, follow these steps:
 
 - Send a POST request to the following URL:
 
-```json
-https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers \
+```http
+https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers
 ```
 
 Replace `organization_name}` and `{project_name}` with the name of your organization and project, respectively.

@@ -166,7 +166,8 @@
         "tutorials/run-triton-server",
         "tutorials/jupyterlab",
         "tutorials/run-cog",
-        "tutorials/long-running-jobs"
+        "tutorials/long-running-jobs",
+        "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api"
       ]
     },
     {
