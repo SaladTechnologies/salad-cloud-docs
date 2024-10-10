@@ -1,4 +1,5 @@
 alwayson
+ASGI
 azcopy
 btop
 CivitAI
@@ -27,6 +28,7 @@ getenv
 getsize
 gsutil
 Healthcheck
+httpie
 IMDS
 imdssdk
 imshow
@@ -97,6 +99,7 @@ underperform
 unet
 upscaler
 upscalers
+uvicorn
 Uvicorn
 vaeapp
 vCPU
