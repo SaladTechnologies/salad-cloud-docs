@@ -26,13 +26,13 @@ In our documentation, we label the "Explanation" section "Products", but otherwi
 
 ## Discussing
 
-The easiest way to contribute to the project is by participating in community discussions on the [Salad Discord
+The easiest way to contribute to the project is by participating in community discussions on the [SaladCloud Discord
 server][discord]. The community often chimes in with helpful advice when you have a question, and you may also find
 yourself providing answers and helping others. Be sure to review the [code of conduct][code-of-conduct-page] before
 participating.
 
 _Please do not use GitHub issues to ask a question._ We will politely close a GitHub issue that asks a question and
-kindly refer you to the Salad Discord server or [official support][support].
+kindly refer you to the SaladCloud Discord server or [official support][support].
 
 _Please do not use public GitHub issues to report a security vulnerability._ Instead, refer to our [security
 policy][security-page] for responsible disclosure options.

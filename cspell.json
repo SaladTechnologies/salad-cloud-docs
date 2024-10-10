@@ -14,7 +14,10 @@
     "german",
     "italian",
     "spanish",
-    "portuguese"
+    "portuguese",
+    "companies",
+    "filetypes",
+    "npm"
   ],
   "dictionaryDefinitions": [
     {
@@ -29,5 +32,6 @@
     "@cspell/dict-es-es/cspell-ext.json",
     "@cspell/dict-pt-br/cspell-ext.json",
     "@cspell/dict-pt-pt/cspell-ext.json"
-  ]
+  ],
+  "allowCompoundWords": true
 }

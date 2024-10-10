@@ -13,7 +13,7 @@ Regardless of your choice of image-generation inference server, models, or exten
 2. Copy any models and extensions you want into the docker image
 3. Ensure the container is listening on an ipv6 address
 4. Push the new image up to a container registry
-5. Deploy the image as a salad container group
+5. Deploy the image as a SaladCloud container group
 
 ## Find a Docker Image
 
@@ -268,7 +268,7 @@ docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-flux1-schnell-fp8
 ```
 
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the
-   [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
+   [SaladCloud Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
 ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
@@ -283,7 +283,7 @@ larger model than previous image generation models, so we're going to want prett
 
 Additionally, we will want to configure our startup and readiness probes (endpoints provided by the wrapper), and enable
 the container gateway on port 3000. We’ve disabled authentication for this example, but you may want to enable it. If
-you enable authentication, requests must be submitted with your Salad API Key in the `Salad-Api-Key` header.
+you enable authentication, requests must be submitted with your SaladCloud API Key in the `Salad-Api-Key` header.
 
 ![Untitled](/guides/image-generation/images/deploy-comfy-4.png)
 
@@ -293,14 +293,14 @@ Click Deploy, and wait for the deployment to come up.
 
 1. Wait for the deployment to be ready.
 
-   1. First, Salad pulls your container image into our own internal high-performance cache.
+   1. First, SaladCloud pulls your container image into our own internal high-performance cache.
       ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-5.png)
-   1. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
-      ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-6.png) This step can take tens of minutes in
-      some cases, depending on the size of the image, and the internet speed of the individual nodes. Note that our
-      progress bars are only estimates, and do not necessarily reflect real-time download status. These slow cold
-      starts, and the possibility of nodes being interrupted by their host without warning, are why we always want to
-      provision multiple replicas.
+   1. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your
+      workload. ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-6.png) This step can take tens of
+      minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes. Note
+      that our progress bars are only estimates, and do not necessarily reflect real-time download status. These slow
+      cold starts, and the possibility of nodes being interrupted by their host without warning, are why we always want
+      to provision multiple replicas.
    1. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
 
       ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-8.png)

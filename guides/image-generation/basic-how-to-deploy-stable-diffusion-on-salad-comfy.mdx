@@ -11,7 +11,7 @@ Regardless of your choice of stable diffusion inference server, models, or exten
 2. Copy any models and extensions you want into the docker image
 3. Ensure the container is listening on an ipv6 address
 4. Push the new image up to a container registry
-5. Deploy the image as a salad container group
+5. Deploy the image as a SaladCloud container group
 
 ## Find a Docker Image
 
@@ -259,7 +259,7 @@ docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
 ```
 
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the
-   [Salad Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
+   [SaladCloud Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
 ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
 
@@ -276,7 +276,7 @@ replicas, to ensure coverage during node interruptions and reallocations.
 
 Additionally, we will want to configure our startup and readiness probes (endpoints provided by the wrapper), and enable
 the container gateway on port 3000. We’ve disabled authentication for this example, but you may want to enable it. If
-you enable authentication, requests must be submitted with your Salad API Key in the `Salad-Api-Key` header.
+you enable authentication, requests must be submitted with your SaladCloud API Key in the `Salad-Api-Key` header.
 
 ![Untitled](/guides/image-generation/images/deploy-comfy-4.png)
 
@@ -286,15 +286,16 @@ Click Deploy, and wait for the deployment to come up.
 
 1. Wait for the deployment to be ready.
 
-   1. First, Salad pulls your container image into our own internal high-performance cache.
+   1. First, SaladCloud pulls your container image into our own internal high-performance cache.
 
       ![Untitled](/guides/image-generation/images/deploy-comfy-5.png)
 
-   2. Next, Salad locates eligible nodes for your workload, based on the configuration you provided.
+   2. Next, SaladCloud locates eligible nodes for your workload, based on the configuration you provided.
 
       ![Untitled](/guides/image-generation/images/deploy-comfy-6.png)
 
-   3. Next, Salad begins downloading the cached container image to the nodes that have been assigned to your workload.
+   3. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your
+      workload.
 
       ![Untitled](/guides/image-generation/images/deploy-comfy-7.png)
 

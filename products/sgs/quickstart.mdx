@@ -5,22 +5,22 @@ description: 'Connect to SGS using HTTP CONNECT over TLS and begin using it in p
 
 ## Connecting
 
-1. After you request SGS service in a region, Salad will provision and test a new, dedicated SGS server before sending
-   you its connection details, which will include a unique SGS hostname, port number, password, and other basic
+1. After you request SGS service in a region, SaladCloud will provision and test a new, dedicated SGS server before
+   sending you its connection details, which will include a unique SGS hostname, port number, password, and other basic
    information.
    <Note>
      Note that this documentation assumes you are using HTTP CONNECT requests. SGS also supports HAProxy's PROXY v2
      protocol. Learn how to use it [here.](/products/sgs/proxy-v2)
    </Note>
 2. All requests should be made through the SGS server using this connection information. The SGS server will then route
-   them to the appropriate Salad node. For example, `https://SESSIONID:PASSWORD@HOSTNAME:PORT/`
+   them to the appropriate SaladCloud node. For example, `https://SESSION_ID:PASSWORD@HOSTNAME:PORT/`
 
-   - Let's break down each component: `SESSIONID`, `PASSWORD`, `HOSTNAME`, and `PORT`.
-     - `SESSIONID` can be anything you like, as a string encoded in ASCII or UTF8. There are no character length limits
-       enforced. Each session ID will be associated with one salad node. Because all requests sent through a single
+   - Let's break down each component: `SESSION_ID`, `PASSWORD`, `HOSTNAME`, and `PORT`.
+     - `SESSION_ID` can be anything you like, as a string encoded in ASCII or UTF8. There are no character length limits
+       enforced. Each session ID will be associated with one SaladCloud node. Because all requests sent through a single
        session ID will be proxied through the same node, we recommend using separate session IDs for each of your end
-       users. If a Salad node goes offline for any reason, all connections that it was servicing will be automatically
-       distributed to one or more nodes using a modified least connections algorithm.
+       users. If a SaladCloud node goes offline for any reason, all connections that it was servicing will be
+       automatically distributed to one or more nodes using a modified least connections algorithm.
      - `PASSWORD` is the password for connecting to SGS. It will be shared with you using a 1Password link before
        beginning the trial period.
      - `HOSTNAME` is the hostname of the SGS server. It is typically in the format `sgs-{unique_string}.salad.com`, and

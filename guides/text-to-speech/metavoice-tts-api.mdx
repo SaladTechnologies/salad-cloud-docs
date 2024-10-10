@@ -1,10 +1,5 @@
 ---
 title: 'MetaVoice TTS with Voice Cloning Guide'
-slug: 'metavoice-tts-api'
-excerpt: ''
-hidden: true
-createdAt: 'Mon Mar 25 2024 20:38:14 GMT+0000 (Coordinated Universal Time)'
-updatedAt: 'Sat Mar 30 2024 14:23:52 GMT+0000 (Coordinated Universal Time)'
 ---
 
 ## Introduction
@@ -14,10 +9,10 @@ efficient. Contemporary TTS models utilize deep learning and artificial intellig
 natural-sounding and highly accurate. These advancements have led to widespread applications in various real-life
 scenarios, including voice assistants, audiobook narration, and accessibility tools for individuals with visual
 impairments or reading difficulties. In this article, we will explore the capabilities of one such TTS model, MetaVoice,
-and demonstrate how to leverage its features on Salad Cloud in a cloud-based environment.
+and demonstrate how to leverage its features on SaladCloud in a cloud-based environment.
 
-** If you are looking for fast deployment of MetaVoice Endpoint on Salad move to
-[Deploying MetaVoice Endpoint to Salad](#deploying-metavoice-endpoint-to-salad) **
+**If you are looking for fast deployment of MetaVoice Endpoint on SaladCloud move to
+[Deploying MetaVoice Endpoint to Salad](#deploying-solution-to-salad)**
 
 ### Discover MetaVoice: The Open-Source Voice Cloning Tool
 
@@ -76,10 +71,10 @@ text data into manageable pieces for MetaVoice processing.
 
 The official documentation for MetaVoice suggests the use of GPUs with a minimum of 12GB of VRAM to ensure optimal
 performance. However, during our trials, we explored the use of GPUs with lower VRAM and found that they could still
-deliver satisfactory results. This necessitated a meticulous selection process from Salad's GPU fleet to identify
+deliver satisfactory results. This necessitated a meticulous selection process from SaladCloud's GPU fleet to identify
 compatible options that could handle the processing demands of MetaVoice.
 
-## Project Overview: TTS with Voice Cloning using MetaVoice and Salad Cloud
+## Project Overview: TTS with Voice Cloning using MetaVoice and SaladCloud
 
 In this project, we aim to deploy a flexible voice solution that enables text-to-speech conversion with addition of a
 narrator's voice tone. This solution will be accessible as an API.
@@ -93,7 +88,7 @@ narrator's voice tone. This solution will be accessible as an API.
 4. **Storage and Accessibility:** The generated audio file is uploaded back to Azure for easy access and further usage.
 
 Through this project, we aim to demonstrate that advanced voice cloning and text-to-speech synthesis are not only
-reserved for large organizations with extensive resources. By leveraging MetaVoice and Salad Cloud, we make cutting-edge
+reserved for large organizations with extensive resources. By leveraging MetaVoice and SaladCloud , we make cutting-edge
 voice technology accessible to a wider audience, enabling the creation of realistic and customizable speech with minimal
 effort. This initiative showcases how cloud computing and AI models can work together to address real-world applications
 in voice synthesis and cloning, offering value in various scenarios such as content creation, accessibility, and
@@ -107,9 +102,9 @@ For average processing prices, refer to our benchmarks:
 - **Deployment**:
   - The FastAPI application is containerized using Docker, providing a consistent and isolated environment for
     deployment.
-  - The Docker container is then deployed on Salad's compute resources to leverage their processing capabilities.
-  - The Docker image is stored in the Salad Docker Container Registry, ensuring secure and easy access for deployment
-    and updates.
+  - The Docker container is then deployed on SaladCloud's compute resources to leverage their processing capabilities.
+  - The Docker image is stored in the SaladCloud Docker Container Registry, ensuring secure and easy access for
+    deployment and updates.
 
 ![](https://files.readme.io/160811e-FASTAPI.drawio_3.png)
 
@@ -147,7 +142,7 @@ script are provided below.
 
 The Setup Script:
 
-```bash Bash
+```bash
 set -e
 echo "setup the curent environment"
 CURRENT_DIRECTORY="$( dirname "${BASH_SOURCE[0]}" )"
@@ -185,14 +180,14 @@ pip install -e .
 To establish a clean virtual environment and install all the necessary libraries, you simply needs to execute the script
 using this command:
 
-```java bash
+```bash
 bash dev/setup
 ```
 
 This script will prepare your local development environment for working with MetaVoice, ensuring that you have all the
 required tools and dependencies to start customizing and testing the application.
 
-### Voice cloning test with MetaVoice on Salad Cloud
+### Voice cloning test with MetaVoice on SaladCloud
 
 To explore the capabilities of MetaVoice, we followed the instructions provided by MetaVoice and used their source code
 as our base: [MetaVoice repo](https://github.com/metavoiceio/metavoice-src). Together with all the processing scripts
@@ -520,7 +515,7 @@ works:
 
 ```python
 def inference(connection_string: str, input_container_name: str, output_container_name: str, voices_container_name: str, reference_voice: str,  text_file: str = None):
-    # authentiacate in azure
+    # authenticate in azure
 
     input_blob = azure_initiate(input_container_name, connection_string)
     result_blob = azure_initiate(output_container_name, connection_string)
@@ -641,7 +636,7 @@ efficient data transfer to and from Azure storage.
 
 Here is the Dockerfile:
 
-```java Dockerfile
+```dockerfile
 FROM nvidia/cuda:11.7.1-devel-ubuntu22.04 as cuda-base
 # Set some environment variable for better NVIDIA compatibility
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
@@ -691,14 +686,15 @@ can use any container registry you prefer.
 We've reached the final and most exciting stage of our project: deploying our solution to SaladCloud. If you're not
 making any additional customizations, you can directly proceed to this step.
 
-Deploying your containerized FastAPI application to Salad's GPU Cloud is a very efficient and cost-effective way to run
-your text-to-speech solutions. Here's how to deploy the solution using the Salad portal:
+Deploying your containerized FastAPI application to SaladCloud's GPU Cloud is a very efficient and cost-effective way to
+run your text-to-speech solutions. Here's how to deploy the solution using the SaladCloud portal:
 
-1. **Create an Account:** Sign up for an account on [Salad's Portal](https://portal.salad.com/) if you haven't already.
-2. **Create an Organization:** Once logged in, set up your organization within the Salad platform to manage your
+1. **Create an Account:** Sign up for an account on [SaladCloud's Portal](https://portal.salad.com/) if you haven't
+   already.
+2. **Create an Organization:** Once logged in, set up your organization within the SaladCloud platform to manage your
    deployments and resources.
-3. **Deploy Container Group:** Go to the "Container Groups" section in the Salad portal and select "Deploy a Container
-   Group" to begin deploying your FastAPI application to Salad's cloud infrastructure.
+3. **Deploy Container Group:** Go to the "Container Groups" section in the SaladCloud portal and select "Deploy a
+   Container Group" to begin deploying your FastAPI application to SaladCloud's infrastructure.
 
 ![](https://mgorkii.atlassian.net/wiki/download/thumbnails/21790721/image-20231110-194241.png?version=1&modificationDate=1710688126907&cacheVersion=1&api=v2&width=741&height=263)
 
@@ -707,9 +703,9 @@ We now need to set up all of our container group parameters:
 **Configure Container Group:**
 
 1. **Create a unique name for your Container group**
-2. **Pick the Image Source:** In our case we are using a public Salad registry. Click Edit next to Image source. Under
-   image name paste the image path: **saladtechnologies/metavoice-api:1.0.0** If you are using your custom solution,
-   specify your image location.
+2. **Pick the Image Source:** In our case we are using a public SaladCloud registry. Click Edit next to Image source.
+   Under image name paste the image path: **saladtechnologies/metavoice-api:1.0.0** If you are using your custom
+   solution, specify your image location.
 
 ![](https://files.readme.io/b80f256-image.png)
 
@@ -721,7 +717,7 @@ We now need to set up all of our container group parameters:
 
 ![](https://files.readme.io/61c8d63-image-20231110-201504.png)
 
-1. **Optional Settings**: Salad gives you some great options like health check probe, external logging and passing
+1. **Optional Settings**: SaladCloud gives you some great options like health check probe, external logging and passing
    environment variables.
 2. **Update Command** We have not updated MetaVoice's Entrypoint in the Dockerfile, so we will need to override it under
    "Command". We need to change our command to **uvicorn fast:app** and add a few arguments: **--host :: --port 80**.
@@ -733,27 +729,27 @@ Additionally, for enhanced security, you have the option to enable Authenticatio
 you'll need to include your personal token with each API call. You can locate your token here:
 https://portal.salad.com/api-key
 
-With all configurations complete, deploying your FastAPI application on Salad is a straightforward process. Leveraging
-Salad's platform ensures that your text-to-speech API operates on a robust infrastructure capable of handling demanding
-tasks cost-effectively.
+With all configurations complete, deploying your FastAPI application on SaladCloud is a straightforward process.
+Leveraging SaladCloud's platform ensures that your text-to-speech API operates on a robust infrastructure capable of
+handling demanding tasks cost-effectively.
 
 Finally, ensure the “AutoStart container group once the image is pulled” option is checked, then click “Deploy”. With
 that, we're ready to go. Let's wait for our solution to deploy and then proceed with testing.
 
 ### Advantages of Selecting Salad:
 
-- **Cost-Efficiency**: Salad's GPU cloud services are priced favorably when compared to other cloud providers, allowing
-  you to leverage additional resources for your application while minimizing expenses.
-- **Intuitive Platform**: Salad emphasizes a seamless user experience, providing an easy-to-navigate interface that
+- **Cost-Efficiency**: SaladCloud's GPU cloud services are priced favorably when compared to other cloud providers,
+  allowing you to leverage additional resources for your application while minimizing expenses.
+- **Intuitive Platform**: SaladCloud emphasizes a seamless user experience, providing an easy-to-navigate interface that
   streamlines the deployment and management of applications in the cloud.
-- **Robust Documentation and Support**: Salad furnishes detailed documentation to facilitate deployment, configuration,
-  and problem-solving, supported by a committed team available to provide assistance as needed.
+- **Robust Documentation and Support**: SaladCloud furnishes detailed documentation to facilitate deployment,
+  configuration, and problem-solving, supported by a committed team available to provide assistance as needed.
 
 ### Test Full Solution deployed to Salad
 
 Once your solution is deployed on Salad, the next step is to interact with your FastAPI application using its public
-endpoint. Salad provides you with a deployment URL, which allows you to send requests to your API using Salad's
-infrastructure, just as you would locally.
+endpoint. SaladCloud provides you with a deployment URL, which allows you to send requests to your API using
+SaladCloud's infrastructure, just as you would locally.
 
 ![](https://files.readme.io/0df9964-image.png)
 
@@ -773,4 +769,4 @@ solution documentation for guidance. The complete list of arguments has been pro
 
 You can now use your endpoint with Swagger to interact with your API directly through the browser. Alternatively, you
 can send requests to your endpoint using tools like curl or Postman for testing and integration into your applications.
-Enjoy leveraging the power of MetaVoice and Salad Cloud for your text-to-speech and voice cloning needs!
+Enjoy leveraging the power of MetaVoice and SaladCloud for your text-to-speech and voice cloning needs!
