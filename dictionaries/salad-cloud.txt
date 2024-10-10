@@ -1,3 +1,4 @@
+-Jxpf
 alwayson
 ASGI
 azcopy
@@ -37,6 +38,7 @@ getsize
 gsutil
 Healthcheck
 httpie
+imds
 IMDS
 imdssdk
 imgsz
@@ -79,11 +81,13 @@ pydantic
 pytorch
 Pytube
 Quickstart
+Roboflow
 routable
 RTMP
 rtsp
 RTSP
 Rundiffusion
+s6-overlay-noarch
 safetensors
 SaladCloud
 saladcloudimdssdk
@@ -100,6 +104,7 @@ spanish
 subseed
 subseeds
 timeframe
+tlsv
 tmax
 tmin
 tojson

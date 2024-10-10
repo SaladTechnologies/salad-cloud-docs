@@ -316,6 +316,8 @@
             {
               "group": "YOLOv8",
               "pages": [
+                "guides/computer-vision/yolov8/yolov8",
+                "guides/computer-vision/yolov8/quickstart",
                 "guides/computer-vision/yolov8/deployment-tutorial",
                 "guides/computer-vision/yolov8/batch-processing",
                 "guides/computer-vision/yolov8/model-training-guide"
