@@ -17,5 +17,8 @@
   },
   "ignorePaths": [
     "node_modules/**"
-  ]
+  ],
+  "devDependencies": {
+    "yaml": "^2.5.1"
+  }
 }
