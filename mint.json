@@ -21,11 +21,7 @@
       "pages": [
         {
           "group": "Getting Started",
-          "pages": [
-            "products/sce/getting-started-with-SaladCloud",
-            "products/sce/quickstart",
-            "products/sce/quickstart-api"
-          ]
+          "pages": ["products/sce/getting-started/about", "products/sce/quickstart", "products/sce/quickstart-api"]
         },
         {
           "group": "Container Groups",
@@ -522,6 +518,10 @@
     {
       "source": "/products/sce/getting-started-with-saladcloud",
       "destination": "/products/sce/getting-started-with-SaladCloud"
+    },
+    {
+      "source": "/products/sce/getting-started-with-SaladCloud",
+      "destination": "/products/sce/getting-started/about"
     }
   ]
 }

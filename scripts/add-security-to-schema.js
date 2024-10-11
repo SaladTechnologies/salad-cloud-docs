@@ -9,6 +9,15 @@ This script adds the security schema from the base schema to the schema to modif
 Base schema and schema to modify can be in either JSON or YAML format.
 `
 
+function loadJSONorYAML(file) {
+    const fileContent = fs.readFileSync(file, 'utf8')
+    const isJson = file.endsWith('.json')
+    return {
+        data: isJson ? JSON.parse(fileContent) : parse(fileContent),
+        isJson,
+    }
+}
+
 /**
  * Load the base schema
  */
@@ -16,8 +25,7 @@ const apiSpecDir = 'api-specs'
 const baseSchema = 'salad-cloud'
 const schema = fs.readdirSync(apiSpecDir).find((file) => path.basename(file, path.extname(file)) === baseSchema)
 const schemaPath = path.join(apiSpecDir, schema)
-const schemaFile = fs.readFileSync(schemaPath, 'utf8')
-const schemaObj = schema.endsWith('.json') ? JSON.parse(schemaFile) : parse(schemaFile)
+const { data: schemaObj } = loadJSONorYAML(schemaPath)
 
 /**
  * Load the schema to modify
@@ -27,9 +35,7 @@ if (!schemaToModify) {
     console.error(usage)
     process.exit(1)
 }
-const schemaToModifyFile = fs.readFileSync(schemaToModify, 'utf8')
-const outputIsJson = schemaToModify.endsWith('.json')
-const schemaToModifyObj = outputIsJson ? JSON.parse(schemaToModifyFile) : parse(schemaToModifyFile)
+const { data: schemaToModifyObj, isJson: outputIsJson } = loadJSONorYAML(schemaToModify)
 
 /**
  * Add the security schema from the base schema to the schema to modify, and enable it for every endpoint
