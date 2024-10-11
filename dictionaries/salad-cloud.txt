@@ -117,6 +117,7 @@ sdxl
 SDXL
 sklearn
 spanish
+splunk
 subseed
 subseeds
 threadpoolctl
