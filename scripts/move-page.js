@@ -51,27 +51,31 @@ fs.renameSync(src, dest)
 
 // Add the redirect
 mint.redirects.push({
-    from: srcPath,
-    to: destPath,
+    source: srcPath,
+    destination: destPath,
 })
 
 /*
  * Update the navigation array in mint.json, which is a recursive structure of { group, pages }, where pages is an array
  * of either strings or objects with group and pages.
  * */
-function updateNavigation(navigation) {
+function updateNavigation(navigation, updated = []) {
     for (let item of navigation) {
         if (typeof item === 'string') {
-            if (item === srcName) {
-                item = destName
+            if (item === srcPath) {
+                updated.push(destPath)
+            } else {
+                updated.push(item)
             }
         } else {
-            if (item.pages) {
-                updateNavigation(item.pages)
-            }
+            const group = { ...item }
+            group.pages = updateNavigation(group.pages)
+            updated.push(group)
         }
     }
+
+    return updated
 }
-updateNavigation(mint.navigation)
+mint.navigation = updateNavigation(mint.navigation)
 
 fs.writeFileSync('mint.json', JSON.stringify(mint, null, 2))
