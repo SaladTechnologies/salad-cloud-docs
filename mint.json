@@ -75,10 +75,10 @@
             {
               "group": "Instance Metadata Service (IMDS)",
               "pages": [
-                "products/sce/imds/introduction",
-                "products/sce/imds/Container-status-endpoint",
-                "products/sce/imds/obtaining-an-imds-jwt",
-                "products/sce/imds/imds-reallocate"
+                "products/sce/container-groups/imds/introduction",
+                "products/sce/container-groups/imds/Container-status-endpoint",
+                "products/sce/container-groups/imds/obtaining-an-imds-jwt",
+                "products/sce/container-groups/imds/imds-reallocate"
               ]
             },
             {
@@ -639,6 +639,22 @@
     {
       "source": "/products/sce/health-probes",
       "destination": "/products/sce/container-groups/health-probes/health-probes"
+    },
+    {
+      "source": "/products/sce/imds/Container-status-endpoint",
+      "destination": "/products/sce/container-groups/imds/Container-status-endpoint"
+    },
+    {
+      "source": "/products/sce/imds/imds-reallocate",
+      "destination": "/products/sce/container-groups/imds/imds-reallocate"
+    },
+    {
+      "source": "/products/sce/imds/introduction",
+      "destination": "/products/sce/container-groups/imds/introduction"
+    },
+    {
+      "source": "/products/sce/imds/obtaining-an-imds-jwt",
+      "destination": "/products/sce/container-groups/imds/obtaining-an-imds-jwt"
     }
   ]
 }
