@@ -84,8 +84,8 @@
             {
               "group": "Billing and Pricing",
               "pages": [
-                "products/sce/billing",
-                "products/sce/priority-pricing"
+                "products/sce/container-groups/billing-and-pricing/billing",
+                "products/sce/container-groups/billing-and-pricing/priority-pricing"
               ]
             },
             "products/sce/specifying-a-command",
@@ -655,6 +655,14 @@
     {
       "source": "/products/sce/imds/obtaining-an-imds-jwt",
       "destination": "/products/sce/container-groups/imds/obtaining-an-imds-jwt"
+    },
+    {
+      "source": "/products/sce/billing",
+      "destination": "/products/sce/container-groups/billing-and-pricing/billing"
+    },
+    {
+      "source": "/products/sce/priority-pricing",
+      "destination": "/products/sce/container-groups/billing-and-pricing/priority-pricing"
     }
   ]
 }
