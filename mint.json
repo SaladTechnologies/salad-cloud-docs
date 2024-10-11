@@ -27,7 +27,7 @@
           "pages": [
             "products/sce/getting-started/about",
             "products/sce/getting-started/quickstart",
-            "products/sce/quickstart-api"
+            "products/sce/getting-started/quickstart-api"
           ]
         },
         {
@@ -543,6 +543,10 @@
     {
       "source": "/products/sce/quickstart",
       "destination": "/products/sce/getting-started/quickstart"
+    },
+    {
+      "source": "/products/sce/quickstart-api",
+      "destination": "/products/sce/getting-started/quickstart-api"
     }
   ]
 }
