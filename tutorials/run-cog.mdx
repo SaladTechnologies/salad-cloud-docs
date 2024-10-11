@@ -250,15 +250,17 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-The provided [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command) override both the
-ENTRYPOINT and CMD of the original image, ensuring that the original first command 'python -m cog.server.http' is run
-only after the Cog HTTP prediction server code has been successfully modified to listen on an IPv6 port.
+The provided [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command)
+override both the ENTRYPOINT and CMD of the original image, ensuring that the original first command 'python -m
+cog.server.http' is run only after the Cog HTTP prediction server code has been successfully modified to listen on an
+IPv6 port.
 
 <img src="/products/sce/images/runcog/runcog1.png" />
 
 The Readiness Probe evaluates whether a container is ready to accept the traffic from the load balancer. Specifically,
-[the HTTP/1.X probe](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#http-1-x-protocol) checks the health of an HTTP
-service running inside the container by sending an HTTP GET request and checking the response code.
+[the HTTP/1.X probe](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#http-1-x-protocol)
+checks the health of an HTTP service running inside the container by sending an HTTP GET request and checking the
+response code.
 
 For the Cog HTTP prediction server in this BLIP image, it will be ready to answer requests only after downloading and
 loading models into the GPU. Since there isn’t a dedicated path operation function for health checks in this server
@@ -351,19 +353,20 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-Because the [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command) override both the
-ENTRYPOINT and CMD of the original image, we need to specify ‘/sbin/tini’ for the ENTRYPOINT and the other four
-arguments for the CMD, as parameters of ‘/sbin/tini’. This ensures that Tini is still used as the init process within
-the container, and the original command 'python -m cog.server.http' is run only after the Cog HTTP prediction server
-code has been successfully modified to listen on an IPv6 port.
+Because the [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command)
+override both the ENTRYPOINT and CMD of the original image, we need to specify ‘/sbin/tini’ for the ENTRYPOINT and the
+other four arguments for the CMD, as parameters of ‘/sbin/tini’. This ensures that Tini is still used as the init
+process within the container, and the original command 'python -m cog.server.http' is run only after the Cog HTTP
+prediction server code has been successfully modified to listen on an IPv6 port.
 
 <img src="/products/sce/images/runcog/runcog4.png" />
 
 The Cog HTTP prediction server in this Whisper image provides a dedicated ‘/health-check’ endpoint and an operation
 function for health checks, indicating different running statuses (STARTING, READY, BUSY and FAILED) within the server.
 
-The Readiness Probe with [the protocol - exec](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#exec-protocol), will
-run the given command inside the container, if the command returns an exit code of 0 ( by using ‘echo $?’ ), the
+The Readiness Probe with
+[the protocol - exec](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#exec-protocol),
+will run the given command inside the container, if the command returns an exit code of 0 ( by using ‘echo $?’ ), the
 container is considered in a healthy state. Any other exit codes indicate the container is not ready yet.
 
 A Python script is provided here and run regularly to determine whether the container is in the READY status, indicating

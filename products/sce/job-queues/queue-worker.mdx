@@ -212,15 +212,17 @@ Here's how to do it.
 
 Regardless of which path you chose, you should now have an image built with your application, the Job Queue Worker, and
 some way of managing both processes. It's time to push it to the container registry of your choice. Learn more about the
-registries supported by SaladCloud at [Container Registries](/products/sce/container-groups/registries/container-registries).
+registries supported by SaladCloud at
+[Container Registries](/products/sce/container-groups/registries/container-registries).
 
 # Additional notes about the SaladCloud Job Queue Worker;
 
 - The Worker needs to connect to a local HTTP server running inside of SEL, our special version of Linux running on the
   host machine behind your container replica. This means you won't be able to test the Job Queue Worker locally.
 - By default, the Worker logging level is set to `error`. Logs will be sent to the
-  [SaladCloud Container Logs](/products/sce/container-groups/container-logs) or your [external logging](/products/sce/container-groups/external-logging/external-logging)
-  tools. You can adjust the logging level by adding a 'SALAD_QUEUE_WORKER_LOG_LEVEL'
+  [SaladCloud Container Logs](/products/sce/container-groups/container-logs) or your
+  [external logging](/products/sce/container-groups/external-logging/external-logging) tools. You can adjust the logging
+  level by adding a 'SALAD_QUEUE_WORKER_LOG_LEVEL'
   [environment variable](/products/sce/container-groups/environment-variables).
 
 <img src="/products/sce/images/08bfbc2-image.png" />
@@ -230,4 +232,5 @@ registries supported by SaladCloud at [Container Registries](/products/sce/conta
   `time="2024-04-26T14:30:42Z" level=info msg=heartbeat file="[worker.go:162]"`.
 - If you choose not to use any Startup and/or Readiness probes, the Job Queue Worker will immediately start to look for
   jobs, even if your application inside is not yet ready to receive jobs. If this happens, the job will fail and you`ll
-  need to submit it again. [Read more about health probes here. ](/products/sce/container-groups/health-probes/health-probes)
+  need to submit it again.
+  [Read more about health probes here. ](/products/sce/container-groups/health-probes/health-probes)

@@ -247,9 +247,10 @@ process, you would only be charged for the running time of a single replica.
 
 The --gpus all option in the command allocates all available GPUs on the host to the container, enabling GPU support for
 applications running inside it. SaladCloud currently supports only one GPU per container. When creating a container
-group, you can select multiple GPU types at a priority level [(Batch/Low/Medium/High)](/products/sce/container-groups/billing-and-pricing/priority-pricing),
-along with the required vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that
-match these selections to run the container group.
+group, you can select multiple GPU types at a priority level
+[(Batch/Low/Medium/High)](/products/sce/container-groups/billing-and-pricing/priority-pricing), along with the required
+vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that match these selections
+to run the container group.
 
 <img src="/tutorials/images/docker_run/docker_run7.png" />
 
@@ -418,13 +419,14 @@ contain only the status and metadata.
 
 ### Health Probes
 
-[Health probes](/products/sce/container-groups/health-probes/health-probes) offer an automated mechanism to initiate specific actions based on the
-status of containers within a container group. **You can think of a probe as a piece of code running alongside the
-inference server within the same container, allowing it to access the service locally or the shared file system**.
+[Health probes](/products/sce/container-groups/health-probes/health-probes) offer an automated mechanism to initiate
+specific actions based on the status of containers within a container group. **You can think of a probe as a piece of
+code running alongside the inference server within the same container, allowing it to access the service locally or the
+shared file system**.
 
-[Readiness probes](/products/sce/container-groups/health-probes/readiness-probes) are essential when deploying a container gateway, as
-they ensure that requests are only forwarded to an instance when it is fully prepared—for example, when the model has
-been loaded and warmed up.
+[Readiness probes](/products/sce/container-groups/health-probes/readiness-probes) are essential when deploying a
+container gateway, as they ensure that requests are only forwarded to an instance when it is fully prepared—for example,
+when the model has been loaded and warmed up.
 
 When configuring a readiness probe on SaladCloud, you can utilize TCP, gRPC, and HTTP protocols. **SaladCloud does not
 provide an option to explicitly select IPv4 or IPv6; it defaults to using IPv6 when the container gateway is deployed,
@@ -452,8 +454,8 @@ Failure Threshold: 3
 
 <img src="/tutorials/images/docker_run/docker_run19.png" />
 
-You can also use the [exec protocol](/products/sce/container-groups/health-probes/health-probes#exec-protocol) to create a custom script for the
-readiness probe.
+You can also use the [exec protocol](/products/sce/container-groups/health-probes/health-probes#exec-protocol) to create
+a custom script for the readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the
 response from accessing `http://[::1]:5000/health-check` contains **'READY'**, the Python script returns zero,

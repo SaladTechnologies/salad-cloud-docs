@@ -41,8 +41,9 @@ state.**
   creating you can **reallocate** your workload to another node.
 - **Running:** Running indicates the container has been started. Depending on your container, additional time may be
   needed before it is ready for Container Gateway (inbound networking) requests, e.g. to run startup scripts or download
-  models. Health Probes can be configured to account for this. Note that [Billing](/products/sce/container-groups/billing-and-pricing/billing) is usage-based
-  on usage and only starts once a container is running. Running containers can be reallocated, recreated, or restarted.
+  models. Health Probes can be configured to account for this. Note that
+  [Billing](/products/sce/container-groups/billing-and-pricing/billing) is usage-based on usage and only starts once a
+  container is running. Running containers can be reallocated, recreated, or restarted.
 - **Stopping:** Indicates that a stop signal has been sent to your container instance. It can take up to several minutes
   for your container to stop while the signal propagates through the network.
 
