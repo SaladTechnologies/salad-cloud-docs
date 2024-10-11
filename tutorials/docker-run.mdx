@@ -186,7 +186,7 @@ Let’s create a container group by providing the docker run command through the
 ### Environment Variables
 
 The -e flag in the docker run command is used to pass information to the container, which can be directly mapped to
-[the Environment Variables](/products/sce/environment-variables) settings on SaladCloud.
+[the Environment Variables](/products/sce/container-groups/environment-variables) settings on SaladCloud.
 
 By utilizing this feature, you can customize system behavior and grant access to additional resources, such as cloud
 storage or job queues or APIs, for your containers running on SaladCloud.
@@ -208,7 +208,7 @@ image will be delivered to the SaladCloud nodes running your instances. When the
 SaladCloud nodes will be released and the images on these nodes will be also removed.
 
 If your image has changed since the container group was created, you will need to
-[update the image source](/products/sce/managing-deployments#editing-your-container-group-deployment) to run the new
+[update the image source](/products/sce/container-groups/managing-deployments#editing-your-container-group-deployment) to run the new
 version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull the latest
 image.
 

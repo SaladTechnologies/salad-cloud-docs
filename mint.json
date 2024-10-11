@@ -22,6 +22,7 @@
     {
       "group": "Container Engine",
       "pages": [
+        "products/sce/salad-container-engine",
         {
           "group": "Getting Started",
           "pages": [
@@ -34,10 +35,9 @@
           "group": "Container Groups",
           "pages": [
             "products/sce/container-groups/container-groups",
-            "products/sce/salad-container-engine",
-            "products/sce/deployment-lifecycle",
-            "products/sce/managing-deployments",
-            "products/sce/environment-variables",
+            "products/sce/container-groups/deployment-lifecycle",
+            "products/sce/container-groups/managing-deployments",
+            "products/sce/container-groups/environment-variables",
             {
               "group": "Container Registries",
               "pages": [
@@ -551,6 +551,18 @@
     {
       "source": "/products/sce/containers",
       "destination": "/products/sce/container-groups/container-groups"
+    },
+    {
+      "source": "/products/sce/deployment-lifecycle",
+      "destination": "/products/sce/container-groups/deployment-lifecycle"
+    },
+    {
+      "source": "/products/sce/managing-deployments",
+      "destination": "/products/sce/container-groups/managing-deployments"
+    },
+    {
+      "source": "/products/sce/environment-variables",
+      "destination": "/products/sce/container-groups/environment-variables"
     }
   ]
 }
