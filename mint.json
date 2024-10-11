@@ -33,7 +33,7 @@
         {
           "group": "Container Groups",
           "pages": [
-            "products/sce/containers",
+            "products/sce/container-groups/container-groups",
             "products/sce/salad-container-engine",
             "products/sce/deployment-lifecycle",
             "products/sce/managing-deployments",
@@ -547,6 +547,10 @@
     {
       "source": "/products/sce/quickstart-api",
       "destination": "/products/sce/getting-started/quickstart-api"
+    },
+    {
+      "source": "/products/sce/containers",
+      "destination": "/products/sce/container-groups/container-groups"
     }
   ]
 }
