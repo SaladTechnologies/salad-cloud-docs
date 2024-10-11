@@ -14,7 +14,10 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": ["products/documentation", "products/quickstart"]
+      "pages": [
+        "products/documentation",
+        "products/quickstart"
+      ]
     },
     {
       "group": "Container Engine",
@@ -50,13 +53,13 @@
             {
               "group": "External Logging",
               "pages": [
-                "products/sce/external-logging",
-                "products/sce/external-logging/axiom",
-                "products/sce/external-logging/new-relic",
-                "products/sce/external-logging/splunk-logging",
-                "products/sce/external-logging/tcp-logging",
-                "products/sce/external-logging/datadog",
-                "products/sce/external-logging/http"
+                "products/sce/container-groups/external-logging/external-logging",
+                "products/sce/container-groups/external-logging/axiom",
+                "products/sce/container-groups/external-logging/new-relic",
+                "products/sce/container-groups/external-logging/splunk-logging",
+                "products/sce/container-groups/external-logging/tcp-logging",
+                "products/sce/container-groups/external-logging/datadog",
+                "products/sce/container-groups/external-logging/http"
               ]
             },
             {
@@ -80,7 +83,10 @@
             },
             {
               "group": "Billing and Pricing",
-              "pages": ["products/sce/billing", "products/sce/priority-pricing"]
+              "pages": [
+                "products/sce/billing",
+                "products/sce/priority-pricing"
+              ]
             },
             "products/sce/specifying-a-command",
             "products/sce/disk-space",
@@ -134,7 +140,9 @@
     },
     {
       "group": "S4 - SaladCloud Simple Storage Service",
-      "pages": ["products/s4/salad-simple-storage-service"]
+      "pages": [
+        "products/s4/salad-simple-storage-service"
+      ]
     },
     {
       "group": "Recipes",
@@ -363,13 +371,18 @@
             },
             {
               "group": "SCE",
-              "pages": ["guides/transcription/sce/youtube"]
+              "pages": [
+                "guides/transcription/sce/youtube"
+              ]
             }
           ]
         },
         {
           "group": "Text To Speech",
-          "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+          "pages": [
+            "guides/text-to-speech/metavoice-tts-api",
+            "guides/text-to-speech/openvoice-api"
+          ]
         }
       ]
     }
@@ -578,6 +591,34 @@
     {
       "source": "/products/sce/container-registries",
       "destination": "/products/sce/container-groups/registries/container-registries"
+    },
+    {
+      "source": "/products/sce/external-logging/axiom",
+      "destination": "/products/sce/container-groups/external-logging/axiom"
+    },
+    {
+      "source": "/products/sce/external-logging/datadog",
+      "destination": "/products/sce/container-groups/external-logging/datadog"
+    },
+    {
+      "source": "/products/sce/external-logging/http",
+      "destination": "/products/sce/container-groups/external-logging/http"
+    },
+    {
+      "source": "/products/sce/external-logging/new-relic",
+      "destination": "/products/sce/container-groups/external-logging/new-relic"
+    },
+    {
+      "source": "/products/sce/external-logging/splunk-logging",
+      "destination": "/products/sce/container-groups/external-logging/splunk-logging"
+    },
+    {
+      "source": "/products/sce/external-logging/tcp-logging",
+      "destination": "/products/sce/container-groups/external-logging/tcp-logging"
+    },
+    {
+      "source": "/products/sce/external-logging",
+      "destination": "/products/sce/container-groups/external-logging/external-logging"
     }
   ]
 }
