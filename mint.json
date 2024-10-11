@@ -14,14 +14,21 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": ["products/documentation", "products/quickstart"]
+      "pages": [
+        "products/documentation",
+        "products/quickstart"
+      ]
     },
     {
       "group": "Container Engine",
       "pages": [
         {
           "group": "Getting Started",
-          "pages": ["products/sce/getting-started/about", "products/sce/quickstart", "products/sce/quickstart-api"]
+          "pages": [
+            "products/sce/getting-started/about",
+            "products/sce/getting-started/quickstart",
+            "products/sce/quickstart-api"
+          ]
         },
         {
           "group": "Container Groups",
@@ -76,7 +83,10 @@
             },
             {
               "group": "Billing and Pricing",
-              "pages": ["products/sce/billing", "products/sce/priority-pricing"]
+              "pages": [
+                "products/sce/billing",
+                "products/sce/priority-pricing"
+              ]
             },
             "products/sce/specifying-a-command",
             "products/sce/disk-space",
@@ -130,7 +140,9 @@
     },
     {
       "group": "S4 - SaladCloud Simple Storage Service",
-      "pages": ["products/s4/salad-simple-storage-service"]
+      "pages": [
+        "products/s4/salad-simple-storage-service"
+      ]
     },
     {
       "group": "Recipes",
@@ -359,13 +371,18 @@
             },
             {
               "group": "SCE",
-              "pages": ["guides/transcription/sce/youtube"]
+              "pages": [
+                "guides/transcription/sce/youtube"
+              ]
             }
           ]
         },
         {
           "group": "Text To Speech",
-          "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+          "pages": [
+            "guides/text-to-speech/metavoice-tts-api",
+            "guides/text-to-speech/openvoice-api"
+          ]
         }
       ]
     }
@@ -522,6 +539,10 @@
     {
       "source": "/products/sce/getting-started-with-SaladCloud",
       "destination": "/products/sce/getting-started/about"
+    },
+    {
+      "source": "/products/sce/quickstart",
+      "destination": "/products/sce/getting-started/quickstart"
     }
   ]
 }
