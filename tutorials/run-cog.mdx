@@ -250,7 +250,7 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-The provided [command and its arguments](https://docs.salad.com/products/sce/specifying-a-command) override both the
+The provided [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command) override both the
 ENTRYPOINT and CMD of the original image, ensuring that the original first command 'python -m cog.server.http' is run
 only after the Cog HTTP prediction server code has been successfully modified to listen on an IPv6 port.
 
@@ -351,7 +351,7 @@ Success Threshold: 1
 Failure Threshold: 3
 ```
 
-Because the [command and its arguments](https://docs.salad.com/products/sce/specifying-a-command) override both the
+Because the [command and its arguments](https://docs.salad.com/products/sce/container-groups/specifying-a-command) override both the
 ENTRYPOINT and CMD of the original image, we need to specify ‘/sbin/tini’ for the ENTRYPOINT and the other four
 arguments for the CMD, as parameters of ‘/sbin/tini’. This ensures that Tini is still used as the init process within
 the container, and the original command 'python -m cog.server.http' is run only after the Cog HTTP prediction server

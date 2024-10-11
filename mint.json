@@ -88,12 +88,12 @@
                 "products/sce/container-groups/billing-and-pricing/priority-pricing"
               ]
             },
-            "products/sce/specifying-a-command",
-            "products/sce/disk-space",
-            "products/sce/workload-logs",
-            "products/sce/container-logs",
-            "products/sce/quotas",
-            "products/sce/faqs"
+            "products/sce/container-groups/specifying-a-command",
+            "products/sce/container-groups/disk-space",
+            "products/sce/container-groups/workload-logs",
+            "products/sce/container-groups/container-logs",
+            "products/sce/container-groups/quotas",
+            "products/sce/container-groups/faqs"
           ]
         },
         {
@@ -663,6 +663,30 @@
     {
       "source": "/products/sce/priority-pricing",
       "destination": "/products/sce/container-groups/billing-and-pricing/priority-pricing"
+    },
+    {
+      "source": "/products/sce/specifying-a-command",
+      "destination": "/products/sce/container-groups/specifying-a-command"
+    },
+    {
+      "source": "/products/sce/disk-space",
+      "destination": "/products/sce/container-groups/disk-space"
+    },
+    {
+      "source": "/products/sce/workload-logs",
+      "destination": "/products/sce/container-groups/workload-logs"
+    },
+    {
+      "source": "/products/sce/container-logs",
+      "destination": "/products/sce/container-groups/container-logs"
+    },
+    {
+      "source": "/products/sce/quotas",
+      "destination": "/products/sce/container-groups/quotas"
+    },
+    {
+      "source": "/products/sce/faqs",
+      "destination": "/products/sce/container-groups/faqs"
     }
   ]
 }
