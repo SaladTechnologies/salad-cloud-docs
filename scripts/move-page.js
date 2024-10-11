@@ -48,6 +48,7 @@ const mint = require('../mint.json')
 
 // Move the page
 fs.renameSync(src, dest)
+console.log(`Moved ${src} to ${dest}`)
 
 // Add the redirect
 mint.redirects.push({
@@ -78,3 +79,25 @@ function updateNavigation(navigation, updated = []) {
 mint.navigation = updateNavigation(mint.navigation)
 
 fs.writeFileSync('mint.json', JSON.stringify(mint, null, 2))
+console.log(`Updated mint.json`)
+
+console.log('updating all links in .mdx files')
+// Update all links in .mdx files, recursively
+function updateLinks(directory) {
+    for (const file of fs.readdirSync(directory, { withFileTypes: true })) {
+        const filePath = path.join(directory, file.name)
+        if (file.isDirectory()) {
+            updateLinks(filePath)
+        } else if (file.name.endsWith('.mdx')) {
+            const content = fs.readFileSync(filePath, 'utf8')
+            if (!content.includes(srcPath)) {
+                continue
+            }
+            console.log(`Updating links in ${filePath}`)
+            const updated = content.replace(new RegExp(srcPath, 'g'), destPath)
+            fs.writeFileSync(filePath, updated)
+            console.log(`Updated links in ${filePath}`)
+        }
+    }
+}
+updateLinks('.')
