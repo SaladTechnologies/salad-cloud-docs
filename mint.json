@@ -65,11 +65,11 @@
             {
               "group": "Health Probes",
               "pages": [
-                "products/sce/health-probes",
-                "products/sce/health-probes/startup-probes",
-                "products/sce/health-probes/liveness-probes",
-                "products/sce/health-probes/readiness-probes",
-                "products/sce/health-probes/health-probe-examples"
+                "products/sce/container-groups/health-probes/health-probes",
+                "products/sce/container-groups/health-probes/startup-probes",
+                "products/sce/container-groups/health-probes/liveness-probes",
+                "products/sce/container-groups/health-probes/readiness-probes",
+                "products/sce/container-groups/health-probes/health-probe-examples"
               ]
             },
             {
@@ -619,6 +619,26 @@
     {
       "source": "/products/sce/external-logging",
       "destination": "/products/sce/container-groups/external-logging/external-logging"
+    },
+    {
+      "source": "/products/sce/health-probes/health-probe-examples",
+      "destination": "/products/sce/container-groups/health-probes/health-probe-examples"
+    },
+    {
+      "source": "/products/sce/health-probes/liveness-probes",
+      "destination": "/products/sce/container-groups/health-probes/liveness-probes"
+    },
+    {
+      "source": "/products/sce/health-probes/readiness-probes",
+      "destination": "/products/sce/container-groups/health-probes/readiness-probes"
+    },
+    {
+      "source": "/products/sce/health-probes/startup-probes",
+      "destination": "/products/sce/container-groups/health-probes/startup-probes"
+    },
+    {
+      "source": "/products/sce/health-probes",
+      "destination": "/products/sce/container-groups/health-probes/health-probes"
     }
   ]
 }

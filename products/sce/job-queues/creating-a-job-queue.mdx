@@ -30,7 +30,7 @@ Enter the Port and Path of your application that you identified during the
 jobs sent to the Queue Worker so that it knows where to post them to the application running inside the deployed
 container.
 
-**We also recommend adding a [readiness probe](/products/sce/health-probes/readiness-probes) to your container
+**We also recommend adding a [readiness probe](/products/sce/container-groups/health-probes/readiness-probes) to your container
 deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to receive and
 process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run after a
 startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to look for

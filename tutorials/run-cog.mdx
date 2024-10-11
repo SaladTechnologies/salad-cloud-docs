@@ -257,7 +257,7 @@ only after the Cog HTTP prediction server code has been successfully modified to
 <img src="/products/sce/images/runcog/runcog1.png" />
 
 The Readiness Probe evaluates whether a container is ready to accept the traffic from the load balancer. Specifically,
-[the HTTP/1.X probe](https://docs.salad.com/products/sce/health-probes#http-1-x-protocol) checks the health of an HTTP
+[the HTTP/1.X probe](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#http-1-x-protocol) checks the health of an HTTP
 service running inside the container by sending an HTTP GET request and checking the response code.
 
 For the Cog HTTP prediction server in this BLIP image, it will be ready to answer requests only after downloading and
@@ -362,7 +362,7 @@ code has been successfully modified to listen on an IPv6 port.
 The Cog HTTP prediction server in this Whisper image provides a dedicated ‘/health-check’ endpoint and an operation
 function for health checks, indicating different running statuses (STARTING, READY, BUSY and FAILED) within the server.
 
-The Readiness Probe with [the protocol - exec](https://docs.salad.com/products/sce/health-probes#exec-protocol), will
+The Readiness Probe with [the protocol - exec](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes#exec-protocol), will
 run the given command inside the container, if the command returns an exit code of 0 ( by using ‘echo $?’ ), the
 container is considered in a healthy state. Any other exit codes indicate the container is not ready yet.
 

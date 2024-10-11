@@ -418,11 +418,11 @@ contain only the status and metadata.
 
 ### Health Probes
 
-[Health probes](/products/sce/health-probes) offer an automated mechanism to initiate specific actions based on the
+[Health probes](/products/sce/container-groups/health-probes/health-probes) offer an automated mechanism to initiate specific actions based on the
 status of containers within a container group. **You can think of a probe as a piece of code running alongside the
 inference server within the same container, allowing it to access the service locally or the shared file system**.
 
-[Readiness probes](/products/sce/health-probes/readiness-probes) are essential when deploying a container gateway, as
+[Readiness probes](/products/sce/container-groups/health-probes/readiness-probes) are essential when deploying a container gateway, as
 they ensure that requests are only forwarded to an instance when it is fully prepared—for example, when the model has
 been loaded and warmed up.
 
@@ -452,7 +452,7 @@ Failure Threshold: 3
 
 <img src="/tutorials/images/docker_run/docker_run19.png" />
 
-You can also use the [exec protocol](/products/sce/health-probes#exec-protocol) to create a custom script for the
+You can also use the [exec protocol](/products/sce/container-groups/health-probes/health-probes#exec-protocol) to create a custom script for the
 readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the
