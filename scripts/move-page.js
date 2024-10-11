@@ -60,10 +60,10 @@ mint.redirects.push({
  * of either strings or objects with group and pages.
  * */
 function updateNavigation(navigation, updated = []) {
-    for (let item of navigation) {
+    for (const item of navigation) {
         if (typeof item === 'string') {
-            if (item === srcPath) {
-                updated.push(destPath)
+            if (item === srcName) {
+                updated.push(destName)
             } else {
                 updated.push(item)
             }
@@ -73,7 +73,6 @@ function updateNavigation(navigation, updated = []) {
             updated.push(group)
         }
     }
-
     return updated
 }
 mint.navigation = updateNavigation(mint.navigation)
