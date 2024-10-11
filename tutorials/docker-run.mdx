@@ -95,7 +95,7 @@ result.
 
 The code constructs the URL as follows:
 
-- If the environment variable HOST is set to **'::'**, the host in the URL becomes **[::1]** for IPv6.
+- If the environment variable HOST is set to **'::'**, the host in the URL becomes `[::1]` for IPv6.
 - Otherwise (**'0.0.0.0'**), it defaults to **127.0.0.1** for IPv4.
 
 The logic above illustrates how to explicitly call a service using either **IPv4 (127.0.0.1)** or **IPv6 (::1)**. For
@@ -197,9 +197,10 @@ storage or job queues or APIs, for your containers running on SaladCloud.
 
 One container group can run only one container image at this moment.
 
-Ensure the repository, image name and tag are all correct in [the Image Source](/products/sce/container-registries). If
-the container image is from a private repository, you will need to provide both the username and access token. These
-credentials will be used by SaladCloud to pull the image.
+Ensure the repository, image name and tag are all correct in
+[the Image Source](/products/sce/container-groups/registries/container-registries). If the container image is from a
+private repository, you will need to provide both the username and access token. These credentials will be used by
+SaladCloud to pull the image.
 
 <img src="/tutorials/images/docker_run/docker_run4.png" />
 
@@ -208,9 +209,9 @@ image will be delivered to the SaladCloud nodes running your instances. When the
 SaladCloud nodes will be released and the images on these nodes will be also removed.
 
 If your image has changed since the container group was created, you will need to
-[update the image source](/products/sce/container-groups/managing-deployments#editing-your-container-group-deployment) to run the new
-version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull the latest
-image.
+[update the image source](/products/sce/container-groups/managing-deployments#editing-your-container-group-deployment)
+to run the new version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull
+the latest image.
 
 **We strongly recommend updating the image name or tag whenever it changes.** This practice helps minimize confusion and
 ensures a smoother transition from local testing to deployment on SaladCloud.
@@ -455,7 +456,7 @@ You can also use the [exec protocol](/products/sce/health-probes#exec-protocol) 
 readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the
-response from accessing **http://[::1]:5000/health-check** contains **'READY'**, the Python script returns zero,
+response from accessing `http://[::1]:5000/health-check` contains **'READY'**, the Python script returns zero,
 indicating a successful probe. Otherwise, the probe is deemed failed.
 
 This probe is more advanced, as it checks not only the HTTP status code, but also the semantics of the response.

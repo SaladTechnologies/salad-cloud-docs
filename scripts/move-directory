@@ -28,3 +28,6 @@ for file in $src/*; do
     filename=$(basename $file)
     node scripts/move-page.js $file $dest/$filename
 done
+
+# Remove the source directory
+rm -r $src

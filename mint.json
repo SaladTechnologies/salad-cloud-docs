@@ -14,10 +14,7 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": [
-        "products/documentation",
-        "products/quickstart"
-      ]
+      "pages": ["products/documentation", "products/quickstart"]
     },
     {
       "group": "Container Engine",
@@ -41,13 +38,13 @@
             {
               "group": "Container Registries",
               "pages": [
-                "products/sce/container-registries",
-                "products/sce/registries/dockerhub",
-                "products/sce/registries/aws-ecr",
-                "products/sce/registries/azure-acr",
-                "products/sce/registries/gcp-gcr",
-                "products/sce/registries/quay",
-                "products/sce/registries/github-ghcr"
+                "products/sce/container-groups/registries/container-registries",
+                "products/sce/container-groups/registries/dockerhub",
+                "products/sce/container-groups/registries/aws-ecr",
+                "products/sce/container-groups/registries/azure-acr",
+                "products/sce/container-groups/registries/gcp-gcr",
+                "products/sce/container-groups/registries/quay",
+                "products/sce/container-groups/registries/github-ghcr"
               ]
             },
             {
@@ -83,10 +80,7 @@
             },
             {
               "group": "Billing and Pricing",
-              "pages": [
-                "products/sce/billing",
-                "products/sce/priority-pricing"
-              ]
+              "pages": ["products/sce/billing", "products/sce/priority-pricing"]
             },
             "products/sce/specifying-a-command",
             "products/sce/disk-space",
@@ -140,9 +134,7 @@
     },
     {
       "group": "S4 - SaladCloud Simple Storage Service",
-      "pages": [
-        "products/s4/salad-simple-storage-service"
-      ]
+      "pages": ["products/s4/salad-simple-storage-service"]
     },
     {
       "group": "Recipes",
@@ -371,18 +363,13 @@
             },
             {
               "group": "SCE",
-              "pages": [
-                "guides/transcription/sce/youtube"
-              ]
+              "pages": ["guides/transcription/sce/youtube"]
             }
           ]
         },
         {
           "group": "Text To Speech",
-          "pages": [
-            "guides/text-to-speech/metavoice-tts-api",
-            "guides/text-to-speech/openvoice-api"
-          ]
+          "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
         }
       ]
     }
@@ -563,6 +550,34 @@
     {
       "source": "/products/sce/environment-variables",
       "destination": "/products/sce/container-groups/environment-variables"
+    },
+    {
+      "source": "/products/sce/registries/aws-ecr",
+      "destination": "/products/sce/container-groups/registries/aws-ecr"
+    },
+    {
+      "source": "/products/sce/registries/azure-acr",
+      "destination": "/products/sce/container-groups/registries/azure-acr"
+    },
+    {
+      "source": "/products/sce/registries/dockerhub",
+      "destination": "/products/sce/container-groups/registries/dockerhub"
+    },
+    {
+      "source": "/products/sce/registries/gcp-gcr",
+      "destination": "/products/sce/container-groups/registries/gcp-gcr"
+    },
+    {
+      "source": "/products/sce/registries/github-ghcr",
+      "destination": "/products/sce/container-groups/registries/github-ghcr"
+    },
+    {
+      "source": "/products/sce/registries/quay",
+      "destination": "/products/sce/container-groups/registries/quay"
+    },
+    {
+      "source": "/products/sce/container-registries",
+      "destination": "/products/sce/container-groups/registries/container-registries"
     }
   ]
 }
