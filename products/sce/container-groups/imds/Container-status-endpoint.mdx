@@ -11,7 +11,8 @@ check whether the container is ready, and start a bash script when it is.
 We'll start by using the IMDS SDK to retrieve the statuses of the currently running container.
 
 <CodeGroup>
-```python Python
+
+```python
 from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
 
 sdk = SaladCloudImdsSdk( base_url=Environment.DEFAULT.value, timeout=10000 )
@@ -20,8 +21,9 @@ result = sdk.metadata.get_container_status()
 
 print(result)
 
-````
-```c# C#
+```
+
+```c#
 using Salad.Cloud.IMDS.SDK;
 
 var client = new SaladCloudImdsSdkClient();
@@ -30,9 +32,9 @@ var response = await client.Metadata.GetContainerStatusAsync();
 
 Console.WriteLine(response);
 
-````
+```
 
-```go Go
+```go
 import (
   "fmt"
   "encoding/json"
@@ -51,7 +53,7 @@ if err != nil {
 fmt.Print(response)
 ```
 
-```java Java
+```java
 import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
 import com.salad.cloud.imdssdk.models.ContainerStatus;
 
@@ -67,7 +69,7 @@ public class Main {
 }
 ```
 
-```typescript TypeScript
+```typescript
 import { SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk'
 ;(async () => {
   const saladCloudImdsSdk = new SaladCloudImdsSdk({})
@@ -78,7 +80,7 @@ import { SaladCloudImdsSdk } from '@saladtechnologies-oss/salad-cloud-imds-sdk'
 })()
 ```
 
-```php PHP
+```php
 <?php
 
 $curl = curl_init();
@@ -108,7 +110,7 @@ if ($err) {
 </CodeGroup>
 Now, if we run this on a container that has passed its [startup probe](https://docs.salad.com/container-engine/health-probes/startup-probes), but not completed its [readiness probe](https://docs.salad.com/container-engine/health-probes/readiness-probes), we'll see this:
 
-```
+```json
 {
   "ready": false,
   "started": true
@@ -119,7 +121,7 @@ Now, if we run this on a container that has passed its [startup probe](https://d
 
 Now we know the status of the container, we can use this to start a bash script when it reaches a ready state.
 
-```python Python
+```python
 import json
 from subprocess import call
 from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment

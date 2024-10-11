@@ -60,7 +60,7 @@ ubuntu@asus:~$ docker run --rm --gpus all -it r8.im/salesforce/blip:latest cat /
 After locating the server code file named “http.py”, we simply need to execute an additional command ‘sed’ to modify the
 code for IPv6 by replacing ‘0.0.0.0’ with ‘::’.
 
-```
+```shell
 sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.8.13/lib/python3.8/site-packages/cog/server/http.py
 ```
 
@@ -106,8 +106,8 @@ INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 
 ubuntu@asus:~$ docker ps
 
-CONTAINER ID   IMAGE                  COMMAND                  CREATED              STATUS              PORTS                    NAMES
-9397ce073a7e   r8.im/openai/whisper   "/sbin/tini -- pytho…"   About a minute ago   Up About a minute   0.0.0.0:5000->5000/tcp   awesome_hawking
+CONTAINER ID   IMAGE                  COMMAND                     CREATED              STATUS              PORTS                    NAMES
+9397ce073a7e   r8.im/openai/whisper   "/sbin/tini -- python..."   About a minute ago   Up About a minute   0.0.0.0:5000->5000/tcp   awesome_hawking
 
 # Open a new terminal and run 'ps -ef' within the container.
 
@@ -231,11 +231,11 @@ Any GPU types with 12 GB or more VRAM
 
 Command:   sh
 Argument1: -c
-Arugment2: sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.8.13/lib/python3.8/site-packages/cog/server/http.py && python -m cog.server.http
+Argument2: sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.8.13/lib/python3.8/site-packages/cog/server/http.py && python -m cog.server.http
 
 # Container Gateway
 
-Enbaled, Port 5000
+Enabled, Port 5000
 
 # Readiness Probe
 
@@ -331,11 +331,11 @@ Command:   /sbin/tini
 Argument1: --
 Argument2: sh
 Argument3: -c
-Arugment4: sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.11.4/lib/python3.11/site-packages/cog/server/http.py && python -m cog.server.http
+Argument4: sed -i 's/0.0.0.0/::/g' /root/.pyenv/versions/3.11.4/lib/python3.11/site-packages/cog/server/http.py && python -m cog.server.http
 
 # Container Gateway
 
-Enbaled, Port 5000
+Enabled, Port 5000
 
 # Readiness Probe
 
@@ -445,7 +445,7 @@ Any GPU types with 12 GB or more VRAM
 
 # Container Gateway
 
-Enbaled, Port 5000
+Enabled, Port 5000
 
 # Readiness Probe
 
@@ -563,7 +563,7 @@ Any GPU types with 12 GB or more VRAM
 
 # Container Gateway
 
-Enbaled, Port 8888
+Enabled, Port 8888
 
 # Readiness Probe
 
