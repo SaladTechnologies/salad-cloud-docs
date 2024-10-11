@@ -94,21 +94,21 @@ Each probe can be in 1 of 3 states:
 
 ### Successful Startup Probe
 
-<img src="/products/sce/images/c651b89-Startup_Success.png" />
+<img src="/products/sce/container-groups/health-probes/images/startup-success.png" />
 
 ### Failed Startup Probe
 
-<img src="/products/sce/images/1046446-Startup_Failure.png" />
+<img src="/products/sce/container-groups/health-probes/images/startup-failure.png" />
 
 ## Liveness Probe
 
 ### Successful Liveness Probe
 
-<img src="/products/sce/images/67f4869-Liveness_Recovers.png" />
+<img src="/products/sce/container-groups/health-probes/images/liveness-success.png" />
 
 ### Failed Liveness Probe
 
-<img src="/products/sce/images/05e66d5-Liveness_Failure.png" />
+<img src="/products/sce/container-groups/health-probes/images/liveness-failure.png" />
 
 ## Readiness Probe
 
@@ -116,11 +116,11 @@ Each probe can be in 1 of 3 states:
 
 <br />
 
-<img src="/products/sce/images/bca39c9-image.png" />
+<img src="/products/sce/container-groups/health-probes/images/readiness-success.png" />
 
 ### Failed Readiness Probe
 
-<img src="/products/sce/images/2a724dc-image.png" />
+<img src="/products/sce/container-groups/health-probes/images/readiness-failure.png" />
 
 <br />
 
@@ -131,7 +131,7 @@ Each probe can be in 1 of 3 states:
 Each of these probes can be configured from the container group configuration page by clicking the edit button beside
 each probe section.
 
-<img src="/products/sce/images/74f4654-image.png" />
+<img src="/products/sce/container-groups/health-probes/images/portal-edit-probes.png" />
 
 # Probe Configuration
 
@@ -140,14 +140,14 @@ SaladCloud provides comprehensive protocol support, including `exec`, `gRPC`, `T
 To perform a probe, SaladCloud executes the command you specify in the target container. To configure a command, press
 the Edit link as shown below.
 
-<img src="/products/sce/images/14265c8-image.png" />
+<img src="/products/sce/container-groups/health-probes/images/startup-exec-edit-command.png" />
 
 Configure the command and any additional arguments. In this example, the container will attempt to read a file located
 at `/tmp/healthy` exactly `Initial Delay Seconds` after startup. If it successfully executes the command within
 `Timeout Seconds`, the probe returns an exit code 0. Once this has happened `Success Threshold` times, the Startup probe
 is 'done' and the Liveness and Readiness probes (if configured) are initiated.
 
-<img src="/products/sce/images/a58f6be-image.png" />
+<img src="/products/sce/container-groups/health-probes/images/startup-exec-config-command.png" />
 
 ## Standard Probe Properties
 
