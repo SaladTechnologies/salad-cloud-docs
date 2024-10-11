@@ -1,0 +1,30 @@
+#! /usr/bin/bash
+
+usage="Usage: $0 <source> <destination>"
+
+src=$1
+dest=$2
+
+if [ -z $src ] || [ -z $dest ]; then
+    echo $usage
+    exit 1
+fi
+
+if [ ! -d $src ]; then
+    echo "Source directory does not exist"
+    exit 1
+fi
+
+if [ -d $dest ]; then
+    echo "Destination directory already exists"
+    exit 1
+fi
+
+# Make the destination directory if it doesn't exist
+mkdir -p $dest
+
+# For each file in the directory, run node scrips/move-page.js <source> <destination>
+for file in $src/*; do
+    filename=$(basename $file)
+    node scripts/move-page.js $file $dest/$filename
+done
