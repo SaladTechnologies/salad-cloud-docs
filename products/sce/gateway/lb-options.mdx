@@ -51,20 +51,15 @@ establish multiple connections per instance and forward concurrent requests to t
 capable of handling multiple requests simultaneously, including a local queue, non-blocking I/O and the back-pressure
 mechanism.
 
-**When the option - “Limit each server to a single, active connection” is selected**, there are two possible cases:
+**When the option - “Limit each server to a single, active connection” is selected**, the container gateway will use a
+single active connection per instance and only forwards one request at a time to an instance, even when using HTTP/2
+multiplexing. **New requests are waiting and queued by the container gateway until the current one is processed and a
+response is returned by the instance.** This configuration ensures that an instance receives and processes only one
+request at any time, with a WebSocket connection treated as a single request.
 
-**- For servers using HTTP/1.1**, the container gateway will use a single active connection per instance and only
-forwards one request at a time to an instance. **New requests are waiting and queued by the container gateway until the
-current one is processed and a response is returned by the instance.** This configuration ensures that an instance
-receives and processes only one request at any time, with a WebSocket connection treated as a single request.
-
-**- For servers using HTTP/2**, the container gateway will use a single active connection per instance, but it can still
-send concurrent requests to an instance because of HTTP/2’s multiplexing capabilities. So, the servers need to handle
-multiple requests simultaneously.
-
-For single inference tasks, such as generating an image at a time, and using HTTP/1.1, choosing this option can
-significantly simplify the implementation of the inference server by using synchronous calls. **Otherwise, this option
-will reduce system throughput and should be avoided.**
+For single inference tasks, such as generating an image at a time, choosing this option can significantly simplify the
+implementation of the inference server by using synchronous calls. **Otherwise, this option will reduce system
+throughput and should be avoided.**
 
 # Client Request Timeout
 
@@ -72,12 +67,11 @@ This setting (millisecond) determines how long a request can be waiting and queu
 sent, after which a timeout error is returned to the client. The default is **100 seconds** (or 100000 milliseconds),
 which is the maximum allowable waiting time for queued requests.
 
-**When a container gateway is configured to use multiple connections per instance or multiple streams with HTTP/2, this
-setting can be ignored**, as all requests are sent to the instance immediately and would be queued by the inference
-server.
+**When a container gateway is configured to use multiple connections per instance, this setting can be ignored**, as all
+requests are sent to the instance immediately and would be queued by the inference server.
 
-**However, if a container gateway is configured to use a single active connection per instance and for HTTP/1.1 servers,
-the setting is crucial in influencing the system behavior:**
+**However, if a container gateway is configured to use a single active connection per instance, the setting is crucial
+in influencing the system behavior:**
 
 - **If set too low, the system may struggle to handle burst traffic.**
 - **If set too high, it could result in longer waiting times on the client side.**
