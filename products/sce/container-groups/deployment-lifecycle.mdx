@@ -1,0 +1,73 @@
+---
+title: 'The Deployment Lifecycle'
+---
+
+The status of container groups and individual instances changes over the lifecycle of a deployment. This page clarifies
+the associated terminology and statuses.
+
+**Container Groups:** Container groups are groups of one or more instances of your container image. These are similar to
+a Kubernetes ReplicaSet.
+
+- **Preparing:** A Preparing (or pending) deployment is undergoing initial processing that needs to occur before the
+  deployment can be started. The required processing depends on if the container image has been previously stored and
+  whether or not it is from a private registry. Depending on the size of the container image, this preparation can take
+  some time. The stages are:
+  - **Pulling** the image from the repository.
+  - **Compressing** the image for faster transmission.
+  - **Storing** the result for distribution.
+- **Stopped:** The container group is prepared, but is either not yet running or has been stopped. Note that presently,
+  individual instances can still be running even after the container group is stopped while the stop message propagates
+  through the network.
+- **Deploying:** The deployment has been started, but no instances are currently running.
+- **Running:** The container has been started and at least one instance is running.
+- **Failed:** A container group can only fail if there was a problem in the Preparing process, either:
+  - **Failed** to pull if we were not able to pull the image from the repository. This could indicate an issue with the
+    provided image name, or a transient issue with the registry. Check the provided image and try again.
+  - **Failed to authenticate** if we could not authenticate to the registry. Check and correct the authentication
+    details and try again.
+  - **Failed to store or compress** indicate a rare problem preparing at the state.
+
+**Instances:** Instances are an assignment of your container to a SaladCloud node. Instances have separate status from
+the container group they are a part of. While deploying on SaladCloud is usually quick, it can occasionally take 20
+minutes or more to get your containers up and running. **You are only charged for an instance once it reaches Running
+state.**
+
+- **Allocating:** Instances are allocating when we are looking for a node to assign your deployment. If all instances
+  show allocating for an extended time it indicates that either that instances are failing to create or that there are
+  not currently nodes available with the requested properties.
+- **Downloading:** Downloading indicates that a node has been assigned to your workload and is downloading the container
+  image.
+- **Creating:** The assigned node is preparing your deployment and starting the container image. If an instance is stuck
+  creating you can **reallocate** your workload to another node.
+- **Running:** Running indicates the container has been started. Depending on your container, additional time may be
+  needed before it is ready for Container Gateway (inbound networking) requests, e.g. to run startup scripts or download
+  models. Health Probes can be configured to account for this. Note that
+  [Billing](/products/sce/container-groups/billing-and-pricing/billing) is usage-based on usage and only starts once a
+  container is running. Running containers can be reallocated, recreated, or restarted.
+- **Stopping:** Indicates that a stop signal has been sent to your container instance. It can take up to several minutes
+  for your container to stop while the signal propagates through the network.
+
+**Replicas:** Replicas are the desired number of instances for your container group. While running, you can edit the
+desired replica count for your deployment.
+
+- For enhanced reliability and smoother operation, we strongly recommend deploying with a minimum of 2 replicas. This
+  ensures your applications remain resilient and maintain performance, even if a node becomes temporarily unavailable.
+  Scaling beyond a single node not only increases fault tolerance but also optimizes resource allocation and load
+  balancing across our distributed cloud infrastructure. Start with 2 or more replicas to unlock the full potential of
+  our platform and experience seamless scaling and improved uptime for your containers.
+
+# Commonly asked questions
+
+### My instance is stuck at 99% creating, help!
+
+Downloading and Creating instance statuses are estimated based on average download and setup times. If your instance is
+taking longer than expected to get set up, it will appear to hang at 99% creating. In this case, it is likely
+downloading or unpacking more slowly than expected. If the node continues to underperform, it will automatically be
+reallocated - there's nothing you need to do in this case but wait. You may attempt a manual reallocation, but note that
+this will cause the process to start over from the allocating step.
+
+### My container group is running, but my instances are not. Am I being charged?
+
+No. You are only charged for instances that are in a **running** state. If you had a container group that reached a
+running state, then you reallocate the instances, the container group would still show as running, even though no
+instances are running at the moment. In that case, you would not be charged until an instance began running again.

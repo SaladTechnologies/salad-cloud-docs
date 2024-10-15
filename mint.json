@@ -19,75 +19,78 @@
     {
       "group": "Container Engine",
       "pages": [
+        "products/sce/salad-container-engine",
         {
           "group": "Getting Started",
           "pages": [
-            "products/sce/getting-started-with-SaladCloud",
-            "products/sce/quickstart",
-            "products/sce/quickstart-api"
+            "products/sce/getting-started/about",
+            "products/sce/getting-started/quickstart",
+            "products/sce/getting-started/quickstart-api"
           ]
         },
         {
           "group": "Container Groups",
           "pages": [
-            "products/sce/containers",
-            "products/sce/salad-container-engine",
-            "products/sce/deployment-lifecycle",
-            "products/sce/managing-deployments",
-            "products/sce/environment-variables",
+            "products/sce/container-groups/container-groups",
+            "products/sce/container-groups/deployment-lifecycle",
+            "products/sce/container-groups/managing-deployments",
+            "products/sce/container-groups/environment-variables",
             {
               "group": "Container Registries",
               "pages": [
-                "products/sce/container-registries",
-                "products/sce/registries/dockerhub",
-                "products/sce/registries/aws-ecr",
-                "products/sce/registries/azure-acr",
-                "products/sce/registries/gcp-gcr",
-                "products/sce/registries/quay",
-                "products/sce/registries/github-ghcr"
+                "products/sce/container-groups/registries/container-registries",
+                "products/sce/container-groups/registries/dockerhub",
+                "products/sce/container-groups/registries/aws-ecr",
+                "products/sce/container-groups/registries/azure-acr",
+                "products/sce/container-groups/registries/gcp-gcr",
+                "products/sce/container-groups/registries/quay",
+                "products/sce/container-groups/registries/github-ghcr"
               ]
             },
             {
               "group": "External Logging",
               "pages": [
-                "products/sce/external-logging",
-                "products/sce/external-logging/axiom",
-                "products/sce/external-logging/new-relic",
-                "products/sce/external-logging/splunk-logging",
-                "products/sce/external-logging/tcp-logging",
-                "products/sce/external-logging/datadog",
-                "products/sce/external-logging/http"
+                "products/sce/container-groups/external-logging/external-logging",
+                "products/sce/container-groups/external-logging/axiom",
+                "products/sce/container-groups/external-logging/new-relic",
+                "products/sce/container-groups/external-logging/splunk-logging",
+                "products/sce/container-groups/external-logging/tcp-logging",
+                "products/sce/container-groups/external-logging/datadog",
+                "products/sce/container-groups/external-logging/http"
               ]
             },
             {
               "group": "Health Probes",
               "pages": [
-                "products/sce/health-probes",
-                "products/sce/health-probes/startup-probes",
-                "products/sce/health-probes/liveness-probes",
-                "products/sce/health-probes/readiness-probes",
-                "products/sce/health-probes/health-probe-examples"
+                "products/sce/container-groups/health-probes/health-probes",
+                "products/sce/container-groups/health-probes/startup-probes",
+                "products/sce/container-groups/health-probes/liveness-probes",
+                "products/sce/container-groups/health-probes/readiness-probes",
+                "products/sce/container-groups/health-probes/health-probe-examples"
               ]
             },
             {
               "group": "Instance Metadata Service (IMDS)",
               "pages": [
-                "products/sce/imds/introduction",
-                "products/sce/imds/Container-status-endpoint",
-                "products/sce/imds/obtaining-an-imds-jwt",
-                "products/sce/imds/imds-reallocate"
+                "products/sce/container-groups/imds/introduction",
+                "products/sce/container-groups/imds/Container-status-endpoint",
+                "products/sce/container-groups/imds/obtaining-an-imds-jwt",
+                "products/sce/container-groups/imds/imds-reallocate"
               ]
             },
             {
               "group": "Billing and Pricing",
-              "pages": ["products/sce/billing", "products/sce/priority-pricing"]
+              "pages": [
+                "products/sce/container-groups/billing-and-pricing/billing",
+                "products/sce/container-groups/billing-and-pricing/priority-pricing"
+              ]
             },
-            "products/sce/specifying-a-command",
-            "products/sce/disk-space",
-            "products/sce/workload-logs",
-            "products/sce/container-logs",
-            "products/sce/quotas",
-            "products/sce/faqs"
+            "products/sce/container-groups/specifying-a-command",
+            "products/sce/container-groups/disk-space",
+            "products/sce/container-groups/workload-logs",
+            "products/sce/container-groups/container-logs",
+            "products/sce/container-groups/quotas",
+            "products/sce/container-groups/faqs"
           ]
         },
         {
@@ -96,7 +99,7 @@
             "products/sce/networking",
             "products/sce/gateway/enabling-ipv6",
             "products/sce/gateway/sending-requests",
-            "products/sce/gateway/lb-options",
+            "products/sce/gateway/load-balancer-options",
             "products/sce/gateway/websockets",
             "products/sce/gateway/error-pages"
           ]
@@ -104,7 +107,7 @@
         {
           "group": "Job Queues",
           "pages": [
-            "products/sce/job-queues",
+            "products/sce/job-queues/job-queues",
             "products/sce/job-queues/creating-a-job-queue",
             "products/sce/job-queues/queue-worker",
             "products/sce/job-queues/using-queues"
@@ -523,6 +526,166 @@
     {
       "source": "/products/sce/getting-started-with-saladcloud",
       "destination": "/products/sce/getting-started-with-SaladCloud"
+    },
+    {
+      "source": "/products/sce/getting-started-with-SaladCloud",
+      "destination": "/products/sce/getting-started/about"
+    },
+    {
+      "source": "/products/sce/quickstart",
+      "destination": "/products/sce/getting-started/quickstart"
+    },
+    {
+      "source": "/products/sce/quickstart-api",
+      "destination": "/products/sce/getting-started/quickstart-api"
+    },
+    {
+      "source": "/products/sce/containers",
+      "destination": "/products/sce/container-groups/container-groups"
+    },
+    {
+      "source": "/products/sce/deployment-lifecycle",
+      "destination": "/products/sce/container-groups/deployment-lifecycle"
+    },
+    {
+      "source": "/products/sce/managing-deployments",
+      "destination": "/products/sce/container-groups/managing-deployments"
+    },
+    {
+      "source": "/products/sce/environment-variables",
+      "destination": "/products/sce/container-groups/environment-variables"
+    },
+    {
+      "source": "/products/sce/registries/aws-ecr",
+      "destination": "/products/sce/container-groups/registries/aws-ecr"
+    },
+    {
+      "source": "/products/sce/registries/azure-acr",
+      "destination": "/products/sce/container-groups/registries/azure-acr"
+    },
+    {
+      "source": "/products/sce/registries/dockerhub",
+      "destination": "/products/sce/container-groups/registries/dockerhub"
+    },
+    {
+      "source": "/products/sce/registries/gcp-gcr",
+      "destination": "/products/sce/container-groups/registries/gcp-gcr"
+    },
+    {
+      "source": "/products/sce/registries/github-ghcr",
+      "destination": "/products/sce/container-groups/registries/github-ghcr"
+    },
+    {
+      "source": "/products/sce/registries/quay",
+      "destination": "/products/sce/container-groups/registries/quay"
+    },
+    {
+      "source": "/products/sce/container-registries",
+      "destination": "/products/sce/container-groups/registries/container-registries"
+    },
+    {
+      "source": "/products/sce/external-logging/axiom",
+      "destination": "/products/sce/container-groups/external-logging/axiom"
+    },
+    {
+      "source": "/products/sce/external-logging/datadog",
+      "destination": "/products/sce/container-groups/external-logging/datadog"
+    },
+    {
+      "source": "/products/sce/external-logging/http",
+      "destination": "/products/sce/container-groups/external-logging/http"
+    },
+    {
+      "source": "/products/sce/external-logging/new-relic",
+      "destination": "/products/sce/container-groups/external-logging/new-relic"
+    },
+    {
+      "source": "/products/sce/external-logging/splunk-logging",
+      "destination": "/products/sce/container-groups/external-logging/splunk-logging"
+    },
+    {
+      "source": "/products/sce/external-logging/tcp-logging",
+      "destination": "/products/sce/container-groups/external-logging/tcp-logging"
+    },
+    {
+      "source": "/products/sce/external-logging",
+      "destination": "/products/sce/container-groups/external-logging/external-logging"
+    },
+    {
+      "source": "/products/sce/health-probes/health-probe-examples",
+      "destination": "/products/sce/container-groups/health-probes/health-probe-examples"
+    },
+    {
+      "source": "/products/sce/health-probes/liveness-probes",
+      "destination": "/products/sce/container-groups/health-probes/liveness-probes"
+    },
+    {
+      "source": "/products/sce/health-probes/readiness-probes",
+      "destination": "/products/sce/container-groups/health-probes/readiness-probes"
+    },
+    {
+      "source": "/products/sce/health-probes/startup-probes",
+      "destination": "/products/sce/container-groups/health-probes/startup-probes"
+    },
+    {
+      "source": "/products/sce/health-probes",
+      "destination": "/products/sce/container-groups/health-probes/health-probes"
+    },
+    {
+      "source": "/products/sce/imds/Container-status-endpoint",
+      "destination": "/products/sce/container-groups/imds/Container-status-endpoint"
+    },
+    {
+      "source": "/products/sce/imds/imds-reallocate",
+      "destination": "/products/sce/container-groups/imds/imds-reallocate"
+    },
+    {
+      "source": "/products/sce/imds/introduction",
+      "destination": "/products/sce/container-groups/imds/introduction"
+    },
+    {
+      "source": "/products/sce/imds/obtaining-an-imds-jwt",
+      "destination": "/products/sce/container-groups/imds/obtaining-an-imds-jwt"
+    },
+    {
+      "source": "/products/sce/billing",
+      "destination": "/products/sce/container-groups/billing-and-pricing/billing"
+    },
+    {
+      "source": "/products/sce/priority-pricing",
+      "destination": "/products/sce/container-groups/billing-and-pricing/priority-pricing"
+    },
+    {
+      "source": "/products/sce/specifying-a-command",
+      "destination": "/products/sce/container-groups/specifying-a-command"
+    },
+    {
+      "source": "/products/sce/disk-space",
+      "destination": "/products/sce/container-groups/disk-space"
+    },
+    {
+      "source": "/products/sce/workload-logs",
+      "destination": "/products/sce/container-groups/workload-logs"
+    },
+    {
+      "source": "/products/sce/container-logs",
+      "destination": "/products/sce/container-groups/container-logs"
+    },
+    {
+      "source": "/products/sce/quotas",
+      "destination": "/products/sce/container-groups/quotas"
+    },
+    {
+      "source": "/products/sce/faqs",
+      "destination": "/products/sce/container-groups/faqs"
+    },
+    {
+      "source": "/products/sce/job-queues",
+      "destination": "/products/sce/job-queues/job-queues"
+    },
+    {
+      "source": "/products/sce/gateway/lb-options",
+      "destination": "/products/sce/gateway/load-balancer-options"
     }
   ]
 }

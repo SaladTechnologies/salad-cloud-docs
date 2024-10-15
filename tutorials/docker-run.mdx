@@ -95,7 +95,7 @@ result.
 
 The code constructs the URL as follows:
 
-- If the environment variable HOST is set to **'::'**, the host in the URL becomes **[::1]** for IPv6.
+- If the environment variable HOST is set to **'::'**, the host in the URL becomes `[::1]` for IPv6.
 - Otherwise (**'0.0.0.0'**), it defaults to **127.0.0.1** for IPv4.
 
 The logic above illustrates how to explicitly call a service using either **IPv4 (127.0.0.1)** or **IPv6 (::1)**. For
@@ -186,7 +186,7 @@ Let’s create a container group by providing the docker run command through the
 ### Environment Variables
 
 The -e flag in the docker run command is used to pass information to the container, which can be directly mapped to
-[the Environment Variables](/products/sce/environment-variables) settings on SaladCloud.
+[the Environment Variables](/products/sce/container-groups/environment-variables) settings on SaladCloud.
 
 By utilizing this feature, you can customize system behavior and grant access to additional resources, such as cloud
 storage or job queues or APIs, for your containers running on SaladCloud.
@@ -197,9 +197,10 @@ storage or job queues or APIs, for your containers running on SaladCloud.
 
 One container group can run only one container image at this moment.
 
-Ensure the repository, image name and tag are all correct in [the Image Source](/products/sce/container-registries). If
-the container image is from a private repository, you will need to provide both the username and access token. These
-credentials will be used by SaladCloud to pull the image.
+Ensure the repository, image name and tag are all correct in
+[the Image Source](/products/sce/container-groups/registries/container-registries). If the container image is from a
+private repository, you will need to provide both the username and access token. These credentials will be used by
+SaladCloud to pull the image.
 
 <img src="/tutorials/images/docker_run/docker_run4.png" />
 
@@ -208,9 +209,9 @@ image will be delivered to the SaladCloud nodes running your instances. When the
 SaladCloud nodes will be released and the images on these nodes will be also removed.
 
 If your image has changed since the container group was created, you will need to
-[update the image source](/products/sce/managing-deployments#editing-your-container-group-deployment) to run the new
-version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull the latest
-image.
+[update the image source](/products/sce/container-groups/managing-deployments#editing-your-container-group-deployment)
+to run the new version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull
+the latest image.
 
 **We strongly recommend updating the image name or tag whenever it changes.** This practice helps minimize confusion and
 ensures a smoother transition from local testing to deployment on SaladCloud.
@@ -246,9 +247,10 @@ process, you would only be charged for the running time of a single replica.
 
 The --gpus all option in the command allocates all available GPUs on the host to the container, enabling GPU support for
 applications running inside it. SaladCloud currently supports only one GPU per container. When creating a container
-group, you can select multiple GPU types at a priority level [(Batch/Low/Medium/High)](/products/sce/priority-pricing),
-along with the required vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that
-match these selections to run the container group.
+group, you can select multiple GPU types at a priority level
+[(Batch/Low/Medium/High)](/products/sce/container-groups/billing-and-pricing/priority-pricing), along with the required
+vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that match these selections
+to run the container group.
 
 <img src="/tutorials/images/docker_run/docker_run7.png" />
 
@@ -262,7 +264,7 @@ priority level.
 If you are using the SaladCloud Job Queue to manage the tasks for your container group, you can use SaladCloud Job Queue
 Worker (an executable binary) to replace io_worker.py in the example. This worker is designed to handle input/output
 operations and interact with your inference server. For more information about SaladCloud Job Queue, please refer to
-[this link](/products/sce/job-queues).
+[this link](/products/sce/job-queues/job-queues).
 
 ### Substitutes
 
@@ -417,13 +419,14 @@ contain only the status and metadata.
 
 ### Health Probes
 
-[Health probes](/products/sce/health-probes) offer an automated mechanism to initiate specific actions based on the
-status of containers within a container group. **You can think of a probe as a piece of code running alongside the
-inference server within the same container, allowing it to access the service locally or the shared file system**.
+[Health probes](/products/sce/container-groups/health-probes/health-probes) offer an automated mechanism to initiate
+specific actions based on the status of containers within a container group. **You can think of a probe as a piece of
+code running alongside the inference server within the same container, allowing it to access the service locally or the
+shared file system**.
 
-[Readiness probes](/products/sce/health-probes/readiness-probes) are essential when deploying a container gateway, as
-they ensure that requests are only forwarded to an instance when it is fully prepared—for example, when the model has
-been loaded and warmed up.
+[Readiness probes](/products/sce/container-groups/health-probes/readiness-probes) are essential when deploying a
+container gateway, as they ensure that requests are only forwarded to an instance when it is fully prepared—for example,
+when the model has been loaded and warmed up.
 
 When configuring a readiness probe on SaladCloud, you can utilize TCP, gRPC, and HTTP protocols. **SaladCloud does not
 provide an option to explicitly select IPv4 or IPv6; it defaults to using IPv6 when the container gateway is deployed,
@@ -451,11 +454,11 @@ Failure Threshold: 3
 
 <img src="/tutorials/images/docker_run/docker_run19.png" />
 
-You can also use the [exec protocol](/products/sce/health-probes#exec-protocol) to create a custom script for the
-readiness probe.
+You can also use the [exec protocol](/products/sce/container-groups/health-probes/health-probes#exec-protocol) to create
+a custom script for the readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the
-response from accessing **http://[::1]:5000/health-check** contains **'READY'**, the Python script returns zero,
+response from accessing `http://[::1]:5000/health-check` contains **'READY'**, the Python script returns zero,
 indicating a successful probe. Otherwise, the probe is deemed failed.
 
 This probe is more advanced, as it checks not only the HTTP status code, but also the semantics of the response.

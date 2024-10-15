@@ -1,0 +1,37 @@
+#!/usr/bin/bash
+
+usage="Usage: $0 <image> <destination>"
+
+src_img=$1
+dst_img=$2
+
+if [ -z "$src_img" ] || [ -z "$dst_img" ]; then
+    echo $usage
+    exit 1
+fi
+
+if [ ! -f "$src_img" ]; then
+    echo "Error: $src_img does not exist"
+    exit 1
+fi
+
+if [ -f "$dst_img" ]; then
+    echo "Error: $dst_img already exists"
+    exit 1
+fi
+
+mkdir -p $(dirname "$dst_img")
+
+mv "$src_img" "$dst_img"
+
+# Escape special characters in src_img and dst_img for use in sed
+escaped_src_img=$(printf '%s\n' "$src_img" | sed -e 's/[\/&]/\\&/g')
+escaped_dst_img=$(printf '%s\n' "$dst_img" | sed -e 's/[\/&]/\\&/g')
+
+# Replace all occurrences of the source image name with the destination image name in all .mdx files, recursively
+find . -name "*.mdx" -print0 | while IFS= read -r -d '' file; do
+    if grep -q "$src_img" "$file"; then
+        echo "Updating $file"
+        sed -i "s|$escaped_src_img|$escaped_dst_img|g" "$file"
+    fi
+done
