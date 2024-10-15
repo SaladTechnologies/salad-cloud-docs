@@ -26,9 +26,9 @@ Queue, press the 'Create New Job Queue' button and do so before returning to thi
 <img src="/products/sce/job-queues/images/portal-configure-job-queue.png" />
 
 Enter the Port and Path of your application that you identified during the
-[Configuring the Job Queue Worker](/products/sce/job-queues/job-queues/queue-worker) step. This information will be
-attached to jobs sent to the Queue Worker so that it knows where to post them to the application running inside the
-deployed container.
+[Configuring the Job Queue Worker](/products/sce/job-queues/queue-worker) step. This information will be attached to
+jobs sent to the Queue Worker so that it knows where to post them to the application running inside the deployed
+container.
 
 **We also recommend adding a [readiness probe](/products/sce/container-groups/health-probes/readiness-probes) to your
 container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
