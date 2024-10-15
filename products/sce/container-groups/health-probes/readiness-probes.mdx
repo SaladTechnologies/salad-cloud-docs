@@ -5,7 +5,7 @@ title: 'Readiness Probes'
 # Overview
 
 Readiness probes are only available if [Container Gateway](/products/sce/networking) or
-[Job Queues](/products/sce/job-queues) are turned on. They run after the startup probe has completed successfully. They
+[Job Queues](/products/sce/job-queues/job-queues) are turned on. They run after the startup probe has completed successfully. They
 are typically used to evaluate whether the application running in your container is ready to accept traffic. If
 configured, no traffic will be sent from the load balancer until the readiness probe has passed, so prevent your
 readiness probe from passing until you have downloaded and warmed up your models. Readiness probes can flap back between

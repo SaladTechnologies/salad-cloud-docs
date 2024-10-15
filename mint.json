@@ -14,7 +14,10 @@
   "navigation": [
     {
       "group": "SaladCloud",
-      "pages": ["products/documentation", "products/quickstart"]
+      "pages": [
+        "products/documentation",
+        "products/quickstart"
+      ]
     },
     {
       "group": "Container Engine",
@@ -106,7 +109,7 @@
         {
           "group": "Job Queues",
           "pages": [
-            "products/sce/job-queues",
+            "products/sce/job-queues/job-queues",
             "products/sce/job-queues/creating-a-job-queue",
             "products/sce/job-queues/queue-worker",
             "products/sce/job-queues/using-queues"
@@ -137,7 +140,9 @@
     },
     {
       "group": "S4 - SaladCloud Simple Storage Service",
-      "pages": ["products/s4/salad-simple-storage-service"]
+      "pages": [
+        "products/s4/salad-simple-storage-service"
+      ]
     },
     {
       "group": "Recipes",
@@ -366,13 +371,18 @@
             },
             {
               "group": "SCE",
-              "pages": ["guides/transcription/sce/youtube"]
+              "pages": [
+                "guides/transcription/sce/youtube"
+              ]
             }
           ]
         },
         {
           "group": "Text To Speech",
-          "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+          "pages": [
+            "guides/text-to-speech/metavoice-tts-api",
+            "guides/text-to-speech/openvoice-api"
+          ]
         }
       ]
     }
@@ -677,6 +687,10 @@
     {
       "source": "/products/sce/faqs",
       "destination": "/products/sce/container-groups/faqs"
+    },
+    {
+      "source": "/products/sce/job-queues",
+      "destination": "/products/sce/job-queues/job-queues"
     }
   ]
 }
