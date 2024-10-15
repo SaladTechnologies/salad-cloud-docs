@@ -99,7 +99,7 @@
             "products/sce/networking",
             "products/sce/gateway/enabling-ipv6",
             "products/sce/gateway/sending-requests",
-            "products/sce/gateway/lb-options",
+            "products/sce/gateway/load-balancer-options",
             "products/sce/gateway/websockets",
             "products/sce/gateway/error-pages"
           ]
@@ -682,6 +682,10 @@
     {
       "source": "/products/sce/job-queues",
       "destination": "/products/sce/job-queues/job-queues"
+    },
+    {
+      "source": "/products/sce/gateway/lb-options",
+      "destination": "/products/sce/gateway/load-balancer-options"
     }
   ]
 }
