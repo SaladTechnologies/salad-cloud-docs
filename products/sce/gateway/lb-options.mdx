@@ -4,7 +4,7 @@ title: 'Load Balancing Options'
 
 When you enable the container gateway during container group creation, several load balancing (LB) options determine how
 requests are forwarded to the container instances, including algorithms, concurrency and timeouts. These settings cannot
-be changed once the container group is created. To modify the container gateway settings, you can duplicate the existing
+be changed once a container group is created. To modify the container gateway settings, you can duplicate the existing
 container group, create a new one, and apply the desired changes.
 
 <img src="/products/sce/images/lb-options/lb-options1.png" />
@@ -44,18 +44,18 @@ In contrast to batched or single inference, using multiprocessing or multithread
 GPU may limit optimal GPU cache utilization and negatively impact performance; therefore, this approach should generally
 be avoided.
 
-**To support various inference servers and use cases, two settings are available for the concurrency:**
+**To support various inference servers and use cases, two settings are available for concurrency:**
 
 **When the option - “Limit each server to a single, active connection” is unselected**, the container gateway will
-establish multiple connections per instance and forward concurrent requests to the inference server, which is supposedly
-capable of handling multiple requests simultaneously, including a local queue, non-blocking I/O and the back-pressure
-mechanism.
+establish multiple connections per instance and forward concurrent requests to the inference server in the container.
+This server should be capable of handling multiple requests simultaneously, include a local queue, use non-blocking I/O
+and have a back-pressure mechanism.
 
 **When the option - “Limit each server to a single, active connection” is selected**, the container gateway will use a
-single active connection per instance and only forwards one request at a time to an instance, even when using HTTP/2
-multiplexing. **New requests are waiting and queued by the container gateway until the current one is processed and a
+single active connection per instance and only forward one request at a time to an instance, even when using HTTP/2
+multiplexing. **New requests will wait and be queued by the container gateway until the current one is processed and a
 response is returned by the instance.** This configuration ensures that an instance receives and processes only one
-request at any time, with a WebSocket connection treated as a single request.
+request at any time. Note that a WebSocket connection treated as a single request.
 
 For single inference tasks, such as generating an image at a time, choosing this option can significantly simplify the
 implementation of the inference server by using synchronous calls. **Otherwise, this option will reduce system
@@ -92,8 +92,8 @@ sending a request. If no response is received within this timeframe, a timeout e
 preventing prolonged waits for responses that may never arrive. The default value is **100 seconds** (100000
 milliseconds）, which is the maximum allowable waiting time for a response.
 
-A 100-second timeout is generally sufficient for many tasks, including image generation and classification.However, for
-LLMs, the decoding process for very long conversions may take a few minutes. **If the inference server operates in
+A 100-second timeout is generally sufficient for many tasks, including image generation and classification. However,
+for LLMs, the decoding process for very long conversions may take a few minutes. **If the inference server operates in
 streaming mode - providing responses immediately after the first token is generated rather than waiting for the entire
 process to complete, LLM applications can still function effectively with the container gateway.**
 
@@ -101,11 +101,11 @@ process to complete, LLM applications can still function effectively with the co
 transcriptions, which would take hours or days to complete for each job. These tasks should instead be managed using a
 job queue.**
 
-# Existing Container Gateway Settings
+# Legacy Container Gateway Settings
 
-The existing container gateways are configured with the **Least Number of Connections** algorithm, **a single active
-connection per instance** and 100 seconds for both Client Request Timeout and Server Response Timeout. These settings
-are not visible in the Portal and cannot be modified.
+Container groups created before these settings were available are configured with the **Least Number of Connections**
+algorithm, **a single active connection per instance** and 100 seconds for both Client Request Timeout and Server
+Response Timeout. These settings cannot be modified.
 
 To accommodate your application’s needs, you can create a new container group by duplicating the existing one and
 selecting the appropriate LB options.
