@@ -48,8 +48,8 @@ be avoided.
 
 **When the option - “Limit each server to a single, active connection” is unselected**, the container gateway will
 establish multiple connections per instance and forward concurrent requests to the inference server in the container.
-This server should be capable of handling multiple requests simultaneously, include a local queue, use non-blocking I/O
-and have a back-pressure mechanism.
+This server should be capable of handling multiple requests simultaneously, including a local queue, use non-blocking
+I/O and have a back-pressure mechanism.
 
 **When the option - “Limit each server to a single, active connection” is selected**, the container gateway will use a
 single active connection per instance and only forward one request at a time to an instance, even when using HTTP/2
@@ -92,8 +92,8 @@ sending a request. If no response is received within this timeframe, a timeout e
 preventing prolonged waits for responses that may never arrive. The default value is **100 seconds** (100000
 milliseconds）, which is the maximum allowable waiting time for a response.
 
-A 100-second timeout is generally sufficient for many tasks, including image generation and classification. However,
-for LLMs, the decoding process for very long conversions may take a few minutes. **If the inference server operates in
+A 100-second timeout is generally sufficient for many tasks, including image generation and classification. However, for
+LLMs, the decoding process for very long conversions may take a few minutes. **If the inference server operates in
 streaming mode - providing responses immediately after the first token is generated rather than waiting for the entire
 process to complete, LLM applications can still function effectively with the container gateway.**
 
