@@ -19,10 +19,46 @@ In our documentation, we label the "Explanation" section "Products", but otherwi
   background knowledge.
 - **Reference**: API documentation for the products.
 
-### Directory Structure
+### Directory Structure And Standards
 
-- The directory structure should match the final website structure.
+- The directory structure should match the final website structure, i.e. the path `/products/documentation` should be
+  represented by a file `products/documentation.mdx`.
 - Images should be placed in a sibling directory to the markdown file that references them, named `images`.
+
+```text
+products/sce/gateway
+├── images
+│   ├── container-gateway-error-400.png
+│   ├── container-gateway-error-401.png
+│   ├── container-gateway-error-403.png
+│   ├── container-gateway-error-404.png
+│   ├── container-gateway-error-408.png
+│   ├── container-gateway-error-410.png
+│   ├── container-gateway-error-413.png
+│   ├── container-gateway-error-500.png
+│   ├── container-gateway-error-501.png
+│   ├── container-gateway-error-502.png
+│   ├── container-gateway-error-503.png
+│   ├── container-gateway-error-504.png
+│   ├── load-balancer-options-1.png
+│   ├── portal-access-domain-name.png
+│   ├── portal-enable-authentication.png
+│   └── portal-enable-container-gateway.png
+├── enabling-ipv6.mdx
+├── error-pages.mdx
+├── load-balancer-options.mdx
+├── sending-requests.mdx
+└── websockets.mdx
+```
+
+- Files should be named with kebab-case, using full words. For example, `load-balancer-options.mdx` is preferred over
+  `lb-opts.mdx`. This applies to image files as well.
+- All content should pass the spell checker. We use [cspell](https://cspell.org/) to check spelling. You can run
+  `npx cspell "**/*.{md,mdx}"` to check spelling on all markdown files. There is a GitHub action that will check
+  spelling on all PRs. If you see a spelling error, please fix it.
+- All content should pass the [Prettier](https://prettier.io/) code formatter. You can run `npx prettier --write .` to
+  format all files. There is a GitHub action that will check formatting on all PRs. If you see a formatting error,
+  please fix it.
 
 ## Discussing
 
@@ -89,6 +125,7 @@ To add a new endpoint (like dreambooth or transcription) to the documentation, f
 1. Place the openapi3 compatible input and output json schema for the endpoint in the `scripts/inputs-and-outputs`
    directory
 2. Place a config file in `scripts/endpoint-schema-configs`, with the following structure:
+
    ```json
    {
      "baseSchema": "api-specs/salad-cloud.json",
@@ -100,6 +137,7 @@ To add a new endpoint (like dreambooth or transcription) to the documentation, f
      "apiDocPath": "reference/dreambooth/sd15"
    }
    ```
+
 3. To run all config files, use `./scripts/add-all-endpoints`
 
 ## Adding Recipes
