@@ -128,6 +128,15 @@ newSchema.components.requestBodies[`Create${jobSchemaName}`].content['applicatio
 }
 
 /**
+ * There are many irrelevant request bodies from the base schema that we can clear out.
+ */
+Object.keys(newSchema.components.requestBodies).forEach((key) => {
+    if (key !== `Create${jobSchemaName}`) {
+        delete newSchema.components.requestBodies[key]
+    }
+})
+
+/**
  * Response Bodies
  */
 // List
@@ -147,6 +156,16 @@ newSchema.components.responses[`Create${jobSchemaName}`] = clone(schema.componen
 newSchema.components.responses[`Create${jobSchemaName}`].content['application/json'].schema = {
     $ref: `#/components/schemas/${jobSchemaName}`,
 }
+
+/**
+ * There are many irrelevant response bodies from the base schema that we can clear out.
+ * We only need the ones we just created.
+ */
+Object.keys(newSchema.components.responses).forEach((key) => {
+    if (![`List${jobSchemaName}`, `Get${jobSchemaName}`, `Create${jobSchemaName}`].includes(key)) {
+        delete newSchema.components.responses[key]
+    }
+})
 
 // Path Parameters
 newSchema.components.parameters.job_id = clone(schema.components.parameters.inference_endpoint_job_id)
