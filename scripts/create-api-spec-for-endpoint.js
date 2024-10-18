@@ -1,5 +1,24 @@
 const fs = require('fs')
 const path = require('path')
+const { parse } = require('yaml')
+
+const usage = `
+Usage: node scripts/create-api-spec-for-endpoint.js <config-file>
+
+This script creates an OpenAPI spec for an endpoint based on the base schema and input/output schemas provided in the config file.
+The config file must be JSON formatted, and should have the following structure:
+{
+    "baseSchema": "path/to/base/schema",
+    "inputSchema": "path/to/input/schema",
+    "outputSchema": "path/to/output/schema",
+    "endpointId": "endpoint_id",
+    "endpointName": "Endpoint Name",
+    "schemaName": "SchemaName",
+    "apiDocPath": "path/to/api-docs"
+}
+
+A new schema file will be created in the same directory as the base schema, with the name <endpointId>.json.
+`
 
 // Directory being run from
 const dir = process.cwd()
@@ -8,24 +27,34 @@ const getImportName = (filePath) => {
     return path.resolve(dir, filePath)
 }
 
+function loadJSONorYAML(file) {
+    const fileContent = fs.readFileSync(file, 'utf8')
+    const isJson = file.endsWith('.json')
+    return {
+        data: isJson ? JSON.parse(fileContent) : parse(fileContent),
+        isJson,
+    }
+}
+
+const clone = (obj) => JSON.parse(JSON.stringify(obj))
+
+if (process.argv.length !== 3) {
+    console.error(usage)
+    process.exit(1)
+}
+
 const configFile = getImportName(process.argv[2])
 console.log(`Reading config file: ${configFile}`)
 const config = require(configFile)
 
-/**
- * Update these values to match the new endpoint
- */
-
-const schema = require(getImportName(config.baseSchema))
-const inputSchema = require(getImportName(config.inputSchema))
-const outputSchema = require(getImportName(config.outputSchema))
+const schema = loadJSONorYAML(getImportName(config.baseSchema))
+const inputSchema = loadJSONorYAML(getImportName(config.inputSchema))
+const outputSchema = loadJSONorYAML(getImportName(config.outputSchema))
 
 const { endpointId, endpointName, schemaName } = config
 const inputSchemaName = `${schemaName}Input`
 const outputSchemaName = `${schemaName}Output`
 const jobSchemaName = `${schemaName}Job`
-
-const clone = (obj) => JSON.parse(JSON.stringify(obj))
 
 const newSchema = clone(schema)
 newSchema.info.title = endpointName
