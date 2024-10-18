@@ -1,7 +1,15 @@
 #!/bin/bash
 
+usage="Usage: cat <input-file> | $0 > <output-file>"
+
 # Read the input from stdin
 input=$(cat)
+
+if [ -z "$input" ]; then
+    echo "Error: No input provided" >&2
+    echo "$usage" >&2
+    exit 1
+fi
 
 # Use awk to process the input
 output=$(echo "$input" | awk '
