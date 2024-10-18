@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Read the input from stdin
+input=$(cat)
+
+# Use awk to process the input
+output=$(echo "$input" | awk '
+BEGIN {
+    in_top_level = 0
+}
+{
+    if ($0 ~ /^- \*\*/) {
+        # Convert top-level list item to h2 header
+        gsub(/^- \*\*/, "## ")
+        gsub(/\*\*$/, "")
+        print $0
+        in_top_level = 1
+    } else if ($0 ~ /^  - / && in_top_level) {
+        # Convert nested list items to paragraphs
+        sub(/^  - /, "")
+        print ""  # Add an empty line before each paragraph
+        print $0
+    } else if ($0 ~ /^    / && in_top_level) {
+        # Un-indent other nested content by two levels
+        sub(/^    /, "")
+        print $0
+    } else if ($0 ~ /^$/) {
+        # Print empty lines
+        print $0
+        in_top_level = 0
+    } else {
+        # Print other lines as they are
+        print $0
+    }
+}
+')
+
+# Print the output
+echo "$output"
