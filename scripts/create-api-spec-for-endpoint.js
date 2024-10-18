@@ -11,7 +11,7 @@ The config file must be JSON formatted, and should have the following structure:
     "baseSchema": "path/to/base/schema",
     "inputSchema": "path/to/input/schema",
     "outputSchema": "path/to/output/schema",
-    "endpointId": "endpoint_id",
+    "endpointId": "endpoint-id",
     "endpointName": "Endpoint Name",
     "schemaName": "SchemaName",
     "apiDocPath": "path/to/api-docs"
