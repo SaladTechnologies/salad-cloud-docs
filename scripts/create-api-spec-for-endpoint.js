@@ -159,7 +159,7 @@ newSchema.components.responses[`Create${jobSchemaName}`].content['application/js
 
 /**
  * There are many irrelevant response bodies from the base schema that we can clear out.
- * We only need the ones we just created, and error responses.
+ * We only need the errors, and the job-related responses.
  */
 function isNumber(str) {
     return !isNaN(str) && !isNaN(parseFloat(str))
@@ -167,7 +167,8 @@ function isNumber(str) {
 Object.keys(newSchema.components.responses).forEach((key) => {
     if (
         ![`List${jobSchemaName}`, `Get${jobSchemaName}`, `Create${jobSchemaName}`, 'UnknownError'].includes(key) &&
-        !isNumber(key)
+        !isNumber(key) &&
+        !key.includes('InferenceEndpoint')
     ) {
         delete newSchema.components.responses[key]
     }
