@@ -27,20 +27,39 @@ const getImportName = (filePath) => {
     return path.resolve(dir, filePath)
 }
 
+/**
+ * Mintlify supports schemas in both JSON and YAML formats. This function
+ * reads a file in either format and returns the parsed content.
+ * @param {string} file A path to a JSON or YAML file
+ * @returns
+ */
 function loadJSONorYAML(file) {
     const fileContent = fs.readFileSync(file, 'utf8')
     const isJson = file.endsWith('.json')
     return isJson ? JSON.parse(fileContent) : parse(fileContent)
 }
 
+/**
+ * Deep clone an object using JSON serialization.
+ * @param {any} obj Any JSON-serializable object
+ * @returns
+ */
 const clone = (obj) => JSON.parse(JSON.stringify(obj))
 
 if (process.argv.length !== 3) {
     console.error(usage)
     process.exit(1)
 }
-
+/**
+ * The config file is the first argument passed to the script
+ */
 const configFile = getImportName(process.argv[2])
+
+/**
+ * We start with the base salad cloud schema, because our endpoint
+ * is essentially a clone of the inference endpoints schemas, but with
+ * the .input and .output schemas replaced with something custom.
+ */
 console.log(`Reading config file: ${configFile}`)
 const config = require(configFile)
 
@@ -53,11 +72,18 @@ const inputSchemaName = `${schemaName}Input`
 const outputSchemaName = `${schemaName}Output`
 const jobSchemaName = `${schemaName}Job`
 
+/**
+ * Create a new schema object with the same structure as the base schema,
+ * but with the title and description updated to reflect the new endpoint.
+ */
 const newSchema = clone(schema)
 newSchema.info.title = endpointName
 newSchema.info.description = `API for ${endpointName}`
 newSchema.paths = {}
 
+/**
+ * Add the required new schemas to the components section
+ */
 // .input
 newSchema.components.schemas[inputSchemaName] = inputSchema
 newSchema.components.schemas[jobSchemaName] = clone(schema.components.schemas.InferenceEndpointJob)
@@ -68,19 +94,32 @@ newSchema.components.schemas[jobSchemaName].properties.input = { $ref: `#/compon
 newSchema.components.schemas[outputSchemaName] = outputSchema
 newSchema.components.schemas[jobSchemaName].properties.output = { $ref: `#/components/schemas/${outputSchemaName}` }
 
+/**
+ * Duplicate the CreateInferenceEndpointJob schema and update it with custom input and output
+ */
 newSchema.components.schemas[`Create${jobSchemaName}`] = clone(schema.components.schemas.CreateInferenceEndpointJob)
 newSchema.components.schemas[`Create${jobSchemaName}`].description = `Create a job for ${endpointName}`
 newSchema.components.schemas[`Create${jobSchemaName}`].properties.input = {
     $ref: `#/components/schemas/${inputSchemaName}`,
 }
 
+/**
+ * Duplicate the InferenceEndpointJobList schema and update it with the new job schema
+ */
 newSchema.components.schemas[`${jobSchemaName}List`] = clone(schema.components.schemas.InferenceEndpointJobList)
 newSchema.components.schemas[`${jobSchemaName}List`].description = `List of jobs for ${endpointName}`
 newSchema.components.schemas[`${jobSchemaName}List`].properties.items = {
     $ref: `#/components/schemas/${jobSchemaName}`,
 }
 
-// Request and response bodies
+/**
+ * The Request and Response body schemas are also defined in the components section.
+ * As before, we duplicate the existing schemas and update them.
+ */
+
+/**
+ * Request Body: Create
+ */
 newSchema.components.requestBodies[`Create${jobSchemaName}`] = clone(
     schema.components.requestBodies.CreateInferenceEndpointJob,
 )
@@ -88,15 +127,22 @@ newSchema.components.requestBodies[`Create${jobSchemaName}`].content['applicatio
     $ref: `#/components/schemas/Create${jobSchemaName}`,
 }
 
+/**
+ * Response Bodies
+ */
+// List
 newSchema.components.responses[`List${jobSchemaName}`] = clone(schema.components.responses.ListInferenceEndpointJobs)
 newSchema.components.responses[`List${jobSchemaName}`].content['application/json'].schema = {
     $ref: `#/components/schemas/${jobSchemaName}List`,
 }
 
+// Get
 newSchema.components.responses[`Get${jobSchemaName}`] = clone(schema.components.responses.GetInferenceEndpointJob)
 newSchema.components.responses[`Get${jobSchemaName}`].content['application/json'].schema = {
     $ref: `#/components/schemas/${jobSchemaName}`,
 }
+
+// Create
 newSchema.components.responses[`Create${jobSchemaName}`] = clone(schema.components.responses.CreateInferenceEndpointJob)
 newSchema.components.responses[`Create${jobSchemaName}`].content['application/json'].schema = {
     $ref: `#/components/schemas/${jobSchemaName}`,
@@ -104,7 +150,12 @@ newSchema.components.responses[`Create${jobSchemaName}`].content['application/js
 
 // Path Parameters
 newSchema.components.parameters.job_id = clone(schema.components.parameters.inference_endpoint_job_id)
+newSchema.components.parameters.job_id.description = `The ID of the job for ${endpointName}`
+newSchema.components.parameters.job_id.name = 'job_id'
 
+/**
+ * Now we add the new endpoint to the paths section of the schema.
+ */
 // Resource: /organizations/{organization_name}/inference-endpoints/{inference_endpoint_name}
 const endpointPath = `/organizations/{organization_name}/inference-endpoints/${endpointId}`
 newSchema.paths[endpointPath] = clone(
@@ -179,6 +230,10 @@ newSchema.paths[`${endpointPath}/jobs/{job_id}`].get.responses['200'] = {
 
 newSchema.paths[`${endpointPath}/jobs/{job_id}`].delete.summary = `Delete job for ${endpointName}`
 
+/**
+ * Write the new schema to a file
+ */
 const newSchemaPath = path.join(path.dirname(config.baseSchema), `${endpointId}.json`)
-
 fs.writeFileSync(newSchemaPath, JSON.stringify(newSchema, null, 2))
+
+console.log(`New schema created: ${newSchemaPath}`)
