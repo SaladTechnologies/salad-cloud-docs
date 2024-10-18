@@ -102,6 +102,9 @@ newSchema.components.responses[`Create${jobSchemaName}`].content['application/js
     $ref: `#/components/schemas/${jobSchemaName}`,
 }
 
+// Path Parameters
+newSchema.components.parameters.job_id = clone(schema.components.parameters.inference_endpoint_job_id)
+
 // Resource: /organizations/{organization_name}/inference-endpoints/{inference_endpoint_name}
 const endpointPath = `/organizations/{organization_name}/inference-endpoints/${endpointId}`
 newSchema.paths[endpointPath] = clone(
@@ -109,7 +112,7 @@ newSchema.paths[endpointPath] = clone(
 )
 
 // Remove the no-longer-needed variable reference
-const inferenceEndpointNameParamIndex = newSchema.paths[endpointPath].parameters.findIndex(
+let inferenceEndpointNameParamIndex = newSchema.paths[endpointPath].parameters.findIndex(
     (param) => param.$ref === '#/components/parameters/inference_endpoint_name',
 )
 if (inferenceEndpointNameParamIndex !== -1) {
@@ -152,6 +155,7 @@ newSchema.paths[`${endpointPath}/jobs/{job_id}`] = clone(
 )
 newSchema.paths[`${endpointPath}/jobs/{job_id}`].summary = `Job for ${endpointName}`
 newSchema.paths[`${endpointPath}/jobs/{job_id}`].description = `Operations for a ${endpointName} job`
+newSchema.paths[`${endpointPath}/jobs/{job_id}`].parameters.push({ $ref: '#/components/parameters/job_id' })
 
 // Remove the no-longer-needed variable reference
 const jobInferenceEndpointNameParamIndex = newSchema.paths[`${endpointPath}/jobs/{job_id}`].parameters.findIndex(
@@ -159,6 +163,12 @@ const jobInferenceEndpointNameParamIndex = newSchema.paths[`${endpointPath}/jobs
 )
 if (jobInferenceEndpointNameParamIndex !== -1) {
     newSchema.paths[`${endpointPath}/jobs/{job_id}`].parameters.splice(jobInferenceEndpointNameParamIndex, 1)
+}
+inferenceEndpointNameParamIndex = newSchema.paths[`${endpointPath}/jobs/{job_id}`].parameters.findIndex(
+    (param) => param.$ref === '#/components/parameters/inference_endpoint_job_id',
+)
+if (inferenceEndpointNameParamIndex !== -1) {
+    newSchema.paths[`${endpointPath}/jobs/{job_id}`].parameters.splice(inferenceEndpointNameParamIndex, 1)
 }
 
 newSchema.paths[`${endpointPath}/jobs/{job_id}`].get.summary = `Get job for ${endpointName}`
