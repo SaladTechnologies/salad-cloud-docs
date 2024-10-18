@@ -30,10 +30,7 @@ const getImportName = (filePath) => {
 function loadJSONorYAML(file) {
     const fileContent = fs.readFileSync(file, 'utf8')
     const isJson = file.endsWith('.json')
-    return {
-        data: isJson ? JSON.parse(fileContent) : parse(fileContent),
-        isJson,
-    }
+    return isJson ? JSON.parse(fileContent) : parse(fileContent)
 }
 
 const clone = (obj) => JSON.parse(JSON.stringify(obj))
