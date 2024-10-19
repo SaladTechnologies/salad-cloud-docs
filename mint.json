@@ -289,6 +289,14 @@
               ]
             }
           ]
+        },
+        {
+          "group": "Transcription API",
+          "pages": [
+            "reference/transcribe/inference_endpoints/create-an-inference-endpoint-job",
+            "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
+            "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
+          ]
         }
       ]
     },
