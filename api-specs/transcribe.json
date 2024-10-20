@@ -3119,7 +3119,7 @@
             "default": false,
             "description": "Perform sentiment analysis on sentence-level transcription."
           },
-          "sentence_classification": {
+          "sentence_topic_classification": {
             "type": "boolean",
             "default": false,
             "description": "Classify sentences with specific labels."
@@ -3160,12 +3160,12 @@
             "description": "Custom vocabulary to improve transcription accuracy for specific terms.",
             "example": "AI, NLP, cloud computing"
           },
-          "classification_labels": {
+          "classification_topics": {
             "type": "string",
             "description": "List of labels to use for sentence classification, e.g., 'INTERVIEW, MEETING, CALL'.",
             "example": "INTERVIEW, MEETING, CALL"
           },
-          "overall_classification": {
+          "overall_topic_classification": {
             "type": "boolean",
             "default": false,
             "description": "Perform overall classification of the transcription."
