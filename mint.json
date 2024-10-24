@@ -333,6 +333,7 @@
           "group": "Large Language Models",
           "pages": [
             "guides/llm/llm-general",
+            "guides/llm/ollama-hf",
             "guides/llm/run-tgi-text-generation-interface-by-huggingface",
             "guides/llm/run-ollama"
           ]

@@ -147,4 +147,7 @@ xlvaeapp
 yolob8m-custom
 yolov8
 zapier
+GGUF
+mlabonne
+Nemotron
 ollama
