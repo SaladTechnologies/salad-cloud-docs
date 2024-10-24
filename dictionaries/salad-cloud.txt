@@ -149,5 +149,5 @@ yolov8
 zapier
 GGUF
 mlabonne
-ollama
 Nemotron
+ollama
