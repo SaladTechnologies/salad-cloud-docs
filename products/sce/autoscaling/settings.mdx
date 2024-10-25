@@ -17,13 +17,16 @@ To fine-tune how autoscaling works in SaladCloud, you can adjust the following s
 - **Range**: Must be between 0 and 100.
 - **Example**: If you set this to 3, the system will never scale below 3 running instances, even during low demand
   periods. If set to 0, the system will scale down to zero instances when there are no jobs in the queue, which means
-  you do not pay for any resources when the queue is empty. However, this may result in longer startup times when new
-  jobs are added to the queue.
+  you do not pay for any resources when the queue is empty. However, this will result in cold starts when new jobs are
+  added to the queue. A cold start happens when the system needs to start new containers, potentially causing delays as
+  the instances are brought online.
 
 ### **Maximum Replicas**
 
 - **Description**: The maximum number of container instances that the system will scale up to.
-- **Range**: Must be between 1 and 200.
+- **Range**: Must be between 1 and 200, or the maximum instance quota assigned to the project, whichever is lower.
+- **Note**: The maximum allowed value depends on the project instance quota. Ensure that your quota supports the desired
+  number of replicas.
 - **Example**: If set to 100, the system will never spin up more than 100 instances, even if the queue continues to
   grow.
 

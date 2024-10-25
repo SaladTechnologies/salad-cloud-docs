@@ -6,12 +6,18 @@ You can enable the autoscaling feature in SaladCloud through the portal or via t
 
 ## Using the Portal
 
-1. **Create or Modify a Container Group**:
-   - In the SaladCloud portal, create a new container group or edit an existing one.
-2. **Enable the Salad Queue**:
+1. **Create or Edit a Container Group**:
 
-   - Ensure that your container group is configured to use the Salad Queue, which the autoscaler monitors to determine
-     scaling behavior. You can find detailed instructions on how to enable the Salad Queue
+   - In the SaladCloud portal, create a new container group or edit an existing one.
+   - **Note**: You can only configure your Job Queue connection when creating a new container group. If the container is
+     not connected to a job queue during creation, you will not be able to retrospectively add the job queue connection
+     later through the "Edit Container" wizard. This differs from the autoscaling settings, which can be added or edited
+     later for any container group that has an active queue connection.
+
+2. **Enable the Job Queue**:
+
+   - Ensure that your container group is configured to use the Job Queue, which the autoscaler monitors to determine
+     scaling behavior. You can find detailed instructions on how to enable the Job Queue
      [here](/products/sce/job-queues/creating-a-job-queue)
 
 3. **Configure Autoscaling Settings**:
@@ -38,7 +44,7 @@ queue length.
 
 You can also configure autoscaling programmatically using SaladCloud's API.
 
-1. **Create a Container Group**: Use the SaladCloud API to create a container group. Ensure that the Salad Queue is
+1. **Create a Container Group**: Use the SaladCloud API to create a container group. Ensure that the Job Queue is
    enabled in the configuration.
 
 2. **Set Autoscaling Parameters**: Set the following parameters in the API request body to enable autoscaling. Example:
