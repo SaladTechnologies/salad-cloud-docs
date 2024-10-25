@@ -153,7 +153,9 @@
       "pages": [
         "products/recipes/dreamshaper8-comfyui",
         "products/recipes/flux1-schnell-fp8-comfyui",
-        "products/recipes/sdxl-with-refiner-comfyui"
+        "products/recipes/sdxl-with-refiner-comfyui",
+        "products/recipes/yolov8",
+        "products/recipes/ollama-llama3.1"
       ]
     },
     {
@@ -295,7 +297,27 @@
                 "reference/recipes/dreamshaper8-comfyui/image-to-image",
                 "reference/recipes/dreamshaper8-comfyui/text-to-image"
               ]
+            },
+            {
+              "group": "Yolo v8 (API)",
+              "pages": [
+                "reference/recipes/yolov8/process_file",
+                "reference/recipes/yolov8/process_url",
+                "reference/recipes/yolov8/health-probe"
+              ]
+            },
+            {
+              "group": "Ollama Llama 3.1",
+              "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
             }
+          ]
+        },
+        {
+          "group": "Transcription API",
+          "pages": [
+            "reference/transcribe/inference_endpoints/create-an-inference-endpoint-job",
+            "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
+            "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
           ]
         }
       ]
@@ -319,6 +341,7 @@
           "group": "Large Language Models",
           "pages": [
             "guides/llm/llm-general",
+            "guides/llm/ollama-hf",
             "guides/llm/run-tgi-text-generation-interface-by-huggingface",
             "guides/llm/run-ollama"
           ]
