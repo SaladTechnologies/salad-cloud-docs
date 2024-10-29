@@ -1,0 +1,39 @@
+---
+title: 'Container Engine Recipes'
+description: 'Easy-to-deploy templates for deploying common workloads on SaladCloud Container Engine.'
+sidebarTitle: 'Overview'
+---
+
+## What are Recipes?
+
+**Recipes** are pre-configured deployment templates for
+[Container Groups](/products/sce/container-groups/container-groups) that make it easy to get started with common
+workloads. Each Recipe includes a set of default parameters and configurations that can be deployed as-is or customized
+to meet your specific needs.
+
+## How to Use Recipes
+
+Recipes can be deployed from the SaladCloud Portal, from the "Create Container Group" page.
+
+1. **Navigate to the Portal**: Visit [https://portal.salad.com](https://portal.salad.com) and log in to your account.
+2. **Select your Organization**: If you have multiple organizations, select the one where you want to deploy the Recipe.
+3. **Select your Project**: If you have multiple projects, select the one where you want to deploy the Recipe.
+4. **Navigate to Container Groups**: Click on the "Container Groups" tab in the left-hand navigation.
+5. **Create a New Container Group**: Click the "Deploy a Container Group" button.
+6. **Choose a Recipe**: Select a Recipe, either from the "Featured" section, or from the "Recipes" section.
+7. **Deploy or Customize**: Review the Recipe parameters and configurations, and click "Deploy" to create the Container
+   Group. The default configuration is chosen for an optimal experience, but you can customize the Recipe to meet your
+   specific requirements, including number of replicas, hardware resources, and more.
+8. **Explore the Documentation**: Each recipe has documentation that explains the purpose of the Recipe, how to use it,
+   and any additional configuration options. You can also find the API reference for each recipe in
+   [Reference](/reference), under the "Recipes" section.
+9. **Monitor and Manage**: Once the Container Group is deployed, you can monitor its status and logs from the Portal.
+   You can also edit and scale the Container Group as needed, including deploying custom docker images. Dockerfiles and
+   configuration for all recipes can be found in the
+   [SaladCloud Recipes GitHub repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/src).
+
+## Billing
+
+Recipes are billed as standard container groups, based on the amount of time any workload replica is running. For more
+information on billing and pricing, see the
+[Billing and Pricing](/products/sce/container-groups/billing-and-pricing/billing) section.
