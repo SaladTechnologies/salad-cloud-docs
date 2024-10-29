@@ -151,9 +151,9 @@
         "products/recipes/overview",
         "products/recipes/dreamshaper8-comfyui",
         "products/recipes/flux1-schnell-fp8-comfyui",
+        "products/recipes/ollama-llama3.1",
         "products/recipes/sdxl-with-refiner-comfyui",
-        "products/recipes/yolov8",
-        "products/recipes/ollama-llama3.1"
+        "products/recipes/yolov8"
       ]
     },
     {
@@ -263,6 +263,21 @@
           "group": "Recipes",
           "pages": [
             {
+              "group": "Dreamshaper 8 - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/dreamshaper8-comfyui/health-probe",
+                "reference/recipes/dreamshaper8-comfyui/readiness-probe",
+                "reference/recipes/dreamshaper8-comfyui/list-models",
+                "reference/recipes/dreamshaper8-comfyui/submit-prompt",
+                "reference/recipes/dreamshaper8-comfyui/image-to-image",
+                "reference/recipes/dreamshaper8-comfyui/text-to-image"
+              ]
+            },
+            {
+              "group": "Ollama Llama 3.1",
+              "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
+            },
+            {
               "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
               "pages": [
                 "reference/recipes/flux1-schnell-fp8-comfyui/health-probe",
@@ -285,28 +300,14 @@
                 "reference/recipes/sdxl-with-refiner-comfyui/text-to-image"
               ]
             },
+
             {
-              "group": "Dreamshaper 8 - ComfyUI (API)",
-              "pages": [
-                "reference/recipes/dreamshaper8-comfyui/health-probe",
-                "reference/recipes/dreamshaper8-comfyui/readiness-probe",
-                "reference/recipes/dreamshaper8-comfyui/list-models",
-                "reference/recipes/dreamshaper8-comfyui/submit-prompt",
-                "reference/recipes/dreamshaper8-comfyui/image-to-image",
-                "reference/recipes/dreamshaper8-comfyui/text-to-image"
-              ]
-            },
-            {
-              "group": "Yolo v8 (API)",
+              "group": "YOLO v8 (API)",
               "pages": [
                 "reference/recipes/yolov8/process_file",
                 "reference/recipes/yolov8/process_url",
                 "reference/recipes/yolov8/health-probe"
               ]
-            },
-            {
-              "group": "Ollama Llama 3.1",
-              "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
             }
           ]
         },
