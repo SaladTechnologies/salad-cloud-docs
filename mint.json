@@ -19,14 +19,10 @@
     {
       "group": "Container Engine",
       "pages": [
-        "products/sce/salad-container-engine",
+        "products/sce/introduction",
         {
           "group": "Getting Started",
-          "pages": [
-            "products/sce/getting-started/about",
-            "products/sce/getting-started/quickstart",
-            "products/sce/getting-started/quickstart-api"
-          ]
+          "pages": ["products/sce/getting-started/quickstart", "products/sce/getting-started/quickstart-api"]
         },
         {
           "group": "Container Groups",
@@ -120,7 +116,8 @@
             "products/sce/autoscaling/settings",
             "products/sce/autoscaling/enable-autoscaling"
           ]
-        }
+        },
+        "products/sce/faqs"
       ]
     },
     {
@@ -717,6 +714,14 @@
     {
       "source": "/products/sce/gateway/lb-options",
       "destination": "/products/sce/gateway/load-balancer-options"
+    },
+    {
+      "source": "/products/sce/getting-started/about",
+      "destination": "/products/sce/faqs"
+    },
+    {
+      "source": "/products/sce/salad-container-engine",
+      "destination": "/products/sce/introduction"
     }
   ]
 }
