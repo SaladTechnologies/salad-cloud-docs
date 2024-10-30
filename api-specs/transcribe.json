@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "SaladCloud Transcription API",
-    "description": "API for SaladCloud Transcription API",
+    "title": "Salad Transcription API",
+    "description": "Salad Transcription API",
     "termsOfService": "https://salad.com/terms",
     "contact": {
       "name": "SaladCloud Support",
@@ -52,8 +52,8 @@
       }
     },
     "/organizations/{organization_name}/inference-endpoints/transcribe/jobs": {
-      "summary": "Jobs for SaladCloud Transcription API",
-      "description": "Operations for SaladCloud Transcription API jobs",
+      "summary": "Jobs for Salad Transcription API",
+      "description": "Operations for Salad Transcription API jobs",
       "parameters": [
         {
           "$ref": "#/components/parameters/organization_name"
@@ -61,8 +61,8 @@
       ],
       "get": {
         "operationId": "get_inference_endpoint_jobs",
-        "summary": "List jobs for SaladCloud Transcription API",
-        "description": "Retrieves a list of jobs for SaladCloud Transcription API",
+        "summary": "List jobs for Salad Transcription API",
+        "description": "Retrieves a list of jobs for Salad Transcription API",
         "parameters": [
           {
             "$ref": "#/components/parameters/page"
@@ -91,8 +91,8 @@
       },
       "post": {
         "operationId": "create_inference_endpoint_job",
-        "summary": "Create a job for SaladCloud Transcription API",
-        "description": "Creates a job for SaladCloud Transcription API",
+        "summary": "Create a job for Salad Transcription API",
+        "description": "Creates a job for Salad Transcription API",
         "requestBody": {
           "$ref": "#/components/requestBodies/CreateSaladCloudTranscriptionAPIJob"
         },
@@ -119,8 +119,8 @@
       }
     },
     "/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}": {
-      "summary": "Job for SaladCloud Transcription API",
-      "description": "Operations for a SaladCloud Transcription API job",
+      "summary": "Job for Salad Transcription API",
+      "description": "Operations for a Salad Transcription API job",
       "parameters": [
         {
           "$ref": "#/components/parameters/organization_name"
@@ -131,8 +131,8 @@
       ],
       "get": {
         "operationId": "get_inference_endpoint_job",
-        "summary": "Get job for SaladCloud Transcription API",
-        "description": "Retrieves a job for SaladCloud Transcription API",
+        "summary": "Get job for Salad Transcription API",
+        "description": "Retrieves a job for Salad Transcription API",
         "responses": {
           "200": {
             "$ref": "#/components/responses/GetSaladCloudTranscriptionAPIJob"
@@ -153,7 +153,7 @@
       },
       "delete": {
         "operationId": "delete_inference_endpoint_job",
-        "summary": "Delete job for SaladCloud Transcription API",
+        "summary": "Delete job for Salad Transcription API",
         "description": "Deletes an inference endpoint job",
         "responses": {
           "202": {
@@ -297,7 +297,7 @@
       "job_id": {
         "in": "path",
         "name": "job_id",
-        "description": "The ID of the job for SaladCloud Transcription API",
+        "description": "The ID of the job for Salad Transcription API",
         "required": true,
         "schema": {
           "type": "string",
@@ -3182,7 +3182,7 @@
         "additionalProperties": false
       },
       "SaladCloudTranscriptionAPIJob": {
-        "description": "Job input schema for SaladCloud Transcription API",
+        "description": "Job input schema for Salad Transcription API",
         "type": "object",
         "properties": {
           "id": {
@@ -3468,7 +3468,7 @@
         "additionalProperties": false
       },
       "CreateSaladCloudTranscriptionAPIJob": {
-        "description": "Create a job for SaladCloud Transcription API",
+        "description": "Create a job for Salad Transcription API",
         "type": "object",
         "properties": {
           "input": {
@@ -3491,7 +3491,7 @@
         ]
       },
       "SaladCloudTranscriptionAPIJobList": {
-        "description": "List of jobs for SaladCloud Transcription API",
+        "description": "List of jobs for Salad Transcription API",
         "type": "object",
         "properties": {
           "items": {

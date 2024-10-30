@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: SaladCloud Simple Storage Service
+  title: Salad Simple Storage Service
   version: 1.1.0
 components:
   securitySchemes:
