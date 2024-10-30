@@ -142,7 +142,7 @@
       ]
     },
     {
-      "group": "S4 - SaladCloud Simple Storage Service",
+      "group": "S4 - Salad Simple Storage Service",
       "pages": ["products/s4/salad-simple-storage-service"]
     },
     {
@@ -250,7 +250,7 @@
           ]
         },
         {
-          "group": "S4 - SaladCloud Simple Storage Service",
+          "group": "S4 - Salad Simple Storage Service",
           "pages": [
             "reference/s4/upload-a-file",
             "reference/s4/download-a-file",
