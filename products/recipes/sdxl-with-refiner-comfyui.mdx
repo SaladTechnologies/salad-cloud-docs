@@ -3,16 +3,13 @@ title: Stable Diffusion XL with Refiner - ComfyUI (API)
 ---
 
 <Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
-<Note>
-  See the [Benchmark](https://blog.salad.com/stable-diffusion-xl-3405-images-per-dollar-on-saladcloud/) for performance
-  information.
-</Note>
+<Note>See the [Benchmark](https://blog.salad.com/sdxl-benchmark/) for performance information.</Note>
 
 ## Overview
 
 This recipe creates an inference API for
-[Stable Diffusion XL](https://www.notion.so/SDXL-with-Refiner-ComfyUI-Recipe-Documentation-0335076da4e441a5b95e84349f86a152?pvs=21),
-an image generation model by Stability AI. It includes the base and
+[Stable Diffusion XL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0), an image generation model by
+Stability AI. It includes the base and
 [refiner model](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0). Inference is powered by
 [ComfyUI](https://github.com/comfyanonymous/ComfyUI/), exposed via
 [a simple HTTP API](https://github.com/SaladTechnologies/comfyui-api) to facilitate scalable stateless operation. Users
