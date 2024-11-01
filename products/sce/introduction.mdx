@@ -99,20 +99,30 @@ build with SCE:
 - use AI models to perform image generation, text to audio, image captioning, and other tasks
 - proxy video-streaming requests for virtual private networks
 - conduct long-running data processing queues
-- execute hyper-threaded, parallelized workloads
+- execute massively parallelizable workloads
 - distribute 3D rendering or VFX queues
 - procedurally-generated mapping simulations
-- access low-latency servers for P2P gaming
 
 # Additional Considerations
 
 Developers interested in using SCE should be aware of these additional considerations:
 
+### AMD64 Architecture
+
+SaladCloud currently **supports only AMD64 architecture** for container instances. ARM architecture **is not supported**
+at this time. If you are developing on a Mac or other ARM-based system, you may need to cross-compile your application
+for AMD64. Docker supports [multi-architecture builds](https://docs.docker.com/build/building/multi-platform/), so you
+can build your application for both ARM and AMD64 at the same time using the `--platform` flag:
+
+```
+docker buildx build --platform linux/amd64,linux/arm64 .
+```
+
 ### Cold-start Overhead
 
-In rare cases, if the Windows Subsystem for Linux utility is not installed on the best available host machine, the Salad
-Bowl daemon must install it before running container workloads within SaladCloud's Linux distribution. This design
-pattern can introduce modest overhead in terms of cold-start time, but should not impact performance or reliability.
+Cold-start times on SaladCloud can be longer than on traditional clouds. This is primarily due to the time it takes to
+download container images to the host machine. Since host machines are consumer-owned, they often have slower internet
+connections than data centers.
 
 ### Data-sensitivity Compliance
 
@@ -126,6 +136,20 @@ legislative authorities (including but not limited to HIPAA and the Financial Mo
 While SCE does maintain a stable replica count within a given Container Group, SCE deployments do not currently
 auto-scale Container Groups based on performance. Container Groups must be scaled up or down on demand through the
 Portal, or by direct request via the SaladCloud API.
+
+### Persistent Storage
+
+SaladCloud does not currently support persistent storage for container instances. All data written to the container
+instance's filesystem is ephemeral and will be lost when the container instance is terminated. If you need persistent
+storage, you can use an external storage service like Amazon S3, Google Cloud Storage, or Azure Blob Storage. We
+recommend a vendor that does not charge egress fees, as SaladCloud nodes are globally distributed and egress fees can
+add up quickly.
+
+### WSL2
+
+SaladCloud uses Windows Subsystem for Linux 2 (WSL2) to run Linux containers on Windows machines. Customers may notice
+that less than 100% of VRAM is available to the container. This is because WSL2 reserves a small portion of the VRAM for
+the Windows host machine.
 
 ### Performance Variability
 
