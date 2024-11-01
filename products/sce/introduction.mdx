@@ -120,9 +120,9 @@ docker buildx build --platform linux/amd64,linux/arm64 .
 
 ### Cold-start Overhead
 
-In rare cases, if the Windows Subsystem for Linux utility is not installed on the best available host machine, the Salad
-Bowl daemon must install it before running container workloads within SaladCloud's Linux distribution. This design
-pattern can introduce modest overhead in terms of cold-start time, but should not impact performance or reliability.
+Cold-start times on SaladCLoud can be longer than on traditional clouds. This is primarily due to the time it takes to
+download container images to the host machine. Since host machines are consumer-owned, they often have slower internet
+connections than data centers.
 
 ### Data-sensitivity Compliance
 
