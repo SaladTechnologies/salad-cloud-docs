@@ -86,8 +86,8 @@ Windows WSL:
 Longer context lengths not only increase waiting time and negatively impact user experience, but may also lead to the
 server response timeout errors at the load balancer in front of the inference servers, which has a maximum timeout limit
 of 100 seconds. Enabling token streaming on the servers allows tokens to be returned one by one, rather than waiting for
- the entire response to be generated. This feature shows the generation progress in real-time, significantly enhancing 
- the user experience, and helping to avoid the timeout errors.
+the entire response to be generated. This feature shows the generation progress in real-time, significantly enhancing
+the user experience, and helping to avoid the timeout errors.
 
 When more VRAM is available, batched inference can significantly increase throughput by effectively leveraging GPU cache
 and parallel processing, while only slightly increasing the processing time. Here is the test data from the same PC:
@@ -129,11 +129,11 @@ container gateway can map a public URL to this IPv6 port. Optionally, you can en
 using an API token.
 
 To support LLM inference efficiently, the container gateway can be configured to use the Least Connections algorithm and
- forward concurrent requests to the inference servers in a container group. The server response timeout setting controls
- how long the container gateway will wait for a response from an instance after sending a request, with a maximum limit 
+forward concurrent requests to the inference servers in a container group. The server response timeout setting controls
+how long the container gateway will wait for a response from an instance after sending a request, with a maximum limit
 of 100 seconds. This timeout affects the maximum length of generated text (for non-streaming) and the number of requests
- that can queue locally on inference servers. For more information on load balancing options and how to adjust these 
- settings to fit your needs, please refer to [this guide](/products/sce/gateway/load-balancer-options).
+that can queue locally on inference servers. For more information on load balancing options and how to adjust these
+settings to fit your needs, please refer to [this guide](/products/sce/gateway/load-balancer-options).
 
 **To use this solution effectively, system requirements and capabilities should be clearly defined and planned to
 properly configure the inference servers.** Deploying the Readiness Probes is also essential to ensure that requests are

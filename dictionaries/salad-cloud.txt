@@ -151,3 +151,7 @@ GGUF
 mlabonne
 Nemotron
 ollama
+nvcc
+NVCC
+rxjupyterlab
+rxjupyterdata
