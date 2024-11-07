@@ -138,7 +138,8 @@
         "products/transcription/transcription-overview",
         "products/transcription/speech-to-text",
         "products/transcription/translation",
-        "products/transcription/captions"
+        "products/transcription/captions",
+        "products/transcription/insights-intelligence"
       ]
     },
     {
@@ -373,7 +374,8 @@
                   "pages": [
                     "guides/transcription/salad-transcription-api/speech-to-text",
                     "guides/transcription/salad-transcription-api/translation",
-                    "guides/transcription/salad-transcription-api/captions"
+                    "guides/transcription/salad-transcription-api/captions",
+                    "guides/transcription/salad-transcription-api/llm-features"
                   ]
                 },
                 {
