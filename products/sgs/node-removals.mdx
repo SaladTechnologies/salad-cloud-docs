@@ -73,7 +73,7 @@ be assigned that sessionID.
 
 ## Example request
 
-```Curl.sh
+```bash
 curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SALAD_JWT" -d '{"sessionId": "$SESSION_ID","timeDetectedAt": $TIME,"removalReason": "$REMOVAL_REASON","service": "$SERVICE"}' https://app-api.salad.io/api/v2/sgs/$SGS_ID/removals
 ```
 
