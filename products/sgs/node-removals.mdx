@@ -21,7 +21,7 @@ will be transferred to other nodes.
 ## How to request a node removal
 
 Submit a node removal request by sending a POST request to the following endpoint:
-`https://app-api.salad.io/api/v2/sgs/$SGS_ID/removals`
+`https://app-api.salad.com/api/v2/sgs/$SGS_ID/removals`
 
 The `SGS_ID` will be shared with you before the trial period begins.
 
@@ -74,7 +74,7 @@ be assigned that sessionID.
 ## Example request
 
 ```bash
-curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SALAD_JWT" -d '{"sessionId": "$SESSION_ID","timeDetectedAt": $TIME,"removalReason": "$REMOVAL_REASON","service": "$SERVICE"}' https://app-api.salad.io/api/v2/sgs/$SGS_ID/removals
+curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SALAD_JWT" -d '{"sessionId": "$SESSION_ID","timeDetectedAt": $TIME,"removalReason": "$REMOVAL_REASON","service": "$SERVICE"}' https://app-api.salad.com/api/v2/sgs/$SGS_ID/removals
 ```
 
 ```JSON node_removal.json
