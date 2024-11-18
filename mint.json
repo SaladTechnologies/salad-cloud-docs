@@ -153,6 +153,8 @@
         "products/recipes/dreamshaper8-comfyui",
         "products/recipes/flux1-schnell-fp8-comfyui",
         "products/recipes/ollama-llama3.1",
+        "products/recipes/sd3.5-large",
+        "products/recipes/sd3.5-medium",
         "products/recipes/sdxl-with-refiner-comfyui",
         "products/recipes/yolov8"
       ]
@@ -301,7 +303,26 @@
                 "reference/recipes/sdxl-with-refiner-comfyui/text-to-image"
               ]
             },
-
+            {
+              "group": "Stable Diffusion 3.5 Large - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/sd3.5-large/health-probe",
+                "reference/recipes/sd3.5-large/readiness-probe",
+                "reference/recipes/sd3.5-large/list-models",
+                "reference/recipes/sd3.5-large/submit-prompt",
+                "reference/recipes/sd3.5-large/txt2img"
+              ]
+            },
+            {
+              "group": "Stable Diffusion 3.5 Medium - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/sd3.5-medium/health-probe",
+                "reference/recipes/sd3.5-medium/readiness-probe",
+                "reference/recipes/sd3.5-medium/list-models",
+                "reference/recipes/sd3.5-medium/submit-prompt",
+                "reference/recipes/sd3.5-medium/txt2img"
+              ]
+            },
             {
               "group": "YOLO v8 (API)",
               "pages": [
