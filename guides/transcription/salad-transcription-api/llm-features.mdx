@@ -1,0 +1,261 @@
+---
+title: 'LLM Integration Guide'
+description: >
+  Learn how to enhance your transcriptions using Salad Transcription API with Large Language Model (LLM) features. This
+  guide covers advanced parameters like `summarize`, `llm_translation`, `custom_prompt`, `classification_labels`,
+  `overall_classification`, and `overall_sentiment_analysis` to extract deeper insights from your audio content.
+---
+
+## Introduction
+
+Salad Transcription API now offers integration with Large Language Models (LLMs) to provide advanced features such as
+summarization, translation, custom prompts, and sentiment analysis. By leveraging LLMs, you can gain richer insights and
+perform complex language processing tasks on your transcriptions.
+
+This guide covers the key LLM-related parameters you can use to enhance your transcription outputs:
+
+- **Summarization**:
+  - `summarize`
+- **LLM-Based Translation**:
+  - `llm_translation`
+  - `srt_translation`
+- **Custom Prompts**:
+  - `custom_prompt`
+- **Overall Classification and Sentiment Analysis**:
+  - `overall_classification`
+  - `overall_sentiment_analysis`
+
+By properly utilizing these parameters, you can unlock the full potential of LLMs in your transcription workflows.
+
+## LLM Integration Parameters
+
+### 1. `summarize`
+
+#### Description
+
+The `summarize` parameter enables you to generate a concise summary of your transcription using an LLM. You can specify
+the maximum word count for the summary.
+
+- **Default**: `0` (No summarization)
+- **Type**: `integer`
+
+#### Usage
+
+Set `"summarize": word_limit` in your request to receive a summary with the specified word limit.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "summarize": 100
+}
+```
+
+**Output**
+
+The summary will be included in the `summary` field of the output.
+
+```json
+"summary": "This meeting discussed project timelines, budget allocations, and assigned tasks to team members for the next quarter."
+```
+
+### 2. `llm_translation`
+
+#### Description
+
+Use the `"llm_translation"` parameter to translate your transcription into one or more specified languages using an LLM.
+
+- **Type**: `string` (Comma-separated list of languages)
+
+**Usage**
+
+Set `"llm_translation": "Language1, Language2"` to translate the transcription into the specified languages.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "llm_translation": "german, italian, french"
+}
+```
+
+**Output**
+
+Translations will be included in the `llm_translation` object.
+
+```json
+"llm_translation": {
+  "French": "Votre transcription en français.",
+  "German": "Ihre Transkription auf Deutsch."
+}
+```
+
+Check [translation page](/guides/transcription/salad-transcription-api/translation) for more details.
+
+### 3. `srt_translation`
+
+#### Description
+
+Translate the generated SRT subtitles into specified languages using an LLM.
+
+- **Type**: `string` (Comma-separated list of languages)
+
+**Usage**
+
+Set `"srt_translation": "Language1, Language2"` to translate the transcription into the specified languages.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "srt_translation": "spanish"
+}
+```
+
+**Output**
+
+Translations will be included in the `srt_translation` object.
+
+```json
+"llm_translation": {
+  "Spanish": "1\n00:00:01,000 --> 00:00:04,000\nSu transcripción en español.\n\n..."
+}
+```
+
+Check [translation page](/guides/transcription/salad-transcription-api/translation) for more details.
+
+### 4. `custom_prompt`
+
+#### Description
+
+Provide a `custom prompt` to guide the LLM in performing specific tasks, such as generating a tailored summary,
+extracting key information, improve result, or answering questions based on the transcription.
+
+- **Type**: `string`
+
+**Usage**
+
+Set `"custom_prompt": "Your custom instruction here"` to direct the LLM. As a result the LLM model will receive a prompt
+in the following format: `custom instruction:transcription`
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "custom_prompt": "List all action items discussed in the meeting."
+}
+```
+
+**Output**
+
+The LLM will generate a response based on the custom prompt. The result will be included in the `llm_result` field.
+
+json Copy code
+
+```json
+"llm_result": "- Prepare the project proposal by Friday.\n- Schedule a follow-up meeting next Monday.\n- Allocate resources for the development team."
+```
+
+### 5. `classification_labels ` and `overall_classification`
+
+#### Description
+
+Use the `classification_labels` parameter in conjunction with `overall_classification` to classify the entire
+transcription into specified categories using an LLM.
+
+- **`classification_labels`**:
+  - **Type**: `string` (Comma-separated list of labels)
+- **`overall_classification`**:
+  - **Default**: `false`
+  - **Type**: `boolean`
+
+#### Usage
+
+Set `"overall_classification": true` and provide your labels in `"classification_labels": "Label1, Label2"` to classify
+the entire transcription.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "overall_classification": true,
+  "classification_labels": "Interview, Meeting, Presentation"
+}
+```
+
+**Output**
+
+The classification result will be included in the `overall_classification` field.
+
+```json
+"overall_classification": "Meeting"
+```
+
+**Notes**
+
+- **`Custom Labels:`**: You can define any categories relevant to your use case.
+- **`Multiple Labels:`**: The LLM will select the most appropriate label from the list provided
+
+### 6. `overall_sentiment_analysis`
+
+#### Description
+
+Analyze the overall sentiment of the transcription using an LLM.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+#### Usage
+
+Set `"overall_sentiment_analysis"`: true to perform sentiment analysis.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "overall_sentiment_analysis": true
+}
+```
+
+**Output**
+
+The result will be included in the `overall_sentiment` field.
+
+json Copy code
+
+```json
+"overall_sentiment": "Positive"
+```
+
+### 7. `custom_vocabulary`
+
+#### Description
+
+Improve transcription accuracy by providing a custom vocabulary of terms that are specific to your domain, such as
+industry jargon, acronyms, or proper nouns.
+
+- **Type**: `string` (Comma-separated list of terms)
+
+#### Usage
+
+Set `"custom_vocabulary": "Term1, Term2"` to include custom terms in the transcription process.
+
+**Example:**
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp3",
+  "custom_vocabulary": "SaladCloud, AI Transcription, LLM Integration"
+}
+```
+
+**Notes**
+
+- The custom vocabulary helps the LLM update domain-specific terms.
+- Result will have both the original transcrioption and updated under `llm_custom_vocabulary`.
