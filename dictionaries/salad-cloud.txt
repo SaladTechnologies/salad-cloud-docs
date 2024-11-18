@@ -54,6 +54,7 @@ infotexts
 inpainting
 INSTALLDIR
 interruptible
+ipinfo
 italian
 iterrows
 jemison
@@ -72,6 +73,7 @@ makedirs
 metavoiceio
 mintlify
 neofetch
+nflx
 noheader
 nomos8khatLOtf_v20.safetensors
 noproxy

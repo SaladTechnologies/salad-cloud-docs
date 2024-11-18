@@ -37,6 +37,28 @@ Whether you're looking to:
 
 Salad Transcription API offers a seamless and powerful solution tailored to your needs.
 
+## Turnaround Times
+
+The Salad Transcription API operates as a batch, async service, not a real-time service. While most jobs are processed
+quickly, turnaround times can vary during peak usage when the queue holds thousands of requests. Our multi-step
+processing model runs audio at approximately 5x the standard playback speed, enabling most transcriptions to be
+completed faster than the actual audio duration.
+
+We use a **sequential long-form algorithm** for transcription, prioritizing **transcription accuracy** over speed, as
+accuracy is our highest priority.
+
+During high-demand periods, there may be increased turnaround times, but our infrastructure is designed to auto-scale as
+needed to ensure no job exceeds a processing time of 2 hours.
+
+#### Standard Response Times for a 15-minute (20 MB) Audio Clip:
+
+- ** < 5 minutes**: 95% of jobs
+- ** 5-30 minutes**: 3% of jobs
+- ** 30-90 minutes**: 2% of jobs
+- ** > 90 minutes**: 1% of jobs
+
+_Note_ : These figures are estimates and can vary based on demand.
+
 ## Get Started Quickly
 
 Ready to transform your media content? Get started in minutes:
