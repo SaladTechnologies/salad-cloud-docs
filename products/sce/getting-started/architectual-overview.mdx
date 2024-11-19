@@ -1,0 +1,145 @@
+---
+title: 'SCE Architectural Overview'
+description: 'The world’s largest distributed GPU cloud at the most competitive prices!'
+---
+
+## SaladCloud Container Engine - SCE
+
+SaladCloud comprises tens of thousands of Salad nodes distributed across the global Internet, with each node equipped
+with a consumer GPU and varying CPU and memory configurations. Parts of the nodes are located in residential networks
+with asymmetric bandwidth, where the upload speed is lower than the download speed.
+
+SCE provides a GPU-enabled container environment to run containerized applications for AI inference and other
+GPU-intensive computations. [The corresponding docker command:](/tutorials/docker-run)
+
+```Code
+docker run --rm -it --gpus all -p 8000:8888 docker.io/saladtechnologies/misc:test
+```
+
+A SCE application (or container group), consists of multiple replicas (or instances) running the same container image,
+with each instance deployed on a separate Salad node.
+
+**SCEs are not virtual machines with attached volumes; instead, both the image and any runtime data are removed from the
+nodes when the application is stopped. Additionally, external SSH access is not supported.**
+
+**The highest node configuration for SCE:**
+
+- 16 vCPUs, 60 GB RAM, RTX 4090 with 24 GB VRAM
+- 50 GB of ephemeral Storage (available while an instance is running)
+
+Most popular models can be run on SaladCloud, including SDXL/Flux, Whisper Large, LLM 7B/8B/9B and quantized 13B/34B,
+and molecular dynamics simulations, etc.
+
+## Prepare a Container Image
+
+**Write [a Dockerfile:](https://github.com/SaladTechnologies/misc/blob/main/Test/Dockerfile)**
+
+- Select a base image with GPU support
+- Add dependencies
+- Copy your code and data
+- Define the default command to run
+
+**Instances running on SaladCloud must have a continuously running process, such as a web server or job queue worker.**
+
+**Use environment variables to pass information to your applications:**
+
+- Customization, such as listening port and maximum request number
+- Access external services, such as cloud storage, database, job queue or APIs
+
+**Build and test your image locally:**
+
+```Code
+docker image build -t docker.io/saladtechnologies/misc:test -f Dockerfile .
+docker run --rm -it --gpus all docker.io/saladtechnologies/misc:test
+```
+
+**Push the image to a public or private repository:**
+
+```Code
+docker push docker.io/saladtechnologies/misc:test
+```
+
+The supported maximum size of container image: 35 GB (compressed).
+
+<img src="/products/sce/images/sce_ao/sce_ao1.png" />
+
+## Deploy a Container Group
+
+Two ways for deployment: SaladCloud Portal and API.
+
+**You may deploy a container group in specific countries using the API, and the application can further filter nodes
+based on custom rules (bandwidth, latency to specific locations and performance), and trigger reallocation if a node is
+not suitable.**
+
+<img src="/products/sce/images/sce_ao/sce_ao2.png" />
+
+The image is pulled from the image source to SaladCloud Repository, and then delivered to the allocated Salad nodes
+while the application is run.
+
+The startup process can take anywhere from a few minutes to longer, with some nodes starting earlier than others,
+depending on the image size and their network conditions.
+
+<img src="/products/sce/images/sce_ao/sce_ao3.png" />
+
+When the application is stopped, the image and any running data are removed from the nodes that are then released.
+**Data persistence must be ensured using external cloud storage.**
+
+Increasing the number of replicas can significantly enhance the reliability and throughput of your applications on
+SaladCloud, and
+[may also reduce waiting time and enhance the developer experience without incurring additional costs.](/tutorials/docker-run#replica-count)
+
+## Provide Input to Applications
+
+**Two ways to provide inputs and retrieve results from applications:**
+
+- Utilize a load balancer for real-time applications (Allowing up to 100 seconds of processing time per request)
+- Integrate with a job queue system for batch jobs (AWS SQS, Salad Job Queue, Salad Kelpie or others)
+
+<img src="/products/sce/images/sce_ao/sce_ao4.png" />
+
+<img src="/products/sce/images/sce_ao/sce_ao5.png" />
+
+The input and output data of a task can be embedded in the request/response and job/result.
+
+For large data, it is recommended to exchange directly between the instances and cloud storage, while the load balancer
+or job queue only carry the reference of data (the clients need to upload the task inputs to cloud storage first).
+
+## [Long-Running Tasks](https://github.com/SaladTechnologies/mds/tree/main)
+
+<img src="/products/sce/images/sce_ao/sce_ao6.png" />
+
+**A node may go down without any prior notification.**
+
+**Application need to incorporate additional steps to support long-running tasks:**
+
+- Save the running state regularly(checkpoints or trajectories) to cloud storage
+
+- Start from scratch while getting a new task
+
+- Resume the previous running state if retrieving an unfinished task
+
+<img src="/products/sce/images/sce_ao/sce_ao7.png" />
+
+**Select nodes with better upload bandwidth to run these applications:**
+
+Use tools that support the multithreading downloading and uploading, such as s3parcp.
+
+Salad Kelpie can help manage the data synchronization from AWS S3-compatible cloud storage.
+
+**Use cloud storage to manage data, and jobs only contain reference of data.**
+
+A separate folder for each job in a cloud storage bucket, including input file, state file and output file.
+
+## [Use Cases and Scenarios](/tutorials/docker-run#summary)
+
+SaladCloud SCE is the highly scalable and most cost-effective platform for large-scale AI inference and GPU-intensive
+computations, which involves tens to thousands of GPUs.
+
+However, single-instance, UI-based, or database applications are not well-suited for SCE.
+
+Consider both system capacity and reliability when determining the replica account, and increasing the number of
+replicas can significantly enhance the reliability and throughput of applications. Deploying a container group with a
+few instances may reduce waiting time and enhance the developer experience without incurring additional costs.
+
+Applications must be optimized to accommodate the distributed and dynamic nature of the platform, including varying
+startup times and node reallocations, and can utilize cloud storage to manage data.
