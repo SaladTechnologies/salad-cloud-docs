@@ -157,3 +157,4 @@ nvcc
 NVCC
 rxjupyterlab
 rxjupyterdata
+s3parcp
