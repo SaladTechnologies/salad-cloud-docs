@@ -22,7 +22,11 @@
         "products/sce/introduction",
         {
           "group": "Getting Started",
-          "pages": ["products/sce/getting-started/quickstart", "products/sce/getting-started/quickstart-api"]
+          "pages": [
+            "products/sce/getting-started/quickstart",
+            "products/sce/getting-started/quickstart-api",
+            "products/sce/getting-started/architectual-overview"
+          ]
         },
         {
           "group": "Container Groups",
