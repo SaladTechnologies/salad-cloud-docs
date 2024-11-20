@@ -17,28 +17,28 @@ with each instance deployed on a separate Salad node.
 
 ## The Distributed and Dynamic Nature, Challenges and Solutions
 
-SaladCloud comprises tens of thousands of Salad nodes distributed globally, primarily gaming PCs running the SaladCloud
-agent. Each node is equipped with a consumer-grade GPU and has varying CPU and memory configurations. When these devices
-are not in use by their owners, SaladCloud assigns SCE workloads (docker containers) to run on them, paying the device
-owners for their compute time.
+SaladCloud comprises tens of thousands of Salad nodes distributed globally, primarily high-performance desktop computers
+and workstations running the SaladCloud agent. Each node is equipped with a consumer-grade GPU and has varying CPU and
+memory configurations. When these devices are not in use by their owners, SaladCloud assigns SCE workloads (docker
+containers) to run on them, paying the device owners for their compute time.
 
 While SaladCloud provides exceptional flexibility to scale GPU-powered applications up or down at the most competitive
 prices in the industry, applications must be optimized to address the following challenges for successful deployment:
 
 | No  | Challenges                                                                                                                                                                                                                                                                                                                                            | Recommended Solutions and Best Practices                                                                                                                                                                                                                                                                                                        |
 | :-- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Salad nodes are globally distributed, resulting in varying distances, latencies, and network throughput to specific endpoints.                                                                                                                                                                                                                        | Use the Salad APIs to create region-specific workloads and choose a cloud storage provider within the same regions to optimize performance. Deploy regional job queues from public cloud providers or using open-source tools, to manage workload input and output locally.                                                                     |
-| 2   | The nodes differ in CPU, RAM, GPU and network capabilities. This leads to variations in processing capacity and network performance, which may also fluctuate over time due to the shared nature of the resources. Many nodes are located in residential networks with asymmetric bandwidth, where the upload speed is lower than the download speed. | You can configure the machine hardware specifications of a container group. Once the instances are running, applications can further perform initial checks and continuously monitor performance to filter nodes based on specific criteria.                                                                                                    |
+| 1   | Salad nodes are globally distributed, resulting in varying distances, latencies, and network throughput to specific endpoints.                                                                                                                                                                                                                        | Use the SaladCloud APIs to create region-specific workloads and choose a cloud storage provider within the same regions to optimize performance. Deploy regional job queues from public cloud providers or using open-source tools, to manage workload input and output locally.                                                                |
+| 2   | The nodes differ in CPU, RAM, GPU and network capabilities. This leads to variations in processing capacity and network performance, which may also fluctuate over time due to the shared nature of the resources. Many nodes are located in residential networks with asymmetric bandwidth, where the upload speed is lower than the download speed. | Configure the machine hardware specifications of a container group. Once the instances are running, applications can further perform initial checks and continuously monitor performance to filter nodes based on specific criteria.                                                                                                            |
 | 3   | AI inference processing times also vary widely, ranging from a few seconds for tasks like image generation to several minutes or longer for tasks such as LLM processing or transcription. Some extensive tasks, like molecular dynamics simulations, can run for up to a week.                                                                       | Implement adaptive architectures to effectively manage variations in both nodes and tasks.                                                                                                                                                                                                                                                      |
-| 4   | When a container group is started, the image is dynamically downloaded to the allocated nodes, leading to variable startup times, potentially ranging from a few minutes to longer.                                                                                                                                                                   | Building a custom auto-scaling solution to align GPU resources with system load at the quarter-hour granularity is achievable on SaladCloud.                                                                                                                                                                                                    |
+| 4   | When a container group is started, the image is dynamically downloaded to the allocated nodes, leading to variable startup times, potentially ranging from a few minutes to longer.                                                                                                                                                                   | Build a custom auto-scaling solution to align GPU resources with system load at the quarter-hour granularity.                                                                                                                                                                                                                                   |
 | 5   | When a container group is stopped, the image and any associated runtime data are removed from the allocated nodes that are then released.                                                                                                                                                                                                             | Data persistence must be ensured using external cloud storage.                                                                                                                                                                                                                                                                                  |
 | 6   | Nodes may experience unexpected downtime without prior notice; however, the majority can operate continuously for over 10 hours.                                                                                                                                                                                                                      | Increasing the replica count for a container group can significantly enhance the reliability and throughput of applications on SaladCloud. Long-running tasks on SaladCloud must meet additional requirements, such as regularly saving task states to cloud storage and being able to resume from the previous state in case of interruptions. |
-| 7   | SCE provides a GPU-enabled container environment (PaaS) for running containerized applications, rather than a virtual machine (IaaS). External SSH access is not supported.                                                                                                                                                                           | UYou can access running instances through the interactive terminal in the Portal. Running JupyterLab on SaladCloud is also feasible, allowing you to perform comprehensive tests and troubleshoot issues directly.                                                                                                                              |
+| 7   | SCE provides a GPU-enabled container environment (PaaS) for running containerized applications, rather than a virtual machine (IaaS). External SSH access is not supported.                                                                                                                                                                           | You can access running instances through the interactive terminal in the Portal. Running JupyterLab on SaladCloud is also feasible, allowing you to perform comprehensive tests and troubleshoot issues directly.                                                                                                                               |
 
 ## Use Cases and Scenarios
 
-SaladCloud is the powerful, highly scalable and cost-effective platform for requirements that involve tens to thousands
-of GPUs for a large-scale and on-demand AI inference application (such as image generation or LLM) utilizing a load
+SaladCloud is a powerful, highly scalable and cost-effective platform for requirements that involve tens to thousands of
+GPUs for a large-scale and on-demand AI inference application (such as image generation or LLM) utilizing a load
 balancer, or a batch-processing system with a job queue to handle millions of jobs (model fine-tuning, transcription,
 molecular simulation) within a specified timeframe.
 
@@ -135,9 +135,9 @@ in the cloud, ensure you select the appropriate nodes based on latency and throu
 consider deploying region-specific container groups to maximize throughput.
 
 You can create a container group in specific countries either by using
-[the Salad API](/reference/saladcloud-api/container_groups/create-a-container-group) (not supported by the Portal) or by
-leveraging [the SaladCloud Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python) to streamline the
-process.
+[the SaladCloud API](/reference/saladcloud-api/container_groups/create-a-container-group) (not supported by the Portal)
+or by leveraging [the SaladCloud Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python) to streamline
+the process.
 
 Before deployment, several parameters need to be considered and decided. The simplest approach is to manually deploy a
 container group via the Portal,
@@ -193,14 +193,15 @@ are measured using Speedtest.net servers, which may not always accurately reflec
 a more precise measurement, you can assess latency and throughput from the node to your cloud bucket's location using
 tools like
 [the pythonping module](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_network.py#L23)
-(the first ping is often lost or inaccurate) and the cloud-specific SDK/CLI.
+(note that the first ping is often lost or inaccurate) and the cloud-specific SDK/CLI.
 
 You can also obtain detailed GPU information, including **the supported CUDA Toolkit version and VRAM usage**, by
 running the nvidia-smi command through Python’s subprocess module.
 
 The NVIDIA driver maintains backward compatibility to continue support of applications built on older CUDA Toolkits.
 Most of Salad nodes (around 97%) have been updated with the latest GPU drivers; however, some nodes may still be running
-older verisons. Currently, SaladCloud doesn't allocate nodes based on NVIDIA driver versions.
+older verisons. SaladCloud currently guarantees support for **CUDA Toolkit version 12.0 and later** when allocating
+nodes.
 
 Given the lag between the release of a new CUDA version and its support in AI frameworks such as TensorFlow and
 PyTorch—due to the time needed for integration, testing, and validation—container images built upon the most recent AI
@@ -291,7 +292,7 @@ Please refer to
 [this link for a detailed comparison](/products/sce/getting-started/architectual-overview#provide-input-to-applications)
 between the container gateway and the job queue.
 
-## Implement Auto Scaling at the Quarter-Hour Level
+## Implement Auto Scaling at the Quarter-Hour Granularity
 
 When a container group is started, the image is dynamically downloaded to the allocated nodes, leading to variable
 startup times, potentially ranging from a few minutes to longer, depending on the image size and the network conditions
@@ -309,9 +310,10 @@ Due to the variable startup times, the real-time auto-scaling to match GPU resou
 level is not feasible on SaladCloud, but we may still be able to implement auto-scaling at the quarter-hour level.
 
 Implementing auto scaling with a job queue is straightforward: you just need to monitor the number of available jobs in
-the queue regularly and then call [the Salad API](/reference/saladcloud-api/container_groups/update-a-container-group)
-to adjust the replica count of the running container group. Both Salad Kelpie and Salad Job Queue already offer this
-feature, saving you the effort of implementing it yourself.
+the queue regularly and then call
+[the SaladCloud API](/reference/saladcloud-api/container_groups/update-a-container-group) to adjust the replica count of
+the running container group. Both Salad Kelpie and Salad Job Queue already offer this feature, saving you the effort of
+implementing it yourself.
 
 Implementing auto-scaling with the container gateway can be complex due to its synchronous and real-time nature.
 
@@ -327,7 +329,7 @@ and **the average response waiting time** within a specified time frame, providi
 planning and auto-scaling.
 
 For example, if the number of rejected requests or the average response waiting time starts to increase, the client
-application can use the Salad APIs to scale up the replica count of the container group. Conversely, if the request
+application can use the SaladCloud API to scale up the replica count of the container group. Conversely, if the request
 volume is significantly lower relative to the number of running instances, the client application can scale down the
 replica count to optimize resource usage and minimize costs.
 
