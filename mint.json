@@ -143,7 +143,8 @@
         "products/transcription/speech-to-text",
         "products/transcription/translation",
         "products/transcription/captions",
-        "products/transcription/insights-intelligence"
+        "products/transcription/insights-intelligence",
+        "products/transcription/billing"
       ]
     },
     {
