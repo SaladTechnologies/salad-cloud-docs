@@ -42,7 +42,7 @@
                 "products/sce/container-groups/registries/dockerhub",
                 "products/sce/container-groups/registries/aws-ecr",
                 "products/sce/container-groups/registries/azure-acr",
-                "products/sce/container-groups/registries/gcp-gcr",
+                "products/sce/container-groups/registries/gcp-gar",
                 "products/sce/container-groups/registries/quay",
                 "products/sce/container-groups/registries/github-ghcr"
               ]

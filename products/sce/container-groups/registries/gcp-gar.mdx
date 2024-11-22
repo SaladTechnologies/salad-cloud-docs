@@ -1,5 +1,5 @@
 ---
-title: 'Google Container Registry'
+title: 'Google Artifact Registry'
 ---
 
 Service accounts are used by applications to make authorized APIs calls on the Google Cloud Platform (GCP). In order for
@@ -11,23 +11,23 @@ the SaladCloud portal to interact with GCP through APIs, a JSON key for a servic
 2. Access the GCP [Console home page](https://console.cloud.google.com), Click on 'Go to project settings' to proceed.
 3. On the left navigation bar, find and select the 'Service Accounts' menu.
 4. Choose 'Create Service Account' to initiate the process.
-5. Provide a name and description for the service account, grant it the necessary access to your project, and proceed to
-   create the account.
+5. Provide a name and description for the service account, grant it `Artfact Resgistry Reader access` to your project, and proceed to
+   create the account. *(Note: Most read/write permissions should work, except Basic - Browser which does **NOT** work)*
 6. Select the newly created service account, and navigate to the 'KEYS' tab.
-7. From the 'ADD KEY' dropdown, opt for 'Create New Key' and select JSON as the key type.Your service account key JSON
+7. From the 'ADD KEY' dropdown, opt for 'Create New Key' and select JSON as the key type. Your service account key JSON
    file will be automatically downloaded to your local machine.
 
 ### Step 2: Configure SaladCloud Container Environment (SCE)
 
 Access the SaladCloud portal, Set up your SCE by selecting the private registry tab when setting the image source. In
-the service dropdown option, choose "Google Container Registry" and provide the following information:
+the service dropdown option, choose "Google Artifact Registry" and provide the following information:
 
-- Image name (example: `us.gcr.io/{my-app}/{my-container-image}:{version/latest}`)
+- Image name (example: `us-central1-docker.pkg.dev/{my-project}/{my-registry}/{my-container-image}:{version/latest}`)
 - JSON Key (generated or downloaded in step 1)
 
-<img src="/products/sce/container-groups/registries/images/configure-gcr.png" />
+<img src="/products/sce/container-groups/registries/images/configure-gar.png" />
 
 > 👍 Congratulations!
 >
-> You have successfully configured the private container registry using Google Container Registry. Now, you can proceed
+> You have successfully configured the private container registry using Google Artifact Registry. Now, you can proceed
 > to configure and deploy your container group.
