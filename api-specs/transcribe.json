@@ -3114,16 +3114,6 @@
             "default": false,
             "description": "Perform sentence-level speaker diarization."
           },
-          "sentence_sentiment_analysis": {
-            "type": "boolean",
-            "default": false,
-            "description": "Perform sentiment analysis on sentence-level transcription."
-          },
-          "sentence_topic_classification": {
-            "type": "boolean",
-            "default": false,
-            "description": "Classify sentences with specific labels."
-          },
           "srt": {
             "type": "boolean",
             "default": false,
@@ -3160,12 +3150,12 @@
             "description": "Custom vocabulary to improve transcription accuracy for specific terms.",
             "example": "AI, NLP, cloud computing"
           },
-          "classification_topics": {
+          "classification_labels": {
             "type": "string",
             "description": "List of labels to use for sentence classification, e.g., 'INTERVIEW, MEETING, CALL'.",
             "example": "INTERVIEW, MEETING, CALL"
           },
-          "overall_topic_classification": {
+          "overall_classification": {
             "type": "boolean",
             "default": false,
             "description": "Perform overall classification of the transcription."
