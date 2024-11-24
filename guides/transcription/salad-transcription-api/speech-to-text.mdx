@@ -232,10 +232,16 @@ Include speaker information at the sentence level.
 
 #### Description
 
-Specify the language of the transcription to improve diarization and timestamps accuracy performance.
+The language_code parameter allows you to specify the language of the transcription to improve the accuracy of
+transcription, diarization and timestamps. This parameter supports both full language names and their short versions.
 
 - **Default**: `en` (English)
 - **Type**: `string`
+
+If no language is specified or the provided language is not in the list, the system will automatically detect the
+language. However, specifying the language correctly enhances transcription accuracy. If the wrong language is
+specified, the system will return a **translation** to the specified language. For **multilingual audio** content, it is
+recommended not to specify a language to achieve optimal results.
 
 #### Usage
 
@@ -250,12 +256,26 @@ Set `"language_code": language_code` to specify the language of the audio conten
 }
 ```
 
-**Supported Languages** Providing the correct language_code enhances transcription accuracy, especially for features
-like diarization. Below is a list of supported language codes: "fr" (French), "de" (German), "es" (Spanish), "it"
-(Italian), "ja" (Japanese), "zh" (Chinese), "nl" (Dutch), "uk" (Ukrainian), "pt" (Portuguese), "ar" (Arabic), "cs”
-(Czech), "ru" (Russian), "pl" (Polish), "hu" (Hungarian), "fi" (Finnish), "fa" (Persian), "el" (Greek), "tr" (Turkish),
-"da" (Danish), "he" (Hebrew), "vi" (Vietnamese), "ko" (Korean), "ur" (Urdu), "te" (Telugu), "hi" (Hindi), "ca"
-(Catalan), "ml" (Malayalam) If the language you use is not in the list, just skip that parameter.
+**Supported Languages:** Below is a list of supported language codes: English, Chinese, German, Spanish, Russian,
+Korean, French, Japanese, Portuguese, Turkish, Polish, Catalan, Dutch, Arabic, Swedish, Italian, Indonesian, Hindi,
+Finnish, Vietnamese, Hebrew, Ukrainian, Greek, Malay, Czech, Romanian, Danish, Hungarian, Tamil, Norwegian, Thai, Urdu,
+Croatian, Bulgarian, Lithuanian, Latin, Maori, Malayalam, Welsh, Slovak, Telugu, Persian, Latvian, Bengali, Serbian,
+Azerbaijani, Slovenian, Kannada, Estonian, Macedonian, Breton, Basque, Icelandic, Armenian, Nepali, Mongolian, Bosnian,
+Kazakh, Albanian, Swahili, Galician, Marathi, Punjabi, Sinhala, Khmer, Shona, Yoruba, Somali, Afrikaans, Occitan,
+Georgian, Belarusian, Tajik, Sindhi, Gujarati, Amharic, Yiddish, Lao, Uzbek, Faroese, Haitian Creole, Pashto, Turkmen,
+Nynorsk, Maltese, Sanskrit, Luxembourgish, Myanmar, Tibetan, Tagalog, Malagasy, Assamese, Tatar, Hawaiian, Lingala,
+Hausa, Bashkir, Javanese, Sundanese, Cantonese, Burmese, Valencian, Flemish, Haitian, Letzeburgesch, Pushto, Panjabi,
+Moldavian, Moldovan, Sinhalese, Castilian, Mandarin.
 
-**Note:** Mandatory for Diarization: When using diarization or sentence_diarization, specifying language_code is
-required for better performance. Default Language: If language_code is not specified, it defaults to English ("en").
+### Note
+
+- **Mandatory for Diarization**: When using diarization or sentence-level diarization, specifying `language_code` is
+  required for optimal performance.
+- **Automatic Detection**: If no language is specified or the provided language is not supported, the system will
+  automatically detect the language.
+- **Translation Option**: If the wrong language is specified, the system will provide a transcription translated into
+  the specified language.
+- **Multilingual Content**: For multilingual audio, it is better not to specify a language to ensure the best results.
+
+By setting the correct `language_code` or leveraging the automatic detection feature, you ensure the best possible
+transcription quality tailored to your audio content.
