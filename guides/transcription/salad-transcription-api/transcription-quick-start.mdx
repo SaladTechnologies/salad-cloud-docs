@@ -2,8 +2,7 @@
 title: 'Transcription API Quickstart'
 description:
   'Get started with Salad Transcription API here. This step by step guide will walk you through setting up your
-  SaladCloud account and running your first Transcription API job. Alternatively, [Fork this PostMan.com
-  collection.](https://www.postman.com/salad-apis/workspace/salad/collection/34559698-f682b990-8c66-4f8f-a8ce-f2cafe8caaac)'
+  SaladCloud account and running your first Transcription API job.'
 ---
 
 ## Accounts & Credentials
@@ -43,7 +42,14 @@ Copy your SaladCloud API key from your account [here.](https://portal.salad.com/
 
 <img src="/guides/transcription/salad-transcription-api/images/9d9c06f-image.png" alt="Token Instructions" />
 
-## API Reference
+## How to Use Transcription API
+
+We provide several examples and resources to help you use the API effectively:
+
+- For a **cURL example** and parameter descriptions, refer to
+  [Example cURL Post Transcript](#example-curl-post-transcript) on this page.
+- For **easy testing** with our API reference, visit the [API Reference](#api-reference).
+- For **process automation**, see [Transcription Automation](#transcription-automation).
 
 ### Example cURL Post Transcript
 
@@ -91,7 +97,7 @@ curl https://api.salad.com/api/public/organizations/{my-organization}/inference-
    -H "Salad-Api-Key: {your-api-key}"
 ```
 
-### Step1 | Configure Header
+### Step 1 | Configure Header
 
 Configure you header to include your unique SaladCloud API URL which can be found above as the variable “API URL”. Also
 include your unique SaladCloud API key [which can be found here](https://portal.salad.com/api-key) as the variable
@@ -340,6 +346,67 @@ file you will see an "error" in the response and one of the reasons:
 
 *File size is more than 3GB *File can not be downloaded or duration is missing. Please check your file and try again.
 \*File duration is more than 2.5 hours
+
+## API Reference
+
+Access detailed API specifications and test requests directly by visiting the
+[Transcription API Reference page](/reference/transcribe/inference_endpoints/create-an-inference-endpoint-job).
+
+### Step 1: Set Up Authorization
+
+- In the dropdown menu on the left, make sure **"Create a job for Salad Transcription API"** is selected.
+- Enter your **Salad API key** and **Organization Name**. Follow instructions above if you do not know where to find
+  them.
+- Under the **Authorization** section, provide your **Salad API key**.
+- Under the **Path** section, specify your organization name.
+
+<img
+  src="/guides/transcription/salad-transcription-api/images/TranscriptionAPIReference1.png"
+  alt="Transcription API Reference"
+/>
+
+### Step 2: Configure Input Parameters
+
+- In the **Body** section, specify the input parameters as described in the documentation above.
+- Each parameter is explained directly on the reference page to help you customize your request.
+
+<img
+  src="/guides/transcription/salad-transcription-api/images/TranscriptionAPIReference2.png"
+  alt="Transcription API Reference 2"
+/>
+
+### Step 3: Submit the Request
+
+- Click the **Send** button to submit the request.
+- Upon success, you'll receive a response containing a unique `"id"` field. This **Job ID** will be used to retrieve the
+  transcription results.
+
+<img
+  src="/guides/transcription/salad-transcription-api/images/TranscriptionAPIReference3.png"
+  alt="Transcription API Reference 3"
+/>
+
+### Step 4: Retrieve Transcription Results
+
+- In the dropdown menu on the left, select **"Get job for Salad Transcription API"**.
+- Under the **Authorization** section, provide your **Salad API key**.
+- Under the **Path** section, specify your **organization name** and the **Job ID** you received in Step 3.
+- Click **Send** to fetch the transcription results.
+
+<img
+  src="/guides/transcription/salad-transcription-api/images/TranscriptionAPIReference4.png"
+  alt="Transcription API Reference 4"
+/>
+
+### Example Response
+
+- The response will include the transcription output, timestamps, and other requested data, depending on the parameters
+  you specified.
+
+<img
+  src="/guides/transcription/salad-transcription-api/images/TranscriptionAPIReference5.png"
+  alt="Transcription API Reference 5"
+/>
 
 ## Transcription Automation
 
