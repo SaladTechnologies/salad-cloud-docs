@@ -158,3 +158,8 @@ NVCC
 rxjupyterlab
 rxjupyterdata
 s3parcp
+Shona
+Luxembourgish
+Valencian
+Letzeburgesch
+Pushto
