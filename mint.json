@@ -156,6 +156,7 @@
       "pages": [
         "products/recipes/overview",
         "products/recipes/dreamshaper8-comfyui",
+        "products/recipes/flux1-dev-fp8-comfyui",
         "products/recipes/flux1-schnell-fp8-comfyui",
         "products/recipes/ollama-llama3.1",
         "products/recipes/sd3.5-large",
@@ -285,6 +286,16 @@
             {
               "group": "Ollama Llama 3.1",
               "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
+            },
+            {
+              "group": "FLUX.1-Dev (FP8) - ComfyUI (API)",
+              "pages": [
+                "reference/recipes/flux1-dev-fp8-comfyui/health-probe",
+                "reference/recipes/flux1-dev-fp8-comfyui/readiness-probe",
+                "reference/recipes/flux1-dev-fp8-comfyui/list-models",
+                "reference/recipes/flux1-dev-fp8-comfyui/submit-prompt",
+                "reference/recipes/flux1-dev-fp8-comfyui/text-to-image"
+              ]
             },
             {
               "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
