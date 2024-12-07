@@ -7,7 +7,10 @@
       "addWords": true
     }
   },
-  "cSpell.enableFiletypes": ["markdown", "mdx"],
+  "cSpell.enabledFileTypes": {
+    "markdown": true,
+    "mdx": true
+  },
   "cSpell.language": "en,en-US",
   "editor.formatOnSave": true,
   "editor.minimap.maxColumn": 120,
