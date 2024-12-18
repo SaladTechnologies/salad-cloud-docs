@@ -1,0 +1,152 @@
+---
+title: 'Build High-Performance Storage Solutions'
+description: 'The world’s largest distributed GPU cloud at the most competitive prices'
+---
+
+## Introduction
+
+Salad Container Engine (SCE) provides a GPU-enabled container environment for running containerized applications. When a
+container group is started, its image is dynamically downloaded to the allocated nodes. If the container group is
+stopped or the nodes are reallocated, all images and associated runtime data are removed from those nodes. For
+applications that process large datasets or produce substantial outputs, implementing a high-performance cloud-based
+storage solution is crucial to ensure efficient data handling and persistence on SaladCloud.
+
+To support [long-running tasks](/tutorials/high-performance-apps#support-long-running-tasks) such as molecular dynamics
+simulations, model fine-tuning, and hyperparameter tuning, applications on SaladCloud must regularly and efficiently
+save their running state (e.g., trajectories or checkpoints) to the cloud. In the event of a node failure, the new node
+can swiftly retrieve the saved state from the cloud and seamlessly resume the task, minimizing downtime and ensuring
+continuity.
+
+The recommended approach is to include and use a Cloud Storage SDK or CLI tool (e.g., azcopy, aws s3, or gsutil) within
+the container images to synchronize data with cloud storage. Note that volume mounting using S3FS, FUSE, or NFS is not
+supported, as SaladCloud containers do not operate in privileged mode.
+
+Consider using open-source tools like [Rclone](https://rclone.org/) or
+[S3parcp](https://github.com/chanzuckerberg/s3parcp) to optimize performance and throughput. These tools support
+chunked, parallel uploads and downloads, enabling more efficient utilization of bandwidth by establishing multiple
+simultaneous connections.
+
+For an even more integrated solution, Salad Kelpie provides a job queue service accessible via APIs, allowing seamless
+task submission. The Kelpie worker, integrated with your workloads running on Salad nodes, automatically retrieves jobs,
+executes your code, and handles data synchronization between local files and S3-compatible cloud storage in the
+background. **Designed for large-scale data transfers, the Kelpie worker optimizes efficiency with chunked, parallel
+uploads and downloads, while also supporting asynchronous concurrency. This enables simultaneous data transfers across
+multiple jobs and stages within a single job, ensuring optimal network bandwidth utilization.**
+
+If managing data synchronization in your applications—such as downloading inputs and states or uploading outputs and
+checkpoints—feels challenging, Salad Kelpie is a robust solution to offload these tasks and streamline your workflow.
+Please refer to [this demo application](https://github.com/SaladTechnologies/mds/tree/main/demo-app1) for more
+information.
+
+## Build a high-performance and cost-effective storage solution
+
+The following factors should be taken into account when selecting or designing a storage solution for SCE workloads:
+
+- To enhance TCP performance and throughput, consider
+  [deploying region-specific container groups](/tutorials/high-performance-apps#build-region-specific-workloads) and
+  [enabling region-specific I/O](/tutorials/high-performance-apps#enable-region-specific-i-o) to reduce round-trip time
+  (RTT) by minimizing network distance and latency to target locations. Additionally, optimize performance by
+  [selecting nodes with higher physical bandwidth](/tutorials/high-performance-apps#perform-initial-checks-to-filter-nodes)
+  and utilizing multiple connections to maximize data transfer efficiency.
+
+- Transmission efficiency generally improves with larger data volumes. In certain scenarios, compressing a large number
+  of small files into a single large file can help increase throughput.
+
+- Many Salad nodes are located in residential networks with asymmetric bandwidth, where the upload speed is lower than
+  the download speed. For applications generating substantial outputs that require cloud storage, consider implementing
+  an asynchronous upload architecture, ensuring that data uploads do not interfere with GPU computation or overall
+  application performance.
+
+- **Salad nodes are not evenly distributed across regions and countries, with nodes in the US and Canada accounting for
+  50~60% of the total**. Deploying workloads that require specific resource types in a limited number of countries may
+  result in insufficient node availability.
+
+- Some cloud providers charge for egress traffic, while ingress traffic is typically free. We recommend a vendor (such
+  as Cloudflare R2) that does not charge egress fees, as Salad nodes are globally distributed and egress fees can add up
+  quickly.
+
+## Integrate Rclone in your applications
+
+[Rclone](https://rclone.org/) is a high-performance, open-source command-line tool for managing, syncing, and
+transferring data across 50+ cloud storage providers. It excels in performance by enabling chunked and parallel
+uploads/downloads, leveraging multiple connections to maximize throughput and utilize available bandwidth efficiently.
+With advanced features like data encryption, integrity checks, and seamless synchronization, Rclone is an excellent
+choice for building a robust, high-performance storage solution on SaladCloud.
+
+Here are some examples to manage data synchronization between container instances and a Cloudflare R2 bucket folder,
+such as **transcripts/high_performance_storage**:
+
+```
+# Lists the files and directories
+rclone lsf r2:transcripts/high_performance_storage
+
+# Upload and download a file to and from remote storage with optimized performance
+# by specifying a chunk size of 10 MB and enabling up to 10 simultaneous transfers
+​​rclone copyto ./200MB.file r2:transcripts/demoapp3/job0/state/state_200MB.file --s3-chunk-size=10M --transfers=10
+rclone copyto r2:transcripts/demoapp3/job0/state/state_200MB.file ./200MB.file --s3-chunk-size=10M --transfers=10
+
+# View the content of a remote file
+rclone cat r2:transcripts/high_performance_storage/results/LOCAL_001.txt
+
+# Delete a remote file
+rclone deletefile r2:transcripts/high_performance_storage/results/LOCAL_001.txt
+```
+
+**Follow these steps to integrate Rclone into your applications:**
+
+- **Download and install Rclone:** Include Rclone in your container image during the build process.
+- **Configure Rclone dynamically:** Generate the Rclone configuration file at runtime using environment variables set in
+  the container.
+- **Execute Rclone commands:** Use the Python subprocess module to run Rclone commands from your application for
+  seamless data management.
+
+**Here’s [a demo application](https://github.com/SaladTechnologies/mds/tree/main/demo-app3) showcasing the use of the
+Kelpie Job Queue combined with self-managed data synchronization using Cloudflare R2 and Rclone:**
+
+This [Dockerfile](https://github.com/SaladTechnologies/mds/blob/main/demo-app3/image/Dockerfile#L22) provides an example
+to set up a containerized environment using the PyTorch base image with GPU support. It installs Rclone and the
+necessary dependencies, and copies the Python scripts into the image.
+
+The [storage.py](https://github.com/SaladTechnologies/mds/blob/main/demo-app3/image/storage.py) file provides example
+code to create the Rclone configuration file based on the environment variables and manage data synchronization between
+Cloudflare R2 and local. It also implements a local queue and a dedicated thread to facilitate asynchronous uploads.
+During the upload process, the main thread creates copies of the files and adds their filenames to the queue, delegating
+the upload tasks to the dedicated thread. The upload thread manages the actual upload process, removes the file copies
+upon completion, and updates a global state that the main thread can query for upload progress, including errors or
+backlogs. **This design ensures that data uploads run independently, avoiding interference with GPU computation and
+maintaining overall application performance.**
+
+The [config.py](https://github.com/SaladTechnologies/mds/blob/main/demo-app3/image/config.py) file includes example code
+to perform initial checks and filter nodes based on custom rules, such as evaluating latency and throughput to specific
+locations, ensuring nodes are properly prepared to run your applications.
+
+## Solution Test using Cloudflare R2 and Rclone on SaladCloud
+
+Over 200 global Salad nodes participated in the test, with approximately 60% located in the US and Canada. Nodes were
+filtered to ensure a minimum upload bandwidth of 20+ Mbps and download bandwidth of 50+ Mbps.
+
+Each node transferred 200 MiB of data, both uploading to and downloading from a Cloudflare R2 bucket hosted in the US
+East region. The data transfer was performed using Rclone, configured with a chunk size of 10 MiB and 10 simultaneous
+chunk transfers. This setup was designed to optimize throughput and maximize the utilization of available network
+bandwidth.
+
+**RTT is primarily determined by the geographical distance and network latency between nodes and the US East region.**
+With a maximum RTT of 320 ms, the one-way latency between any two points is typically under 160 ms. This provides an
+important benchmark when designing applications on SaladCloud. For time-sensitive applications, consider deploying
+region-specific workloads and enabling region-specific I/O to optimize performance.
+
+<img src="/tutorials/images/hp_storage/hps_rtt.png" />
+
+**Throughput is influenced by factors such as the end-to-end physical bandwidth, RTT, the number of concurrent
+transfers, and the size of the transferred data (200 MiB in this test)**. If your applications handle large datasets or
+generate substantial outputs that need to be stored in the cloud, consider deploying region-specific workloads near your
+cloud storage provider. Additionally, applications can perform initial checks to filter nodes based on upload/download
+speeds and latency to the cloud storage.
+
+<img src="/tutorials/images/hp_storage/hps_throughput.png" />
+
+The asymmetric bandwidth of SaladCloud is notable, as many nodes are located in residential networks. However, a
+significant number of these nodes still offer good upload throughput. If your applications require bidirectional
+symmetric bandwidth, conduct initial checks to filter nodes based on custom rules.
+
+<img src="/tutorials/images/hp_storage/hps_correlation.png" />
