@@ -170,6 +170,7 @@
       "pages": [
         "tutorials/docker-run",
         "tutorials/high-performance-apps",
+        "tutorials/high-performance-storage-solutions",
         {
           "group": "Run a Node App",
           "pages": [
