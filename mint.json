@@ -121,6 +121,12 @@
             "products/sce/autoscaling/enable-autoscaling"
           ]
         },
+        {
+          "group": "Security",
+          "pages": [
+            "products/sce/security/email-security",
+          ]
+        }
         "products/sce/faqs"
       ]
     },
