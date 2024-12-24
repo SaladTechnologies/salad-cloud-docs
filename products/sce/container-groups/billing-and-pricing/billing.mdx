@@ -2,8 +2,55 @@
 title: 'Billing & Pricing'
 ---
 
-We require an active, valid credit card on file for most accounts. This is primarily a means to prevent abuse and ensure
-that we can collect payment at the end of the month.
+> ℹ️ **Info:** SaladCloud is migrating to prepaid billing for all organizations.
+>
+> Please follow the directions below to ensure your account stays active. We will begin enforcing organizations to have
+> a positive credit balance starting on February 1, 2025.
+>
+> In the month of January 2025, you must have a positive credit balance or a valid payment method on file to utilize
+> SaladCloud.
+
+We require organizations to have a positive credit balance before running workloads or using our API endpoints. This is
+primarily a means to prevent abuse and ensure that we can collect payment at the end of the month.
+
+# Prepaid Billing
+
+In order to keep your organization's workloads active, you must maintain a positive credit balance. There are two
+options to do this on SaladCloud: Auto Recharge and Manual Recharge.
+
+## Auto Recharge
+
+SaladCloud recommends enabling auto recharge for organizations serving production workloads to ensure uninterrupted
+service. With auto recharge, you configure a threshold and recharge amount, allowing SaladCloud to automatically
+replenish your organization’s credit balance when needed.
+
+    •	Recharge Threshold: The balance level that triggers an auto recharge ("when my balance falls below").
+
+    •	Recharge Amount: The predefined amount SaladCloud charges to your payment method when the threshold is reached ("bring credit balance back up to").
+
+You can update these settings anytime through the Billing & Usage page in your organization’s portal. If you set the
+recharge threshold to an amount higher than your current credit balance, an auto recharge will be triggered immediately
+upon saving the updated settings.
+
+<img src="/products/sce/container-groups/billing-and-pricing/images/auto-recharge.png" width="600" />
+
+If an auto recharge encounters an error with the payment method, SaladCloud sends an email notification, and the
+organization’s workloads are given a grace period to resolve the issue. If the issue is not resolved promptly,
+SaladCloud reserves the right to stop all active workloads and API usage.
+
+## Manual Recharge
+
+Manual credit recharges provide an alternative way to maintain a positive credit balance for your organization. At any
+time, you can add up to $10,000 in credits to your account by clicking the “Add to Credit Balance” button on the Billing
+& Usage page.
+
+<img src="/products/sce/container-groups/billing-and-pricing/images/manual-recharge.png" width="600" />
+
+For amounts exceeding $10,000, please refer to our volume discount instructions below.
+
+If your organization is not enrolled in auto recharge and the account balance reaches $0.00, all active workloads and
+API usage will stop immediately until a positive credit balance is restored. For organizations running production
+workloads, SaladCloud strongly recommends enabling auto recharge to prevent service interruptions.
 
 # How Are Charges Calculated?
 
@@ -51,9 +98,22 @@ You can monitor the current month's usage and view previous invoices directly in
 
 <img src="/products/sce/container-groups/billing-and-pricing/images/usage-monitoring.png" />
 
-# Volume Discounts
+## Volume Discounts
 
-Looking to deploy 50+ GPU instances on Salad? [Reach out](mailto:cloud@salad.com) to the team for volume pricing.
+SaladCloud offers volume pricing through prepaid credit purchases. You can bulk purchase SaladCloud usage credits at the
+following discounted rates:
+
+| Pre-Paid Amount     | Discount      |
+| ------------------- | ------------- |
+| $10,000 - $24,999   | 2%            |
+| $25,000 - $49,999   | 4%            |
+| $50,000 - $74,999   | 6%            |
+| $75,000 - $99,999   | 8%            |
+| $100,000 - $150,000 | 10%           |
+| Above $150,000      | Talk to Sales |
+
+For purchases above $150,000 or to complete a volume credit purchase, contact us at
+[sales@salad.com](mailto:sales@salad.com).
 
 # Preauthorization Requests
 
@@ -63,12 +123,3 @@ companies present these as real charges, which may surprise you.
 A preauth is really just a hold on a credit card. We'll typically preauthorize a small amount (usually $10) when a new
 payment method is added to your Organization, then cancel the authorization immediately. Banks may show the preauth for
 up to 7 days, even though we have not collected any money.
-
-# Incremental Billing
-
-SaladCloud will charge the payment method on file each time your bill reaches $200. This helps mitigate fraud on the
-platform. If you use a high volume of compute and have an account in good standing, this requirement may be waived.
-Reach out to your account manager to learn more.
-
-If a payment fails, you will be notified by email. If a valid payment method has not been added to your account, your
-deployments will be terminated. Any remaining balance will be billed at the end of the month.
