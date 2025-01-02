@@ -82,7 +82,7 @@
               "group": "Billing and Pricing",
               "pages": [
                 "products/sce/container-groups/billing-and-pricing/billing",
-                "products/sce/container-groups/billing-and-pricing/priority-pricing"
+                "products/sce/container-groups/billing-and-pricing/priority-pricing",
                 "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
               ]
             },
