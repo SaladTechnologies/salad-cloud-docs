@@ -214,6 +214,191 @@ Expected Output: A url_mappings.json file is generated with the mappings:
 Once the audio files are uploaded to Salad Storage and you have the corresponding signed URLs, the final step is to send
 these URLs to the Salad Transcription API for processing.
 
-You can find detailed instructions on how to send requests to the Salad Transcription API in the official documentation:
+You can find detailed instructions on how to send requests a to the Salad Transcription API in the official
+documentation:
 
 [Salad Transcription API Documentation](/guides/transcription/salad-transcription-api/transcription-quick-start)
+
+Below, we provide a function to send a transcription request to the API and retrieve the `job_id`.
+
+**Function to Send a Transcription Request**
+
+This function sends a transcription request to the Salad Transcription API for a single URL:
+
+```python
+import requests
+
+def send_transcription_request(audio_url, organization_name, salad_key, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        api_endpoint (str): The Salad Transcription API endpoint.
+        salad_key (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+```
+
+**Usage Example**
+
+Here is how you can use the function to submit a transcription request: All the parameters needed for the function were
+already defined in the previous steps.
+
+```python
+# Define dynamic input parameters. Discover more about available parameters in the official documentation.
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+# Send the transcription request
+try:
+    response = send_transcription_request(
+        audio_url=uploaded_url,
+        organization_name=organization_name,
+        salad_key=salad_api_key,
+        language_code="en",  # Specify the language code if needed
+        input_params=input_parameters
+    )
+    print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+except Exception as e:
+    print(f"Error sending transcription request: {e}")
+
+```
+
+**Expected Output**
+
+If the request is successful, the API will return a job_id and our function will print it out:
+
+```text
+Transcription request submitted successfully. Job ID: 6ea78b03-6ca4-4aeb-9136-4442fe8f49b2
+```
+
+The job_id is a unique identifier for the transcription job. You can use it later to check the job status or retrieve
+the final result.
+
+**Note** If you have multiple audio files to process, you can loop through the list of URLs and call this function for
+each one to retrieve a list of job_ids.
+
+### **Step 7: Retrieve the Transcription Result**
+
+If you did not specify a webhook to receive the result, you can manually retrieve the transcription result using the
+job_id returned in Step 6.
+
+**Function to Retrieve Transcription Results**
+
+This function retrieves the result of a transcription job from the Salad Transcription API:
+
+```python
+def get_transcription_result(job_id, salad_key, organization_name):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        salad_key (str): The Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+```
+
+**Usage Example**
+
+Here is how to use the function to retrieve the result:
+
+```python
+
+# Retrieve the transcription result
+try:
+    result = get_transcription_result(
+        job_id=response["id"],
+        salad_key=salad_api_key,
+        organization_name=organization_name
+    )
+    if result['output']:
+        print(f"Transcription Result: {result['output']}")
+    else:
+        print(f"Current job status is {result['status']}")
+except Exception as e:
+    print(f"Error retrieving transcription result: {e}")
+
+```
+
+**Expected Output**
+
+If the job is still processing:
+
+```text
+Current job status is processing
+```
+
+If the job is completed:
+
+```text
+Transcription Result: {'text': " if you're an ai company you are paying too much for the cloud high-end gpus like
+the h100 the a100 they're expensive they require long wait times and pre-paid contracts but what if you can access
+tens of thousands of gpus on demand fully managed at the lowest prices anywhere and you'll get more inferences per
+dollar while doing that at At Salad, that's exactly what we've built. The world's most affordable GPU cloud for AI
+inference at scale. We're talking prices as low as 10 cents per hour, folks. Say goodbye to high GPU prices, pesky
+prepaid contracts, and waiting for GPUs. Whether you're generating thousands of images per day, thousands of images
+per hour, millions of text responses, Salad Cloud can save you up to 90% on your cloud cost. and you'll get six times
+more inferences per dollar. It's time to change the recipe for your cloud. And I didn't even use a single salad pun,
+not even unbeatable prices.", 'duration_in_seconds': 72.48, 'duration': 0.02, 'processing_time': 9.196255207061768}
+```
+
+**Note**
+
+- **Check the Status**: If the job is still processing, you will need to retry later. Ensure you handle the status in
+  the response appropriately.
+
+- **Polling Frequency**: Avoid excessive polling. Query the API at reasonable intervals (e.g., every 5-10 seconds) to
+  check if the job is completed.
