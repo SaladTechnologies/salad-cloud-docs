@@ -770,6 +770,10 @@
     {
       "source": "/products/sce/salad-container-engine",
       "destination": "/products/sce/introduction"
+    },
+    {
+      "source": "/products/sce/getting-started/architectual-overview",
+      "destination": "/products/sce/getting-started/architectural-overview"
     }
   ]
 }
