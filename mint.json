@@ -124,9 +124,7 @@
         },
         {
           "group": "Security",
-          "pages": [
-            "products/sce/security/email-security"
-          ]
+          "pages": ["products/sce/security/email-security"]
         },
         "products/sce/faqs"
       ]
@@ -440,7 +438,11 @@
                     "guides/transcription/salad-transcription-api/zapiertranscriptionguide"
                   ]
                 },
-                "guides/transcription/salad-transcription-api/transcriptionfaq"
+                "guides/transcription/salad-transcription-api/transcriptionfaq",
+                {
+                  "group": "Cookbooks",
+                  "pages": ["guides/transcription/salad-transcription-api/transcribe-youtube"]
+                }
               ]
             },
             {

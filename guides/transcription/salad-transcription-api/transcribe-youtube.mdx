@@ -1,0 +1,405 @@
+---
+title: 'How to Transcribe YouTube Videos with Salad Transcription API'
+---
+
+YouTube URLs are not natively downloadable, which can be a challenge when working with the Salad Transcription API,
+which requires downloadable audio links. However, you can extract audio from YouTube videos, upload it to
+[Salad Simple Storage Service](/products/s4/salad-simple-storage-service/) free of charge, and use the resulting link
+with the API.
+
+This guide will walk you through the process, starting with handling a single YouTube URL and then scaling to batch
+processing multiple URLs.
+
+---
+
+### **Prerequisites**
+
+Before you begin, make sure you have:
+
+1. **Python Installed**: Ensure you have Python 3.8 or higher.
+2. **Libraries Installed**: Use the following command to install the required libraries:
+   ```bash
+   pip install yt-dlp requests
+   ```
+3. **FFmpeg Installed**: FFmpeg is needed by yt-dlp for processing audio:
+   - **Linux**: `sudo apt install ffmpeg`
+   - **MacOS**: `brew install ffmpeg`
+   - **Windows**: [Download FFmpeg](https://ffmpeg.org/download.html) and add it to your system PATH.
+4. **Salad API Key**: Ensure you have a valid Salad API key.
+
+---
+
+### **Step 1: Import Libraries**
+
+To start, import the required Python libraries:
+
+```python
+
+# For extracting audio from YouTube
+from yt_dlp import YoutubeDL
+
+# For handling HTTP requests and file paths
+import requests
+from pathlib import Path
+import os
+
+# For working with JSON files (batch processing).
+import json
+```
+
+### **Step 2: Define Functions**
+
+**1. Download Audio from YouTube**
+
+This function downloads the best-quality audio from a YouTube video:
+
+```python
+def download_audio_from_youtube(video_url, output_format="mp3"):
+    """
+    Downloads audio from a YouTube video in the specified format.
+
+    Args:
+        video_url (str): The URL of the YouTube video.
+        output_format (str): Desired audio format (default: "mp3").
+
+    Returns:
+        str: The filename of the downloaded audio file.
+    """
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': output_format,
+                'preferredquality': '192',
+            }],
+            'outtmpl': '%(id)s.%(ext)s',
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            return f"{info['id']}.{output_format}"
+    except Exception as e:
+        print(f"Error downloading audio: {e}")
+        return None
+
+```
+
+**2. Upload Audio to Salad Storage**
+
+This function uploads the audio file to Salad Storage and generates a presigned URL:
+
+```python
+def upload_to_salad_storage(audio_file_path, salad_api_key, organization_name, mime_type="audio/mpeg"):
+    """
+    Uploads an audio file to Salad Storage and generates a signed access URL.
+
+    Args:
+        audio_file_path (str): Path to the audio file.
+        salad_api_key (str): Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+        mime_type (str): MIME type of the file (default: "audio/mpeg").
+
+    Returns:
+        str: The signed URL for the uploaded file.
+    """
+    try:
+      # Generate the upload URL
+      file_name = f"audio/{Path(audio_file_path).name}"
+      upload_url = f"https://storage-api.salad.com/organizations/{organization_name}/files/{file_name}"
+
+      # Prepare headers for authentication
+      headers = {"Salad-Api-Key": salad_api_key}
+
+      # Prepare data for the upload
+      data = {
+          "mimeType": mime_type,
+          "sign": "true",  # Request a signed URL
+          "signatureExp": 3 * 24 * 60 * 60  # 3 days in seconds
+      }
+
+      # Prepare the file to be uploaded
+      with open(audio_file_path, "rb") as f:
+          files = {"file": (Path(audio_file_path).name, f)}
+          response = requests.put(upload_url, headers=headers, data=data, files=files)
+          response.raise_for_status()
+
+      # Extract and return the signed URL
+      signed_url = response.json().get("url")
+      if not signed_url:
+          raise ValueError("Signed URL not returned by the API.")
+      return signed_url
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error uploading to Salad storage: {e}")
+    except ValueError as ve:
+        print(f"API response error: {ve}")
+    return None
+
+```
+
+### **Step 3: Define Variables**
+
+Set the variables required for the process:
+
+```python
+# Salad Storage credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# YouTube URL to process
+YOUTUBE_URL = "https://www.youtube.com/watch?v=5TXKy-Efu3Q"  # Replace with your YouTube video URL
+
+```
+
+### **Step 4: Process a Single URL**
+
+Use the functions to process a single YouTube URL:
+
+```python
+print("Processing single YouTube URL...")
+audio_path = download_audio_from_youtube(YOUTUBE_URL)  # Step 1: Download audio
+print(f"Downloaded audio to: {audio_path}")
+
+storage_url = upload_to_salad_storage(audio_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Step 2: Upload to Salad Storage
+print(f"Uploaded successfully. Storage URL: {storage_url}")
+# Clean up temporary files
+os.remove(audio_path)
+```
+
+Signed Salad Storage URL will be printed and stored under `storage_url`.
+
+### **Step 5: Batch Process Multiple URLs**
+
+To process multiple YouTube URLs, use the following script:
+
+```python
+# List of YouTube URLs
+YOUTUBE_URLS = [
+    "https://www.youtube.com/watch?v=5TXKy-Efu3Q",
+    "https://www.youtube.com/watch?v=XywRe0c0bGU",
+]
+
+# Dictionary to store mappings of YouTube URLs to Salad Storage links
+url_mappings = {}
+
+for url in YOUTUBE_URLS:
+    try:
+        print(f"Processing: {url}")
+        audio_path = download_audio_from_youtube(url)  # Step 1: Download audio
+        storage_url = upload_to_salad_storage(audio_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Step 2: Upload audio
+        url_mappings[url] = storage_url
+        Path(audio_path).unlink()  # Clean up local file
+        print(f"Processed successfully: {url}")
+    except Exception as e:
+        print(f"Failed to process {url}: {e}")
+
+# Save mappings to a JSON file
+with open("url_mappings.json", "w") as f:
+    json.dump(url_mappings, f, indent=4)
+
+print("Batch processing complete. URL mappings saved to url_mappings.json.")
+
+```
+
+Expected Output: A url_mappings.json file is generated with the mappings:
+
+```json
+{
+  "https://www.youtube.com/watch?v=5TXKy-Efu3Q": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3",
+  "https://www.youtube.com/watch?v=XywRe0c0bGU": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/...mp3"
+}
+```
+
+### **Step 6: Send Prepared URLs to the Salad Transcription API**
+
+Once the audio files are uploaded to Salad Storage and you have the corresponding signed URLs, the final step is to send
+these URLs to the Salad Transcription API for processing.
+
+You can find detailed instructions on how to send requests a to the Salad Transcription API in the official
+documentation:
+
+[Salad Transcription API Documentation](/guides/transcription/salad-transcription-api/transcription-quick-start)
+
+Below, we provide a function to send a transcription request to the API and retrieve the `job_id`.
+
+**Function to Send a Transcription Request**
+
+This function sends a transcription request to the Salad Transcription API for a single URL:
+
+```python
+import requests
+
+def send_transcription_request(audio_url, organization_name, salad_key, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        api_endpoint (str): The Salad Transcription API endpoint.
+        salad_key (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+```
+
+**Usage Example**
+
+Here is how you can use the function to submit a transcription request: All the parameters needed for the function were
+already defined in the previous steps.
+
+```python
+# Define dynamic input parameters. Discover more about available parameters in the official documentation.
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+# Send the transcription request
+try:
+    response = send_transcription_request(
+        audio_url=uploaded_url,
+        organization_name=organization_name,
+        salad_key=salad_api_key,
+        language_code="en",  # Specify the language code if needed
+        input_params=input_parameters
+    )
+    print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+except Exception as e:
+    print(f"Error sending transcription request: {e}")
+
+```
+
+**Expected Output**
+
+If the request is successful, the API will return a job_id and our function will print it out:
+
+```text
+Transcription request submitted successfully. Job ID: 6ea78b03-6ca4-4aeb-9136-4442fe8f49b2
+```
+
+The job_id is a unique identifier for the transcription job. You can use it later to check the job status or retrieve
+the final result.
+
+**Note** If you have multiple audio files to process, you can loop through the list of URLs and call this function for
+each one to retrieve a list of job_ids.
+
+### **Step 7: Retrieve the Transcription Result**
+
+If you did not specify a webhook to receive the result, you can manually retrieve the transcription result using the
+job_id returned in Step 6.
+
+**Function to Retrieve Transcription Results**
+
+This function retrieves the result of a transcription job from the Salad Transcription API:
+
+```python
+def get_transcription_result(job_id, salad_key, organization_name):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        salad_key (str): The Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+```
+
+**Usage Example**
+
+Here is how to use the function to retrieve the result:
+
+```python
+
+# Retrieve the transcription result
+try:
+    result = get_transcription_result(
+        job_id=response["id"],
+        salad_key=salad_api_key,
+        organization_name=organization_name
+    )
+    if result['output']:
+        print(f"Transcription Result: {result['output']}")
+    else:
+        print(f"Current job status is {result['status']}")
+except Exception as e:
+    print(f"Error retrieving transcription result: {e}")
+
+```
+
+**Expected Output**
+
+If the job is still processing:
+
+```text
+Current job status is processing
+```
+
+If the job is completed:
+
+```text
+Transcription Result: {'text': " if you're an ai company you are paying too much for the cloud high-end gpus like
+the h100 the a100 they're expensive they require long wait times and pre-paid contracts but what if you can access
+tens of thousands of gpus on demand fully managed at the lowest prices anywhere and you'll get more inferences per
+dollar while doing that at At Salad, that's exactly what we've built. The world's most affordable GPU cloud for AI
+inference at scale. We're talking prices as low as 10 cents per hour, folks. Say goodbye to high GPU prices, pesky
+prepaid contracts, and waiting for GPUs. Whether you're generating thousands of images per day, thousands of images
+per hour, millions of text responses, Salad Cloud can save you up to 90% on your cloud cost. and you'll get six times
+more inferences per dollar. It's time to change the recipe for your cloud. And I didn't even use a single salad pun,
+not even unbeatable prices.", 'duration_in_seconds': 72.48, 'duration': 0.02, 'processing_time': 9.196255207061768}
+```
+
+**Note**
+
+- **Check the Status**: If the job is still processing, you will need to retry later. Ensure you handle the status in
+  the response appropriately.
+
+- **Polling Frequency**: Avoid excessive polling. Query the API at reasonable intervals (e.g., every 5-10 seconds) to
+  check if the job is completed.

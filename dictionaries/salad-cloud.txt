@@ -166,3 +166,4 @@ Pushto
 Rclone
 rclone
 copyto
+outtmpl
