@@ -10,7 +10,7 @@ of Salad nodes.
 
 We assume you have some development experience with SaladCloud, including application building, troubleshooting, and
 operational management. If you're new to SaladCloud and SCE, we recommend starting with
-[the SCE Architectural Overview](/products/sce/getting-started/architectual-overview) and
+[the SCE Architectural Overview](/products/sce/getting-started/architectural-overview) and
 [the Docker Run on SaladCloud](/tutorials/docker-run) to gain hands-on experience. In this tutorial, an "application"
 refers to a container group consisting of multiple replicas (or instances/containers) running the same container image,
 with each instance deployed on a separate Salad node.
@@ -155,7 +155,7 @@ deployment.
 ## Enable Region-Specific I/O
 
 There are generally
-[two methods for providing inputs and retrieving results](/products/sce/getting-started/architectual-overview#provide-input-to-applications)
+[two methods for providing inputs and retrieving results](/products/sce/getting-started/architectural-overview#provide-input-to-applications)
 from applications on SaladCloud: the Salad container gateway (load balancer) and a job queue from any provider
 (including Salad Kelpie and Salad Job Queue).
 
@@ -289,7 +289,7 @@ job to the queue, you need to query the job result asynchronously or provide a c
 once the job is completed.
 
 Please refer to
-[this link for a detailed comparison](/products/sce/getting-started/architectual-overview#provide-input-to-applications)
+[this link for a detailed comparison](/products/sce/getting-started/architectural-overview#provide-input-to-applications)
 between the container gateway and the job queue.
 
 ## Implement Auto Scaling at the Quarter-Hour Granularity
@@ -371,7 +371,7 @@ To enable flexible data management, such as selectively downloading or uploading
 building a solution based on AWS SQS. This approach allows you to implement custom logic for managing data, tailored to
 the requirements of your applications.
 
-Please refer to [the reference architecture](/products/sce/getting-started/architectual-overview#long-running-tasks),
+Please refer to [the reference architecture](/products/sce/getting-started/architectural-overview#long-running-tasks),
 [demo apps and their test results](https://github.com/SaladTechnologies/mds) for long-running tasks on SaladCloud.
 
 ## Enable Shell Access
