@@ -1,0 +1,57 @@
+---
+title: 'System Events - Coming soon!'
+---
+
+System Events include useful Container Group and Instance events for overall understanding and troubleshooting of your
+deployment on SaladCloud. You can access System Events for your container group through the System Events tab in the
+SaladCloud Portal page for your container group.
+
+### Container Group System Events
+
+- `Container Group Started`
+- `Container Group Stopped`
+- `Container Group Desired Replica Count Updated from XX to XX`
+- `Container Group Updated (Version X)` : The container group was updated to the version indicated.
+
+### Instance Status System Events
+
+These events describe phases of the
+[deployment lifecycle](https://docs.salad.com/products/sce/container-groups/deployment-lifecycle) on SaladCloud.
+
+- `Instance Allocated`
+- `Instance Creating`
+- `Instance Downloading`
+- `Instance Starting`
+- `Instance Running`
+- `Instance Restarted`
+- `Instance Recreated`
+- `Instance Reallocated by User`
+- `Instance Reallocated by Platform`: We automatically reallocated an instance that is not meeting internal checks for
+  time-to-start or networking.
+- `Instance Interrupted (Priority)`: The instances was interrupted by a higher priority workload. Consider increasing
+  the
+  [priority](https://docs.salad.com/products/sce/container-groups/billing-and-pricing/priority-pricing#priority-levels)
+  of your workload.
+- `Instance Interrupted (Node Offline)`: The node running the instance has gone offline. This is expected to occur with
+  our
+  [infrastructure](https://docs.salad.com/products/sce/container-groups/billing-and-pricing/priority-pricing#saladcloud-infrastructure).
+
+### Instance Exit System Events
+
+These System Events record exits and the exit code provided by your container.
+
+- `Instance Exited:XXX (Error)`: Other exit events with the error code provided by your container.
+- `Instance Exited:137 (Likely Out of System Memory)`: A 137 exit code often, but not always, indicates the container
+  exceeded it's allotted memory. If this could be the case, try increasing the RAM allocated.
+- `Instance Exited:0 (Exited Successfully)`
+
+### Health Probe System Events
+
+If you have setup [health probes](https://docs.salad.com/products/sce/container-groups/health-probes/health-probes) for
+your container group, these System Events record state changes of those probes.
+
+- `Instance Interrupted (Liveness Probe Failure)`
+- `Instance Interrupted (Startup Probe Failure)`
+- `Instance Startup Probe Passed`
+- `Instance Not Ready (Readiness Probe Failure)`
+- `Instance Ready (Readiness Probe Passed)`
