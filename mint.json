@@ -88,7 +88,7 @@
             },
             "products/sce/container-groups/specifying-a-command",
             "products/sce/container-groups/disk-space",
-            "products/sce/container-groups/workload-logs",
+            "products/sce/container-groups/system-events",
             "products/sce/container-groups/container-logs",
             "products/sce/container-groups/quotas",
             "products/sce/container-groups/faqs"
@@ -742,10 +742,6 @@
     {
       "source": "/products/sce/disk-space",
       "destination": "/products/sce/container-groups/disk-space"
-    },
-    {
-      "source": "/products/sce/workload-logs",
-      "destination": "/products/sce/container-groups/workload-logs"
     },
     {
       "source": "/products/sce/container-logs",
