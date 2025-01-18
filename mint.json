@@ -454,6 +454,10 @@
         {
           "group": "Text To Speech",
           "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+        },
+        {
+          "group": "Long-Running Tasks",
+          "pages": ["guides/long-running-tasks/solution-overview"]
         }
       ]
     }
