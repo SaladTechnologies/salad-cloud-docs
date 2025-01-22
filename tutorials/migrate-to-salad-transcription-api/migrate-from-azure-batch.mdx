@@ -2,31 +2,31 @@
 title: 'Migrating from Azure Batch Transcription'
 ---
 
+Migrating from Azure Batch Transcription to Salad Transcription API will require only a simple API call modification.
+Depending on which features you are using, you may also be able to reduce the number of API calls required, as Salad
+Transcription API is able to handle multiple steps in one.
 
-Migrating from Azure Batch Transcription to Salad Transcription API will require only a simple API call modification. Depending on which features you are using, you may also be able to reduce the number of API calls required, as Salad Transcription API is able to handle multiple steps in one. 
-
-
-
-|  | SaladCloud Transcription | Azure Batch Transcription |
-| ----- | ------------------------ | ------------------------- |
-| Translation | ✅ | Requires additional API |
-| Audio Transcription | ✅ | ✅ |
-| Video Transcription | ✅ | ✅ |
-| Multilingual Transcription | ✅ | ✅ |
-| Summarization | ✅ | Requires additional API |
-| Speaker Identification | ✅ | ✅ |
-| SRT Output | ✅ | ❌ |
-| Transcribe Multiple Files | ❌ | ✅ |
-| Max Length | 2.5 Hours | 4 Hours |
+|                            | SaladCloud Transcription | Azure Batch Transcription |
+| -------------------------- | ------------------------ | ------------------------- |
+| Translation                | ✅                       | Requires additional API   |
+| Audio Transcription        | ✅                       | ✅                        |
+| Video Transcription        | ✅                       | ✅                        |
+| Multilingual Transcription | ✅                       | ✅                        |
+| Summarization              | ✅                       | Requires additional API   |
+| Speaker Identification     | ✅                       | ✅                        |
+| SRT Output                 | ✅                       | ❌                        |
+| Transcribe Multiple Files  | ❌                       | ✅                        |
+| Max Length                 | 2.5 Hours                | 4 Hours                   |
 
 ## 1. Get your Salad API Key.
 
     - Open up https://portal.salad.com and sign up/log into your account.
     - Navigate to your profile at the top right, and select API Access. Here you can find your API Key.
 
-## 2. Updating job creation API calls. 
+## 2. Updating job creation API calls.
 
-If you’re just using the basic Speech To Text features from Azure Batch Transcription, moving to Salad Transcription API is as simple as updating your API call. 
+If you’re just using the basic Speech To Text features from Azure Batch Transcription, moving to Salad Transcription API
+is as simple as updating your API call.
 
 ### Azure Batch Transcription
 
@@ -70,13 +70,22 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
   	}'
 ```
 
-- If you’re copy/pasting this call, you’ll update the URL to include your Salad Organization Name. 
-- You’ll also need to include your SaladCloud API Key in the header. 
-- Next, you’ll add the URL to the file to transcribe into the URL object. Make sure the file length is less than 2.5 hours, and less than 3GB. Make sure the URL provided is to a direct download of the file. Header based security is not compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by [Salad Simple Storage Service](https://docs.salad.com/products/s4/salad-simple-storage-service#upload-a-file)
+- If you’re copy/pasting this call, you’ll update the URL to include your Salad Organization Name.
+- You’ll also need to include your SaladCloud API Key in the header.
+- Next, you’ll add the URL to the file to transcribe into the URL object. Make sure the file length is less than 2.5
+  hours, and less than 3GB. Make sure the URL provided is to a direct download of the file. Header based security is not
+  compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
+  [Salad Simple Storage Service](https://docs.salad.com/products/s4/salad-simple-storage-service#upload-a-file)
 
-One key difference between Azure Batch Transcription and Salad Transcription API is that Salad Transcription API is only able to transcribe one file per job. Rather than submitting one job containing all of the URLs, you will instead create a unique job for each file. Other than this, all other features available on a simple transcription available via Azure Batch Transcription are also available via the Salad Transcription API. A breakdown of all our input parameters are available [here](https://docs.salad.com/guides/transcription/salad-transcription-api/transcription-quick-start#step-2-set-input-parameters).
+One key difference between Azure Batch Transcription and Salad Transcription API is that Salad Transcription API is only
+able to transcribe one file per job. Rather than submitting one job containing all of the URLs, you will instead create
+a unique job for each file. Other than this, all other features available on a simple transcription available via Azure
+Batch Transcription are also available via the Salad Transcription API. A breakdown of all our input parameters are
+available
+[here](https://docs.salad.com/guides/transcription/salad-transcription-api/transcription-quick-start#step-2-set-input-parameters).
 
-You will receive this JSON body from the POST response. You’ll need to cache the ID you receive, as this is how you’ll pull your job results.
+You will receive this JSON body from the POST response. You’ll need to cache the ID you receive, as this is how you’ll
+pull your job results.
 
 ```
 {
@@ -96,10 +105,15 @@ You will receive this JSON body from the POST response. You’ll need to cache t
 ```
 
 ## 3. More advanced jobs
-If you are utilising additional features offered by Azure to translate the text to another language, or summarize intent, you can integrate these features into the same API call with Salad Transcription API. 
+
+If you are utilising additional features offered by Azure to translate the text to another language, or summarize
+intent, you can integrate these features into the same API call with Salad Transcription API.
 
 ### Translation to English:
-To activate translation on the same API call as above, just add the `translate` input parameter. This parameter is only to convert from other languages to English. If you need to translate to another language, you’ll need to use our LLM translation features, also available in the same API call.
+
+To activate translation on the same API call as above, just add the `translate` input parameter. This parameter is only
+to convert from other languages to English. If you need to translate to another language, you’ll need to use our LLM
+translation features, also available in the same API call.
 
 ```
 curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
@@ -118,7 +132,11 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 ```
 
 ### Translation to other languages:
-Utilising our LLM translation services is similar to the direct to English translation, but uses a different input parameter. Instead, you’ll use `llm_translation`. Eight languages are currently supported for LLM translation: ```English, French, German, Italian, Portuguese, Hindi, Spanish, and Thai```. You can translate to multiple languages at once, and you’ll receive back the original transcription, along with translations in all the languages requested.
+
+Utilising our LLM translation services is similar to the direct to English translation, but uses a different input
+parameter. Instead, you’ll use `llm_translation`. Eight languages are currently supported for LLM translation:
+`English, French, German, Italian, Portuguese, Hindi, Spanish, and Thai`. You can translate to multiple languages at
+once, and you’ll receive back the original transcription, along with translations in all the languages requested.
 
 ```
 curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
@@ -137,7 +155,10 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 ```
 
 ### Intent/summarization:
-If you’re also using Azure services to obtain the intent or summarization of transcribed text, you can also integrate this easily with Salad Transcription API with the same API call. For this, you’ll add the `summarize` input parameter, with the word limit for the summarization.
+
+If you’re also using Azure services to obtain the intent or summarization of transcribed text, you can also integrate
+this easily with Salad Transcription API with the same API call. For this, you’ll add the `summarize` input parameter,
+with the word limit for the summarization.
 
 ```
 curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
@@ -158,22 +179,26 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 
 ## 4. Updating your job retrieval:
 
-You’ll also need to update the code you’re using to retrieve your job results. Currently, your process with Azure Batch Transcription is likely made up of two steps, checking the status of the job, and then another step to obtain the files once complete. With Salad Transcription API, this is compacted into a single API call which contains the job status, as well as the completed results once the job succeeds.
+You’ll also need to update the code you’re using to retrieve your job results. Currently, your process with Azure Batch
+Transcription is likely made up of two steps, checking the status of the job, and then another step to obtain the files
+once complete. With Salad Transcription API, this is compacted into a single API call which contains the job status, as
+well as the completed results once the job succeeds.
 
 ### Azure Batch Transcription
+
 Your flow with Azure Batch Transcription should look something like this:
 
 - Check the status of the job
+
 ```
 curl -v -X GET "https://YourServiceRegion.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions/YourTranscriptionId" -H "Ocp-Apim-Subscription-Key: YourSubscriptionKey"
 ```
 
 - Obtain the results from the completed job
+
 ```
 curl -v -X GET "https://YourServiceRegion.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions/YourTranscriptionId/files" -H "Ocp-Apim-Subscription-Key: YourSubscriptionKey"
 ```
-
-
 
 ### Salad Transcription API Equivalent
 
@@ -214,7 +239,7 @@ This method will return this JSON body:
    ],
    "organization_name":"salad",
    "output":{
-      "url":"https://storage-api.salad.com/organizations/salad/files/transcription/73b2ee75-664e-4332-a853-9210dde5c5fd?token=ac34664a-088d-4c72-b53c-b1199cfbf538",
+      "url":"https://storage-api.salad.com/organizations/salad/files/transcription/73b2ee75-664e-4332-a853-9210dde5c5fd?token=ac34664a-088d-4c72-b53c-c99cfbf538",
       "duration_in_seconds":320.4135,
       "duration":0.09,
       "processing_time":46.076966285705566
@@ -224,4 +249,5 @@ This method will return this JSON body:
 }
 ```
 
-Once the job is completed, the response will automatically update to include the URL for the file containing your job results. 
+Once the job is completed, the response will automatically update to include the URL for the file containing your job
+results.
