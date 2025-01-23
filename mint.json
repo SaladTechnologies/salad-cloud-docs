@@ -195,13 +195,7 @@
         "tutorials/jupyterlab",
         "tutorials/run-cog",
         "tutorials/long-running-jobs",
-        "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
-        {
-          "group": "Migrate to Salad Transcription API",
-          "pages": [
-            "tutorials/migrate-to-salad-transcription-api/migrate-from-azure-batch"
-          ]
-        }
+        "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api"
       ]
     },
     {
@@ -445,6 +439,12 @@
                   ]
                 },
                 "guides/transcription/salad-transcription-api/transcriptionfaq",
+                {
+                  "group": "Migrate to Salad Transcription API",
+                  "pages": [
+                    "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-azure-batch"
+                  ]
+                },
                 {
                   "group": "Cookbooks",
                   "pages": ["guides/transcription/salad-transcription-api/transcribe-youtube"]
