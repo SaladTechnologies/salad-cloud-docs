@@ -1,0 +1,98 @@
+---
+title: 'Create and Deploy A Video Generation API on SaladCloud'
+description:
+  'A step-by-step guide to creating and deploying a video generation API on SaladCloud, using ComfyUI and ComfyUI API.'
+---
+
+This guide will take you step by step through the process of creating and deploying a production ready video-generation
+service on SaladCloud. We will be using the following technologies:
+
+- [ComfyUI](https://github.com/comfyanonymous/ComfyUI/) - A highly modular user interface and inference engine for
+  diffusion models.
+- [ComfyUI API](https://github.com/SaladTechnologies/comfyui-api) - A RESTful API for ComfyUI.
+- [SaladCloud](https://salad.com/) - A platform for deploying containerized GPU-accelerated applications at scale.
+- [Docker](https://www.docker.com/) - A tool for developing, shipping, and running applications in containers.
+- [LTX Video](https://huggingface.co/Lightricks/LTX-Video) - An open-source Apache 2.0 licensed video generation model
+  capable of both text to video, and image to video generation.
+- [Typescript](https://www.typescriptlang.org/) - A strongly typed programming language that builds on JavaScript that
+  we can use to write a custom endpoint for our API.
+- [wget](https://www.gnu.org/software/wget/) - A command-line utility for downloading files from the web. Optional, but
+  useful for downloading model weights.
+
+This guide assumes you have a basic understanding of the technologies listed above. If you are new to any of these
+tools, we recommend you familiarize yourself with them before proceeding. Additionally, you will need a SaladCloud
+account to deploy your service. It will be helpful, but not strictly necessary to have a GPU available for local
+development. Any terminal commands in this guide are written for a Unix-like shell, such as bash, and this guide was
+developed using Ubuntu 22.
+
+## Step 1: Set Up Your Development Environment
+
+Before we can start building our video generation API, we need to set up our development environment, and create a
+repository to store our code. We will be using Typescript to write our API, so we need to install Node.js and
+Typescript. If you don't already have Node.js installed, I recommend using [nvm](https://github.com/nvm-sh/nvm) to
+install and manage Node.js versions. You will also need Docker installed on your machine to build and run your API, as
+well as to deploy it to SaladCloud.
+
+First, let's create a new directory for our project and initialize the git repo:
+
+```bash
+mkdir video-generation-api
+cd video-generation-api
+git init
+```
+
+We'll also go ahead and download our model weights to this directory. You may instead link the file from a different
+directory, if you already have it locally, e.g. in your ComfyUI installation (if you have one). Download the model
+weights and save them to the `video-generation-api` directory:
+
+- [Checkpoint](https://huggingface.co/Lightricks/LTX-Video/blob/main/ltx-video-2b-v0.9.1.safetensors)
+- [Text Encoder](https://huggingface.co/Comfy-Org/mochi_preview_repackaged/blob/main/split_files/text_encoders/t5xxl_fp16.safetensors)
+
+This can be done with the following commands:
+
+```bash
+wget https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.1.safetensors
+wget https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp16.safetensors
+```
+
+Next, open your code editor in this directory.
+
+Create a new file called `.gitignore` and add the following content:
+
+```plaintext
+*.safetensors
+```
+
+This will prevent you from checking the model weights themselves into version control, as they are quite large.
+
+Create another new file, and name it `Dockerfile`. This file will contain the instructions for building your Docker
+image. Add the following content to the file:
+
+```dockerfile
+FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.12-api1.8.2-torch2.5.0-cuda12.1-devel
+
+# Video generation requires a few extra dependencies from the base image
+RUN apt-get update && apt-get install -y \
+  libgl1 \
+  libgl1-mesa-glx \
+  libglib2.0-0 && \
+  rm -rf /var/lib/apt/lists/*
+
+COPY ltx-video-2b-v0.9.1.safetensors ${COMFY_HOME}/models/checkpoints/
+COPY t5xxl_fp16.safetensors ${COMFY_HOME}/models/clip/
+
+RUN comfy node registry-install comfyui-videohelpersuite
+```
+
+This Dockerfile is based on the [ComfyUI API](https://github.com/SaladTechnologies/comfyui-api) image, which is a
+pre-built image that includes ComfyUI, the ComfyUI API and all dependencies. The tag indicates the version of ComfyUI,
+ComfyUI API, Torch, and CUDA that the image is built with. The `devel` tag indicates that this image contains the full
+CUDA toolkit, which is necessary for running the LTX Video model. We are copying the model weights we downloaded earlier
+into the image, and installing from the [Comfy Registry](https://registry.comfy.org/) a custom node pack that contains
+helper functions for video generation.
+
+For now, we're going to build this docker image, and then run it to develop our workflow in ComfyUI.
+
+```bash
+docker build -t video-generation-api .
+```
