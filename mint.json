@@ -208,19 +208,20 @@
             {
               "group": "Container Groups",
               "pages": [
+                "reference/saladcloud-api/container_groups/list-container-groups",
                 "reference/saladcloud-api/container_groups/create-a-container-group",
                 "reference/saladcloud-api/container_groups/get-a-container-group",
-                "reference/saladcloud-api/container_groups/list-container-groups",
                 "reference/saladcloud-api/container_groups/update-a-container-group",
                 "reference/saladcloud-api/container_groups/delete-a-container-group",
                 "reference/saladcloud-api/container_groups/start-a-container-group",
                 "reference/saladcloud-api/container_groups/stop-a-container-group",
                 "reference/saladcloud-api/container_groups/get-container-group-errors",
+                "reference/saladcloud-api/container_groups/get-container-group-system-logs",
                 "reference/saladcloud-api/container_groups/list-container-group-instances",
                 "reference/saladcloud-api/container_groups/get-a-container-group-instance",
-                "reference/saladcloud-api/container_groups/restart-a-container-group-instance",
+                "reference/saladcloud-api/container_groups/reallocate-a-container-group-instance",
                 "reference/saladcloud-api/container_groups/recreate-a-container-group-instance",
-                "reference/saladcloud-api/container_groups/reallocate-a-container-group-instance"
+                "reference/saladcloud-api/container_groups/restart-a-container-group-instance"
               ]
             },
             {
@@ -252,7 +253,9 @@
               "group": "Organizations",
               "pages": [
                 "reference/saladcloud-api/organizations/get-gpu-classes",
-                "reference/saladcloud-api/organizations/get-quotas"
+                "reference/saladcloud-api/organizations/get-quotas",
+                "reference/saladcloud-api/organizations/get-webhook-secret-key",
+                "reference/saladcloud-api/organizations/update-webhook-secret-key"
               ]
             }
           ]
