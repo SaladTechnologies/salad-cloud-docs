@@ -844,10 +844,10 @@ second ide request timeout that SaladCloud's container gateway imposes.
 
 ## Step 5: Add A Job Queue
 
-To handle long-running requests like this, we can use
-[SaladCloud's Job Queue](http://localhost:3000/products/sce/job-queues/job-queues). With the job queue, we can submit
-our prompt, and then either poll for the result, or receive a webhook when the job is complete. Additionally, the job
-queue will automatically handle retrying failed requests, and includes some basic autoscaling functionality.
+To handle long-running requests like this, we can use [SaladCloud's Job Queue](/products/sce/job-queues/job-queues).
+With the job queue, we can submit our prompt, and then either poll for the result, or receive a webhook when the job is
+complete. Additionally, the job queue will automatically handle retrying failed requests, buffer overflow requests, and
+includes some basic autoscaling functionality.
 
 To use the job queue, we simply need to add the Job Queue worker binary to our Dockerfile:
 
@@ -913,7 +913,8 @@ On the right side of the screen, you'll see a cost estimation that reflects our 
 
 Next, we're going to connect the container group to the job queue we made in the previous step. Configure the job queue
 for port 3000 (where our API is running), and set the path to `/workflow/video-clip`, which is the endpoint we created.
-For now, we won't enable autoscaling.
+For this tutorial, we won't enable autoscaling, but you
+[learn more about it here](/products/sce/autoscaling/autoscaling#autoscaling-overview).
 
 ![](/guides/image-generation/images/video-gen-service-connect-job-queue.png)
 
@@ -939,3 +940,444 @@ as allocating an instance, and downloading the image.
 Eventually, you will see the container group status change to "Running" when at least 1 instance is up and running.
 
 ![](/guides/image-generation/images/video-gen-service-running.png)
+
+## Step 7: Using the API
+
+Now, we're going to use the SaladCloud JavaScript SDK to create a function that submits a job to the job queue, and
+polls for the result. First, we need to install the SDK:
+
+```bash
+npm install @saladtechnologies-oss/salad-cloud-sdk
+```
+
+Copy the following into a new file called `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "target": "ES2021" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "module": "commonjs" /* Specify what module code is generated. */,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */ /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "strict": true /* Enable all strict type-checking options. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  },
+  "include": ["example.ts"]
+}
+```
+
+In a new file called `example.ts`, add the following code:
+
+```typescript
+import { SaladCloudSdk } from '@saladtechnologies-oss/salad-cloud-sdk'
+import assert from 'assert'
+import fs from 'fs/promises'
+
+// Get some configuration from the environment
+const { SALAD_API_KEY, SALAD_ORG_NAME, SALAD_PROJECT_NAME, SALAD_QUEUE_NAME } = process.env
+
+// Ensure that we have all the required configuration
+assert(SALAD_API_KEY, 'SALAD_API_KEY is required')
+const saladApiKey = SALAD_API_KEY as string
+
+assert(SALAD_ORG_NAME, 'SALAD_ORG_NAME is required')
+const saladOrgName = SALAD_ORG_NAME as string
+
+assert(SALAD_PROJECT_NAME, 'SALAD_PROJECT_NAME is required')
+const saladProjectName = SALAD_PROJECT_NAME as string
+
+assert(SALAD_QUEUE_NAME, 'SALAD_QUEUE_NAME is required')
+const saladQueueName = SALAD_QUEUE_NAME as string
+
+// Create an instance of the SaladCloud SDK
+const salad = new SaladCloudSdk({
+  apiKey: saladApiKey,
+})
+```
+
+Here we've imported the SDK, and set up some configuration from environment variables. We're using the `assert` function
+to ensure that these variables are set. Finally, we've created an authenticated instance of the SDK. Next, let's define
+an interface that matches our endpoint's request schema:
+
+```typescript
+interface Request {
+  /** The prompt to generate a video clip from. */
+  prompt: string
+
+  /** The negative prompt to generate a video clip from. */
+  negative_prompt?: string
+
+  /** The duration of the video clip in seconds. */
+  duration_seconds?: number
+
+  /** The number of steps to run the model for. */
+  steps?: number
+
+  /** The cfg value to use for the model. */
+  cfg?: number
+
+  /** The seed to use for the model. */
+  seed?: number
+
+  /** The width of the video. Must be a multiple of 32. */
+  width?: number
+
+  /** The height of the video. Must be a multiple of 32. */
+  height?: number
+}
+```
+
+There's some polling involved, so we're going to define a sleep function:
+
+```typescript
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+```
+
+Next, we're going to define a function that submits a job to the job queue, and polls for the result:
+
+```typescript
+async function generateVideoClip(request: Request): Promise<{ video: Buffer; filename: string }> {
+  let queuedJob
+  const failureStatuses = ['failed', 'cancelled']
+
+  /**
+   * Step 1: Queue the job
+   */
+  try {
+    const { data } = await salad.queues.createQueueJob(saladOrgName, saladProjectName, saladQueueName, {
+      // The Salad job schema has an input field
+      input: {
+        // Our API schema also has an input field
+        input: request,
+      },
+    })
+    if (!data) {
+      throw new Error('Failed to queue job')
+    }
+    queuedJob = data
+  } catch (error) {
+    console.error(error)
+    throw new Error('Failed to queue job')
+  }
+
+  console.log(`Queued job with ID: ${queuedJob.id}`)
+
+  /**
+   * Step 2: Wait for the job to be picked up
+   * If there are jobs in the queue already, we will have to wait for
+   * this job to get picked up.
+   */
+  while (queuedJob.status === 'pending') {
+    await sleep(500)
+    try {
+      const { data } = await salad.queues.getQueueJob(saladOrgName, saladProjectName, saladQueueName, queuedJob.id)
+      if (!data) {
+        throw new Error('Failed to get job status')
+      }
+      queuedJob = data
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to get job status')
+    }
+  }
+
+  if (failureStatuses.includes(queuedJob.status)) {
+    console.error(JSON.stringify(queuedJob, null, 2))
+    throw new Error(`Job ${queuedJob.status}`)
+  }
+
+  console.log(`Job status: ${queuedJob.status}`)
+
+  /**
+   * Step 3: Wait for the job to complete
+   * Once the job has been picked up, it will be running until
+   * it is completed.
+   */
+  while (queuedJob.status === 'running') {
+    await sleep(1000)
+    try {
+      const { data } = await salad.queues.getQueueJob(saladOrgName, saladProjectName, saladQueueName, queuedJob.id)
+      if (!data) {
+        throw new Error('Failed to get job status')
+      }
+      queuedJob = data
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to get job status')
+    }
+  }
+
+  if (failureStatuses.includes(queuedJob.status)) {
+    console.error(JSON.stringify(queuedJob, null, 2))
+    throw new Error(`Job ${queuedJob.status}`)
+  }
+
+  console.log(`Job status: ${queuedJob.status}`)
+  const { output } = queuedJob
+
+  if (output.statusCode) {
+    /**
+     * If the API returns a 400 series status code, the job will have
+     * the status "succeeded", but the output will contain an error message.
+     */
+    console.error(JSON.stringify(output, null, 2))
+    throw new Error(`Job failed with status code ${output.statusCode}`)
+  }
+
+  /**
+   * Step 4: Get the output
+   */
+  const base64Video = output.images[0]
+  const filename = output.filenames[0]
+
+  const video = Buffer.from(base64Video, 'base64')
+
+  return { video, filename }
+}
+```
+
+Finally, we're going to call this function with a request object, and save the video to a file:
+
+```typescript
+async function main() {
+  const request: Request = {
+    prompt:
+      'high quality nature documentary footage of one cute fluffy husky puppy walks from the left side of the screen to the right, through fresh powdery white snow. it is happy and in sharp focus. It is tricolor, with black, white and grey fur. the camera angle is close to the puppy, and focused on the puppy, following it as it moves. nature documentary footage of very high quality, bbc, planet earth',
+    negative_prompt:
+      'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
+    steps: 200,
+    cfg: 3.8,
+  }
+
+  const { video, filename } = await generateVideoClip(request)
+
+  await fs.writeFile(filename, video)
+}
+
+main().catch(console.error)
+```
+
+### Completed Example
+
+```typescript
+import { SaladCloudSdk } from '@saladtechnologies-oss/salad-cloud-sdk'
+import assert from 'assert'
+import fs from 'fs/promises'
+
+// Get some configuration from the environment
+const { SALAD_API_KEY, SALAD_ORG_NAME, SALAD_PROJECT_NAME, SALAD_QUEUE_NAME } = process.env
+
+// Ensure that we have all the required configuration
+assert(SALAD_API_KEY, 'SALAD_API_KEY is required')
+const saladApiKey = SALAD_API_KEY as string
+
+assert(SALAD_ORG_NAME, 'SALAD_ORG_NAME is required')
+const saladOrgName = SALAD_ORG_NAME as string
+
+assert(SALAD_PROJECT_NAME, 'SALAD_PROJECT_NAME is required')
+const saladProjectName = SALAD_PROJECT_NAME as string
+
+assert(SALAD_QUEUE_NAME, 'SALAD_QUEUE_NAME is required')
+const saladQueueName = SALAD_QUEUE_NAME as string
+
+// Create an instance of the SaladCloud SDK
+const salad = new SaladCloudSdk({
+  apiKey: saladApiKey,
+})
+
+// Define an interface that matches our endpoint's request schema
+interface Request {
+  /** The prompt to generate a video clip from. */
+  prompt: string
+
+  /** The negative prompt to generate a video clip from. */
+  negative_prompt?: string
+
+  /** The duration of the video clip in seconds. */
+  duration_seconds?: number
+
+  /** The number of steps to run the model for. */
+  steps?: number
+
+  /** The cfg value to use for the model. */
+  cfg?: number
+
+  /** The seed to use for the model. */
+  seed?: number
+
+  /** The width of the video. Must be a multiple of 32. */
+  width?: number
+
+  /** The height of the video. Must be a multiple of 32. */
+  height?: number
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+async function generateVideoClip(request: Request): Promise<{ video: Buffer; filename: string }> {
+  let queuedJob
+  const failureStatuses = ['failed', 'cancelled']
+
+  /**
+   * Step 1: Queue the job
+   */
+  try {
+    const { data } = await salad.queues.createQueueJob(saladOrgName, saladProjectName, saladQueueName, {
+      // The Salad job schema has an input field
+      input: {
+        // Our API schema also has an input field
+        input: request,
+      },
+    })
+    if (!data) {
+      throw new Error('Failed to queue job')
+    }
+    queuedJob = data
+  } catch (error) {
+    console.error(error)
+    throw new Error('Failed to queue job')
+  }
+
+  console.log(`Queued job with ID: ${queuedJob.id}`)
+
+  /**
+   * Step 2: Wait for the job to be picked up
+   * If there are jobs in the queue already, we will have to wait for
+   * this job to get picked up.
+   */
+  while (queuedJob.status === 'pending') {
+    await sleep(500)
+    try {
+      const { data } = await salad.queues.getQueueJob(saladOrgName, saladProjectName, saladQueueName, queuedJob.id)
+      if (!data) {
+        throw new Error('Failed to get job status')
+      }
+      queuedJob = data
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to get job status')
+    }
+  }
+
+  if (failureStatuses.includes(queuedJob.status)) {
+    console.error(JSON.stringify(queuedJob, null, 2))
+    throw new Error(`Job ${queuedJob.status}`)
+  }
+
+  console.log(`Job status: ${queuedJob.status}`)
+
+  /**
+   * Step 3: Wait for the job to complete
+   * Once the job has been picked up, it will be running until
+   * it is completed.
+   */
+  while (queuedJob.status === 'running') {
+    await sleep(1000)
+    try {
+      const { data } = await salad.queues.getQueueJob(saladOrgName, saladProjectName, saladQueueName, queuedJob.id)
+      if (!data) {
+        throw new Error('Failed to get job status')
+      }
+      queuedJob = data
+    } catch (error) {
+      console.error(error)
+      throw new Error('Failed to get job status')
+    }
+  }
+
+  if (failureStatuses.includes(queuedJob.status)) {
+    console.error(JSON.stringify(queuedJob, null, 2))
+    throw new Error(`Job ${queuedJob.status}`)
+  }
+
+  console.log(`Job status: ${queuedJob.status}`)
+  const { output } = queuedJob
+
+  if (output.statusCode) {
+    /**
+     * If the API returns a 400 series status code, the job will have
+     * the status "succeeded", but the output will contain an error message.
+     */
+    console.error(JSON.stringify(output, null, 2))
+    throw new Error(`Job failed with status code ${output.statusCode}`)
+  }
+
+  /**
+   * Step 4: Get the output
+   */
+  const base64Video = output.images[0]
+  const filename = output.filenames[0]
+
+  const video = Buffer.from(base64Video, 'base64')
+
+  return { video, filename }
+}
+
+async function main() {
+  const request: Request = {
+    prompt:
+      'high quality nature documentary footage of one cute fluffy husky puppy walks from the left side of the screen to the right, through fresh powdery white snow. it is happy and in sharp focus. It is tricolor, with black, white and grey fur. the camera angle is close to the puppy, and focused on the puppy, following it as it moves. nature documentary footage of very high quality, bbc, planet earth',
+    negative_prompt:
+      'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
+    steps: 200,
+    cfg: 3.8,
+  }
+
+  const { video, filename } = await generateVideoClip(request)
+
+  await fs.writeFile(filename, video)
+}
+
+main().catch(console.error)
+```
+
+### Running the Example
+
+Customize the request object in `example.ts` to your liking, and copy the following script into a file
+`run-ts-example.sh`, replacing the placeholders with your organization, project, and queue names. Make sure to set the
+`SALAD_API_KEY` environment variable. For help finding your API Key,
+[see this guide](/products/sce/getting-started/quickstart-api#step-1-obtain-your-api-key).
+
+```bash
+#!/bin/bash
+
+export SALAD_ORG_NAME="salad-benchmarking"
+export SALAD_PROJECT_NAME="ltx-video-testing"
+export SALAD_QUEUE_NAME="video-gen-jobs"
+
+if [ -z "$SALAD_API_KEY" ]; then
+  echo "Please set the SALAD_API_KEY environment variable"
+  exit 1
+fi
+
+# Compile the TypeScript file
+npx tsc
+
+start_time=$(date +%s)
+node example.js
+end_time=$(date +%s)
+
+echo "Time taken: $((end_time - start_time)) seconds"
+```
+
+Make the script executable:
+
+```bash
+chmod +x run-ts-example.sh
+```
+
+Run the script:
+
+```bash
+./run-ts-example.sh
+```
+
+On an RTX 4090, this script takes just under 4 minutes to generate a 10 second video.
+
+## Conclusion
+
+In this guide, we used ComfyUI to design a video generation workflow using LTX Video. We created a custom endpoint with
+ComfyUI API that generates video clips from prompts using that workflow. We deployed this endpoint to a GPU cluster with
+SaladCloud, behind a job queue for resiliency. We used the SaladCloud SDK to submit jobs to the queue, poll for the
+result of the job, and save the resulting video to a file.
