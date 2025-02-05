@@ -9,7 +9,7 @@ info:
     email: cloud@salad.com
   license:
     name: MIT
-  version: 0.9.0-alpha.5
+  version: 0.9.0-alpha.6
 servers:
   - url: 'https://api.salad.com/api/public'
 paths:
@@ -61,6 +61,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - container_groups
+      x-liblab-resource: ContainerGroup#Create
   '/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}':
     summary: Container Group
     description: Operations for a container group
@@ -83,6 +84,8 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - container_groups
+      x-liblab-datasource: ContainerGroup#Read
+      x-liblab-resource: ContainerGroup#Read
     patch:
       operationId: update_container_group
       summary: Update Container Group
@@ -104,6 +107,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - container_groups
+      x-liblab-resource: ContainerGroup#Update
     delete:
       operationId: delete_container_group
       summary: Delete Container Group
@@ -121,6 +125,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - container_groups
+      x-liblab-resource: ContainerGroup#Delete
   '/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/errors':
     summary: Workload Errors
     description: Operations for workload errors
@@ -131,7 +136,7 @@ paths:
     get:
       operationId: get_workload_errors
       summary: Get Workload Errors
-      description: Gets the workload errors
+      description: Gets the workload errors. This has been deprecated and will be replaced by the new System Logs endpoint. See `/system-logs`.
       responses:
         '200':
           $ref: '#/components/responses/ListWorkloadErrors'
@@ -141,8 +146,31 @@ paths:
           $ref: '#/components/responses/429'
         default:
           $ref: '#/components/responses/UnknownError'
+      deprecated: true
       tags:
         - workload_errors
+  '/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/system-logs':
+    summary: System Logs
+    description: Operations for System Logs
+    parameters:
+      - $ref: '#/components/parameters/organization_name'
+      - $ref: '#/components/parameters/project_name'
+      - $ref: '#/components/parameters/container_group_name'
+    get:
+      operationId: get_system_logs
+      summary: Get System Logs
+      description: Gets the System Logs
+      responses:
+        '200':
+          $ref: '#/components/responses/ListSystemLogs'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        default:
+          $ref: '#/components/responses/UnknownError'
+      tags:
+        - system_logs
   '/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/start':
     summary: Container Group
     description: Operations for a container group
@@ -345,6 +373,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - queues
+      x-liblab-resource: Queue#Create
   '/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}':
     summary: Queue
     description: Operations for a queue
@@ -367,6 +396,8 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - queues
+      x-liblab-datasource: Queue#Read
+      x-liblab-resource: Queue#Read
     patch:
       operationId: update_queue
       summary: Update Queue
@@ -386,6 +417,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - queues
+      x-liblab-resource: Queue#Update
     delete:
       operationId: delete_queue
       summary: Delete Queue
@@ -401,6 +433,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - queues
+      x-liblab-resource: Queue#Delete
   '/organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs':
     summary: Jobs in a Queue
     description: Operations for jobs in a queue
@@ -503,6 +536,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - quotas
+      x-liblab-datasource: OrganizationQuotas#Read
   '/organizations/{organization_name}/inference-endpoints':
     summary: Inference Endpoints
     description: Operations for inference endpoints
@@ -647,6 +681,7 @@ paths:
           $ref: '#/components/responses/UnknownError'
       tags:
         - organization_data
+      x-liblab-datasource: OrganizationGpuClasses#Read
   '/organizations/{organization_name}/webhook-secret-key':
     parameters:
       - $ref: '#/components/parameters/organization_name'
@@ -1536,6 +1571,7 @@ components:
           maxItems: 50
           minItems: 0
       additionalProperties: false
+      deprecated: true
       required:
         - items
     WorkloadError:
@@ -1564,6 +1600,7 @@ components:
           type: integer
           minimum: 1
       additionalProperties: false
+      deprecated: true
       required:
         - detail
         - failed_at
@@ -1571,6 +1608,72 @@ components:
         - machine_id
         - allocated_at
         - version
+    SystemLogList:
+      description: Represents a list of system logs
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemLog'
+          maxItems: 50
+          minItems: 0
+      additionalProperties: false
+      required:
+        - items
+    SystemLog:
+      description: Represents a system log
+      type: object
+      properties:
+        event_name:
+          description: The name of the event
+          type: string
+        event_time:
+          description: The UTC date & time when the log item was created
+          type: string
+          format: date-time
+        instance_id:
+          description: The unique instance ID
+          type: string
+          format: uuid
+        machine_id:
+          description: The organization-specific machine ID
+          type: string
+          format: uuid
+        version:
+          description: The version instance ID
+          type: string
+        resource_cpu:
+          description: The number of CPUs
+          type: integer
+          maximum: 16
+          minimum: 1
+          nullable: true
+        resource_memory:
+          description: The memory amount in MB
+          type: integer
+          maximum: 61440
+          minimum: 1024
+          nullable: true
+        resource_gpu_class:
+          description: The GPU class name
+          type: string
+        resource_storage_amount:
+          description: The storage amount in bytes
+          type: integer
+          format: int64
+          maximum: 53687091200
+          minimum: 1073741824
+          nullable: true
+      additionalProperties: false
+      required:
+        - event_name
+        - event_time
+        - version
+        - resource_gpu_class
+        - resource_cpu
+        - resource_memory
+        - resource_storage_amount
     QueueList:
       description: Represents a list of queues
       type: object
@@ -2225,7 +2328,7 @@ components:
               nullable: true
             memory:
               type: integer
-              maximum: 30720
+              maximum: 61440
               minimum: 1024
               nullable: true
             gpu_classes:
@@ -2601,10 +2704,12 @@ components:
       type: object
       properties:
         min_replicas:
+          description: The minimum number of instances the container can scale down to
           type: integer
           maximum: 100
           minimum: 0
         max_replicas:
+          description: The maximum number of instances the container can scale up to
           type: integer
           maximum: 250
           minimum: 1
@@ -2613,14 +2718,17 @@ components:
           maximum: 100
           minimum: 1
         polling_period:
+          description: The period (in seconds) in which the queue checks the formula
           type: integer
           maximum: 1800
           minimum: 15
         max_upscale_per_minute:
+          description: The maximum number of instances that can be added per minute
           type: integer
           maximum: 100
           minimum: 1
         max_downscale_per_minute:
+          description: The maximum number of instances that can be removed per minute
           type: integer
           maximum: 100
           minimum: 1
@@ -2916,6 +3024,7 @@ components:
         webhook:
           type: string
           format: url
+          maxLength: 2000
           nullable: true
       additionalProperties: false
       required:
@@ -3353,6 +3462,37 @@ components:
                     allocated_at: '2023-09-10T15:44:20.8139996Z'
                     started_at: '2023-09-13T10:44:18.9824223Z'
                     version: 1
+    ListSystemLogs:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SystemLogList'
+          examples:
+            jsonExample:
+              value:
+                organization_name: acme-corp
+                project_name: anvil-drop-simulator
+                container_group_name: sim1
+                items:
+                  - event_name: 'StartFailure:0'
+                    event_time: '2023-09-15T21:38:45.1220217Z'
+                    machine_id: 2155a188-7304-8351-b98d-af6c79e5978f
+                    instance_id: 2155a188-7304-8351-b98d-af6c79e5978f
+                    version: 1
+                    resource_cpu: 1
+                    resource_storage_amount: 2048
+                    resource_memory: 1024
+                    resource_gpu_class: Any RTX GPU
+                  - event_name: 'RunFailure:-1'
+                    event_time: '2023-09-14T11:30:05.2271645Z'
+                    machine_id: dc96663a-fe19-345a-8363-174616159cb6
+                    instance_id: dc96663a-fe19-345a-8363-174616159cb6
+                    version: 1
+                    resource_cpu: 1
+                    resource_storage_amount: 2048
+                    resource_memory: 1024
+                    resource_gpu_class: Any RTX GPU
     ListQueues:
       description: OK
       content:
@@ -3704,6 +3844,8 @@ tags:
     description: quotas
   - name: workload_errors
     description: Workload Errors
+  - name: system_logs
+    description: System Logs
   - name: webhook_secret_key
     description: Webhook Secret Key
 security:
