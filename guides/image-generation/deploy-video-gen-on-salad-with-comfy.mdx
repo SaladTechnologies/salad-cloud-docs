@@ -61,9 +61,11 @@ Create a new file called `.gitignore` and add the following content:
 
 ```plaintext
 *.safetensors
+node_modules
 ```
 
-This will prevent you from checking the model weights themselves into version control, as they are quite large.
+This will prevent you from checking the model weights themselves into version control, as they are quite large. Later in
+this guide we're going to install javascript modules, and we don't want to check those in either.
 
 ## Step 2: Create a Docker Image
 
@@ -944,10 +946,12 @@ Eventually, you will see the container group status change to "Running" when at 
 ## Step 7: Using the API
 
 Now, we're going to use the SaladCloud JavaScript SDK to create a function that submits a job to the job queue, and
-polls for the result. First, we need to install the SDK:
+polls for the result. First, we need to initialize a javascript project and install the SDK:
 
 ```bash
+npm init -y
 npm install @saladtechnologies-oss/salad-cloud-sdk
+npm install --save-dev typescript @types/node
 ```
 
 Copy the following into a new file called `tsconfig.json`:
@@ -1373,9 +1377,31 @@ Run the script:
 ./run-ts-example.sh
 ```
 
-On an RTX 4090, this script takes just under 4 minutes to generate a 10 second video.
+On an RTX 4090, this script takes just under 4 minutes to generate a 10 second video and save it to a file.
 
-## Conclusion
+Now that we have everything working, let's go ahead and commit our work to git.
+
+```bash
+git add .
+git commit -m "Video Generation API with Job Queue"
+```
+
+## Next Steps
+
+Now that you have a working video generation service, and the beginnings of a client that can submit jobs to the job
+queue, you can start to integrate the video generation service into your own applications. You can also start
+experimenting with [autoscaling](/products/sce/autoscaling/autoscaling#autoscaling-overview) to handle more requests,
+and reduce costs during periods of low demand.
+
+ComfyUI API also supports sending workflow
+[progress updates](https://github.com/SaladTechnologies/comfyui-api?tab=readme-ov-file#progress) to a webhook, which can
+be useful to provide real-time feedback to users.
+
+The SaladCloud Job Queue also supports webhooks, which can be used to notify your application when a job is complete.
+This may be preferable to polling, depending on the architecture of the rest of your application and the billing model
+of your hosting provider.
+
+## Summary
 
 In this guide, we used ComfyUI to design a video generation workflow using LTX Video. We created a custom endpoint with
 ComfyUI API that generates video clips from prompts using that workflow. We deployed this endpoint to a GPU cluster with
