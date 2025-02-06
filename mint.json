@@ -381,7 +381,8 @@
             "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
             "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
             "guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
-            "guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy"
+            "guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
+            "guides/image-generation/deploy-video-gen-on-salad-with-comfy"
           ]
         },
         {
