@@ -30,7 +30,7 @@ replacement.
 ## 2. Updating job creation API calls.
 
 The Salad Transcription API uses a Job Queue system for processing transcription requests, rather than a Python function
-that returns the data like GCP. With Salad Transcription API, you'll use two steps. Submit the job, and then requst the
+that returns the data like GCP. With Salad Transcription API, you'll use two steps. Submit the job, and then request the
 results.
 
 ### GCP Transcription
@@ -155,7 +155,7 @@ The response will look like this:
 
 ## 3. Obtaining job results
 
-In the response from submitting your job with the above step, you'll recieve the Job ID which is required to obtain the
+In the response from submitting your job with the above step, you'll receive the Job ID which is required to obtain the
 results of your transcription. The Job status and transcription results are combined into a single API call. With this
 Python function, you'll check the status, and once the job is completed it will also retrieve the transcription results.
 
