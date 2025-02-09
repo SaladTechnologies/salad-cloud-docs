@@ -61,6 +61,7 @@ jemison
 konieshadow
 LAVIS
 lib-dynload
+libgl1
 libgl1-mesa-dev
 libsm6
 libxext6
@@ -68,6 +69,7 @@ libxrender1
 listdir
 LoRA
 LoRAs
+ltxv
 Lykon
 makedirs
 metavoiceio
