@@ -1,0 +1,220 @@
+---
+title: 'Migrating from GCP Transcription'
+---
+
+Migrating from GCP Transcription to Salad Transcription API will require you to replace your GCP Python functions with
+Salad compatible ones. Whilst we do not offer an SDK, we do have example Python functions that you can use in
+replacement.
+
+| Features                   | SaladCloud Transcription | GCP Transcription |
+| -------------------------- | ------------------------ | ----------------- |
+| Translation                | ✅                       | ❌                |
+| Audio Transcription        | ✅                       | ✅                |
+| Video Transcription        | ✅                       | ❌                |
+| Multilingual Transcription | ✅                       | ✅                |
+| Summarization              | ✅                       | ❌                |
+| Speaker Identification     | ✅                       | ❌                |
+| SRT Output                 | ✅                       | ❌                |
+| Transcribe Multiple Files  | ❌                       | ❌                |
+| Max Length                 | 2.5 Hours                | 8 Hours           |
+| Text Sentiment Analysis    | ✅                       | ❌                |
+| Text Classification        | ✅                       | ❌                |
+| Custom LLM Prompt          | ✅                       | ❌                |
+| Custom Vocabulary          | ✅                       | ❌                |
+
+## 1. Get your Salad API Key.
+
+    - Open up https://portal.salad.com and sign up/log into your account.
+    - Navigate to your profile at the top right, and select API Access. Here you can find your API Key.
+
+## 2. Updating job creation API calls.
+
+The Salad Transcription API uses a Job Queue system for processing transcription requests, rather than a Python function
+that returns the data like GCP. With Salad Transcription API, you'll use two steps. Submit the job, and then request the
+results.
+
+### GCP Transcription
+
+Your existing Python code for GCP Transcription should look something like this:
+
+```Python
+import os
+
+from google.cloud.speech_v2 import SpeechClient
+from google.cloud.speech_v2.types import cloud_speech
+
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+
+
+audio_uri = "gs://transcription-files/file.mp3"
+def transcribe_batch_gcs_input_inline_output_v2(
+    audio_uri: str,
+) -> cloud_speech.BatchRecognizeResults:
+    """Transcribes audio from a Google Cloud Storage URI using the Google Cloud Speech-to-Text API.
+        The transcription results are returned inline in the response.
+    Args:
+        audio_uri (str): The Google Cloud Storage URI of the input audio file.
+            E.g., gs://[BUCKET]/[FILE]
+    Returns:
+        cloud_speech.BatchRecognizeResults: The response containing the transcription results.
+    """
+    # Instantiates a client
+    client = SpeechClient()
+
+    config = cloud_speech.RecognitionConfig(
+        auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
+        language_codes=["en-US"],
+        model="long",
+    )
+
+    file_metadata = cloud_speech.BatchRecognizeFileMetadata(uri=audio_uri)
+
+    request = cloud_speech.BatchRecognizeRequest(
+        recognizer=f"projects/projectid/locations/global/recognizers/_",
+        config=config,
+        files=[file_metadata],
+        recognition_output_config=cloud_speech.RecognitionOutputConfig(
+            inline_response_config=cloud_speech.InlineOutputConfig(),
+        ),
+    )
+
+    # Transcribes the audio into text
+    operation = client.batch_recognize(request=request)
+
+    print("Waiting for operation to complete...")
+    response = operation.result(timeout=1200)
+    print(response)
+    for result in response.results[audio_uri].transcript.results:
+        print(f"Transcript: {result.alternatives[0].transcript}")
+
+    return response.results[audio_uri].transcript
+
+print(transcribe_batch_gcs_input_inline_output_v2(audio_uri))
+```
+
+### Salad Transcription API Equivalent
+
+When using Salad Transcription API, you’ll update that job creation function to instead look like this:
+
+```Python
+import requests
+
+def salad_transcribe(file, Salad-Api-Key):
+
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+    payload = {
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": true,
+       	    "word_level_timestamps": true
+        }
+    }
+    headers = {
+        "Salad-Api-Key": Salad-Api-Key,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)
+    return response
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+file = "https://example.com/path/to/file.mp3"
+
+job = salad_transcribe(file)
+print(job.text)
+```
+
+- For this code snippet, you'll need to insert your Salad Organization name into the API url field.
+- You will also need to insert your Salad API Key we obtained earlier lower down in the code snippet.
+- Put the URL to the file to be transcribed into the file string. Please note that Salad Transcription API can only
+  process files up to 2.5 hours. Make sure the URL provided is to a direct download of the file. Header based security
+  is not compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
+  [Salad Simple Storage Service.](https://docs.salad.com/products/s4/salad-simple-storage-service#upload-a-file)
+
+The response will look like this:
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "inference_endpoint_name": "transcribe",
+  "input": {
+    "property1": "value1",
+    "property2": "value2"
+  },
+  "metadata": null,
+  "organization_name": "example-corp",
+  "status": "pending",
+  "events": [],
+  "create_time": "2025-01-016T19:00:00Z",
+  "update_time": "2025-01-016T19:00:00Z"
+}
+```
+
+## 3. Obtaining job results
+
+In the response from submitting your job with the above step, you'll receive the Job ID which is required to obtain the
+results of your transcription. The Job status and transcription results are combined into a single API call. With this
+Python function, you'll check the status, and once the job is completed it will also retrieve the transcription results.
+
+```Python
+def get_result(job_id, Salad-Api-Key):
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/" + job_id
+
+    headers = {"Salad-Api-Key": Salad-Api-Key}
+
+    response = requests.request("GET", url, headers=headers)
+
+job_id = "{JOB_ID FROM BEFORE}"
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+result = get_result(job_id, Salad-Api-Key)
+print(result.text)
+```
+
+- Make sure to again update the organization name above to your organization name.
+- You will need to insert the Job ID that you obtained from the previous step as well.
+- And again make sure to include your Salad API Key.
+
+Once the status of your job has reached `succeeded`, the `output` object will include the URL to the completed
+transcription via a directly downloadable URL.
+
+```json
+{
+  "id": "7c425fc0-dd3d-4c6c-8b6a-a010187492dd",
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "return_as_file": true,
+    "word_level_timestamps": true
+  },
+  "inference_endpoint_name": "transcribe",
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2025-01-22T15:57:26.0815348+00:00"
+    },
+    {
+      "action": "started",
+      "time": "2025-01-22T15:57:26.2061428+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2025-01-22T15:58:13.9323189+00:00"
+    }
+  ],
+  "organization_name": "salad",
+  "output": {
+    "url": "https://storage-api.salad.com/organizations/salad/files/transcription/73b2ee75-664e-4332-a853-9210dde5c5fd?token=ac34664a-088d-4c72-b53c-c99cfbf538",
+    "duration_in_seconds": 320.4135,
+    "duration": 0.09,
+    "processing_time": 46.076966285705566
+  },
+  "create_time": "2025-01-22T15:57:26.0815348+00:00",
+  "update_time": "2025-01-22T15:58:13.9323189+00:00"
+}
+```
