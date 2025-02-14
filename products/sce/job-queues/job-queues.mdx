@@ -7,6 +7,19 @@ With Job Queues you configure a port on your container, deploy your container gr
 endpoint. These requests are automatically queued and distributed to healthy nodes, with automatic retries to handle
 transient failures.
 
+# Limitations
+
+- Our Job Queues are designed to distribute tasks to an HTTP server, and queue operations are managed with http response
+  symantics, e.g. return 200 for a successful job, 500 for a failed job.
+- Jobs will be retried up to 3 times (meaning 4 total attempts) before being marked as failed. This limitation in
+  combination with interruptible instances means our job queues are not well suited for extremely long running tasks.
+- Instance interruptions count as job failures, and those jobs will be retried according to the above policy.
+- Jobs are not guaranteed to be processed in order, but they will be processed in a FIFO manner.
+- Jobs are not guaranteed to be processed by the same node, but they will be processed by a healthy node.
+- The response body from your http server cannot exceed 10MB.
+- Job Queues can only be managed and accessed via the
+  [Job Queue API](http://localhost:3000/reference/saladcloud-api/queues/create-a-queue)
+
 # Terminology
 
 - **Job:** An individual request to be processed. An example of a job might be a token string sent to an image
