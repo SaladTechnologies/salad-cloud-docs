@@ -448,7 +448,8 @@
                   "pages": [
                     "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-azure-batch",
                     "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-gcp-transcription",
-                    "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-rev-transcription"
+                    "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-rev-transcription",
+                    "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-assembly-transcription"
                   ]
                 },
                 {
