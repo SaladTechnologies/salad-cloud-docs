@@ -1,0 +1,136 @@
+# SGS API
+
+The SGS API enables you to manage streaming capability tags for nodes in your network. By tagging nodes based on their ability to handle specific streaming services, you can create optimized routing paths for different workloads.
+
+## Authentication
+
+All API requests require your Salad-provided JWT token:
+
+```bash
+curl https://{sgs_name}.salad.com:7443/nodes \
+  -H "Authorization: Bearer YOUR_SALAD_JWT"
+```
+
+Requests without proper authentication will receive a `401 Unauthorized` response.
+
+## Nodes
+
+### List all nodes
+
+```http
+GET /nodes
+```
+
+Returns all active, non-quarantined nodes connected to your SGS server.
+
+#### Example response
+
+```json
+{
+  "nodes": [
+    {
+      "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+      "tags": {
+        "nflx": 1,
+        "dsnp": 1
+      },
+      "update_time": "2023-05-04T05:41:05Z"
+    }
+  ]
+}
+```
+
+### Retrieve a node
+
+```http
+GET /nodes/{machine_id}
+```
+
+Retrieves information about a specific node.
+
+#### Example response
+
+```json
+{
+  "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
+  "tags": {
+    "nflx": 1,
+    "dsnp": 1
+  },
+  "update_time": "2023-05-04T05:41:05Z"
+}
+```
+
+### Update a node
+
+```http
+PATCH /nodes/{machine_id}/tags
+```
+
+Updates capability tags for a specific node. 
+
+Tag values must be between 0 and 1, where:
+- `0` indicates the node cannot handle the service
+- Any value `> 0` and `≤ 1` indicates the node can handle the service
+
+#### Parameters
+
+| Parameter | Description |
+| --- | --- |
+| `service_name` | Key-value pairs where key is the service name and value is between 0 and 1, inclusive |
+
+#### Example request
+
+```json
+{
+  "nflx": 1,
+  "dsnp": 0,
+  "itv": 0.8
+}
+```
+
+### Remove all tags
+
+```http
+DELETE /nodes/{machine_id}/tags
+```
+
+Removes all capability tags from a node.
+
+## Using capabilities
+
+To route sessions to capable nodes, append the capability parameter to your session IDs:
+
+```
+&cap=internal-service_name
+```
+
+> **Important:** Use a unique prefix (like `internal-`) for your custom tags to avoid conflicts with Salad's internal Destination Health Check tags. Salad uses only a handful of internal DHC tags, and they vary by region. Check with your Salad Account manager if you're unclear on which tags are in use.
+
+## Routing behavior
+
+- SGS routes sessions for a service only to nodes with a positive tag value (`> 0`) for that service
+- Missing tags are treated as `0` (unroutable)
+- If all nodes are unroutable for a requested capability, SGS will "fail open" and distribute traffic across all nodes
+- The rational number tag values (between `0` and `1`) enable future weighted load balancing features
+
+## Common workflows
+
+### Qualifying nodes for a new service
+
+1. List all nodes to identify machine IDs
+2. Test each node for your new service (e.g., "internal-streaming") by targeting specific nodes:
+   ```bash
+   # Add the X-Sgs-Machine-Id header to test a specific node
+   # Do not use &cap= in the sessionID during testing
+   curl https://your-streaming-endpoint.example.com \
+     -H "X-Sgs-Machine-Id: 5ebfa363-6e0b-4db1-b9be-70ed4995d0b1"
+   ```
+3. Tag successful nodes:
+   ```bash
+   curl -X PATCH https://{sgs_name}.salad.com:7443/nodes/{machine_id}/tags \
+     -H "Authorization: Bearer YOUR_SALAD_JWT" \
+     -H "Content-Type: application/json" \
+     -d '{"internal-streaming": 1}'
+   ```
+4. Route traffic to successful nodes by including `&cap=internal-streaming` in your session IDs
