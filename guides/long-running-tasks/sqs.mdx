@@ -378,3 +378,135 @@ def acknowledge_job(receipt_handle: str):
         ReceiptHandle=receipt_handle
     )
 ```
+
+We also want a function to download the checkpoint from cloud storage, and a function to upload the checkpoint to cloud
+storage. In this simplified example, we're going to use a small JSON file for the checkpoint, but the principle is the
+same no matter what the actual checkpoint is.
+
+```python
+def download_checkpoint(job_id: str):
+    '''
+    Download the checkpoint from S3
+
+    Parameters:
+    - job_id: str, the job ID
+
+    Returns:
+    - checkpoint: dict, the checkpoint
+    '''
+    try:
+        response = s3.get_object(
+            Bucket=r2_bucket_name,
+            Key=f'{job_id}/checkpoint.json'
+        )
+    except boto3.exceptions.S3.NoSuchKey:
+        return None
+
+    checkpoint = json.loads(response['Body'].read())
+    return checkpoint
+
+
+def upload_checkpoint(job_id: str, checkpoint: dict):
+    '''
+    Upload the checkpoint to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - checkpoint: dict, the checkpoint
+    '''
+    s3.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/checkpoint.json',
+        Body=json.dumps(checkpoint)
+    )
+```
+
+Now, we need a function for "doing the work", which in our case is just slowly calculating a sum.
+
+```python
+def do_the_actual_work(job: dict, checkpoint: dict):
+    '''
+    Do the actual work for the job. This function will simulate work by
+    sleeping for 30 seconds and incrementing the step and sum in the
+    checkpoint.
+
+    Parameters:
+    - job: dict, the job
+    - checkpoint: dict, the checkpoint
+    '''
+    while checkpoint['step'] < job['steps']:
+        time.sleep(30)  # Simulate work
+        checkpoint['step'] += 1
+        checkpoint['sum'] += checkpoint['step']
+        upload_checkpoint(job['job_id'], checkpoint)
+
+    return checkpoint['sum']
+```
+
+Once our work has completed, we'll need a function to upload the results to cloud storage.
+
+```python
+def upload_result(job_id: str, result: int):
+    '''
+    Upload the result to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - result: int, the result
+    '''
+    s3.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/result.txt',
+        Body=str(result)
+    )
+```
+
+Now, we need to put it all together in a function called `process_job`.
+
+```python
+def process_job(job: dict, receipt_handle: str):
+    # Now that we have the job, we need to start a separate thread that
+    # heartbeats for it. This will keep the job alive in the SQS queue.
+    heartbeat_stop_signal = threading.Event()
+    heartbeat_thread = threading.Thread(
+        target=heartbeat_job, args=(receipt_handle, heartbeat_stop_signal))
+    heartbeat_thread.start()
+
+    # If there's a checkpoint, we want to use it, but if not, we need to
+    # initialize it.
+    checkpoint = download_checkpoint(job['job_id'])
+    if checkpoint is None:
+        checkpoint = {'step': 0, 'sum': 0}
+
+    # Now we can do the actual work
+    try:
+        result = do_the_actual_work(job, checkpoint)
+
+        # The job isn't really done until the result is uploaded.
+        upload_result(job['job_id'], result)
+
+        # Once the result is uploaded, we can acknowledge the job and stop
+        # the heartbeat.
+        acknowledge_job(receipt_handle)
+        heartbeat_stop_signal.set()
+        heartbeat_thread.join()
+    except Exception as e:
+        # If there's an error, we need to release the job back to the queue
+        # so it can be retried.
+        heartbeat_stop_signal.set()
+        heartbeat_thread.join()
+        release_job(receipt_handle)
+        return
+```
+
+Finally, we need to create a loop that will run forever, processing jobs as they come in.
+
+```python
+if __name__ == '__main__':
+    while True:
+        job, receipt_handle = get_job()
+        if job is not None:
+            process_job(job, receipt_handle)
+        else:
+            time.sleep(10)
+```
