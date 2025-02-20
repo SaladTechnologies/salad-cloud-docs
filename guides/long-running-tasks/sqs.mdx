@@ -161,9 +161,9 @@ Again, I'm going to tag the queue with "project: sqs-demo". Being religious abou
 of time and headache later.
 
 Now we're going to create our dead-letter queue. Navigate back to the SQS console, and click "Create queue". We're going
-to use mostly the same settings as before, but we're going to name this queue `my-job-queue-dlq.fifo`, and not assign it
-anything beyond the default permissions. For this one, we will enable "Redrive allow policy", and allow our first queue
-as the source queue.
+to use mostly the same settings as before, but we're going to name this queue `my-job-queue-dlq.fifo`, and set its
+permissions to allow `job-worker` to _send_ messages to it. For this one, we will enable "Redrive allow policy", and
+allow our first queue as the source queue.
 
 <Frame caption="Enable access from our main queue to the dead-letter queue">
   <img src="/guides/long-running-tasks/images/sqs-create-dlq-redrive.png" alt="Creating a dead-letter queue" />
@@ -237,6 +237,7 @@ SQS_AWS_ACCESS_KEY_ID=your-access-key-id
 SQS_AWS_SECRET_ACCESS_KEY=your-secret-access-key
 SQS_AWS_REGION=your-region
 SQS_QUEUE_URL=your-queue-url
+SQS_DLQ_URL=your-dlq-url
 ```
 
 Then, to source this into my environment when I run my code, I run the following command:
@@ -264,6 +265,7 @@ sqs_aws_access_key_id = os.getenv('SQS_AWS_ACCESS_KEY_ID')
 sqs_aws_secret_access_key = os.getenv('SQS_AWS_SECRET_ACCESS_KEY')
 sqs_aws_region = os.getenv('SQS_AWS_REGION')
 sqs_queue_url = os.getenv('SQS_QUEUE_URL')
+sqs_dlq_url = os.getenv('SQS_DLQ_URL')
 
 # Create the clients
 sqs = boto3.client('sqs',
@@ -285,7 +287,7 @@ checkpoint to cloud storage, and for loading a checkpoint from cloud storage.
 We're going to need to import some things from our client file.
 
 ```python
-from clients import sqs, s3, sqs_queue_url, r2_bucket_name
+from clients import sqs, s3, sqs_queue_url, sqs_dlq_url, r2_bucket_name
 ```
 
 Now, we define a `get_job` function:
@@ -376,6 +378,20 @@ def acknowledge_job(receipt_handle: str):
     sqs.delete_message(
         QueueUrl=sqs_queue_url,
         ReceiptHandle=receipt_handle
+    )
+
+
+def fail_job(job, receipt_handle: str):
+    '''
+    Move the job to the dead-letter queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    acknowledge_job(receipt_handle)
+    sqs.send_message(
+        QueueUrl=sqs_dlq_url,
+        MessageBody=json.dumps(job)
     )
 ```
 
@@ -479,6 +495,15 @@ def process_job(job: dict, receipt_handle: str):
     if checkpoint is None:
         checkpoint = {'step': 0, 'sum': 0}
 
+    # Some jobs may have a validation step. For instance, dreambooth training may have a step
+    # that verifies if all inputs have faces. If the validation fails, we should stop the job
+    # and not retry it, but instead move it to the DLQ.
+    if not validate_job(job):
+        heartbeat_stop_signal.set()
+        fail_job(job, receipt_handle)
+        heartbeat_thread.join()
+        return
+
     # Now we can do the actual work
     try:
         result = do_the_actual_work(job, checkpoint)
@@ -515,7 +540,7 @@ if __name__ == '__main__':
 ### Completed Example
 
 ```python
-from clients import sqs, s3, sqs_queue_url, r2_bucket_name
+from clients import sqs, s3, sqs_queue_url, sqs_dlq_url, r2_bucket_name
 import json
 import time
 import threading
@@ -596,6 +621,20 @@ def acknowledge_job(receipt_handle: str):
     )
 
 
+def fail_job(job, receipt_handle: str):
+    '''
+    Move the job to the dead-letter queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    acknowledge_job(receipt_handle)
+    sqs.send_message(
+        QueueUrl=sqs_dlq_url,
+        MessageBody=json.dumps(job)
+    )
+
+
 def download_checkpoint(job_id: str):
     '''
     Download the checkpoint from S3
@@ -631,6 +670,10 @@ def upload_checkpoint(job_id: str, checkpoint: dict):
         Key=f'{job_id}/checkpoint.json',
         Body=json.dumps(checkpoint)
     )
+
+
+def validate_job(job: dict):
+    return 'job_id' in job and 'steps' in job
 
 
 def do_the_actual_work(job: dict, checkpoint: dict):
@@ -680,6 +723,15 @@ def process_job(job: dict, receipt_handle: str):
     checkpoint = download_checkpoint(job['job_id'])
     if checkpoint is None:
         checkpoint = {'step': 0, 'sum': 0}
+
+    # Some jobs may have a validation step. For instance, dreambooth training may have a step
+    # that verifies if all inputs have faces. If the validation fails, we should stop the job
+    # and not retry it, but instead move it to the DLQ.
+    if not validate_job(job):
+        heartbeat_stop_signal.set()
+        fail_job(job, receipt_handle)
+        heartbeat_thread.join()
+        return
 
     # Now we can do the actual work
     try:
