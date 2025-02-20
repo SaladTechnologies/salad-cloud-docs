@@ -7,7 +7,12 @@ Managing long running tasks, such as molecular simulations, dreambooth training,
 challenges on SaladCloud, due primarily to the interruptible nature of nodes. At the core of all solutions to this
 problem are a job queue, and progress checkpoints. The job queue is responsible for distributing tasks to workers, and
 detecting when a worker has been interrupted. Workloads should save checkpoints of their progress and upload it to cloud
-storage, so that they can be resumed from the last checkpoint in the event of an interruption.
+storage, so that they can be resumed from the last checkpoint in the event of an interruption. Workers should also
+upload completed artifacts to cloud storage.
+
+<Frame caption="Basic architecture for long-running tasks on SaladCloud">
+  <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
+</Frame>
 
 In this guide, we will be using [Amazon SQS](https://aws.amazon.com/sqs/) as our job queue, and
 [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage service, as
@@ -16,4 +21,61 @@ SaladCloud's distributed nodes are not in datacenters, and therefore may incur e
 Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
 
-##
+For this guide, we will consider two example workloads: one that lasts five hours, and one that lasts two weeks.
+
+## The Job Queue: SQS
+
+Simple Queue Service, or SQS, is a fully managed serverless queue solution from AWS. It is a great choice for managing
+long-running tasks on SaladCloud because it is highly available, scalable, and requires no maintenance. However, it is
+not free, and while the pricing may seem low, the cost can add up quickly if you are not careful. That said, if you are
+processing less than a few million jobs per month, the cost should be negligible.
+
+### Relevant Limitations
+
+- Maximum message size of 256KB. This means if our job has much in the way of input data, we will need to store that
+  input data in cloud storage, and only include references to it in the job definition.
+- Maximum message retention of 14 days. This means if jobs sit in the queue for longer than 14 days, they will be
+  automatically deleted.
+- Maximum message visibility timeout of 12 hours. This means that if a worker does not delete a message from the queue
+  within 12 hours of receiving it, the message will be made available to other workers. For some particularly long
+  workloads, this presents challenges that we will discuss later. For others, it is a non-issue.
+
+### Creating an SQS Queue
+
+To create an SQS queue, navigate to the [SQS console](https://console.aws.amazon.com/sqs/), and click "Create queue".
+
+<Frame caption="The SQS Console">
+  <img src="/guides/long-running-tasks/images/sqs-console.png" alt="The SQS Console" />
+</Frame>
+
+You'll want to choose a better name than I have, but for the purposes of this guide, we'll call our queue
+`my-job-queue.fifo`.
+
+- FIFO queues are recommended for long-running tasks, because the cost of processing a job is often relatively high, and
+  FIFO queues ensure _exactly-once_ processing of each job. In non-FIFO queues, throughput is higher and the cost of
+  jobs potentially being delivered more than once.
+- Set the visibility timeout to 60 seconds. You might think, don't we want it to be way longer than that? The answer is
+  no, because we want the job queue to hand the job out to a new worker as soon as possible if a worker gets
+  interrupted. In our application, we will programmatically extend the visibility timeout while the job is running. The
+  60 second value then becomes the maximum amount of time a worker can be out of communication before a job is handed
+  out again.
+- Set the message retention period to 14 days. This is the maximum value, and we want to keep jobs around as long as
+  possible in case we need to reprocess them, or in case our we have a scenario with dramatically more jobs than
+  workers.
+- Set the default message delay to 0 seconds. This is the amount of time a message will sit in the queue before it is
+  available to be picked up by a worker. We want this to be as low as possible, because we want workers to be able to
+  pick up jobs as soon as they are available.
+- Set maximum message size to 256KB. This is the maximum size of a message in the queue. If your job input is larger
+  than this, you will need to store the job inputs in cloud storage, and only include a reference to the job in the
+  message. An example would be dreambooth training, where many images are needed as an input to the job.
+- Set the "Receive message wait time" to 20 seconds. In order to minimize the number of api requests (which are billed),
+  we want workers to wait up to 20 seconds on an open connection for a job to become available. In times of high
+  throughput, this setting doesn't really matter because workers will always have a wait time of 0 seconds. however, in
+  times of low job volume, this setting can lead to significant savings in billed api requests.
+- Leave content-based deduplication disabled. We will be using the more lightweight `MessageDeduplicationId` field to
+  ensure exactly-once processing of jobs, and assigning GUIDs to jobs in our application code.
+- We want the deduplication scope to be queue-wide, so that we can ensure exactly-once processing of jobs across all
+  workers.
+- For "FIFO throughput limit", we want to set this to "Per queue". Selecting "Per message group ID" enables
+  high-throughput FIFO queues, which are excessive for out application. If you are processing tens of thousands of
+  simultaneous jobs, you may want to enable high-throughput FIFO queues, but for most applications, this is unnecessary.
