@@ -14,21 +14,57 @@ upload completed artifacts to cloud storage.
   <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
 </Frame>
 
-In this guide, we will be using [Amazon SQS](https://aws.amazon.com/sqs/) as our job queue, and
+We will be using [Amazon SQS](https://aws.amazon.com/sqs/) as our job queue, and
 [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage service, as
 our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge egress, and
 SaladCloud's distributed nodes are not in datacenters, and therefore may incur egress fees from other providers.
 Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
 
-For this guide, we will consider two example workloads: one that lasts five hours, and one that lasts two weeks.
+For this guide, we will consider two example workloads: one that lasts five hours, and one that lasts two weeks. We will
+set up a job queue and related resources, a storage bucket, a checkpoint saving system, and a simple auto-scaling
+mechanism.
+
+## IAM: Identity and Access Management
+
+IAM is the AWS system for managing users, roles, and permissions. We will need to create two IAM users: one for us, the
+user submitting the jobs, and one for the workers. The user submitting the jobs will need to be able to submit jobs to
+the queue, and the workers will need to be able to read and delete jobs from the queue. To get started, navigate to the
+[IAM console](https://console.aws.amazon.com/iam/), and select "Users" from the left-hand menu. Click "Create User".
+
+<Frame caption="The IAM Users Console">
+  <img src="/guides/long-running-tasks/images/iam-users-console.png" alt="The IAM Console" />
+</Frame>
+
+We're going to name our user `job-submitter`. It does not need console access.
+
+<Frame caption="Creating the job-submitter user">
+  <img src="/guides/long-running-tasks/images/iam-submitter-st1.png" alt="Creating the job-submitter user" />
+</Frame>
+
+On the next screen, we're going to grant no permissions the the user. We will be using a resource-based policy later to
+grant the user access to the queue.
+
+<Frame caption="Granting no permissions to the job-submitter user">
+  <img
+    src="/guides/long-running-tasks/images/iam-submitter-st2.png"
+    alt="Granting no permissions to the job-submitter user"
+  />
+</Frame>
+
+Finally, give the user any tags that will make it easier to find and organize later. We're going to give it a tag of
+"Project: sqs-demo".
+
+<Frame caption="Tagging the job-submitter user">
+  <img src="/guides/long-running-tasks/images/iam-submitter-st3.png" alt="Tagging the job-submitter user" />
+</Frame>
 
 ## The Job Queue: SQS
 
 Simple Queue Service, or SQS, is a fully managed serverless queue solution from AWS. It is a great choice for managing
-long-running tasks on SaladCloud because it is highly available, scalable, and requires no maintenance. However, it is
-not free, and while the pricing may seem low, the cost can add up quickly if you are not careful. That said, if you are
-processing less than a few million jobs per month, the cost should be negligible.
+long-running tasks on SaladCloud because it is highly available, scalable, and requires no ongoing maintenance. However,
+it is not free, and while the pricing may seem low, the cost can add up quickly if you are not careful. That said, if
+you are processing less than a few million jobs per month, the cost should be negligible.
 
 ### Relevant Limitations
 
@@ -39,6 +75,7 @@ processing less than a few million jobs per month, the cost should be negligible
 - Maximum message visibility timeout of 12 hours. This means that if a worker does not delete a message from the queue
   within 12 hours of receiving it, the message will be made available to other workers. For some particularly long
   workloads, this presents challenges that we will discuss later. For others, it is a non-issue.
+- AWS is pretty complicated if you are unfamiliar with it (and even if you are!).
 
 ### Creating an SQS Queue
 
@@ -48,7 +85,11 @@ To create an SQS queue, navigate to the [SQS console](https://console.aws.amazon
   <img src="/guides/long-running-tasks/images/sqs-console.png" alt="The SQS Console" />
 </Frame>
 
-You'll want to choose a better name than I have, but for the purposes of this guide, we'll call our queue
+<Frame caption="Creating a new FIFO queue">
+  <img src="/guides/long-running-tasks/images/sqs-create-queue.png" alt="Creating a new FIFO queue" />
+</Frame>
+
+You may want to choose a better name than I have, but for the purposes of this guide, we'll call our queue
 `my-job-queue.fifo`.
 
 - FIFO queues are recommended for long-running tasks, because the cost of processing a job is often relatively high, and
