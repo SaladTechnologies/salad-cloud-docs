@@ -421,7 +421,8 @@ def upload_checkpoint(job_id: str, checkpoint: dict):
     )
 ```
 
-Now, we need a function for "doing the work", which in our case is just slowly calculating a sum.
+Now, we need a function for "doing the work", which in our case is just slowly calculating a sum. For you this may be AI
+training jobs or molecular simulations.
 
 ```python
 def do_the_actual_work(job: dict, checkpoint: dict):
@@ -502,6 +503,205 @@ def process_job(job: dict, receipt_handle: str):
 Finally, we need to create a loop that will run forever, processing jobs as they come in.
 
 ```python
+if __name__ == '__main__':
+    while True:
+        job, receipt_handle = get_job()
+        if job is not None:
+            process_job(job, receipt_handle)
+        else:
+            time.sleep(10)
+```
+
+### Completed Example
+
+```python
+from clients import sqs, s3, sqs_queue_url, r2_bucket_name
+import json
+import time
+import threading
+import boto3
+
+visibility_timeout = 60
+
+
+def get_job():
+    '''
+    Get the job from the SQS queue
+
+    Returns:
+    - job: dict, the job to be processed
+    - receipt_handle: str, the receipt handle of the message
+
+    If there are no messages in the queue, return None, None
+    '''
+    response = sqs.receive_message(
+        QueueUrl=sqs_queue_url,
+        AttributeNames=['All'],
+        MaxNumberOfMessages=1,
+        MessageAttributeNames=['All'],
+        VisibilityTimeout=visibility_timeout,
+        WaitTimeSeconds=20
+    )
+
+    if 'Messages' in response:
+        message = response['Messages'][0]
+        receipt_handle = message['ReceiptHandle']
+        job = json.loads(message['Body'])
+        return job, receipt_handle
+    else:
+        return None, None
+
+
+def heartbeat_job(receipt_handle: str, stop_signal: threading.Event):
+    '''
+    Send a heartbeat to the SQS queue to keep the job alive
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    - stop_signal: threading.Event, a signal to stop the heartbeat
+    '''
+    while not stop_signal.is_set():
+        sqs.change_message_visibility(
+            QueueUrl=sqs_queue_url,
+            ReceiptHandle=receipt_handle,
+            VisibilityTimeout=visibility_timeout
+        )
+        time.sleep(visibility_timeout / 2)
+
+
+def release_job(receipt_handle: str):
+    '''
+    Release the job back to the SQS queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    sqs.change_message_visibility(
+        QueueUrl=sqs_queue_url,
+        ReceiptHandle=receipt_handle,
+        VisibilityTimeout=0
+    )
+
+
+def acknowledge_job(receipt_handle: str):
+    '''
+    Acknowledge the job and delete it from the SQS queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    sqs.delete_message(
+        QueueUrl=sqs_queue_url,
+        ReceiptHandle=receipt_handle
+    )
+
+
+def download_checkpoint(job_id: str):
+    '''
+    Download the checkpoint from S3
+
+    Parameters:
+    - job_id: str, the job ID
+
+    Returns:
+    - checkpoint: dict, the checkpoint
+    '''
+    try:
+        response = s3.get_object(
+            Bucket=r2_bucket_name,
+            Key=f'{job_id}/checkpoint.json'
+        )
+    except boto3.exceptions.S3.NoSuchKey:
+        return None
+
+    checkpoint = json.loads(response['Body'].read())
+    return checkpoint
+
+
+def upload_checkpoint(job_id: str, checkpoint: dict):
+    '''
+    Upload the checkpoint to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - checkpoint: dict, the checkpoint
+    '''
+    s3.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/checkpoint.json',
+        Body=json.dumps(checkpoint)
+    )
+
+
+def do_the_actual_work(job: dict, checkpoint: dict):
+    '''
+    Do the actual work for the job. This function will simulate work by
+    sleeping for 30 seconds and incrementing the step and sum in the
+    checkpoint.
+
+    Parameters:
+    - job: dict, the job
+    - checkpoint: dict, the checkpoint
+    '''
+    while checkpoint['step'] < job['steps']:
+        time.sleep(30)  # Simulate work
+        checkpoint['step'] += 1
+        checkpoint['sum'] += checkpoint['step']
+        upload_checkpoint(job['job_id'], checkpoint)
+
+    return checkpoint['sum']
+
+
+def upload_result(job_id: str, result: int):
+    '''
+    Upload the result to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - result: int, the result
+    '''
+    s3.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/result.txt',
+        Body=str(result)
+    )
+
+
+def process_job(job: dict, receipt_handle: str):
+    # Now that we have the job, we need to start a separate thread that
+    # heartbeats for it. This will keep the job alive in the SQS queue.
+    heartbeat_stop_signal = threading.Event()
+    heartbeat_thread = threading.Thread(
+        target=heartbeat_job, args=(receipt_handle, heartbeat_stop_signal))
+    heartbeat_thread.start()
+
+    # If there's a checkpoint, we want to use it, but if not, we need to
+    # initialize it.
+    checkpoint = download_checkpoint(job['job_id'])
+    if checkpoint is None:
+        checkpoint = {'step': 0, 'sum': 0}
+
+    # Now we can do the actual work
+    try:
+        result = do_the_actual_work(job, checkpoint)
+
+        # The job isn't really done until the result is uploaded.
+        upload_result(job['job_id'], result)
+
+        # Once the result is uploaded, we can acknowledge the job and stop
+        # the heartbeat.
+        acknowledge_job(receipt_handle)
+        heartbeat_stop_signal.set()
+        heartbeat_thread.join()
+    except Exception as e:
+        # If there's an error, we need to release the job back to the queue
+        # so it can be retried.
+        heartbeat_stop_signal.set()
+        heartbeat_thread.join()
+        release_job(receipt_handle)
+        return
+
+
 if __name__ == '__main__':
     while True:
         job, receipt_handle = get_job()
