@@ -25,6 +25,8 @@ For this guide, we will consider two example python workloads: one that lasts fi
 We will set up a job queue and related resources, a storage bucket, a checkpoint saving system, and a simple
 auto-scaling mechanism.
 
+You will need an AWS account, and a Cloudflare account to follow this guide.
+
 ## IAM: Identity and Access Management
 
 IAM is the AWS system for managing users, roles, and permissions. We will need to create two IAM users: one for us, the
@@ -61,6 +63,17 @@ Finally, give the user any tags that will make it easier to find and organize la
 
 Repeat that process to create a user called `job-worker`. Once you're done, leave this tab open, because we will need
 the resource IDs (ARNs) of the users later.
+
+We need to create a set of access keys for both IAM users in AWS. Navigate back to your IAM console tab, and click on
+the job-worker user. Select "Create access key", and save the access keys and secret keys somewhere safe. Make sure to
+keep track of which set of keys belongs to which user, since they have different permissions.
+
+<Frame caption="Creating an access key for the job-worker user">
+  <img
+    src="/guides/long-running-tasks/images/iam-worker-create-key.png"
+    alt="Creating an access key for the job-worker user"
+  />
+</Frame>
 
 ## The Job Queue: SQS
 
@@ -163,3 +176,205 @@ is received 3 times without being deleted, it will be moved to the dead-letter q
 <Frame caption="Enable the dead-letter queue on the main queue">
   <img src="/guides/long-running-tasks/images/sqs-assign-dlq.png" alt="Enabling the dead-letter queue" />
 </Frame>
+
+For our application to use these queues, we will need the Queue URL, available on the queue's details page.
+
+<Frame caption="The Queue URL">
+  <img src="/guides/long-running-tasks/images/sqs-get-queue-url.png" alt="The Queue URL" />
+</Frame>
+
+## Cloud Storage: R2
+
+R2 is a cloud storage service from Cloudflare that is compatible with the S3 API. It is a great choice for SaladCloud
+workloads because it does not charge egress fees, and SaladCloud's distributed nodes are mostly not in datacenters, and
+therefore may incur egress fees from other providers.
+
+From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
+
+<Frame caption="The R2 Object Storage Console">
+  <img src="/guides/long-running-tasks/images/r2-console.png" alt="The R2 Object Storage Console" />
+</Frame>
+
+Give your bucket a meaningful name, and select an appropriate location. We are going to use the standard storage class,
+and automatic location.
+
+<Frame caption="Creating a new bucket">
+  <img src="/guides/long-running-tasks/images/r2-create-bucket.png" alt="Creating a new bucket" />
+</Frame>
+
+Once your bucket is created, you will need to create an access key and secret key. Select "Manage API tokens" from the
+"\{ \} API" menu, and click "Create Token".
+
+<Frame caption="You still need an API token to access your bucket">
+  <img src="/guides/long-running-tasks/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
+</Frame>
+
+Create a token with "Object Read & Write" permissions, and only grant it access to the bucket we've just created. Since
+secret rotation is outside the scope of this guide, we're going to use the "forever" TTL. However, it is best practice
+to user shorter-lived secrets and to have easy automatic mechanisms in place to rotate secrets as needed.
+
+Once created you will be given an access key and secret key. Save these somewhere safe, as you will not be able to
+retrieve them again. The application code will get these keys from environment variables, so you will need to set them
+in your environment. Also on that page will be the S3 endpoint URL for your bucket. Save this as well, as it will be
+needed in the application code.
+
+## Instrumenting Our Application
+
+We're going to use the `boto3` library to interact with both SQS and R2. You can install it with `pip install boto3`.
+
+First, we need to set up our environment variables. All of the following environment variables will be needed by the
+application code.
+
+There are several ways to do this, but what I've done for my development environment is create a file called `.env` in
+the root of my project, and add the following lines:
+
+```shell
+R2_AWS_ACCESS_KEY_ID=your-access-key-id
+R2_AWS_SECRET_ACCESS_KEY=your-secret-access-key
+R2_S3_ENDPOINT_URL=your-s3-endpoint-url
+R2_BUCKET_NAME=your-bucket-name
+SQS_AWS_ACCESS_KEY_ID=your-access-key-id
+SQS_AWS_SECRET_ACCESS_KEY=your-secret-access-key
+SQS_AWS_REGION=your-region
+SQS_QUEUE_URL=your-queue-url
+```
+
+Then, to source this into my environment when I run my code, I run the following command:
+
+```shell
+export $(grep -v '^#' .env | xargs -d '\n')
+```
+
+Make sure this `.env` file is in your .gitignore. You don't want to commit your secrets to your repository.
+
+Now, create a file called `clients.py`, and add the following code:
+
+```python
+import boto3
+import os
+
+# Get the environment variables
+r2_aws_region = "auto"
+r2_aws_access_key_id = os.getenv('R2_AWS_ACCESS_KEY_ID')
+r2_aws_secret_access_key = os.getenv('R2_AWS_SECRET_ACCESS_KEY')
+r2_s3_endpoint_url = os.getenv('R2_S3_ENDPOINT_URL')
+r2_bucket_name = os.getenv('R2_BUCKET_NAME')
+
+sqs_aws_access_key_id = os.getenv('SQS_AWS_ACCESS_KEY_ID')
+sqs_aws_secret_access_key = os.getenv('SQS_AWS_SECRET_ACCESS_KEY')
+sqs_aws_region = os.getenv('SQS_AWS_REGION')
+sqs_queue_url = os.getenv('SQS_QUEUE_URL')
+
+# Create the clients
+sqs = boto3.client('sqs',
+                   aws_access_key_id=sqs_aws_access_key_id,
+                   aws_secret_access_key=sqs_aws_secret_access_key,
+                   region_name=sqs_aws_region)
+
+s3 = boto3.client('s3',
+                  aws_access_key_id=r2_aws_access_key_id,
+                  aws_secret_access_key=r2_aws_secret_access_key,
+                  region_name=r2_aws_region,
+                  endpoint_url=r2_s3_endpoint_url)
+```
+
+Now, we create our main application file, `main.py`, where we need to define functions for retrieving a job, for
+extending the visibility timeout of a job, and for deleting a job. We also need to define a function for saving a
+checkpoint to cloud storage, and for loading a checkpoint from cloud storage.
+
+We're going to need to import some things from our client file.
+
+```python
+from clients import sqs, s3, sqs_queue_url, r2_bucket_name
+```
+
+Now, we define a `get_job` function:
+
+```python
+import json
+
+visibility_timeout = 60
+
+
+def get_job():
+    '''
+    Get the job from the SQS queue
+
+    Returns:
+    - job: dict, the job to be processed
+    - receipt_handle: str, the receipt handle of the message
+
+    If there are no messages in the queue, return None, None
+    '''
+    response = sqs.receive_message(
+        QueueUrl=sqs_queue_url,
+        AttributeNames=['All'],
+        MaxNumberOfMessages=1,
+        MessageAttributeNames=['All'],
+        VisibilityTimeout=visibility_timeout,
+        WaitTimeSeconds=20
+    )
+
+    if 'Messages' in response:
+        message = response['Messages'][0]
+        receipt_handle = message['ReceiptHandle']
+        job = json.loads(message['Body'])
+        return job, receipt_handle
+    else:
+        return None, None
+```
+
+Now, we define a `heartbeat_job` function, that will extend the visibility timeout on a cadence, and can be interrupted
+from a different thread.
+
+```python
+import time
+import threading
+
+
+def heartbeat_job(receipt_handle: str, stop_signal: threading.Event):
+    '''
+    Send a heartbeat to the SQS queue to keep the job alive
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    - stop_signal: threading.Event, a signal to stop the heartbeat
+    '''
+    while not stop_signal.is_set():
+        sqs.change_message_visibility(
+            QueueUrl=sqs_queue_url,
+            ReceiptHandle=receipt_handle,
+            VisibilityTimeout=visibility_timeout
+        )
+        time.sleep(visibility_timeout / 2)
+```
+
+Now, we need functions to release the job to be retried, and to acknowledge the job, completed or failed.
+
+```python
+def release_job(receipt_handle: str):
+    '''
+    Release the job back to the SQS queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    sqs.change_message_visibility(
+        QueueUrl=sqs_queue_url,
+        ReceiptHandle=receipt_handle,
+        VisibilityTimeout=0
+    )
+
+
+def acknowledge_job(receipt_handle: str):
+    '''
+    Acknowledge the job and delete it from the SQS queue
+
+    Parameters:
+    - receipt_handle: str, the receipt handle of the message
+    '''
+    sqs.delete_message(
+        QueueUrl=sqs_queue_url,
+        ReceiptHandle=receipt_handle
+    )
+```
