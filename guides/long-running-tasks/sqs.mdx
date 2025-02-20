@@ -53,11 +53,14 @@ grant the user access to the queue.
 </Frame>
 
 Finally, give the user any tags that will make it easier to find and organize later. We're going to give it a tag of
-"Project: sqs-demo".
+"project: sqs-demo".
 
 <Frame caption="Tagging the job-submitter user">
   <img src="/guides/long-running-tasks/images/iam-submitter-st3.png" alt="Tagging the job-submitter user" />
 </Frame>
+
+Repeat that process to create a user called `job-worker`. Once you're done, leave this tab open, because we will need
+the resource IDs (ARNs) of the users later.
 
 ## The Job Queue: SQS
 
@@ -90,7 +93,7 @@ To create an SQS queue, navigate to the [SQS console](https://console.aws.amazon
 </Frame>
 
 You may want to choose a better name than I have, but for the purposes of this guide, we'll call our queue
-`my-job-queue.fifo`.
+`my-job-queue.fifo`. The `.fifo` suffix indicates that this is a FIFO queue.
 
 - FIFO queues are recommended for long-running tasks, because the cost of processing a job is often relatively high, and
   FIFO queues ensure _exactly-once_ processing of each job. In non-FIFO queues, throughput is higher and the cost of
@@ -120,3 +123,23 @@ You may want to choose a better name than I have, but for the purposes of this g
 - For "FIFO throughput limit", we want to set this to "Per queue". Selecting "Per message group ID" enables
   high-throughput FIFO queues, which are excessive for out application. If you are processing tens of thousands of
   simultaneous jobs, you may want to enable high-throughput FIFO queues, but for most applications, this is unnecessary.
+
+More info on [limitations](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-fifo.html)
+and [pricing](https://aws.amazon.com/sqs/pricing/) can be found on the AWS website and in the SQS documentation.
+
+Leave encryption enabled. We will be using the default KMS key, which is managed by AWS, but you can also use your own
+KMS key if you have one.
+
+We're going to use a basic access policy, which allows the job-submitter user to send messages to the queue, and the
+job-worker user to receive and delete messages from the queue.
+
+<Frame caption="Assigning permissions to the users we previously created.">
+  <img src="/guides/long-running-tasks/images/sqs-assign-permissions.png" alt="Assigning permissions to the users" />
+</Frame>
+
+For now, we're not going to enable "Redrive allow policy, or Dead-letter queue", because we haven't created out dead
+letter queue yet. Once we have, we will come back and enable this feature.
+
+<Frame caption="Skipping the dead-letter queue for now">
+  <img src="/guides/long-running-tasks/images/sqs-no-dlq-yet.png" alt="Skipping the dead-letter queue for now" />
+</Frame>
