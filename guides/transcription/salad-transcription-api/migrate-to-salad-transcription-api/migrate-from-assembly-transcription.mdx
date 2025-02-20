@@ -1,26 +1,26 @@
 ---
-title: 'Migrating from Google Cloud Speech to Text'
+title: 'Migrating from Assembly Transcription'
 ---
 
-Migrating from GCP Transcription (Google Cloud Speech to Text) to Salad Transcription API will require you to replace
-your GCP Python functions with Salad compatible ones. Whilst we do not offer an SDK, we do have example Python functions
-that you can use in replacement.
+Migrating from Assembly Transcription to Salad Transcription API will require you to replace your Assembly Python
+functions with Salad compatible ones. Whilst we do not offer an SDK, we do have example Python functions that you can
+use in replacement.
 
-| Features                   | SaladCloud Transcription | GCP Transcription |
-| -------------------------- | ------------------------ | ----------------- |
-| Translation                | ✅                       | ❌                |
-| Audio Transcription        | ✅                       | ✅                |
-| Video Transcription        | ✅                       | ❌                |
-| Multilingual Transcription | ✅                       | ✅                |
-| Summarization              | ✅                       | ❌                |
-| Speaker Identification     | ✅                       | ❌                |
-| SRT Output                 | ✅                       | ❌                |
-| Transcribe Multiple Files  | ❌                       | ❌                |
-| Max Length                 | 2.5 Hours                | 8 Hours           |
-| Text Sentiment Analysis    | ✅                       | ❌                |
-| Text Classification        | ✅                       | ❌                |
-| Custom LLM Prompt          | ✅                       | ❌                |
-| Custom Vocabulary          | ✅                       | ❌                |
+| Features                   | SaladCloud Transcription | Assembly Transcription  |
+| -------------------------- | ------------------------ | ----------------------- |
+| Translation                | ✅                       | ❌                      |
+| Audio Transcription        | ✅                       | ✅                      |
+| Video Transcription        | ✅                       | ✅                      |
+| Multilingual Transcription | ✅                       | ✅                      |
+| Summarization              | ✅                       | Requires Additional API |
+| Speaker Identification     | ✅                       | ✅                      |
+| SRT Output                 | ✅                       | ❌                      |
+| Transcribe Multiple Files  | ❌                       | ❌                      |
+| Max Length                 | 2.5 Hours                | 10 Hours                |
+| Text Sentiment Analysis    | ✅                       | Requires Additional API |
+| Text Classification        | ✅                       | Requires Additional API |
+| Custom LLM Prompt          | ✅                       | Requires Additional API |
+| Custom Vocabulary          | ✅                       | Requires Additional API |
 
 ## 1. Get your Salad API Key.
 
@@ -30,66 +30,35 @@ that you can use in replacement.
 ## 2. Updating job creation API calls.
 
 The Salad Transcription API uses a Job Queue system for processing transcription requests, rather than a Python function
-that returns the data like GCP. With Salad Transcription API, you'll use two steps. Submit the job, and then request the
-results.
+that returns the data like Assembly. With Salad Transcription API, you'll use two steps. Submit the job, and then
+request the results.
 
-### GCP Transcription (Google Cloud Speech to Text)
+### Assembly Transcription
 
-Your existing Python code for GCP Transcription (Google Cloud Speech to Text) should look something like this:
+Your existing Python code for Assembly Transcription should look something like this:
 
 ```Python
-import os
+import assemblyai as aai
 
-from google.cloud.speech_v2 import SpeechClient
-from google.cloud.speech_v2.types import cloud_speech
+aai.settings.api_key = "<YOUR_API_KEY>"
 
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+# You can use a local filepath:
+# audio_file = "./example.mp3"
 
+# Or use a publicly-accessible URL:
+audio_file = (
+    "https://assembly.ai/wildfires.mp3"
+)
 
-audio_uri = "gs://transcription-files/file.mp3"
-def transcribe_batch_gcs_input_inline_output_v2(
-    audio_uri: str,
-) -> cloud_speech.BatchRecognizeResults:
-    """Transcribes audio from a Google Cloud Storage URI using the Google Cloud Speech-to-Text API.
-        The transcription results are returned inline in the response.
-    Args:
-        audio_uri (str): The Google Cloud Storage URI of the input audio file.
-            E.g., gs://[BUCKET]/[FILE]
-    Returns:
-        cloud_speech.BatchRecognizeResults: The response containing the transcription results.
-    """
-    # Instantiates a client
-    client = SpeechClient()
+transcriber = aai.Transcriber()
 
-    config = cloud_speech.RecognitionConfig(
-        auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
-        language_codes=["en-US"],
-        model="long",
-    )
+transcript = transcriber.transcribe(audio_file)
 
-    file_metadata = cloud_speech.BatchRecognizeFileMetadata(uri=audio_uri)
+if transcript.status == aai.TranscriptStatus.error:
+    print(f"Transcription failed: {transcript.error}")
+    exit(1)
 
-    request = cloud_speech.BatchRecognizeRequest(
-        recognizer=f"projects/projectid/locations/global/recognizers/_",
-        config=config,
-        files=[file_metadata],
-        recognition_output_config=cloud_speech.RecognitionOutputConfig(
-            inline_response_config=cloud_speech.InlineOutputConfig(),
-        ),
-    )
-
-    # Transcribes the audio into text
-    operation = client.batch_recognize(request=request)
-
-    print("Waiting for operation to complete...")
-    response = operation.result(timeout=1200)
-    print(response)
-    for result in response.results[audio_uri].transcript.results:
-        print(f"Transcript: {result.alternatives[0].transcript}")
-
-    return response.results[audio_uri].transcript
-
-print(transcribe_batch_gcs_input_inline_output_v2(audio_uri))
+print(transcript.text)
 ```
 
 ### Salad Transcription API Equivalent
@@ -153,7 +122,61 @@ The response will look like this:
 }
 ```
 
-## 3. Obtaining job results
+## 3. More advanced jobs
+
+If you are utilizing additional features offered by Assembly to apply LLMs, or summarize intent, you can integrate these
+features into the same API call with Salad Transcription API.
+
+### Using an LLM:
+
+Salad Transcription API offers direct a integration to use LLMs to answer questions about your audio, or any other
+custom prompts. To use it, just add `custom_prompt` as an input option.
+
+```
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
+   -d '{
+  	"input": {
+     	"url": "https://example.com/path/to/file.mp3",
+  	    "custom_prompt": "List all action items discussed in the meeting."
+     	"language_code": "en",
+     	"return_as_file": true,
+     	"word_level_timestamps": true
+  	},
+  	}
+```
+
+When you obtain the job results in the next step, an additional field will be included in the JSON response, and it'll
+look like this:
+
+```
+"llm_result": "- Prepare the project proposal by Friday.\n- Schedule a follow-up meeting next Monday.\n- Allocate resources for the development team."
+```
+
+### Intent/summarization:
+
+If you’re also using Assembly services to obtain the intent or summarization of transcribed text, you can also integrate
+this easily with Salad Transcription API with the same API call. For this, you’ll add the `summarize` input parameter,
+with the word limit for the summarization.
+
+```
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
+   -d '{
+  	"input": {
+     	"url": "https://example.com/path/to/file.mp3",
+  	"llm_translation": "italian, french",
+	"summarize: 50,
+     	"language_code": "en",
+     	"return_as_file": true,
+     	"word_level_timestamps": true
+  	},
+  	}
+```
+
+## 4. Obtaining job results
 
 In the response from submitting your job with the above step, you'll receive the Job ID which is required to obtain the
 results of your transcription. The Job status and transcription results are combined into a single API call. With this

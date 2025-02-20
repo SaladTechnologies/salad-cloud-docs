@@ -171,3 +171,5 @@ copyto
 outtmpl
 Apim
 projectid
+REVAI
+assemblyai
