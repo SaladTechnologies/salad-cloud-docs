@@ -21,9 +21,9 @@ SaladCloud's distributed nodes are not in datacenters, and therefore may incur e
 Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
 
-For this guide, we will consider two example workloads: one that lasts five hours, and one that lasts two weeks. We will
-set up a job queue and related resources, a storage bucket, a checkpoint saving system, and a simple auto-scaling
-mechanism.
+For this guide, we will consider two example python workloads: one that lasts five hours, and one that lasts two weeks.
+We will set up a job queue and related resources, a storage bucket, a checkpoint saving system, and a simple
+auto-scaling mechanism.
 
 ## IAM: Identity and Access Management
 
@@ -80,7 +80,7 @@ you are processing less than a few million jobs per month, the cost should be ne
   workloads, this presents challenges that we will discuss later. For others, it is a non-issue.
 - AWS is pretty complicated if you are unfamiliar with it (and even if you are!).
 
-### Creating an SQS Queue
+### Creating SQS Queues
 
 To create an SQS queue, navigate to the [SQS console](https://console.aws.amazon.com/sqs/), and click "Create queue".
 
@@ -137,7 +137,7 @@ job-worker user to receive and delete messages from the queue.
   <img src="/guides/long-running-tasks/images/sqs-assign-permissions.png" alt="Assigning permissions to the users" />
 </Frame>
 
-For now, we're not going to enable "Redrive allow policy, or Dead-letter queue", because we haven't created out dead
+For now, we're not going to enable "Redrive allow policy,"" or "Dead-letter queue", because we haven't created our dead
 letter queue yet. Once we have, we will come back and enable this feature.
 
 <Frame caption="Skipping the dead-letter queue for now">
@@ -146,3 +146,20 @@ letter queue yet. Once we have, we will come back and enable this feature.
 
 Again, I'm going to tag the queue with "project: sqs-demo". Being religious about tagging resources will save you a lot
 of time and headache later.
+
+Now we're going to create our dead-letter queue. Navigate back to the SQS console, and click "Create queue". We're going
+to use mostly the same settings as before, but we're going to name this queue `my-job-queue-dlq.fifo`, and not assign it
+anything beyond the default permissions. For this one, we will enable "Redrive allow policy", and allow our first queue
+as the source queue.
+
+<Frame caption="Enable access from our main queue to the dead-letter queue">
+  <img src="/guides/long-running-tasks/images/sqs-create-dlq-redrive.png" alt="Creating a dead-letter queue" />
+</Frame>
+
+Once this dead-letter queue is created, we can go back and edit our original queue, and enable the dead-letter queue.
+We'll choose our dead-letter queue as the destination, and set the maximum receive count to 3. This means that if a job
+is received 3 times without being deleted, it will be moved to the dead-letter queue.
+
+<Frame caption="Enable the dead-letter queue on the main queue">
+  <img src="/guides/long-running-tasks/images/sqs-assign-dlq.png" alt="Enabling the dead-letter queue" />
+</Frame>
