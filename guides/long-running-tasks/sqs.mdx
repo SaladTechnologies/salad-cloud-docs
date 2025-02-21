@@ -1092,3 +1092,53 @@ Once that has run, we can see in the SQS console that our queue has 10000 messag
     alt="The SQS Console showing 10000 messages in the queue"
   />
 </Frame>
+
+## Dockerizing the Worker Application
+
+Now that we have our worker application and our job submitter, we can package our worker in a docker container, and run
+it on a SaladCloud Container Group.
+
+First, let's make sure our dependencies are documented in `requirements.txt`.
+
+```shell
+boto3
+```
+
+Now, create a new file called `Dockerfile`. Our application is simple, so a basic python base image should be fine.
+
+```dockerfile
+FROM python:3.10.12-slim-buster
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY clients.py .
+COPY main.py .
+
+CMD ["python", "main.py"]
+```
+
+Now, build the docker image, and use a tag that makes sense for you.
+
+```shell
+docker build -t saladtechnologies/lrt-worker-examples:sqs .
+```
+
+Now, we can test it locally to make sure it works, before we deploy it to SaladCloud.
+
+```shell
+docker run -it --rm  --env-file worker.env saladtechnologies/lrt-worker-examples:sqs
+```
+
+You should see it start up and begin processing a job. Once this is working, you can go ahead and terminate the
+container with `Ctrl+C`.
+
+Now, we can push the image to Docker Hub.
+
+```shell
+docker push saladtechnologies/lrt-worker-examples:sqs
+```
+
+## Deploying the Worker to SaladCloud
