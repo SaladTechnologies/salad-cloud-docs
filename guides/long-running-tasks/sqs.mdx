@@ -92,10 +92,12 @@ per month, the cost should be negligible.
   automatically deleted.
 - Maximum message visibility timeout of 12 hours. This means that if a worker does not delete a message from the queue
   within 12 hours of receiving it, the message will be made available to other workers. For some particularly long
-  workloads, this presents challenges that we will discuss later. For others, it is a non-issue.
-- There is not a mechanism to look up what jobs are in the queue, or what jobs have finished. This means that if you
-  need to know the status of a job, you will need to store that information somewhere in the cloud (database, bucket
+  workloads, this presents challenges. For others, it is a non-issue.
+- There is no built-in mechanism to look up what jobs are in the queue, or what jobs have finished. This means that if
+  you need to know the status of a job, you will need to store that information somewhere in the cloud (database, bucket
   storage, etc), and update it as the job progresses.
+- There is no built-in mechanism for canceling a job once submitted. If that is something you need, you would need to
+  build an additional mechanism for it, and have your worker check for a cancel signal periodically.
 - AWS is pretty complicated if you are unfamiliar with it (and even if you are!).
 
 ### Creating SQS Queues
