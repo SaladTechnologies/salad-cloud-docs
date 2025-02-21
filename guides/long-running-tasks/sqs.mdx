@@ -232,8 +232,8 @@ We're going to use the `boto3` library to interact with both SQS and R2. You can
 First, we need to set up our environment variables. All of the following environment variables will be needed by the
 application code.
 
-There are several ways to do this, but what I've done for my development environment is create a file called `.env` in
-the root of my project, and add the following lines:
+There are several ways to do this, but what I've done for my development environment is create a file called
+`worker.env` in the root of my project, and add the following lines:
 
 ```shell
 R2_AWS_ACCESS_KEY_ID=your-access-key-id
@@ -250,10 +250,10 @@ SQS_DLQ_URL=your-dlq-url
 Then, to source this into my environment when I run my code, I run the following command:
 
 ```shell
-export $(grep -v '^#' .env | xargs -d '\n')
+export $(grep -v '^#' worker.env | xargs -d '\n')
 ```
 
-Make sure this `.env` file is in your .gitignore. You don't want to commit your secrets to your repository.
+Make sure `*.env` is in your .gitignore. You don't want to commit your secrets to your repository.
 
 Now, create a file called `clients.py`, and add the following code:
 
@@ -874,3 +874,221 @@ if __name__ == '__main__':
         else:
             time.sleep(10)
 ```
+
+Now that we have our worker application ready to go, we can run it with `python main.py`. It will run forever, polling
+the queue for jobs, and processing them as they come in.
+
+## Submitting Jobs to the Queue
+
+Next, we need a way to submit jobs to the queue. We're going to use the `boto3` library for this as well, but we'll be
+using the AWS keys for the `job-submitter` user. I've saved mine in a file called `submitter.env`, and I'm going to
+source them into my environment with the following command:
+
+```shell
+export $(grep -v '^#' submitter.env | xargs -d '\n')
+```
+
+I've named my submitter script `submit-jobs.py`.
+
+The first part should look familiar, getting config from the environment, and initializing our SQS client.
+
+```python
+import boto3
+import os
+
+# Get the environment variables
+sqs_aws_access_key_id = os.getenv('SQS_AWS_ACCESS_KEY_ID')
+sqs_aws_secret_access_key = os.getenv('SQS_AWS_SECRET_ACCESS_KEY')
+sqs_aws_region = os.getenv('SQS_AWS_REGION')
+sqs_queue_url = os.getenv('SQS_QUEUE_URL')
+
+# Create the client
+sqs = boto3.client('sqs',
+                   aws_access_key_id=sqs_aws_access_key_id,
+                   aws_secret_access_key=sqs_aws_secret_access_key,
+                   region_name=sqs_aws_region)
+```
+
+For this, let's assume we have ten thousand jobs we want to submit, each taking 5 hours to complete. We're going to use
+`send_message_batch` to maximize throughput, and we're going to assign a `MessageDeduplicationId` to each job to ensure
+exactly-once processing.
+
+```python
+from uuid import uuid4
+import json
+
+def submit_one_batch(jobs: list) -> None:
+    '''
+    Submit a batch of jobs to the SQS queue
+
+    Parameters:
+    - jobs: list, the list of jobs
+    '''
+    if len(jobs) == 0:
+        return
+    if len(jobs) > 10:
+        raise ValueError('You can submit at most 10 jobs at a time')
+
+    def job_to_entry(job):
+        if 'job_id' not in job:
+            job["job_id"] = str(uuid4())
+        job["steps"] = int(job["steps"])
+        return {
+            'Id': job["job_id"],
+            'MessageDeduplicationId': job["job_id"],
+            'MessageGroupId': job["job_id"],
+            'MessageBody': json.dumps(job)
+        }
+
+    entries = [job_to_entry(job) for job in jobs]
+    response = sqs.send_message_batch(
+        QueueUrl=sqs_queue_url,
+        Entries=entries
+    )
+    if 'Failed' in response:
+        print(response)
+        raise Exception(f'Failed to submit jobs: {response["Failed"]}')
+    else:
+        print(f'Submitted {len(jobs)} jobs')
+```
+
+This first function we've defined will submit one single batch, up to the SQS-imposed limit of 10 messages at a time.
+Now we need a function that can take an arbitrarily large set of jobs and submit them all successfully.
+
+```python
+from typing import Iterable
+
+
+def submit_jobs(jobs: Iterable) -> None:
+    '''
+    Submit an arbitrary number of jobs to the queue
+
+    Parameters:
+    - jobs: Iterable, the iterable of jobs
+    '''
+    batch = []
+    for job in jobs:
+        batch.append(job)
+        if len(batch) == 10:
+            submit_one_batch(batch)
+            batch = []
+    if batch:
+        submit_one_batch(batch)
+```
+
+Now, suppose we have a csv with our 10,000 jobs, and we want to submit them all. Our CSV (data.csv) looks like this,
+with 10,000 rows.
+
+```csv
+job_id,steps
+job-0,600
+job-1,600
+job-2,600
+job-3,600
+```
+
+Now, in our job submitter script, we can read this CSV and submit all the jobs, lazily reading the csv so as not to run
+out of memory. We wouldn't anyways with this tiny example, but it's a good habit to get into.
+
+```python
+import csv
+
+if __name__ == '__main__':
+    with open("data.csv") as f:
+        reader = csv.DictReader(f)
+        submit_jobs(reader)
+```
+
+### Completed Example
+
+```python
+import boto3
+import os
+from uuid import uuid4
+import json
+from typing import Iterable
+import csv
+
+# Get the environment variables
+sqs_aws_access_key_id = os.getenv('SQS_AWS_ACCESS_KEY_ID')
+sqs_aws_secret_access_key = os.getenv('SQS_AWS_SECRET_ACCESS_KEY')
+sqs_aws_region = os.getenv('SQS_AWS_REGION')
+sqs_queue_url = os.getenv('SQS_QUEUE_URL')
+
+# Create the client
+sqs = boto3.client('sqs',
+                   aws_access_key_id=sqs_aws_access_key_id,
+                   aws_secret_access_key=sqs_aws_secret_access_key,
+                   region_name=sqs_aws_region)
+
+
+def submit_one_batch(jobs: list) -> None:
+    '''
+    Submit a batch of jobs to the SQS queue
+
+    Parameters:
+    - jobs: list, the list of jobs
+    '''
+    if len(jobs) == 0:
+        return
+    if len(jobs) > 10:
+        raise ValueError('You can submit at most 10 jobs at a time')
+
+    def job_to_entry(job):
+        if 'job_id' not in job:
+            job["job_id"] = str(uuid4())
+        job["steps"] = int(job["steps"])
+        return {
+            'Id': job["job_id"],
+            'MessageDeduplicationId': job["job_id"],
+            'MessageGroupId': job["job_id"],
+            'MessageBody': json.dumps(job)
+        }
+
+    entries = [job_to_entry(job) for job in jobs]
+    response = sqs.send_message_batch(
+        QueueUrl=sqs_queue_url,
+        Entries=entries
+    )
+    if 'Failed' in response:
+        print(response)
+        raise Exception(f'Failed to submit jobs: {response["Failed"]}')
+    else:
+        print(f'Submitted {len(jobs)} jobs')
+
+
+def submit_jobs(jobs: Iterable) -> None:
+    '''
+    Submit an arbitrary number of jobs to the queue
+
+    Parameters:
+    - jobs: Iterable, the iterable of jobs
+    '''
+    batch = []
+    for job in jobs:
+        batch.append(job)
+        if len(batch) == 10:
+            submit_one_batch(batch)
+            batch = []
+    if batch:
+        submit_one_batch(batch)
+
+
+if __name__ == '__main__':
+    with open("data.csv") as f:
+        reader = csv.DictReader(f)
+        submit_jobs(reader)
+```
+
+### Running the Job Submitter
+
+Run the job submitter with `python submit-jobs.py`. It will read the csv file and submit all the jobs to the queue.
+
+Once that has run, we can see in the SQS console that our queue has 10000 messages.
+
+<Frame caption="The SQS Console showing 10000 messages in the queue">
+  <img
+    src="/guides/long-running-tasks/images/sqs-10k-messages.png"
+    alt="The SQS Console showing 10000 messages in the queue"
+  />
+</Frame>
