@@ -21,9 +21,9 @@ SaladCloud's distributed nodes are not in datacenters, and therefore may incur e
 Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
 
-For this guide, we will consider two example python workloads: one that lasts five hours, and one that lasts two weeks.
-We will set up a job queue and related resources, a storage bucket, a checkpoint saving system, and a simple
-auto-scaling mechanism.
+For this guide, we will build an application that slowly calculates a sum for _n_ steps, sleeping for 30 seconds between
+steps to simulate work. We will set up a job queue and related resources, a storage bucket, a checkpoint saving system,
+and a simple auto-scaling mechanism.
 
 You will need an AWS account, and a Cloudflare account to follow this guide.
 
@@ -78,9 +78,11 @@ keep track of which set of keys belongs to which user, since they have different
 ## The Job Queue: SQS
 
 Simple Queue Service, or SQS, is a fully managed serverless queue solution from AWS. It is a great choice for managing
-long-running tasks on SaladCloud because it is highly available, scalable, and requires no ongoing maintenance. However,
-it is not free, and while the pricing may seem low, the cost can add up quickly if you are not careful. That said, if
-you are processing less than a few million jobs per month, the cost should be negligible.
+long-running tasks (but < 12 hours) on SaladCloud because it is highly available, scalable, and requires no ongoing
+maintenance. For tasks longer than 12 hours, the job will be processed no more than 12 hours at a time by any particular
+worker, and the job must be completed with 14 days of being submitted. SQS is not free, and while the pricing may seem
+low, the cost can add up quickly if you are not careful. That said, if you are processing less than a few million jobs
+per month, the cost should be negligible.
 
 ### Relevant Limitations
 
@@ -91,6 +93,9 @@ you are processing less than a few million jobs per month, the cost should be ne
 - Maximum message visibility timeout of 12 hours. This means that if a worker does not delete a message from the queue
   within 12 hours of receiving it, the message will be made available to other workers. For some particularly long
   workloads, this presents challenges that we will discuss later. For others, it is a non-issue.
+- There is not a mechanism to look up what jobs are in the queue, or what jobs have finished. This means that if you
+  need to know the status of a job, you will need to store that information somewhere in the cloud (database, bucket
+  storage, etc), and update it as the job progresses.
 - AWS is pretty complicated if you are unfamiliar with it (and even if you are!).
 
 ### Creating SQS Queues
@@ -327,28 +332,38 @@ def get_job():
 ```
 
 Now, we define a `heartbeat_job` function, that will extend the visibility timeout on a cadence, and can be interrupted
-from a different thread.
+from a different thread. This function also needs to be able to stop the main job if the receipt handle is invalid,
+which means the job has been acknowledged (finished), or the message has been given to another worker.
 
 ```python
 import time
 import threading
 
 
-def heartbeat_job(receipt_handle: str, stop_signal: threading.Event):
+def heartbeat_job(receipt_handle: str, heartbeat_stop_signal: threading.Event, job_stop_signal: threading.Event):
     '''
     Send a heartbeat to the SQS queue to keep the job alive
 
     Parameters:
     - receipt_handle: str, the receipt handle of the message
-    - stop_signal: threading.Event, a signal to stop the heartbeat
+    - heartbeat_stop_signal: threading.Event, a signal to stop the heartbeat
+    - job_stop_signal: threading.Event, a signal to stop the main job
     '''
-    while not stop_signal.is_set():
-        sqs.change_message_visibility(
-            QueueUrl=sqs_queue_url,
-            ReceiptHandle=receipt_handle,
-            VisibilityTimeout=visibility_timeout
-        )
-        time.sleep(visibility_timeout / 2)
+    while not heartbeat_stop_signal.is_set():
+        try:
+            sqs.change_message_visibility(
+                QueueUrl=sqs_queue_url,
+                ReceiptHandle=receipt_handle,
+                VisibilityTimeout=visibility_timeout
+            )
+            time.sleep(visibility_timeout / 2)
+        except boto3.SQS.Client.exceptions.ReceiptHandleIsInvalid:
+            # If the receipt handle is invalid, it means the job has been
+            # acknowledged, or the message has been given to another worker.
+            # In this case, we can stop the heartbeat, and interrupt the
+            # main job.
+            job_stop_signal.set()
+            break
 ```
 
 Now, we need functions to release the job to be retried, and to acknowledge the job, completed or failed.
@@ -361,11 +376,18 @@ def release_job(receipt_handle: str):
     Parameters:
     - receipt_handle: str, the receipt handle of the message
     '''
-    sqs.change_message_visibility(
-        QueueUrl=sqs_queue_url,
-        ReceiptHandle=receipt_handle,
-        VisibilityTimeout=0
-    )
+    try:
+        sqs.change_message_visibility(
+            QueueUrl=sqs_queue_url,
+            ReceiptHandle=receipt_handle,
+            VisibilityTimeout=0
+        )
+    except boto3.SQS.Client.exceptions.ReceiptHandleIsInvalid:
+        # If the receipt handle is invalid, it means the job has been
+        # acknowledged, or the message has been given to another worker.
+        # In this case, we can ignore the error, because we were trying to
+        # release the job anyway.
+        pass
 
 
 def acknowledge_job(receipt_handle: str):
@@ -388,7 +410,10 @@ def fail_job(job, receipt_handle: str):
     Parameters:
     - receipt_handle: str, the receipt handle of the message
     '''
+    # First remove job from the queue
     acknowledge_job(receipt_handle)
+
+    # Then send it to the DLQ
     sqs.send_message(
         QueueUrl=sqs_dlq_url,
         MessageBody=json.dumps(job)
@@ -437,11 +462,22 @@ def upload_checkpoint(job_id: str, checkpoint: dict):
     )
 ```
 
+We may also need a function to validate the job before engaging in the main work. This function should return `True` if
+the job is valid, and `False` if the job is invalid. In our case, we're going to assume that any job with a `job_id` and
+`steps` is valid, but your usecase is likely far more complex than that.
+
+```python
+def validate_job(job: dict):
+    # This is a very simple function for our very simple application.
+    # You should replace this with your actual validation logic.
+    return 'job_id' in job and 'steps' in job
+```
+
 Now, we need a function for "doing the work", which in our case is just slowly calculating a sum. For you this may be AI
 training jobs or molecular simulations.
 
 ```python
-def do_the_actual_work(job: dict, checkpoint: dict):
+def do_the_actual_work(job: dict, checkpoint: dict, stop_signal: threading.Event) -> int | None:
     '''
     Do the actual work for the job. This function will simulate work by
     sleeping for 30 seconds and incrementing the step and sum in the
@@ -450,14 +486,24 @@ def do_the_actual_work(job: dict, checkpoint: dict):
     Parameters:
     - job: dict, the job
     - checkpoint: dict, the checkpoint
+    - stop_signal: threading.Event, a signal to stop the work
     '''
-    while checkpoint['step'] < job['steps']:
-        time.sleep(30)  # Simulate work
-        checkpoint['step'] += 1
-        checkpoint['sum'] += checkpoint['step']
-        upload_checkpoint(job['job_id'], checkpoint)
+    while checkpoint['step'] < job['steps'] and not stop_signal.is_set():
+        # Simulate work
+        time.sleep(30)
 
-    return checkpoint['sum']
+        # If the job was interrupted, we don't want to upload the
+        # checkpoint, because it may conflict with the next worker.
+        if not stop_signal.is_set():
+            # Update the checkpoint.
+            checkpoint['step'] += 1
+            checkpoint['sum'] += checkpoint['step']
+            upload_checkpoint(job['job_id'], checkpoint)
+
+    if not stop_signal.is_set():
+        return checkpoint['sum']
+    else:
+        return None
 ```
 
 Once our work has completed, we'll need a function to upload the results to cloud storage.
@@ -481,23 +527,28 @@ def upload_result(job_id: str, result: int):
 Now, we need to put it all together in a function called `process_job`.
 
 ```python
-def process_job(job: dict, receipt_handle: str):
+def process_job(job: dict, receipt_handle: str) -> None:
     # Now that we have the job, we need to start a separate thread that
     # heartbeats for it. This will keep the job alive in the SQS queue.
+    # Separate threads are critical here, because our main work is likely
+    # blocking, and we don't want to block the heartbeat.
     heartbeat_stop_signal = threading.Event()
+    job_stop_signal = threading.Event()
     heartbeat_thread = threading.Thread(
-        target=heartbeat_job, args=(receipt_handle, heartbeat_stop_signal))
+        target=heartbeat_job, args=(
+            receipt_handle, heartbeat_stop_signal, job_stop_signal))
     heartbeat_thread.start()
 
     # If there's a checkpoint, we want to use it, but if not, we need to
-    # initialize it.
+    # initialize our state.
     checkpoint = download_checkpoint(job['job_id'])
     if checkpoint is None:
         checkpoint = {'step': 0, 'sum': 0}
 
     # Some jobs may have a validation step. For instance, dreambooth training may have a step
     # that verifies if all inputs have faces. If the validation fails, we should stop the job
-    # and not retry it, but instead move it to the DLQ.
+    # and not retry it, but instead move it to the DLQ. In this situation, we can
+    # be confident that the job will never succeed.
     if not validate_job(job):
         heartbeat_stop_signal.set()
         fail_job(job, receipt_handle)
@@ -507,6 +558,13 @@ def process_job(job: dict, receipt_handle: str):
     # Now we can do the actual work
     try:
         result = do_the_actual_work(job, checkpoint)
+        if result is None:
+            # This means the job was interrupted, so we need to release it
+            # back to the queue.
+            heartbeat_stop_signal.set()
+            heartbeat_thread.join()
+            release_job(receipt_handle)
+            return
 
         # The job isn't really done until the result is uploaded.
         upload_result(job['job_id'], result)
@@ -540,7 +598,7 @@ if __name__ == '__main__':
 ### Completed Example
 
 ```python
-from clients import sqs, s3, sqs_queue_url, sqs_dlq_url, r2_bucket_name
+from clients import sqs, r2, sqs_queue_url, sqs_dlq_url, r2_bucket_name
 import json
 import time
 import threading
@@ -549,7 +607,7 @@ import boto3
 visibility_timeout = 60
 
 
-def get_job():
+def get_job() -> tuple:
     '''
     Get the job from the SQS queue
 
@@ -577,38 +635,54 @@ def get_job():
         return None, None
 
 
-def heartbeat_job(receipt_handle: str, stop_signal: threading.Event):
+def heartbeat_job(receipt_handle: str, heartbeat_stop_signal: threading.Event, job_stop_signal: threading.Event) -> None:
     '''
     Send a heartbeat to the SQS queue to keep the job alive
 
     Parameters:
     - receipt_handle: str, the receipt handle of the message
-    - stop_signal: threading.Event, a signal to stop the heartbeat
+    - heartbeat_stop_signal: threading.Event, a signal to stop the heartbeat
+    - job_stop_signal: threading.Event, a signal to stop the main job
     '''
-    while not stop_signal.is_set():
-        sqs.change_message_visibility(
-            QueueUrl=sqs_queue_url,
-            ReceiptHandle=receipt_handle,
-            VisibilityTimeout=visibility_timeout
-        )
-        time.sleep(visibility_timeout / 2)
+    while not heartbeat_stop_signal.is_set():
+        try:
+            sqs.change_message_visibility(
+                QueueUrl=sqs_queue_url,
+                ReceiptHandle=receipt_handle,
+                VisibilityTimeout=visibility_timeout
+            )
+            time.sleep(visibility_timeout / 2)
+        except boto3.SQS.Client.exceptions.ReceiptHandleIsInvalid:
+            # If the receipt handle is invalid, it means the job has been
+            # acknowledged, or the message has been given to another worker.
+            # In this case, we can stop the heartbeat, and interrupt the
+            # main job.
+            job_stop_signal.set()
+            break
 
 
-def release_job(receipt_handle: str):
+def release_job(receipt_handle: str) -> None:
     '''
     Release the job back to the SQS queue
 
     Parameters:
     - receipt_handle: str, the receipt handle of the message
     '''
-    sqs.change_message_visibility(
-        QueueUrl=sqs_queue_url,
-        ReceiptHandle=receipt_handle,
-        VisibilityTimeout=0
-    )
+    try:
+        sqs.change_message_visibility(
+            QueueUrl=sqs_queue_url,
+            ReceiptHandle=receipt_handle,
+            VisibilityTimeout=0
+        )
+    except boto3.SQS.Client.exceptions.ReceiptHandleIsInvalid:
+        # If the receipt handle is invalid, it means the job has been
+        # acknowledged, or the message has been given to another worker.
+        # In this case, we can ignore the error, because we were trying to
+        # release the job anyway.
+        pass
 
 
-def acknowledge_job(receipt_handle: str):
+def acknowledge_job(receipt_handle: str) -> None:
     '''
     Acknowledge the job and delete it from the SQS queue
 
@@ -621,21 +695,24 @@ def acknowledge_job(receipt_handle: str):
     )
 
 
-def fail_job(job, receipt_handle: str):
+def fail_job(job, receipt_handle: str) -> None:
     '''
     Move the job to the dead-letter queue
 
     Parameters:
     - receipt_handle: str, the receipt handle of the message
     '''
+    # First remove job from the queue
     acknowledge_job(receipt_handle)
+
+    # Then send it to the DLQ
     sqs.send_message(
         QueueUrl=sqs_dlq_url,
         MessageBody=json.dumps(job)
     )
 
 
-def download_checkpoint(job_id: str):
+def download_checkpoint(job_id: str) -> dict:
     '''
     Download the checkpoint from S3
 
@@ -646,7 +723,7 @@ def download_checkpoint(job_id: str):
     - checkpoint: dict, the checkpoint
     '''
     try:
-        response = s3.get_object(
+        response = r2.get_object(
             Bucket=r2_bucket_name,
             Key=f'{job_id}/checkpoint.json'
         )
@@ -657,7 +734,7 @@ def download_checkpoint(job_id: str):
     return checkpoint
 
 
-def upload_checkpoint(job_id: str, checkpoint: dict):
+def upload_checkpoint(job_id: str, checkpoint: dict) -> None:
     '''
     Upload the checkpoint to S3
 
@@ -665,18 +742,29 @@ def upload_checkpoint(job_id: str, checkpoint: dict):
     - job_id: str, the job ID
     - checkpoint: dict, the checkpoint
     '''
-    s3.put_object(
+    r2.put_object(
         Bucket=r2_bucket_name,
         Key=f'{job_id}/checkpoint.json',
         Body=json.dumps(checkpoint)
     )
 
 
-def validate_job(job: dict):
+def validate_job(job: dict) -> bool:
+    '''
+    Validate the job
+
+    Parameters:
+    - job: dict, the job
+
+    Returns:
+    - bool, whether the job is valid
+    '''
+    # This is a very simple function for our very simple application.
+    # You should replace this with your actual validation logic.
     return 'job_id' in job and 'steps' in job
 
 
-def do_the_actual_work(job: dict, checkpoint: dict):
+def do_the_actual_work(job: dict, checkpoint: dict, stop_signal: threading.Event) -> int | None:
     '''
     Do the actual work for the job. This function will simulate work by
     sleeping for 30 seconds and incrementing the step and sum in the
@@ -685,17 +773,27 @@ def do_the_actual_work(job: dict, checkpoint: dict):
     Parameters:
     - job: dict, the job
     - checkpoint: dict, the checkpoint
+    - stop_signal: threading.Event, a signal to stop the work
     '''
-    while checkpoint['step'] < job['steps']:
-        time.sleep(30)  # Simulate work
-        checkpoint['step'] += 1
-        checkpoint['sum'] += checkpoint['step']
-        upload_checkpoint(job['job_id'], checkpoint)
+    while checkpoint['step'] < job['steps'] and not stop_signal.is_set():
+        # Simulate work
+        time.sleep(30)
 
-    return checkpoint['sum']
+        # If the job was interrupted, we don't want to upload the
+        # checkpoint, because it may conflict with the next worker.
+        if not stop_signal.is_set():
+            # Update the checkpoint.
+            checkpoint['step'] += 1
+            checkpoint['sum'] += checkpoint['step']
+            upload_checkpoint(job['job_id'], checkpoint)
+
+    if not stop_signal.is_set():
+        return checkpoint['sum']
+    else:
+        return None
 
 
-def upload_result(job_id: str, result: int):
+def upload_result(job_id: str, result: int) -> None:
     '''
     Upload the result to S3
 
@@ -703,30 +801,35 @@ def upload_result(job_id: str, result: int):
     - job_id: str, the job ID
     - result: int, the result
     '''
-    s3.put_object(
+    r2.put_object(
         Bucket=r2_bucket_name,
         Key=f'{job_id}/result.txt',
         Body=str(result)
     )
 
 
-def process_job(job: dict, receipt_handle: str):
+def process_job(job: dict, receipt_handle: str) -> None:
     # Now that we have the job, we need to start a separate thread that
     # heartbeats for it. This will keep the job alive in the SQS queue.
+    # Separate threads are critical here, because our main work is likely
+    # blocking, and we don't want to block the heartbeat.
     heartbeat_stop_signal = threading.Event()
+    job_stop_signal = threading.Event()
     heartbeat_thread = threading.Thread(
-        target=heartbeat_job, args=(receipt_handle, heartbeat_stop_signal))
+        target=heartbeat_job, args=(
+            receipt_handle, heartbeat_stop_signal, job_stop_signal))
     heartbeat_thread.start()
 
     # If there's a checkpoint, we want to use it, but if not, we need to
-    # initialize it.
+    # initialize our state.
     checkpoint = download_checkpoint(job['job_id'])
     if checkpoint is None:
         checkpoint = {'step': 0, 'sum': 0}
 
     # Some jobs may have a validation step. For instance, dreambooth training may have a step
     # that verifies if all inputs have faces. If the validation fails, we should stop the job
-    # and not retry it, but instead move it to the DLQ.
+    # and not retry it, but instead move it to the DLQ. In this situation, we can
+    # be confident that the job will never succeed.
     if not validate_job(job):
         heartbeat_stop_signal.set()
         fail_job(job, receipt_handle)
@@ -736,6 +839,13 @@ def process_job(job: dict, receipt_handle: str):
     # Now we can do the actual work
     try:
         result = do_the_actual_work(job, checkpoint)
+        if result is None:
+            # This means the job was interrupted, so we need to release it
+            # back to the queue.
+            heartbeat_stop_signal.set()
+            heartbeat_thread.join()
+            release_job(receipt_handle)
+            return
 
         # The job isn't really done until the result is uploaded.
         upload_result(job['job_id'], result)
