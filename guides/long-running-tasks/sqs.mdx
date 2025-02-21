@@ -3,6 +3,8 @@ title: 'SQS and SaladCloud'
 description: 'Managing Long-Running Tasks on SaladCloud with SQS'
 ---
 
+# Managing Long-Running Tasks on SaladCloud with SQS
+
 Managing long running tasks, such as molecular simulations, dreambooth training, and llm finetuning, presents unique
 challenges on SaladCloud, due primarily to the interruptible nature of nodes. At the core of all solutions to this
 problem are a job queue, and progress checkpoints. The job queue is responsible for distributing tasks to workers, and
@@ -1209,3 +1211,68 @@ From the R2 console, we can see that our bucket is being filled with checkpoints
     alt="Checkpoints and results in the R2 bucket"
   />
 </Frame>
+
+## Autoscaling
+
+Now that we have our worker running, we can set up some simple autoscaling to automatically scale the number of replicas
+up and down based on the number of messages in the queue.
+
+There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
+minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
+(the maximum in the API). To implement this, we're going to use AWS Lambda, a serverless compute service that can run
+code in response to events. Cloudflare Workers can also be used to implement this, along with most other serverless
+compute platforms.
+
+Navigate to the Lambda console, and create a new function.
+
+<Frame caption="Creating a new Lambda function">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-console.png" alt="Creating a new Lambda function" />
+</Frame>
+
+We're going to use Python 3.13, and we'll run it with `arm64`, because it is cheaper, and we aren't doing anything
+architecture-specific. We can leave the default permissions for now.
+
+<Frame caption="Setting the runtime and architecture">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-create.png" alt="Setting the runtime and architecture" />
+</Frame>
+
+Once your function has been created, you'll land on the function overview page.
+
+<Frame caption="The function overview page">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-editor.png" alt="The function overview page" />
+</Frame>
+
+Next, we need to give this lambda the correct permissions to interact with our SQS queue.
+
+First, we need to get the ARN for the _execution role_ of the function, not the ARN of the function itself.
+
+<Frame caption="Find The Execution Role">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-find-execution-role.png" alt="The ARN of the execution role" />
+</Frame>
+
+Clicking that link will take you the IAM console page for that role, where you can then copy the ARN.
+
+<Frame caption="The ARN of the execution role">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-find-role-arn.png" alt="The ARN of the execution role" />
+</Frame>
+
+We're going to do this by editing the policy created by the queue. Back in the SQS console, on the details page for our
+queue, navigate to the "Queue Policies" tab.
+
+<Frame caption="The Queue Policies tab">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-permissions.png" alt="The Queue Policies tab" />
+</Frame>
+
+Add this additional statement to the Access policy, replacing the ARN with the ARN of the execution role of the lambda
+
+```json
+{
+  "Sid": "AutoscalerAccess",
+  "Action": ["sqs:GetQueueAttributes"],
+  "Effect": "Allow",
+  "Resource": "arn:aws:sqs:us-east-2:523358417554:my-job-queue.fifo",
+  "Principal": {
+    "AWS": ["arn:aws:iam::523358417554:role/service-role/lrt-autoscaling-role-liaizhxl"]
+  }
+}
+```
