@@ -1095,7 +1095,7 @@ Once that has run, we can see in the SQS console that our queue has 10000 messag
   />
 </Frame>
 
-## Dockerizing the Worker Application
+## Containerize the Worker Application
 
 Now that we have our worker application and our job submitter, we can package our worker in a docker container, and run
 it on a SaladCloud Container Group.
@@ -1272,7 +1272,7 @@ Add this additional statement to the Access policy, replacing the ARN with the A
   "Effect": "Allow",
   "Resource": "arn:aws:sqs:us-east-2:523358417554:my-job-queue.fifo",
   "Principal": {
-    "AWS": ["arn:aws:iam::523358417554:role/service-role/lrt-autoscaling-role-liaizhxl"]
+    "AWS": ["arn:aws:iam::523358417554:role/service-role/lrt-autoscaling-role-some-unique-ending"]
   }
 }
 ```
@@ -1549,7 +1549,7 @@ The final step is adding a trigger for our lambda. We're going to use a CloudWat
 based on a schedule. We're going to set it to run every 5 minutes.
 
 <Frame caption="Creating a new CloudWatch Event">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-trigger.png" alt="Creating a new CloudWatch Event" />
+  <img src="/guides/long-running-tasks/images/sqs-lambda-add-trigger.png" alt="Creating a new CloudWatch Event" />
 </Frame>
 
 <Frame caption="Setting the schedule">
