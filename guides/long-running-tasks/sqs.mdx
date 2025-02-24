@@ -1276,3 +1276,288 @@ Add this additional statement to the Access policy, replacing the ARN with the A
   }
 }
 ```
+
+Save the queue policy, and now the lambda has the permissions it needs to get the current number of messages from the
+queue.
+
+Now, we need to write the code for the lambda. We're going to use the `boto3` library to interact with the SQS queue,
+which in included by default in the lambda environment.
+
+We will be setting our configuration for this lambda in environment variables. You can find this under configuration on
+the lambda console page for our function. Alsol in configuration, we want to increase our function timeout to 10s, since
+we have to make multiple serial requests to external services.
+
+```python
+import boto3
+import os
+
+# Our job queue
+queue_url = os.environ['queue_url']
+
+# Scaling Configuration
+max_replicas = int(os.environ['max_replicas'])
+min_replicas = int(os.environ['min_replicas'])
+
+# Salad Info
+org = os.environ['salad_org']
+project = os.environ['salad_project']
+container_group_name = os.environ['salad_container_group_name']
+salad_api_key = os.environ['salad_api_key']
+
+salad_base_url = "https://api.salad.com/api/public"
+```
+
+We also are going to write a simple helper function for making http requests. We don't need everything offered by
+requests, just some basic functionality.
+
+```python
+import urllib
+import http.client
+import ssl
+import json
+
+def send_request(
+    method: str,
+    url: str,
+    headers: Dict[str, str],
+    body: Optional[Union[Dict[str, Any], str]] = None,
+    timeout: int = 30,
+    verify_ssl: bool = True
+) -> Dict[str, Any]:
+    """
+    Send an HTTP request with precise control over headers case.
+
+    Args:
+        method: HTTP method (GET, POST, PUT, DELETE, etc.)
+        url: The URL to send the request to
+        headers: Dictionary of headers with exact case to preserve
+        body: Optional request body (dict will be converted to JSON)
+        timeout: Request timeout in seconds
+        verify_ssl: Whether to verify SSL certificates
+
+    Returns:
+        Dictionary containing:
+            - status_code: HTTP status code
+            - headers: Response headers
+            - body: Response body (parsed as JSON if possible)
+            - raw: Raw response body as string
+    """
+    # Parse the URL to get components
+    parsed_url = urllib.parse.urlparse(url)
+    host = parsed_url.netloc
+    path = parsed_url.path
+    if parsed_url.query:
+        path += f"?{parsed_url.query}"
+
+    # Set up SSL context if needed
+    context = None
+    if parsed_url.scheme == 'https':
+        context = ssl.create_default_context()
+        if not verify_ssl:
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+
+    # Prepare the body data if needed
+    data = None
+    if body is not None:
+        if isinstance(body, dict):
+            data = json.dumps(body).encode('utf-8')
+        elif isinstance(body, str):
+            data = body.encode('utf-8')
+        else:
+            data = str(body).encode('utf-8')
+
+    try:
+        # Choose the appropriate connection type
+        if parsed_url.scheme == 'https':
+            conn = http.client.HTTPSConnection(
+                host=host,
+                timeout=timeout,
+                context=context
+            )
+        else:
+            conn = http.client.HTTPConnection(
+                host=host,
+                timeout=timeout
+            )
+
+        # Send the request with unmodified headers
+        conn.request(
+            method=method.upper(),
+            url=path,
+            body=data,
+            headers=headers  # Headers case is preserved exactly as provided
+        )
+
+        # Get the response
+        response = conn.getresponse()
+        status_code = response.status
+        response_headers = dict(response.getheaders())
+        response_body = response.read().decode('utf-8')
+
+        # Try to parse the response as JSON
+        try:
+            parsed_body = json.loads(response_body)
+        except json.JSONDecodeError:
+            parsed_body = None
+
+        return {
+            "status_code": status_code,
+            "headers": response_headers,
+            "body": parsed_body,
+            "raw": response_body
+        }
+
+    except http.client.HTTPException as e:
+        return {
+            "status_code": None,
+            "headers": {},
+            "body": None,
+            "raw": None,
+            "error": f"HTTP Error: {str(e)}"
+        }
+    except ssl.SSLError as e:
+        return {
+            "status_code": None,
+            "headers": {},
+            "body": None,
+            "raw": None,
+            "error": f"SSL Error: {str(e)}"
+        }
+    except Exception as e:
+        return {
+            "status_code": None,
+            "headers": {},
+            "body": None,
+            "raw": None,
+            "error": str(e)
+        }
+    finally:
+        # Always close the connection
+        if 'conn' in locals():
+            conn.close()
+```
+
+Next, we're going to define some helper function for using the 4 API methods we need to interact with SaladCloud.
+
+```python
+def get_container_group():
+    response = send_request(
+        method="GET",
+        url=f"{salad_base_url}/organizations/{org}/projects/{project}/containers/{container_group_name}",
+        headers={
+            "Salad-Api-Key": salad_api_key
+        }
+    )
+    return response["body"]
+
+
+def start_container_group():
+    send_request(
+        method="POST",
+        url=f"{salad_base_url}/organizations/{org}/projects/{project}/containers/{container_group_name}/start",
+        headers={
+            "Content-Type": "application/json",
+            "Salad-Api-Key": salad_api_key
+        }
+    )
+
+
+def stop_container_group():
+    send_request(
+        method="POST",
+        url=f"{salad_base_url}/organizations/{org}/projects/{project}/containers/{container_group_name}/stop",
+        headers={
+            "Content-Type": "application/json",
+            "Salad-Api-Key": salad_api_key
+        }
+    )
+
+
+def set_replicas(replicas: int):
+    send_request(
+        method="PATCH",
+        url=f"{salad_base_url}/organizations/{org}/projects/{project}/containers/{container_group_name}",
+        body=json.dumps({
+            "replicas": replicas
+        }),
+        headers={
+            "Content-Type": "application/merge-patch+json",
+            "Salad-Api-Key": salad_api_key
+        }
+    )
+```
+
+Finally, we can stitch it all together in the lambda handler.
+
+```python
+def lambda_handler(event, context):
+    sqs = boto3.client('sqs')
+
+    # We need to know how much work is waiting and how much is in flight
+    attributes = sqs.get_queue_attributes(
+        QueueUrl=queue_url,
+        AttributeNames=['ApproximateNumberOfMessages',
+                        'ApproximateNumberOfMessagesNotVisible']
+    )
+
+    num_waiting_messages = int(
+        attributes['Attributes']['ApproximateNumberOfMessages'])
+    num_messages_in_flight = int(
+        attributes['Attributes']['ApproximateNumberOfMessagesNotVisible'])
+
+    # This is our ideal number of replicas
+    total_messages = num_waiting_messages + num_messages_in_flight
+
+    # We need to constrain this number by our min and max.
+    desired_replicas = min(max(min_replicas, total_messages), max_replicas)
+
+    container_group = get_container_group()
+    current_replicas = container_group["replicas"]
+    print(
+        f"Current replicas: {current_replicas}, Desired replicas: {desired_replicas}")
+
+    # always one of pending, running, stopped, failed, deploying
+    current_state = container_group["current_state"]["status"]
+    print(f"Current state: {current_state}")
+
+    if current_state == "stopped" and desired_replicas > 0:
+        start_container_group()
+
+    if current_state == "running" and desired_replicas == 0:
+        stop_container_group()
+
+    if desired_replicas != current_replicas:
+        set_replicas(desired_replicas)
+
+    return {
+        'statusCode': 200
+    }
+```
+
+Now, deploy and test your lambda. You can use the default test event, as our lambda does not use any information from
+the event itself.
+
+<Frame caption="Testing the Lambda">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-deploy-and-test.png" alt="Testing the Lambda" />
+</Frame>
+
+You should see it log the current and desired replicas, and the current state of the container group. Then, if you've
+configured everything correctly, you should see the desired changes reflected in your SaladCloud Container Group.
+
+The final step is adding a trigger for our lambda. We're going to use a CloudWatch Event, which will trigger our lambda
+based on a schedule. We're going to set it to run every 5 minutes.
+
+<Frame caption="Creating a new CloudWatch Event">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-trigger.png" alt="Creating a new CloudWatch Event" />
+</Frame>
+
+<Frame caption="Setting the schedule">
+  <img src="/guides/long-running-tasks/images/sqs-lambda-configure-trigger.png" alt="Setting the schedule" />
+</Frame>
+
+## Conclusion
+
+In this guide, we've built a simple worker application that processes jobs from an SQS queue, and we've deployed it to
+SaladCloud. We've also implemented autoscaling for our worker using a scheduled Lambda function, so that it can
+automatically scale up and down based on the number of messages in the queue.
