@@ -18,7 +18,7 @@ upload completed artifacts to cloud storage.
 
 We will be using [Amazon SQS](https://aws.amazon.com/sqs/) as our job queue, and
 [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage service, as
-our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge egress, and
+our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge for egress data, and
 SaladCloud's distributed nodes are not in datacenters, and therefore may incur egress fees from other providers.
 Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
