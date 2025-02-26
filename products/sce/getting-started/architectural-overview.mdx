@@ -9,7 +9,7 @@ SaladCloud comprises tens of thousands of Salad nodes distributed across the glo
 with a consumer GPU and varying CPU and memory configurations. Parts of the nodes are located in residential networks
 with asymmetric bandwidth, where the upload speed is lower than the download speed.
 
-SCE provides a GPU-enabled container environment to run containerized applications for AI inference and other
+SCE provides a GPU-enabled container environment to **run containerized applications** for AI inference and other
 GPU-intensive computations. [The corresponding docker command:](/tutorials/docker-run)
 
 ```Code
@@ -19,12 +19,13 @@ docker run --rm -it --gpus all -p 8000:8888 docker.io/saladtechnologies/misc:tes
 A SCE application (or container group), consists of multiple replicas (or instances) running the same container image,
 with each instance deployed on a separate Salad node.
 
-**SCEs are not virtual machines with attached volumes; instead, both the image and any runtime data are removed from the
-nodes when the application is stopped. Additionally, external SSH access is not supported.**
+SCEs are **not virtual machines or physical machines** with attached volumes; instead, both the image and any runtime
+data are removed from the nodes when the application is stopped. Additionally, **external SSH access is not supported**
+and **running docker run commands inside SCE instances (Docker-in-Docker) is not permitted.**
 
 **The highest node configuration for SCE:**
 
-- 16 vCPUs, 60 GB RAM, RTX 4090 with 24 GB VRAM
+- 16 vCPUs, 60 GB RAM, RTX 5090 with 32 GB VRAM
 - 50 GB of ephemeral Storage (available while an instance is running)
 
 Most popular models can be run on SaladCloud, including SDXL/Flux, Whisper Large, LLM 7B/8B/9B and quantized 13B/34B,
@@ -92,8 +93,9 @@ SaladCloud, and
 
 **Two ways to provide inputs and retrieve results from applications:**
 
-- Utilize a load balancer for real-time applications (Allowing up to 100 seconds of processing time per request)
-- Integrate with a job queue system for batch jobs (AWS SQS, Salad Job Queue, Salad Kelpie or others)
+- [Utilize a load balance](/products/sce/gateway/networking) for real-time applications (Allowing up to 100 seconds of
+  processing time per request) or [build your own real-time queue](/guides/real-time-inference/build-redis-queue).
+- Integrate with a job queue system for batch jobs (AWS SQS, Salad Job Queue, Salad Kelpie or others).
 
 <img src="/products/sce/images/sce_ao/sce_ao4.png" />
 

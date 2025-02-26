@@ -9,12 +9,15 @@ Several customers have successfully implemented a Redis-based, flexible and plat
 applications on SaladCloud, showcasing the following advantages:
 
 - The Redis cluster, client applications, and Salad nodes are all strategically deployed within the same region to
-  ensure local access and minimize latency.
+  **ensure local access and minimize latency.**
 - Supports multiple clients and servers, providing real-time request/response functionality **in streaming and
   non-streaming modes with support for synchronous and asynchronous processing.**
 - More resilient to burst traffic, node failures, and the variability in AI inference times, while allowing easy
   customization for specific applications, such as using different timeout settings per request and adjusting streaming
   granularity (tokens or chunks).
+- The input and output data of a task can be embedded within the request and response. For large datasets, data exchange
+  can occur directly between client applications or SCE instances and cloud storage, with the request and response
+  containing only a reference to the data.
 
 <img src="/guides/real-time-inference/images/2brq.png" />
 
@@ -25,10 +28,10 @@ However, implementing this solution requires effort and comes with certain limit
 - IP whitelisting for access control is not applicable from Salad nodes to the Redis cluster; instead, application-level
   authentication can be used.
 
-The Redis-based solution is generally used for low-latency, real-time applications where responses or partial responses
-must be returned immediately as soon as they are ready, or for node-to-node communication. It can also be applied to
-batch jobs or long-running tasks, but this requires additional logic and effort. For these scenarios, we typically rely
-on Salad Kelpie and AWS SQS.
+The Redis-based solution is generally used for **low-latency, real-time applications** where responses or partial
+responses must be returned immediately as soon as they are ready, or for **node-to-node communication** within the same
+container group or across different groups. It may be applied to batch jobs or long-running tasks, but this requires
+additional logic and effort. For these scenarios, we typically rely on Salad Kelpie and AWS SQS.
 
 ## Key Concepts in Redis
 

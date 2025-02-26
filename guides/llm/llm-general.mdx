@@ -162,6 +162,18 @@ traffic control in both the inference servers and client applications.
 worker will be responsible for pulling jobs, calling the inference server, uploading the generated texts and finally
 returning job results or status to the job queue.
 
+## Build Your Own Queue
+
+Several customers have successfully implemented a Redis-based, flexible and platform-independent queue for LLM
+applications on SaladCloud, demonstrating the following advantages:
+
+- Supports both asynchronous and synchronous calls, with results provided in streaming or non-streaming modes.
+- Enables regional deployment to ensure local access and minimize latency.
+- More resilient to burst traffic, node failures, and the variability in AI inference times, while allowing easy
+  customization for specific applications.
+
+Please refer to [this guide](/guides/real-time-inference/build-redis-queue) for more details.
+
 # Local Deployment To SaladCloud
 
 Before deploying an image of these inference servers on SaladCloud, we recommend testing it in a local environment
