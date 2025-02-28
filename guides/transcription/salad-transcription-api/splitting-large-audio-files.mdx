@@ -42,7 +42,8 @@ def split_audio(file_path, output_dir, segment_length=int(2.5*60*60*1000)): ## A
 
   for i in range(0, total_length, segment_length):
     segment = audio[i:i+segment_length]
-    segment.export(os.path.join(output_dir, f"{input_file}_segment_{i//segment_length + 1}.mp3"), format="mp3")
+    file_constant = os.path.splitext(os.path.basename(file_path))[0]
+    segment.export(os.path.join(output_dir, f"{file_constant}_segment_{i//segment_length + 1}.
 
 if __name__ == "__main__":
   input_file = "path/to/file.mp3" ## Set this to the location of the file you want to split. MP3 and MP4 files are compatible, but will always convert to MP3.
