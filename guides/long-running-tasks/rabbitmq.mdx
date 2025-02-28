@@ -42,8 +42,66 @@ service.
   a maximum of 1.5k connections, and up to 500 messages per second. This will be more than sufficient for this guide,
   where we will only be scaling up to 250 workers.
 - Maximum message size is 512MB, and further limited by the amount of RAM available on the host machine, as messages are
-  held in memory, with optional persistence. The default max message size on CloudAMQP is 128MB.
+  held in memory, with optional persistence. The default max message size on CloudAMQP is 128MB. As is true for most job
+  queues, it is recommended to keep large amounts of data in cloud storage, putting only references to the data location
+  in the message itself.
 - CloudAMQP's default message timeout is 2 hours, but we can disable this limit entirely, allowing for extremely
   long-running tasks.
-- RabbitMQ relies on long-lived connections between the broker and clients, so it is important to handle reconnections
-  gracefully in your code.
+- RabbitMQ relies on long-lived connections between the message broker and clients, so it is important to handle
+  reconnections gracefully in your code.
+
+### Setting Up RabbitMQ on CloudAMQP
+
+Once you have your account on CloudAMQP, it's time to deploy a new instance. We will be using the "Sassy Squirrel" plan
+for this guide, which is $50/month (billed by the second). You can choose a different plan if you need more or less
+resources.
+
+<Frame caption="Creating a new instance on CloudAMQP">
+  <img src="/guides/long-running-tasks/images/rabbitmq-create-1.png" alt="Creating a new instance on CloudAMQP" />
+</Frame>
+
+Next, you can choose the datacenter and region for your instance. We will be using DigitalOcean's New York 3 datacenter
+for this guide, but if you have other application components (besides the worker) in a different cloud, you should
+consider deploying the broker to the same cloud and region as your other components.
+
+<Frame caption="Choosing a Datacenter and Region">
+  <img src="/guides/long-running-tasks/images/rabbitmq-create-2.png" alt="Choosing a datacenter and region" />
+</Frame>
+
+Next, select the number of nodes you want to deploy, and the version of RabbitMQ. We will be using a single node, and
+the latest version of RabbitMQ (4.0.5 as of the time of this writing)
+
+<Frame caption="Choosing the number of nodes and RabbitMQ version">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-create-3.png"
+    alt="Choosing the number of nodes and RabbitMQ version"
+  />
+</Frame>
+
+Confirm all of your settings on the next page, and deploy your instance. Once deployed, you should see something like
+this on the CloudAMQP console:
+
+<Frame caption="CloudAMQP Console">
+  <img src="/guides/long-running-tasks/images/cloudamqp-console.png" alt="CloudAMQP Console" />
+</Frame>
+
+Click the name of the instance to pull up the details page. Later, you will need info from this page to connect to your
+RabbitMQ instance, but for now, just navigate to the configuration tab on the left-hand navigation bar. Once there,
+disable the field labeled `rabbit.consumer_timeout`. This will allow us to have tasks run longer than the default 2-hour
+timeout.
+
+<Frame caption="Disabling the consumer timeout">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-disable-consumer-timeout.png"
+    alt="Disabling the consumer timeout"
+  />
+</Frame>
+
+Save your changes when done, and then navigate to the "RabbitMQ Manager", which will open a new tab. The RabbitMQ
+Manager is a web interface for managing your RabbitMQ instance. You can view queues, exchanges, and other RabbitMQ
+objects, as well as publish and consume messages. There is an HTTP API for this management layer, but for this guide we
+will be using the web interface.
+
+<Frame caption="RabbitMQ Manager">
+  <img src="/guides/long-running-tasks/images/rabbitmq-manager.png" alt="RabbitMQ Manager" />
+</Frame>
