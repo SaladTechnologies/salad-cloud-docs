@@ -171,8 +171,7 @@ queue. This can introduce additional latency for instances located outside of th
 performance in other regions.
 
 For low-latency applications outside North America, consider using job queue products from public cloud providers or
-deploy open-source tools like [the RQ (Redis Queue)](https://github.com/SaladTechnologies/misc/tree/main/RQ_App1) in
-those regions.
+building a custom Redis-based real-time queue by following [this guide](/guides/real-time-inference/build-redis-queue).
 
 **Some Salad customers have implemented custom queues using Redis to provide real-time and streaming services for LLM
 applications without relying on a regional load balancer.**
