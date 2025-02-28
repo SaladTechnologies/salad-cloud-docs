@@ -93,8 +93,8 @@ def salad_transcribe(file, Salad-Api-Key):
         "input": {
        	    "url": file,
        	    "language_code": "en",
-       	    "return_as_file": true,
-       	    "word_level_timestamps": true
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True
         }
     }
     headers = {
@@ -109,7 +109,7 @@ Salad-Api-Key = "{Salad-Api-Key}"
 
 file = "https://example.com/path/to/file.mp3"
 
-job = salad_transcribe(file)
+job = salad_transcribe(file, Salad-Api-Key)
 print(job.text)
 ```
 
@@ -154,8 +154,8 @@ translation features, also available in the same API call.
         "input": {
        	    "url": file,
        	    "language_code": "en",
-       	    "return_as_file": true,
-       	    "word_level_timestamps": true,
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
             "translate": "to_eng"
         }
 ```
@@ -171,8 +171,8 @@ once, and you’ll receive back the original transcription, along with translati
         "input": {
        	    "url": file,
        	    "language_code": "en",
-       	    "return_as_file": true,
-       	    "word_level_timestamps": true,
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
             "llm_translation": "italian, french"
         }
 ```
@@ -186,10 +186,10 @@ parameter. It will include the srt file for download when you fetch your job res
         "input": {
        	    "url": file,
        	    "language_code": "en",
-       	    "return_as_file": true,
-       	    "word_level_timestamps": true,
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
             "llm_translation": "italian, french",
-            "srt": true
+            "srt": True
         }
 ```
 
@@ -200,6 +200,8 @@ results of your transcription. The Job status and transcription results are comb
 Python function, you'll check the status, and once the job is completed it will also retrieve the transcription results.
 
 ```Python
+import json
+
 def get_result(job_id, Salad-Api-Key):
     url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/" + job_id
 
@@ -213,10 +215,10 @@ Salad-Api-Key = "{Salad-Api-Key}"
 
 file = "https://example.com/path/to/file.mp3"
 
-job = salad_transcribe(file)
+job = salad_transcribe(file, Salad-Api-Key)
 print(job.text)
 
-data = json.loads(job)
+data = job.json()
 job_id = data['id']
 
 result = get_result(job_id, Salad-Api-Key)
@@ -235,8 +237,8 @@ transcription via a directly downloadable URL.
   "input": {
     "url": "https://example.com/path/to/file.mp3",
     "language_code": "en",
-    "return_as_file": true,
-    "word_level_timestamps": true
+    "return_as_file": True,
+    "word_level_timestamps": True
   },
   "inference_endpoint_name": "transcribe",
   "status": "succeeded",
