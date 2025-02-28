@@ -30,3 +30,20 @@ and a simple auto-scaling mechanism.
 You will need a CloudAMQP account, and a Cloudflare account to follow this guide.
 
 ## The Job Queue: RabbitMQ
+
+RabbitMQ is a highly configurable open-source message broker that implements the Advanced Message Queuing Protocol
+(AMQP) and has client libraries in many languages. It is a robust and scalable solution for job queues, and is widely
+used in the industry. You can self-host if desired, but for this guide we will be using CloudAMQP's hosted RabbitMQ
+service.
+
+### Relevant Limitations
+
+- While RabbitMQ itself has no such inherent limitations, The "Sassy Squirrel" plan we'll be using on CloudAMQP supports
+  a maximum of 1.5k connections, and up to 500 messages per second. This will be more than sufficient for this guide,
+  where we will only be scaling up to 250 workers.
+- Maximum message size is 512MB, and further limited by the amount of RAM available on the host machine, as messages are
+  held in memory, with optional persistence. The default max message size on CloudAMQP is 128MB.
+- CloudAMQP's default message timeout is 2 hours, but we can disable this limit entirely, allowing for extremely
+  long-running tasks.
+- RabbitMQ relies on long-lived connections between the broker and clients, so it is important to handle reconnections
+  gracefully in your code.
