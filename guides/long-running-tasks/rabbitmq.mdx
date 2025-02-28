@@ -1,0 +1,32 @@
+---
+title: 'RabbitMQ and SaladCloud'
+description: 'Managing Long-Running Tasks on SaladCloud with RabbitMQ'
+---
+
+# Managing Long-Running Tasks on SaladCloud with SQS
+
+Managing long running tasks, such as molecular simulations, dreambooth training, and llm finetuning, presents unique
+challenges on SaladCloud, due primarily to the interruptible nature of nodes. At the core of all solutions to this
+problem are a job queue, and progress checkpoints. The job queue is responsible for distributing tasks to workers, and
+detecting when a worker has been interrupted. Workloads should save checkpoints of their progress and upload it to cloud
+storage, so that they can be resumed from the last checkpoint in the event of an interruption. Workers should also
+upload completed artifacts to cloud storage.
+
+<Frame caption="Basic architecture for long-running tasks on SaladCloud">
+  <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
+</Frame>
+
+We will be using [RabbitMQ](https://www.rabbitmq.com/) hosted on [CloudAMQP](https://www.cloudamqp.com/) as our job
+queue, and [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage
+service, as our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge for
+egress data, and SaladCloud's distributed nodes are not in datacenters, and therefore may incur egress fees from other
+providers. Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the
+future if you choose to do so.
+
+For this guide, we will build an application that slowly calculates a sum for _n_ steps, sleeping for 30 seconds between
+steps to simulate work. We will set up a job queue and related resources, a storage bucket, a checkpoint saving system,
+and a simple auto-scaling mechanism.
+
+You will need a CloudAMQP account, and a Cloudflare account to follow this guide.
+
+## The Job Queue: RabbitMQ
