@@ -19,9 +19,9 @@ docker run --rm -it --gpus all -p 8000:8888 docker.io/saladtechnologies/misc:tes
 A SCE application (or container group), consists of multiple replicas (or instances) running the same container image,
 with each instance deployed on a separate Salad node.
 
-SCE instances are **not virtual machines or physical machines** with attached volumes; instead, both the image and any runtime
-data are removed from the physical nodes when the application is stopped. Additionally, **external SSH access is not supported**
-and **running docker run commands inside SCE instances (Docker-in-Docker) is not permitted.**
+SCE instances are **not virtual machines or physical machines** with attached volumes; instead, both the image and any
+runtime data are removed from the physical nodes when the application is stopped. Additionally, **external SSH access is
+not supported** and **running docker run commands inside SCE instances (Docker-in-Docker) is not permitted.**
 
 **The highest node configuration for SCE:**
 
