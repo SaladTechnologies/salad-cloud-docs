@@ -455,7 +455,10 @@
                 },
                 {
                   "group": "Cookbooks",
-                  "pages": ["guides/transcription/salad-transcription-api/transcribe-youtube"]
+                  "pages": [
+                    "guides/transcription/salad-transcription-api/transcribe-youtube",
+                    "guides/transcription/salad-transcription-api/splitting-large-audio-files"
+                  ]
                 }
               ]
             },
