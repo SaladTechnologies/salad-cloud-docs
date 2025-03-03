@@ -13,7 +13,7 @@ function trackUrlChanges() {
 
     function handleUrlChange() {
         setTimeout(function () {
-            // we need timeout to get get url and title (document.title) aligned in tracing, overwise the previous page title will be picked and associated to the latest url
+            // we need timeout to get  url and title (document.title) aligned for tracking, overwise the previous page title will be picked and associated to the latest url
             var _hsq = (window._hsq = window._hsq || [])
             const path = window.location.href.replace(window.location.origin, '')
             _hsq.push(['setPath', path])
