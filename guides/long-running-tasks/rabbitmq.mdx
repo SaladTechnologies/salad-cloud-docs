@@ -146,8 +146,9 @@ deadletter queue. This will ensure that messages sent to the deadletter exchange
 ### Main Job Queue
 
 Next, we will create the main job queue. This queue will hold messages that represent tasks to be processed by workers.
-Navigate back to the Queues tab, and add a new queue called "my-job-queue", and set the deadletter exchange to the
-exchange we created earlier.
+Navigate back to the Queues tab, and add a new Quorum queue called "my-job-queue", and set the deadletter exchange to
+the exchange we created earlier, and setting the delivery limit to 3. This will allow a message to be retried 3 times
+before being sent to the deadletter exchange.
 
 <Frame caption="Creating the main job queue">
   <img src="/guides/long-running-tasks/images/rabbitmq-create-queue.png" alt="Creating the main job queue" />
@@ -202,7 +203,6 @@ There are several ways to do this, but what I've done for my development environ
 ```shell
 AMQP_URL=amqps://your-username:your-password@your-hostname/your-vhost
 JOB_QUEUE=my-job-queue
-DEADLETTER_EXCHANGE=deadletter
 R2_AWS_ACCESS_KEY_ID=your-access-key-id
 R2_AWS_SECRET_ACCESS_KEY=your-secret-access-key
 R2_S3_ENDPOINT_URL=your-s3-endpoint-url
@@ -223,6 +223,7 @@ Now, create a file called `main.py` in the root of your project, and add the fol
 import os
 import boto3
 import pika
+import json
 
 # Get the environment variables
 r2_aws_region = "auto"
@@ -233,7 +234,6 @@ r2_bucket_name = os.getenv('R2_BUCKET_NAME')
 
 amqp_url = os.getenv('AMQP_URL')
 job_queue = os.getenv('JOB_QUEUE')
-deadletter_exchange = os.getenv('DEADLETTER_EXCHANGE')
 
 # Create the R2 client
 r2 = boto3.client('s3',
@@ -241,4 +241,350 @@ r2 = boto3.client('s3',
                   aws_secret_access_key=r2_aws_secret_access_key,
                   region_name=r2_aws_region,
                   endpoint_url=r2_s3_endpoint_url)
+```
+
+Next, let's take a look at the "work" function, where we will do the actual work for the job. This function will
+simulate work by sleeping for 30 seconds and incrementing the step and sum in the checkpoint, and saving that checkpoint
+to R2.
+
+```python
+def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
+    '''
+    Do the actual work for the job. This function will simulate work by
+    sleeping for 30 seconds and incrementing the step and sum in the
+    checkpoint.
+
+    Parameters:
+    - job: dict, the job
+    - checkpoint: dict, the checkpoint
+    - stop_signal: threading.Event, a signal to stop the work
+    '''
+    print(f'Starting job {job["job_id"]}')
+    print(f"Max steps: {job['steps']}")
+    print(f"Starting step: {checkpoint['step']}")
+    while checkpoint['step'] < job['steps']:
+        # Simulate work
+        print(f"Working on job {job['job_id']}, step {checkpoint['step']}")
+        time.sleep(30)
+        # Update the checkpoint.
+        checkpoint['step'] += 1
+        checkpoint['sum'] += checkpoint['step']
+        upload_checkpoint(job['job_id'], checkpoint)
+
+    print(f'Job {job["job_id"]} finished')
+    return checkpoint['sum']
+```
+
+Additionally, we may want a function that validates the job before starting work on it. In our simple example, we'll
+just make sure the basic fields are present.
+
+```python
+def validate_job(job: dict) -> bool:
+    '''
+    Validate the job
+
+    Parameters:
+    - job: dict, the job
+
+    Returns:
+    - bool, whether the job is valid
+    '''
+    # This is a very simple function for our very simple application.
+    # You should replace this with your actual validation logic.
+    return 'job_id' in job and 'steps' in job
+```
+
+We also want functions to upload and download our progress checkpoints, and to upload the result. In this simplified
+example, we're going to use a small JSON file for the checkpoint, but the principle is the same no matter what the
+actual checkpoint is.
+
+```python
+def download_checkpoint(job_id: str):
+    '''
+    Download the checkpoint from S3
+
+    Parameters:
+    - job_id: str, the job ID
+
+    Returns:
+    - checkpoint: dict, the checkpoint
+    '''
+    try:
+        response = s3.get_object(
+            Bucket=r2_bucket_name,
+            Key=f'{job_id}/checkpoint.json'
+        )
+    except boto3.exceptions.S3.NoSuchKey:
+        return None
+
+    checkpoint = json.loads(response['Body'].read())
+    return checkpoint
+
+
+def upload_checkpoint(job_id: str, checkpoint: dict):
+    '''
+    Upload the checkpoint to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - checkpoint: dict, the checkpoint
+    '''
+    s3.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/checkpoint.json',
+        Body=json.dumps(checkpoint)
+    )
+
+
+def upload_result(job_id: str, result: int) -> None:
+    '''
+    Upload the result to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - result: int, the result
+    '''
+    r2.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/result.txt',
+        Body=str(result)
+    )
+    print(f'Result uploaded for job {job_id}')
+```
+
+Now, we put these parts together in a function called `process_job`.
+
+```python
+def process_job(ch, method, properties, body):
+    job = json.loads(body)
+    print(f"Received job {job['job_id']}")
+
+    # If there's a checkpoint, we want to use it, but if not, we need to
+    # initialize our state.
+    checkpoint = download_checkpoint(job['job_id'])
+    if checkpoint is None:
+        checkpoint = {'step': 0, 'sum': 0}
+
+    # Some jobs may have a validation step. For instance, dreambooth training may have a step
+    # that verifies if all inputs have faces. If the validation fails, we should stop the job
+    # and not retry it, but instead move it to the DLQ. In this situation, we can
+    # be confident that the job will never succeed.
+    if not validate_job(job):
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        return
+
+    # Now we can do the actual work
+    try:
+        result = do_the_actual_work(job, checkpoint)
+        if result is None:
+            # This means the job was interrupted, so we need to release it
+            # back to the queue.
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            return
+
+        # The job isn't really done until the result is uploaded.
+        upload_result(job['job_id'], result)
+
+        # Once the result is uploaded, we can acknowledge the job and stop
+        # the heartbeat.
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        return
+    except Exception as e:
+        # If there's an error, we need to release the job back to the queue
+        # so it can be retried.
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        return
+```
+
+Finally, we need to connect to RabbitMQ and start consuming messages from the queue.
+
+```python
+if __name__ == "__main__":
+    # Create the connection and channel
+    connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
+    channel = connection.channel()
+
+    # We only want 1 job at a time per worker
+    channel.basic_qos(prefetch_count=1, global_qos=True)
+
+    # Start consuming the messages
+    channel.basic_consume(queue=job_queue, on_message_callback=process_job)
+    channel.start_consuming()
+```
+
+#### Completed Example
+
+```python
+import os
+import boto3
+import pika
+import json
+import time
+
+# Get the environment variables
+r2_aws_region = "auto"
+r2_aws_access_key_id = os.getenv('R2_AWS_ACCESS_KEY_ID')
+r2_aws_secret_access_key = os.getenv('R2_AWS_SECRET_ACCESS_KEY')
+r2_s3_endpoint_url = os.getenv('R2_S3_ENDPOINT_URL')
+r2_bucket_name = os.getenv('R2_BUCKET_NAME')
+
+amqp_url = os.getenv('AMQP_URL')
+job_queue = os.getenv('JOB_QUEUE')
+
+# Create the R2 client
+r2 = boto3.client('s3',
+                  aws_access_key_id=r2_aws_access_key_id,
+                  aws_secret_access_key=r2_aws_secret_access_key,
+                  region_name=r2_aws_region,
+                  endpoint_url=r2_s3_endpoint_url)
+
+
+def download_checkpoint(job_id: str) -> dict:
+    '''
+    Download the checkpoint from S3
+
+    Parameters:
+    - job_id: str, the job ID
+
+    Returns:
+    - checkpoint: dict, the checkpoint
+    '''
+    try:
+        response = r2.get_object(
+            Bucket=r2_bucket_name,
+            Key=f'{job_id}/checkpoint.json'
+        )
+    except r2.exceptions.NoSuchKey:
+        return None
+
+    checkpoint = json.loads(response['Body'].read())
+    return checkpoint
+
+
+def upload_checkpoint(job_id: str, checkpoint: dict) -> None:
+    '''
+    Upload the checkpoint to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - checkpoint: dict, the checkpoint
+    '''
+    r2.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/checkpoint.json',
+        Body=json.dumps(checkpoint)
+    )
+    print(f'Checkpoint uploaded for job {job_id}')
+
+
+def validate_job(job: dict) -> bool:
+    '''
+    Validate the job
+
+    Parameters:
+    - job: dict, the job
+
+    Returns:
+    - bool, whether the job is valid
+    '''
+    # This is a very simple function for our very simple application.
+    # You should replace this with your actual validation logic.
+    return 'job_id' in job and 'steps' in job
+
+
+def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
+    '''
+    Do the actual work for the job. This function will simulate work by
+    sleeping for 30 seconds and incrementing the step and sum in the
+    checkpoint.
+
+    Parameters:
+    - job: dict, the job
+    - checkpoint: dict, the checkpoint
+    - stop_signal: threading.Event, a signal to stop the work
+    '''
+    print(f'Starting job {job["job_id"]}')
+    print(f"Max steps: {job['steps']}")
+    print(f"Starting step: {checkpoint['step']}")
+    while checkpoint['step'] < job['steps']:
+        # Simulate work
+        print(f"Working on job {job['job_id']}, step {checkpoint['step']}")
+        time.sleep(30)
+        # Update the checkpoint.
+        checkpoint['step'] += 1
+        checkpoint['sum'] += checkpoint['step']
+        upload_checkpoint(job['job_id'], checkpoint)
+
+    print(f'Job {job["job_id"]} finished')
+    return checkpoint['sum']
+
+
+def upload_result(job_id: str, result: int) -> None:
+    '''
+    Upload the result to S3
+
+    Parameters:
+    - job_id: str, the job ID
+    - result: int, the result
+    '''
+    r2.put_object(
+        Bucket=r2_bucket_name,
+        Key=f'{job_id}/result.txt',
+        Body=str(result)
+    )
+    print(f'Result uploaded for job {job_id}')
+
+
+def process_job(ch, method, properties, body):
+    job = json.loads(body)
+    print(f"Received job {job['job_id']}")
+
+    # If there's a checkpoint, we want to use it, but if not, we need to
+    # initialize our state.
+    checkpoint = download_checkpoint(job['job_id'])
+    if checkpoint is None:
+        checkpoint = {'step': 0, 'sum': 0}
+
+    # Some jobs may have a validation step. For instance, dreambooth training may have a step
+    # that verifies if all inputs have faces. If the validation fails, we should stop the job
+    # and not retry it, but instead move it to the DLQ. In this situation, we can
+    # be confident that the job will never succeed.
+    if not validate_job(job):
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        return
+
+    # Now we can do the actual work
+    try:
+        result = do_the_actual_work(job, checkpoint)
+        if result is None:
+            # This means the job was interrupted, so we need to release it
+            # back to the queue.
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+            return
+
+        # The job isn't really done until the result is uploaded.
+        upload_result(job['job_id'], result)
+
+        # Once the result is uploaded, we can acknowledge the job and stop
+        # the heartbeat.
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        return
+    except Exception as e:
+        # If there's an error, we need to release the job back to the queue
+        # so it can be retried.
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        return
+
+
+if __name__ == "__main__":
+    # Create the connection and channel
+    connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
+    channel = connection.channel()
+
+    # We only want 1 job at a time per worker
+    channel.basic_qos(prefetch_count=1, global_qos=True)
+
+    # Start consuming the messages
+    channel.basic_consume(queue=job_queue, on_message_callback=process_job)
+    channel.start_consuming()
 ```
