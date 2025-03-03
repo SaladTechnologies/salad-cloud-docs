@@ -405,7 +405,7 @@ if __name__ == "__main__":
     channel = connection.channel()
 
     # We only want 1 job at a time per worker
-    channel.basic_qos(prefetch_count=1, global_qos=True)
+    channel.basic_qos(prefetch_count=1)
 
     # Start consuming the messages
     channel.basic_consume(queue=job_queue, on_message_callback=process_job)
@@ -587,4 +587,116 @@ if __name__ == "__main__":
     # Start consuming the messages
     channel.basic_consume(queue=job_queue, on_message_callback=process_job)
     channel.start_consuming()
+```
+
+## Submitting Jobs to the Queue
+
+Next, we need a way to submit jobs to the queue. We're going to use the `pika` library for this as well, with the same
+`AMQP_URL` and `JOB_QUEUE` from `worker.env`. I've saved mine in a file called `submitter.env`, and I'm going to source
+them into my environment with the following command:
+
+```shell
+export $(grep -v '^#' submitter.env | xargs -d '\n')
+```
+
+Suppose we have a csv with our 10,000 jobs, and we want to submit them all. Our CSV (data.csv) looks like this, with
+10,000 rows.
+
+```csv
+job_id,steps
+job-0,600
+job-1,600
+job-2,600
+job-3,600
+```
+
+It is pretty straightforward to submit these jobs to the queue. Here's an example script that does just that:
+
+```python
+import csv
+import json
+import pika
+import os
+
+amqp_url = os.getenv('AMQP_URL')
+job_queue = os.getenv('JOB_QUEUE')
+
+if __name__ == '__main__':
+    connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
+    channel = connection.channel()
+    with open("data.csv") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            job = {
+                "job_id": row["job_id"],
+                "steps": int(row["steps"])
+            }
+            channel.basic_publish(
+                exchange='',
+                routing_key=job_queue,
+                body=json.dumps(job)
+            )
+            print(f'Job {job["job_id"]} submitted')
+    connection.close()
+```
+
+### Running the Job Submitter
+
+Run the job submitter with `python submit-jobs.py`. It will read the csv file and submit all the jobs to the queue.
+
+Once that has run, we can see in the RabbitMQ management interface
+
+<Frame caption="RabbitMQ Management Interface showing a full queue">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-10k-messages.png"
+    alt="RabbitMQ Management Interface showing a full queue"
+  />
+</Frame>
+
+## Containerize the Worker Application
+
+Now that we have our worker application and our job submitter, we can package our worker in a docker container, and run
+it on a SaladCloud Container Group.
+
+First, let's make sure our dependencies are documented in `requirements.txt`.
+
+```shell
+boto3
+pika
+```
+
+Now, create a new file called `Dockerfile`. Our application is simple, so a basic python base image should be fine.
+
+```dockerfile
+FROM python:3.10.12-slim-buster
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY main.py .
+
+CMD ["python", "main.py"]
+```
+
+Now, build the docker image, and use a tag that makes sense for you.
+
+```shell
+docker build -t saladtechnologies/lrt-worker-examples:rabbitmq .
+```
+
+Now, we can test it locally to make sure it works, before we deploy it to SaladCloud.
+
+```shell
+docker run -it --rm  --env-file worker.env saladtechnologies/lrt-worker-examples:rabbitmq
+```
+
+You should see it start up and begin processing a job. Once this is working, you can go ahead and terminate the
+container with `Ctrl+C`.
+
+Now, we can push the image to Docker Hub.
+
+```shell
+docker push saladtechnologies/lrt-worker-examples:rabbitmq
 ```
