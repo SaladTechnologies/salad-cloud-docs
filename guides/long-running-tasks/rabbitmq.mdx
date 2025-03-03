@@ -700,3 +700,81 @@ Now, we can push the image to Docker Hub.
 ```shell
 docker push saladtechnologies/lrt-worker-examples:rabbitmq
 ```
+
+## Deploying the Worker to SaladCloud
+
+To deploy our worker to SaladCloud, we need to create a new Container Group. This can be done via the API, SDKs, or the
+Portal. We're going to use the Portal.
+
+We're going to create a new Container Group, and we're going to use the image we just pushed to Docker Hub. We're going
+to request 100 replicas (the max via the portal), and we're going to set all of our environment variables from
+`worker.env`.
+
+<Frame caption="Creating a new Container Group">
+  <img src="/guides/long-running-tasks/images/rabbitmq-cg-create-1.png" alt="Creating a new Container Group" />
+</Frame>
+
+Our application is extremely simple, so we're going to only request 1 vCPU, 1 GB of RAM, and no GPU. Your hardware
+requirements are likely significantly higher than this.
+
+<Frame caption="Setting the hardware requirements">
+  <img src="/guides/long-running-tasks/images/rabbitmq-cg-create-2.png" alt="Setting the hardware requirements" />
+</Frame>
+
+All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't need any additional storage for this
+particular application.
+
+<Frame caption="Setting the job priority and storage requirements">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-cg-create-3.png"
+    alt="Setting the job priority and storage requirements"
+  />
+</Frame>
+
+We do not need the container gateway, as our application pulls its work from a queue. We also do not need health probes,
+as those are primarily for services accessed via Container Gateway. Go ahead and hit deploy, and you'll be taken to the
+container group page, where you can see its status.
+
+First, it will prepare by pulling the container image into our high-performance cache.
+
+<Frame caption="Preparing the container">
+  <img src="/guides/long-running-tasks/images/rabbitmq-cg-preparing.png" alt="Preparing the container" />
+</Frame>
+
+Once it's prepared, it will start allocating replicas, and downloading the container image to those replicas.
+
+<Frame caption="Downloading the images to the replicas">
+  <img src="/guides/long-running-tasks/images/rabbitmq-cg-deploying.png" alt="Downloading the images to the replicas" />
+</Frame>
+
+After a minute or so, we should see our instances up and running.
+
+<Frame caption="Instances up and running">
+  <img src="/guides/long-running-tasks/images/rabbitmq-cg-running.png" alt="Instances up and running" />
+</Frame>
+
+## Validating That It Works
+
+Now that our cluster is up and running, we can go to the SQS console, and see that we have in-flight messages now.
+
+<Frame caption="In-flight messages in our queue">
+  <img src="/guides/long-running-tasks/images/rabbitmq-messages-in-flight.png" alt="In-flight messages in the queue" />
+</Frame>
+
+From the R2 console, we can see that our bucket is being filled with checkpoints and results.
+
+<Frame caption="Checkpoints and results in the R2 bucket">
+  <img
+    src="/guides/long-running-tasks/images/r2-bucket-has-objects.png"
+    alt="Checkpoints and results in the R2 bucket"
+  />
+</Frame>
+
+## Autoscaling
+
+Now that we have our worker running, we can set up some simple autoscaling to automatically scale the number of replicas
+up and down based on the number of messages in the queue.
+
+There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
+minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
+(the maximum in the API). To implement this, we're going to use Cloudflare Workers with a schedule trigger.
