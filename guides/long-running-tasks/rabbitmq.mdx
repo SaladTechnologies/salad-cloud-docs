@@ -105,3 +105,140 @@ will be using the web interface.
 <Frame caption="RabbitMQ Manager">
   <img src="/guides/long-running-tasks/images/rabbitmq-manager.png" alt="RabbitMQ Manager" />
 </Frame>
+
+### Deadletter Exchange
+
+A deadletter exchange is an exchange that messages are sent to when they are rejected by a queue. This can happen when a
+message is not acknowledged by a consumer, typically indicating that the consumer has gone offline, or the message is
+malformed.
+
+We will be creating a deadletter exchange and queue first, so that we can configure our main queue to send messages to
+it when they are rejected. This will allow us to inspect and requeue messages that have failed to be processed.
+
+From the RabbitMQ Manager, navigate to the Exchanges tab, and add a new exchange called "deadletter".
+
+<Frame caption="Adding a deadletter exchange">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-create-deadletter-exchange.png"
+    alt="Adding a deadletter exchange"
+  />
+</Frame>
+
+Make sure to select the non-root virtual host, and set the type to "direct."
+
+Next, navigate to the Queues tab, and add a new queue called "deadletter". Make sure to select the same virtual host as
+the exchange.
+
+<Frame caption="Adding a deadletter queue">
+  <img src="/guides/long-running-tasks/images/rabbitmq-create-deadletter-queue.png" alt="Adding a deadletter queue" />
+</Frame>
+
+Once the queue is created, click on it in the list of queues, and create a binding from the deadletter exchange to the
+deadletter queue. This will ensure that messages sent to the deadletter exchange are routed to the deadletter queue.
+
+<Frame caption="Binding the deadletter exchange to the deadletter queue">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-bind-dlq.png"
+    alt="Binding the deadletter exchange to the deadletter queue"
+  />
+</Frame>
+
+### Main Job Queue
+
+Next, we will create the main job queue. This queue will hold messages that represent tasks to be processed by workers.
+Navigate back to the Queues tab, and add a new queue called "my-job-queue", and set the deadletter exchange to the
+exchange we created earlier.
+
+<Frame caption="Creating the main job queue">
+  <img src="/guides/long-running-tasks/images/rabbitmq-create-queue.png" alt="Creating the main job queue" />
+</Frame>
+
+## Cloud Storage: R2
+
+R2 is a cloud storage service from Cloudflare that is compatible with the S3 API. It is a great choice for SaladCloud
+workloads because it does not charge egress fees, and SaladCloud's distributed nodes are mostly not in datacenters, and
+therefore may incur egress fees from other providers.
+
+From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
+
+<Frame caption="The R2 Object Storage Console">
+  <img src="/guides/long-running-tasks/images/r2-console.png" alt="The R2 Object Storage Console" />
+</Frame>
+
+Give your bucket a meaningful name, and select an appropriate location. We are going to use the standard storage class,
+and automatic location.
+
+<Frame caption="Creating a new bucket">
+  <img src="/guides/long-running-tasks/images/r2-create-bucket.png" alt="Creating a new bucket" />
+</Frame>
+
+Once your bucket is created, you will need to create an access key and secret key. Select "Manage API tokens" from the
+"\{ \} API" menu, and click "Create Token".
+
+<Frame caption="You still need an API token to access your bucket">
+  <img src="/guides/long-running-tasks/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
+</Frame>
+
+Create a token with "Object Read & Write" permissions, and only grant it access to the bucket we've just created. Since
+secret rotation is outside the scope of this guide, we're going to use the "forever" TTL. However, it is best practice
+to user shorter-lived secrets and to have easy automatic mechanisms in place to rotate secrets as needed.
+
+Once created you will be given an access key and secret key. Save these somewhere safe, as you will not be able to
+retrieve them again. The application code will get these keys from environment variables, so you will need to set them
+in your environment. Also on that page will be the S3 endpoint URL for your bucket. Save this as well, as it will be
+needed in the application code.
+
+## Instrumenting Our Application
+
+We're going to use the `boto3` library to interact with R2, and the `pika` library to interact with RabbitMQ. You can
+install it with `pip install boto3 pika`.
+
+First, we need to set up our environment variables. All of the following environment variables will be needed by the
+application code.
+
+There are several ways to do this, but what I've done for my development environment is create a file called
+`worker.env` in the root of my project, and add the following lines:
+
+```shell
+AMQP_URL=amqps://your-username:your-password@your-hostname/your-vhost
+JOB_QUEUE=my-job-queue
+DEADLETTER_EXCHANGE=deadletter
+R2_AWS_ACCESS_KEY_ID=your-access-key-id
+R2_AWS_SECRET_ACCESS_KEY=your-secret-access-key
+R2_S3_ENDPOINT_URL=your-s3-endpoint-url
+R2_BUCKET_NAME=your-bucket-name
+```
+
+Then, to source this into my environment when I run my code, I run the following command:
+
+```shell
+export $(grep -v '^#' worker.env | xargs -d '\n')
+```
+
+Make sure `*.env` is in your .gitignore. You don't want to commit your secrets to your repository.
+
+Now, create a file called `main.py` in the root of your project, and add the following code:
+
+```python
+import os
+import boto3
+import pika
+
+# Get the environment variables
+r2_aws_region = "auto"
+r2_aws_access_key_id = os.getenv('R2_AWS_ACCESS_KEY_ID')
+r2_aws_secret_access_key = os.getenv('R2_AWS_SECRET_ACCESS_KEY')
+r2_s3_endpoint_url = os.getenv('R2_S3_ENDPOINT_URL')
+r2_bucket_name = os.getenv('R2_BUCKET_NAME')
+
+amqp_url = os.getenv('AMQP_URL')
+job_queue = os.getenv('JOB_QUEUE')
+deadletter_exchange = os.getenv('DEADLETTER_EXCHANGE')
+
+# Create the R2 client
+r2 = boto3.client('s3',
+                  aws_access_key_id=r2_aws_access_key_id,
+                  aws_secret_access_key=r2_aws_secret_access_key,
+                  region_name=r2_aws_region,
+                  endpoint_url=r2_s3_endpoint_url)
+```
