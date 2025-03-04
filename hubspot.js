@@ -14,7 +14,7 @@ function trackUrlChanges() {
 
     function handleUrlChange() {
         setTimeout(function () {
-            // we need timeout to get  url and title (document.title) aligned for tracking, overwise the previous page title will be picked and associated to the latest url
+            // we need timeout to get url and title (document.title) aligned for tracking, overwise the previous page title will be picked and associated to the latest url
             const _hsq = (window._hsq = window._hsq || [])
             const pathname = window.location.pathname
 
