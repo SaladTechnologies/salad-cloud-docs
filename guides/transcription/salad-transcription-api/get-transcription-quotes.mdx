@@ -2,11 +2,13 @@
 title: Extract quotes from transcriptions
 ---
 
-By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions, along with the timestamps. To use this, you just need to add the `custom_prompt` input parameter to your transcription request. 
+By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions, along with
+the timestamps. To use this, you just need to add the `custom_prompt` input parameter to your transcription request.
 
 ## Custom input parameters
 
-In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input parameter to extract quotes from the transcription. We'll use the following input parameters:
+In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input
+parameter to extract quotes from the transcription. We'll use the following input parameters:
 
 ```python
 payload = {"input": {
@@ -20,6 +22,7 @@ payload = {"input": {
 ## Python script
 
 We'll use it in the following Python script:
+
 ```python
 import requests
 import json
@@ -64,12 +67,14 @@ while True:
       elif response["status"] == "failed":
           print(f'Job failed')
           break
-      else: 
+      else:
         print(f'Error retrieving transcription result: {e}')
         break
 ```
 
-In this script, we're telling Salad to extract the most engaging quotes from the transcription. The quotes will be returned in the `llm_result` field of the response. We're then printing the result of this field to the console. It'll look something like this once it finishes:
+In this script, we're telling Salad to extract the most engaging quotes from the transcription. The quotes will be
+returned in the `llm_result` field of the response. We're then printing the result of this field to the console. It'll
+look something like this once it finishes:
 
 ### Output
 
@@ -89,5 +94,5 @@ Current job status is running
 "Welcome to the compute-sharing economy! 90% of the world’s compute resources (over 400 million consumer GPUs) sit idle for 20-22 hrs daily."
 ```
 
-At this time, timestamps are **not** supported for extracting quotes. The custom `llm_prompt` only views the "text" field response from the transcription completion, and so currently is unable to see the timestamps of the quotes.
-
+At this time, timestamps are **not** supported for extracting quotes. The custom `llm_prompt` only views the "text"
+field response from the transcription completion, and so currently is unable to see the timestamps of the quotes.
