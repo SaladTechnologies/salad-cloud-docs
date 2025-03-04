@@ -1,0 +1,93 @@
+---
+title: Extract quotes from transcriptions
+---
+
+By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions, along with the timestamps. To use this, you just need to add the `custom_prompt` input parameter to your transcription request. 
+
+## Custom input parameters
+
+In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input parameter to extract quotes from the transcription. We'll use the following input parameters:
+
+```python
+payload = {"input": {
+        "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
+        "url": audio_file_url,
+        "language_code": "en",
+        "return_as_file": False
+    }}
+```
+
+## Python script
+
+We'll use it in the following Python script:
+```python
+import requests
+import json
+
+url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+payload = {"input": {
+        "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
+        "url": audio_file_url,
+        "language_code": "en",
+        "return_as_file": False
+    }}
+headers = {
+    "Salad-Api-Key": "{salad_api_key}",
+    "Content-Type": "application/json"
+}
+
+salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
+organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
+
+audio_file_url = "url/to/audio/file.mp3"
+
+response = requests.request("POST", url, json=payload, headers=headers)
+
+response = response.json()
+job_id=response["id"]
+print (f'Job ID: {job_id}')
+
+while True:
+  time.sleep(5)
+  try:
+      response = requests.request("GET", url + "/" + job_id, headers=headers)
+      response = response.json()
+      if response["output"]:
+          print(response["output"]["llm_result"])
+          break
+      else:
+          print(f'Current job status is {response["status"]}')
+  except Exception as e:
+      if response["status"] == "created" or response["status"] == "pending" or response["status"] == "started" or response["status"] == "running":
+          print(f'Current job status is {response["status"]}')
+      elif response["status"] == "failed":
+          print(f'Job failed')
+          break
+      else: 
+        print(f'Error retrieving transcription result: {e}')
+        break
+```
+
+In this script, we're telling Salad to extract the most engaging quotes from the transcription. The quotes will be returned in the `llm_result` field of the response. We're then printing the result of this field to the console. It'll look something like this once it finishes:
+
+### Output
+
+```bash
+Job ID: abcfaf6c-7323-41e8-b81b-ecc7709066ed
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+"Deploy AI/ML production models at scale securely on the world's largest distributed cloud network. Save up to 90% on compute costs compared to high-end GPUs & hyperscalers."
+"SaladCloud offered us the lowest GPU prices in the market with incredible scalability."
+"Welcome to the compute-sharing economy! 90% of the world’s compute resources (over 400 million consumer GPUs) sit idle for 20-22 hrs daily."
+```
+
+At this time, timestamps are **not** supported for extracting quotes. The custom `llm_prompt` only views the "text" field response from the transcription completion, and so currently is unable to see the timestamps of the quotes.
+
