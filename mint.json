@@ -457,7 +457,8 @@
                   "group": "Cookbooks",
                   "pages": [
                     "guides/transcription/salad-transcription-api/transcribe-youtube",
-                    "guides/transcription/salad-transcription-api/splitting-large-audio-files"
+                    "guides/transcription/salad-transcription-api/splitting-large-audio-files",
+                    "guides/transcription/salad-transcription-api/transcribe-a-local-file"
                   ]
                 }
               ]
