@@ -2,8 +2,7 @@
 title: Extract quotes from transcriptions
 ---
 
-By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions, along with
-the timestamps. To use this, you just need to add the `custom_prompt` input parameter to your transcription request.
+By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions. To use this, you just need to add the `custom_prompt` input parameter to your transcription request.
 
 ## Custom input parameters
 
@@ -25,9 +24,11 @@ We'll use it in the following Python script:
 
 ```python
 import requests
-import json
+import time
 
-url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+audio_file_url = "url/to/audio/file.mp3"
 
 payload = {"input": {
         "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
@@ -36,14 +37,12 @@ payload = {"input": {
         "return_as_file": False
     }}
 headers = {
-    "Salad-Api-Key": "{salad_api_key}",
+    "Salad-Api-Key": salad_api_key,
     "Content-Type": "application/json"
 }
 
 salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
 organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
-
-audio_file_url = "url/to/audio/file.mp3"
 
 response = requests.request("POST", url, json=payload, headers=headers)
 
@@ -54,20 +53,19 @@ print (f'Job ID: {job_id}')
 while True:
   time.sleep(5)
   try:
-      response = requests.request("GET", url + "/" + job_id, headers=headers)
-      response = response.json()
-      if response["output"]:
-          print(response["output"]["llm_result"])
-          break
-      else:
-          print(f'Current job status is {response["status"]}')
-  except Exception as e:
-      if response["status"] == "created" or response["status"] == "pending" or response["status"] == "started" or response["status"] == "running":
-          print(f'Current job status is {response["status"]}')
-      elif response["status"] == "failed":
+      result = requests.request("GET", url + "/" + job_id, headers=headers)
+      result = result.json()
+      if result["status"] == "created" or result["status"] == "pending" or result["status"] == "started" or result["status"] == "running":
+          print(f'Current job status is {result["status"]}')
+      elif result["status"] == "failed":
           print(f'Job failed')
           break
+      elif result["output"]:
+          print(result["output"]["llm_result"])
+          break
       else:
+          print(f'Current job status is {result["status"]}')
+  except Exception as e:
         print(f'Error retrieving transcription result: {e}')
         break
 ```
