@@ -291,16 +291,6 @@ def upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME, m
         print(f"API response error: {ve}")
     return None
 
-# Salad credentials
-SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
-ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
-
-# audio file to process
-audio_file_path = "audio/file/path.mp3"  # Replace with the path to the local audio file you want to upload
-
-storage_url = upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Uploads to Salad Storage
-print(f"Uploaded successfully. Storage URL: {storage_url}")
-
 def send_transcription_request(audio_url, ORGANIZATION_NAME, SALAD_API_KEY, language_code="en", input_params=None):
     """
     Sends a transcription request to the Salad Transcription API with dynamic input parameters.
@@ -339,29 +329,6 @@ def send_transcription_request(audio_url, ORGANIZATION_NAME, SALAD_API_KEY, lang
     # Extract and return the response
     return response.json()
 
-# Define dynamic input parameters. Learn about all of the available input parameters in the Salad Transcription API documentation
-# Example:
-input_parameters = {
-    "sentence_level_timestamps": False,
-    "diarization": False,
-}
-
-storage_url = storage_url  # Replace with the signed URL returned from the previous step
-
-# Send the transcription request
-try:
-    response = send_transcription_request(
-        audio_url=storage_url,
-        ORGANIZATION_NAME=ORGANIZATION_NAME,
-        SALAD_API_KEY=SALAD_API_KEY,
-        language_code="en",  # Specify the language code if needed
-        input_params=input_parameters
-    )
-    print(f"Transcription request submitted successfully. Job ID: {response['id']}")
-except Exception as e:
-    print(f"Error sending transcription request: {e}")
-
-
 def get_transcription_result(job_id, SALAD_API_KEY, ORGANIZATION_NAME):
     """
     Retrieves the transcription result from the Salad Transcription API for a given job ID.
@@ -391,6 +358,38 @@ def get_transcription_result(job_id, SALAD_API_KEY, ORGANIZATION_NAME):
     # Extract and return the response
     return response.json()
 
+# Salad credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# audio file to process
+audio_file_path = "audio/file/path.mp3"  # Replace with the path to the local audio file you want to upload
+
+# Define dynamic input parameters. Learn about all of the available input parameters in the Salad Transcription API documentation
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+storage_url = upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Uploads to Salad Storage
+if storage_url:
+    print(f"Uploaded successfully. Storage URL: {storage_url}")
+    try:
+        response = send_transcription_request(
+            audio_url=storage_url,
+            ORGANIZATION_NAME=ORGANIZATION_NAME,
+            SALAD_API_KEY=SALAD_API_KEY,
+            language_code="en",  # Specify the language code if needed
+            input_params=input_parameters
+        )
+        print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+    except Exception as e:
+        print(f"Error sending transcription request: {e}")
+else:
+    print("Failed to upload file. Exiting.")
+    exit()
+
 while True:
   # Retrieve the transcription result
   time.sleep(5) # Adjust this value if needed, depending on whether your transcription is long or short.
@@ -400,7 +399,9 @@ while True:
           SALAD_API_KEY=SALAD_API_KEY,
           ORGANIZATION_NAME=ORGANIZATION_NAME
       )
-      if result["output"]:
+      if result["status"] == "created" or result["status"] == "started" or result["status"] == "running" or result["status"] == "failed":
+          print(f'Current job status is {result["status"]}')
+      elif result["output"]:
           with open("transcription_result.txt", "w") as f:
               text = str(result["output"]["text"])
               f.write(text)
@@ -411,7 +412,5 @@ while True:
       else:
           print(f'Current job status is {result["status"]}')
   except Exception as e:
-      if result["status"] == "created" or result["status"] == "started" or result["status"] == "running" or result["status"] == "failed":
-          print(f'Current job status is {result["status"]}')
-      else: print(f'Error retrieving transcription result: {e}')
+      print(f'Error retrieving transcription result: {e}')
 ```
