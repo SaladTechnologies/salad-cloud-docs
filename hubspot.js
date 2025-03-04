@@ -8,15 +8,23 @@ script.src = '//js.hs-scripts.com/7230102.js'
 document.head.appendChild(script)
 
 function trackUrlChanges() {
+    let initialPathname = window.location.pathname
     const originalPushState = history.pushState
     const originalReplaceState = history.replaceState
 
     function handleUrlChange() {
         setTimeout(function () {
             // we need timeout to get  url and title (document.title) aligned for tracking, overwise the previous page title will be picked and associated to the latest url
-            var _hsq = (window._hsq = window._hsq || [])
-            const path = window.location.href.replace(window.location.origin, '')
-            _hsq.push(['setPath', path])
+            const _hsq = (window._hsq = window._hsq || [])
+            const pathname = window.location.pathname
+
+            // avoid double tracking on page load as trackPageVies has been already invoked for this page on hubspot script load
+            if (pathname === initialPathname) {
+                return
+            }
+
+            initialPathname = null
+            _hsq.push(['setPath', pathname])
             _hsq.push(['trackPageView'])
         }, 100)
     }
