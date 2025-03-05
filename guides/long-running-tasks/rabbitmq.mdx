@@ -49,6 +49,9 @@ service.
   long-running tasks.
 - RabbitMQ relies on long-lived connections between the message broker and clients, so it is important to handle
   reconnections gracefully in your code.
+- Using RabbitMQ in python in a multi-threaded environment can be a little tricky, however it is required in order to
+  support long lived jobs and quick interruption detection. We will be using the `pika` library, which does have support
+  for threaded workers.
 
 ### Setting Up RabbitMQ on CloudAMQP
 
@@ -224,6 +227,9 @@ import os
 import boto3
 import pika
 import json
+import time
+import threading
+import functools
 
 # Get the environment variables
 r2_aws_region = "auto"
@@ -234,6 +240,8 @@ r2_bucket_name = os.getenv('R2_BUCKET_NAME')
 
 amqp_url = os.getenv('AMQP_URL')
 job_queue = os.getenv('JOB_QUEUE')
+
+machine_id = os.getenv('SALAD_MACHINE_ID')
 
 # Create the R2 client
 r2 = boto3.client('s3',
@@ -248,6 +256,9 @@ simulate work by sleeping for 30 seconds and incrementing the step and sum in th
 to R2.
 
 ```python
+cancel_signal = threading.Event()
+
+
 def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
     '''
     Do the actual work for the job. This function will simulate work by
@@ -257,15 +268,20 @@ def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
     Parameters:
     - job: dict, the job
     - checkpoint: dict, the checkpoint
-    - stop_signal: threading.Event, a signal to stop the work
     '''
-    print(f'Starting job {job["job_id"]}')
-    print(f"Max steps: {job['steps']}")
-    print(f"Starting step: {checkpoint['step']}")
-    while checkpoint['step'] < job['steps']:
+    global cancel_signal
+    print(f'Starting job {job["job_id"]}', flush=True)
+    print(f"Max steps: {job['steps']}", flush=True)
+    print(f"Starting step: {checkpoint['step']}", flush=True)
+    while checkpoint['step'] < job['steps'] and not cancel_signal.is_set():
         # Simulate work
-        print(f"Working on job {job['job_id']}, step {checkpoint['step']}")
+        print(
+            f"Working on job {job['job_id']}, step {checkpoint['step']}", flush=True)
         time.sleep(30)
+        if cancel_signal.is_set():
+            # If we were interrupted, we need to return None to indicate that
+            # the job was interrupted.
+            return None
         # Update the checkpoint.
         checkpoint['step'] += 1
         checkpoint['sum'] += checkpoint['step']
@@ -299,7 +315,7 @@ example, we're going to use a small JSON file for the checkpoint, but the princi
 actual checkpoint is.
 
 ```python
-def download_checkpoint(job_id: str):
+def download_checkpoint(job_id: str) -> dict:
     '''
     Download the checkpoint from S3
 
@@ -310,18 +326,18 @@ def download_checkpoint(job_id: str):
     - checkpoint: dict, the checkpoint
     '''
     try:
-        response = s3.get_object(
+        response = r2.get_object(
             Bucket=r2_bucket_name,
             Key=f'{job_id}/checkpoint.json'
         )
-    except boto3.exceptions.S3.NoSuchKey:
+    except r2.exceptions.NoSuchKey:
         return None
 
     checkpoint = json.loads(response['Body'].read())
     return checkpoint
 
 
-def upload_checkpoint(job_id: str, checkpoint: dict):
+def upload_checkpoint(job_id: str, checkpoint: dict) -> None:
     '''
     Upload the checkpoint to S3
 
@@ -329,11 +345,12 @@ def upload_checkpoint(job_id: str, checkpoint: dict):
     - job_id: str, the job ID
     - checkpoint: dict, the checkpoint
     '''
-    s3.put_object(
+    r2.put_object(
         Bucket=r2_bucket_name,
         Key=f'{job_id}/checkpoint.json',
         Body=json.dumps(checkpoint)
     )
+    print(f'Checkpoint uploaded for job {job_id}', flush=True)
 
 
 def upload_result(job_id: str, result: int) -> None:
@@ -349,15 +366,40 @@ def upload_result(job_id: str, result: int) -> None:
         Key=f'{job_id}/result.txt',
         Body=str(result)
     )
-    print(f'Result uploaded for job {job_id}')
+    print(f'Result uploaded for job {job_id}', flush=True)
+```
+
+We also are going to make helper functions for acknowledging and rejecting messages from the queue.
+
+```python
+def ack_message(channel, delivery_tag):
+    '''
+    Acknowledge the message, indicating that it has been processed successfully
+    '''
+    if channel.is_open:
+        channel.basic_ack(delivery_tag)
+    else:
+        # Channel is already closed, so we can't ack this message;
+        print("Channel is closed, message not acked")
+
+
+def nack_message(channel, delivery_tag, requeue=True):
+    '''
+    Reject the message, indicating that it has not been processed successfully
+    '''
+    if channel.is_open:
+        channel.basic_nack(delivery_tag, requeue=requeue)
+    else:
+        # Channel is already closed, so we can't nack this message;
+        print("Channel is closed, message not nacked")
 ```
 
 Now, we put these parts together in a function called `process_job`.
 
 ```python
-def process_job(ch, method, properties, body):
+def process_job(channel, delivery_tag, body):
     job = json.loads(body)
-    print(f"Received job {job['job_id']}")
+    print(f"Received job {job['job_id']}", flush=True)
 
     # If there's a checkpoint, we want to use it, but if not, we need to
     # initialize our state.
@@ -370,46 +412,101 @@ def process_job(ch, method, properties, body):
     # and not retry it, but instead move it to the DLQ. In this situation, we can
     # be confident that the job will never succeed.
     if not validate_job(job):
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        cb = functools.partial(nack_message, channel, delivery_tag, False)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
         return
 
     # Now we can do the actual work
     try:
         result = do_the_actual_work(job, checkpoint)
-        if result is None:
-            # This means the job was interrupted, so we need to release it
-            # back to the queue.
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-            return
-
-        # The job isn't really done until the result is uploaded.
-        upload_result(job['job_id'], result)
-
-        # Once the result is uploaded, we can acknowledge the job and stop
-        # the heartbeat.
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-        return
     except Exception as e:
-        # If there's an error, we need to release the job back to the queue
-        # so it can be retried.
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        print(f"Error in job {job['job_id']}: {str(e)}")
+        cb = functools.partial(nack_message, channel, delivery_tag)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
         return
+
+    if result is None:
+        # Job was interrupted
+        cb = functools.partial(nack_message, channel, delivery_tag)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
+        return
+
+    # Upload the result and ack the message
+    upload_result(job['job_id'], result)
+    cb = functools.partial(ack_message, channel, delivery_tag)
+    if channel.is_open:
+        channel.connection.add_callback_threadsafe(cb)
 ```
 
-Finally, we need to connect to RabbitMQ and start consuming messages from the queue.
+Now, because we need to run our long-running task in a separate thread from the rabbitmq client, we need a function that
+spawns that worker thread for us.
+
+```python
+def on_message(channel, method_frame, header_frame, body, args):
+    threads = args
+    delivery_tag = method_frame.delivery_tag
+    t = threading.Thread(target=process_job, args=(
+        channel, delivery_tag, body))
+    t.start()
+    threads.append(t)
+```
+
+Finally, we need to connect to RabbitMQ and start consuming messages from the queue, taking care to handle all sorts of
+connection errors that may arise.
 
 ```python
 if __name__ == "__main__":
-    # Create the connection and channel
-    connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
-    channel = connection.channel()
+    # We will be doing all of our work in separate threads, so that rabbitmq's heartbeat
+    # can be properly handled.
+    threads = []
+    while True:
+        try:
+            # Create the connection and channel, heartbeating every 30 seconds.
+            connection = pika.BlockingConnection(
+                pika.URLParameters(amqp_url + "?heartbeat=30"))
+            channel = connection.channel()
 
-    # We only want 1 job at a time per worker
-    channel.basic_qos(prefetch_count=1)
+            # We only want 1 job at a time per worker
+            channel.basic_qos(prefetch_count=1)
 
-    # Start consuming the messages
-    channel.basic_consume(queue=job_queue, on_message_callback=process_job)
-    channel.start_consuming()
+            # Start consuming the messages
+            on_message_callback = functools.partial(
+                on_message, args=(threads)
+            )
+            channel.basic_consume(
+                queue=job_queue, on_message_callback=on_message_callback, consumer_tag=machine_id)
+            channel.start_consuming()
+        # Don't recover if connection was closed by broker
+        except pika.exceptions.ConnectionClosedByBroker:
+            print("Connection closed by broker")
+            break
+        # Don't recover on channel errors
+        except pika.exceptions.AMQPChannelError as e:
+            print("Channel error")
+            print(str(e))
+            break
+        # Recover on all other connection errors
+        except pika.exceptions.AMQPConnectionError as e:
+            print("Connection error, retrying...")
+            print(str(e))
+            time.sleep(1)
+            continue
+        except KeyboardInterrupt:
+            print("Keyboard interrupt")
+            channel.stop_consuming()
+            break
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            break
+
+    cancel_signal.set()
+    print("Exiting")
+    for thread in threads:
+        thread.join()
+    connection.close()
 ```
 
 #### Completed Example
@@ -420,6 +517,8 @@ import boto3
 import pika
 import json
 import time
+import threading
+import functools
 
 # Get the environment variables
 r2_aws_region = "auto"
@@ -430,6 +529,8 @@ r2_bucket_name = os.getenv('R2_BUCKET_NAME')
 
 amqp_url = os.getenv('AMQP_URL')
 job_queue = os.getenv('JOB_QUEUE')
+
+machine_id = os.getenv('SALAD_MACHINE_ID')
 
 # Create the R2 client
 r2 = boto3.client('s3',
@@ -474,7 +575,7 @@ def upload_checkpoint(job_id: str, checkpoint: dict) -> None:
         Key=f'{job_id}/checkpoint.json',
         Body=json.dumps(checkpoint)
     )
-    print(f'Checkpoint uploaded for job {job_id}')
+    print(f'Checkpoint uploaded for job {job_id}', flush=True)
 
 
 def validate_job(job: dict) -> bool:
@@ -492,6 +593,9 @@ def validate_job(job: dict) -> bool:
     return 'job_id' in job and 'steps' in job
 
 
+cancel_signal = threading.Event()
+
+
 def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
     '''
     Do the actual work for the job. This function will simulate work by
@@ -501,15 +605,20 @@ def do_the_actual_work(job: dict, checkpoint: dict) -> int | None:
     Parameters:
     - job: dict, the job
     - checkpoint: dict, the checkpoint
-    - stop_signal: threading.Event, a signal to stop the work
     '''
-    print(f'Starting job {job["job_id"]}')
-    print(f"Max steps: {job['steps']}")
-    print(f"Starting step: {checkpoint['step']}")
-    while checkpoint['step'] < job['steps']:
+    global cancel_signal
+    print(f'Starting job {job["job_id"]}', flush=True)
+    print(f"Max steps: {job['steps']}", flush=True)
+    print(f"Starting step: {checkpoint['step']}", flush=True)
+    while checkpoint['step'] < job['steps'] and not cancel_signal.is_set():
         # Simulate work
-        print(f"Working on job {job['job_id']}, step {checkpoint['step']}")
+        print(
+            f"Working on job {job['job_id']}, step {checkpoint['step']}", flush=True)
         time.sleep(30)
+        if cancel_signal.is_set():
+            # If we were interrupted, we need to return None to indicate that
+            # the job was interrupted.
+            return None
         # Update the checkpoint.
         checkpoint['step'] += 1
         checkpoint['sum'] += checkpoint['step']
@@ -532,12 +641,34 @@ def upload_result(job_id: str, result: int) -> None:
         Key=f'{job_id}/result.txt',
         Body=str(result)
     )
-    print(f'Result uploaded for job {job_id}')
+    print(f'Result uploaded for job {job_id}', flush=True)
 
 
-def process_job(ch, method, properties, body):
+def ack_message(channel, delivery_tag):
+    '''
+    Acknowledge the message, indicating that it has been processed successfully
+    '''
+    if channel.is_open:
+        channel.basic_ack(delivery_tag)
+    else:
+        # Channel is already closed, so we can't ack this message;
+        print("Channel is closed, message not acked")
+
+
+def nack_message(channel, delivery_tag, requeue=True):
+    '''
+    Reject the message, indicating that it has not been processed successfully
+    '''
+    if channel.is_open:
+        channel.basic_nack(delivery_tag, requeue=requeue)
+    else:
+        # Channel is already closed, so we can't nack this message;
+        print("Channel is closed, message not nacked")
+
+
+def process_job(channel, delivery_tag, body):
     job = json.loads(body)
-    print(f"Received job {job['job_id']}")
+    print(f"Received job {job['job_id']}", flush=True)
 
     # If there's a checkpoint, we want to use it, but if not, we need to
     # initialize our state.
@@ -550,43 +681,93 @@ def process_job(ch, method, properties, body):
     # and not retry it, but instead move it to the DLQ. In this situation, we can
     # be confident that the job will never succeed.
     if not validate_job(job):
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        cb = functools.partial(nack_message, channel, delivery_tag, False)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
         return
 
     # Now we can do the actual work
     try:
         result = do_the_actual_work(job, checkpoint)
-        if result is None:
-            # This means the job was interrupted, so we need to release it
-            # back to the queue.
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-            return
-
-        # The job isn't really done until the result is uploaded.
-        upload_result(job['job_id'], result)
-
-        # Once the result is uploaded, we can acknowledge the job and stop
-        # the heartbeat.
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-        return
     except Exception as e:
-        # If there's an error, we need to release the job back to the queue
-        # so it can be retried.
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        print(f"Error in job {job['job_id']}: {str(e)}")
+        cb = functools.partial(nack_message, channel, delivery_tag)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
         return
+
+    if result is None:
+        # Job was interrupted
+        cb = functools.partial(nack_message, channel, delivery_tag)
+        if channel.is_open:
+            channel.connection.add_callback_threadsafe(cb)
+        return
+
+    # Upload the result and ack the message
+    upload_result(job['job_id'], result)
+    cb = functools.partial(ack_message, channel, delivery_tag)
+    if channel.is_open:
+        channel.connection.add_callback_threadsafe(cb)
+
+
+def on_message(channel, method_frame, header_frame, body, args):
+    threads = args
+    delivery_tag = method_frame.delivery_tag
+    t = threading.Thread(target=process_job, args=(
+        channel, delivery_tag, body))
+    t.start()
+    threads.append(t)
 
 
 if __name__ == "__main__":
-    # Create the connection and channel
-    connection = pika.BlockingConnection(pika.URLParameters(amqp_url))
-    channel = connection.channel()
+    # We will be doing all of our work in separate threads, so that rabbitmq's heartbeat
+    # can be properly handled.
+    threads = []
+    while True:
+        try:
+            # Create the connection and channel, heartbeating every 30 seconds.
+            connection = pika.BlockingConnection(
+                pika.URLParameters(amqp_url + "?heartbeat=30"))
+            channel = connection.channel()
 
-    # We only want 1 job at a time per worker
-    channel.basic_qos(prefetch_count=1, global_qos=True)
+            # We only want 1 job at a time per worker
+            channel.basic_qos(prefetch_count=1)
 
-    # Start consuming the messages
-    channel.basic_consume(queue=job_queue, on_message_callback=process_job)
-    channel.start_consuming()
+            # Start consuming the messages
+            on_message_callback = functools.partial(
+                on_message, args=(threads)
+            )
+            channel.basic_consume(
+                queue=job_queue, on_message_callback=on_message_callback, consumer_tag=machine_id)
+            channel.start_consuming()
+        # Don't recover if connection was closed by broker
+        except pika.exceptions.ConnectionClosedByBroker:
+            print("Connection closed by broker")
+            break
+        # Don't recover on channel errors
+        except pika.exceptions.AMQPChannelError as e:
+            print("Channel error")
+            print(str(e))
+            break
+        # Recover on all other connection errors
+        except pika.exceptions.AMQPConnectionError as e:
+            print("Connection error, retrying...")
+            print(str(e))
+            time.sleep(1)
+            continue
+        except KeyboardInterrupt:
+            print("Keyboard interrupt")
+            channel.stop_consuming()
+            break
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            break
+
+    cancel_signal.set()
+    print("Exiting")
+    for thread in threads:
+        thread.join()
+    connection.close()
 ```
 
 ## Submitting Jobs to the Queue
@@ -778,3 +959,258 @@ up and down based on the number of messages in the queue.
 There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
 minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
 (the maximum in the API). To implement this, we're going to use Cloudflare Workers with a schedule trigger.
+
+Navigate to the Cloudflare portal, and select the "Compute (Workers)" tab from the left navigation bar. Click "Create",
+and then choose the "Hello World" template. Go ahead and deploy the default, we're going to edit it in the next step.
+
+<Frame caption="Creating a new Worker">
+  <img src="/guides/long-running-tasks/images/rabbitmq-workers-create.png" alt="Creating a new Worker" />
+</Frame>
+
+Now, we're going to edit the worker code to set the number of replicas to be equal to the number of messages in the
+queue. First, we need some helper functions to interact with the
+[SaladCloud API](https://docs.salad.com/reference/saladcloud-api/container_groups/get-a-container-group).
+
+```javascript
+const saladBaseUrl = 'https://api.salad.com/api/public'
+
+async function getContainerGroup(org, project, containerGroupName, saladApiKey) {
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch container group: ${resp.statusText}`)
+  }
+  return resp.json()
+}
+
+async function startContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Starting container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/start`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to start container group: ${resp.statusText}`)
+  }
+}
+
+async function stopContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Stopping container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/stop`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to stop container group: ${resp.statusText}`)
+  }
+}
+
+async function setReplicas(org, project, containerGroupName, replicas, saladApiKey) {
+  console.log(`Setting replicas to ${replicas}`)
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify({ replicas }),
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to set replicas: ${resp.statusText}`)
+  }
+}
+```
+
+Next, we need a helper function to get metadata about the queue, including the number of messages it contains. This can
+be done via the RabbitMQ Management API.
+
+```javascript
+async function getQueueInfo(baseUrl, username, password, vHost, queueName) {
+  const url = `${baseUrl}/api/queues/${vHost}/${queueName}`
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch queue info: ${resp.statusText}`)
+  }
+  return resp.json()
+}
+```
+
+Now, we can put it all together in a `scheduled` event listener. Note all of the values that we will provide via
+environment variables.
+
+```javascript
+export default {
+  async scheduled(event, env, ctx) {
+    const {
+      min_replicas,
+      max_replicas,
+      org,
+      project,
+      container_group_name,
+      salad_api_key,
+      rabbitmq_url,
+      rabbitmq_username,
+      rabbitmq_password,
+      vhost,
+      queue_name,
+    } = env
+
+    const queueInfo = await getQueueInfo(rabbitmq_url, rabbitmq_username, rabbitmq_password, vhost, queue_name)
+    const numMessages = queueInfo.messages
+    console.log(`Queue ${queue_name} has ${numMessages} messages`)
+
+    const desiredReplicas = Math.min(Math.max(parseInt(min_replicas), numMessages), parseInt(max_replicas))
+
+    const containerGroup = await getContainerGroup(org, project, container_group_name, salad_api_key)
+    const currentReplicas = containerGroup.replicas
+    const currentState = containerGroup.current_state.status
+    console.log(
+      `Current replicas: ${currentReplicas}, current state: ${currentState}, desired replicas: ${desiredReplicas}`,
+    )
+    if (currentState === 'stopped' && desiredReplicas > 0) {
+      await startContainerGroup(org, project, container_group_name, salad_api_key)
+    }
+    if (currentState === 'running' && desiredReplicas === 0) {
+      await stopContainerGroup(org, project, container_group_name, salad_api_key)
+    }
+    if (currentReplicas !== desiredReplicas) {
+      await setReplicas(org, project, container_group_name, desiredReplicas, salad_api_key)
+    }
+  },
+}
+```
+
+### Completed Example
+
+```javascript
+const saladBaseUrl = 'https://api.salad.com/api/public'
+
+async function getContainerGroup(org, project, containerGroupName, saladApiKey) {
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch container group: ${resp.statusText}`)
+  }
+  return resp.json()
+}
+
+async function startContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Starting container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/start`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to start container group: ${resp.statusText}`)
+  }
+}
+
+async function stopContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Stopping container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/stop`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to stop container group: ${resp.statusText}`)
+  }
+}
+
+async function setReplicas(org, project, containerGroupName, replicas, saladApiKey) {
+  console.log(`Setting replicas to ${replicas}`)
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify({ replicas }),
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to set replicas: ${resp.statusText}`)
+  }
+}
+
+async function getQueueInfo(baseUrl, username, password, vHost, queueName) {
+  const url = `${baseUrl}/api/queues/${vHost}/${queueName}`
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch queue info: ${resp.statusText}`)
+  }
+  return resp.json()
+}
+
+export default {
+  async scheduled(event, env, ctx) {
+    const {
+      min_replicas,
+      max_replicas,
+      org,
+      project,
+      container_group_name,
+      salad_api_key,
+      rabbitmq_url,
+      rabbitmq_username,
+      rabbitmq_password,
+      vhost,
+      queue_name,
+    } = env
+
+    const queueInfo = await getQueueInfo(rabbitmq_url, rabbitmq_username, rabbitmq_password, vhost, queue_name)
+    const numMessages = queueInfo.messages
+    console.log(`Queue ${queue_name} has ${numMessages} messages`)
+
+    const desiredReplicas = Math.min(Math.max(parseInt(min_replicas), numMessages), parseInt(max_replicas))
+
+    const containerGroup = await getContainerGroup(org, project, container_group_name, salad_api_key)
+    const currentReplicas = containerGroup.replicas
+    const currentState = containerGroup.current_state.status
+    console.log(
+      `Current replicas: ${currentReplicas}, current state: ${currentState}, desired replicas: ${desiredReplicas}`,
+    )
+    if (currentState === 'stopped' && desiredReplicas > 0) {
+      await startContainerGroup(org, project, container_group_name, salad_api_key)
+    }
+    if (currentState === 'running' && desiredReplicas === 0) {
+      await stopContainerGroup(org, project, container_group_name, salad_api_key)
+    }
+    if (currentReplicas !== desiredReplicas) {
+      await setReplicas(org, project, container_group_name, desiredReplicas, salad_api_key)
+    }
+  },
+}
+```
