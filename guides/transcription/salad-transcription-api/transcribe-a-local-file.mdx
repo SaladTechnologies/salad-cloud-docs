@@ -1,0 +1,416 @@
+---
+title: 'How to Transcribe a local file using S4 and Salad Transcription API'
+---
+
+## Introduction
+
+By following this guide, you'll learn how to transcribe a file you have locally on your PC by uploading it to S4 (Salad
+Simple Storage Service), transcribing using Salad Transcription API, and saving the transcription to a file.
+
+---
+
+## **Prerequisites**
+
+Before you begin, make sure you have:
+
+1. **Python Installed**: Ensure you have Python 3.8 or higher. _ Python 3.11.6 was used for the creation of this script_
+2. **Salad API Key**: Ensure you have a valid [Salad API key](/reference/api-usage#get-your-saladcloud-api-key).
+
+---
+
+## Uploading and Transcribing
+
+Now, we'll start by uploading the file to the S4 service and generating a signed access URL to keep the data secure.
+Next, we'll send that file to the Salad Transcription API, and after that we will save the results to a local file in
+the same directory as the audio file.
+
+### Uploading to S4
+
+```Python
+import requests
+from pathlib import Path
+import os
+import json
+import time
+import sys
+
+def upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME, mime_type="audio/mpeg"):
+    """
+    Uploads an audio file to Salad Storage and generates a signed access URL.
+
+    Args:
+        audio_file_path (str): Path to the audio file.
+        SALAD_API_KEY (str): Salad API key for authentication.
+        ORGANIZATION_NAME (str): Name of the Salad organization.
+        mime_type (str): MIME type of the file (default: "audio/mpeg").
+
+    Returns:
+        str: The signed URL for the uploaded file.
+    """
+    try:
+      # Generate the upload URL
+      file_name = f"audio/{Path(audio_file_path).name}"
+      upload_url = f"https://storage-api.salad.com/organizations/{ORGANIZATION_NAME}/files/{file_name}"
+
+      # Prepare headers for authentication
+      headers = {"Salad-Api-Key": SALAD_API_KEY}
+
+      # Prepare data for the upload
+      data = {
+          "mimeType": mime_type,
+          "sign": "true",  # Request a signed URL
+          "signatureExp": 3 * 24 * 60 * 60  # 3 days in seconds
+      }
+
+      # Prepare the file to be uploaded
+      with open(audio_file_path, "rb") as f:
+          files = {"file": (Path(audio_file_path).name, f)}
+          response = requests.put(upload_url, headers=headers, data=data, files=files)
+          response.raise_for_status()
+
+      # Extract and return the signed URL
+      signed_url = response.json().get("url")
+      if not signed_url:
+          raise ValueError("Signed URL not returned by the API.")
+      return signed_url
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error uploading to Salad storage: {e}")
+    except ValueError as ve:
+        print(f"API response error: {ve}")
+    return None
+
+# Salad Storage credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# audio file to process
+audio_file_path = "path/to/your/audio.mp3"  # Replace with the path to the local audio file you want to upload
+
+storage_url = upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Uploads to Salad Storage
+print(f"Uploaded successfully. Storage URL: {storage_url}")
+```
+
+If you were to run your script now, it would upload your audio to S4 and return a signed URL to access the file. Next,
+we'll send that URL to Salad Transcription API to transcribe.
+
+### Transcribing the Audio
+
+```Python
+import requests
+
+def send_transcription_request(audio_url, ORGANIZATION_NAME, SALAD_API_KEY, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        ORGANIZATION_NAME (str): The name of the organization.
+        SALAD_API_KEY (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": SALAD_API_KEY,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{ORGANIZATION_NAME}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+# Define dynamic input parameters. Learn about all of the available input parameters in the Salad Transcription API documentation
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+storage_url = "your/signed/storage/url"  # Replace with the signed URL returned from the previous step
+
+# Send the transcription request
+try:
+    response = send_transcription_request(
+        audio_url=storage_url,
+        ORGANIZATION_NAME=ORGANIZATION_NAME,
+        SALAD_API_KEY=SALAD_API_KEY,
+        language_code="en",  # Specify the language code if needed
+        input_params=input_parameters
+    )
+    print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+except Exception as e:
+    print(f"Error sending transcription request: {e}")
+```
+
+If you were to run your script now, it would send the transcription request using the signed S4 URL to the Salad
+Transcription API and return the job ID. Next, we'll save the transcription to a file.
+
+### Saving the Transcription to a File
+
+```Python
+def get_transcription_result(job_id, SALAD_API_KEY, ORGANIZATION_NAME):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        SALAD_API_KEY (str): The Salad API key for authentication.
+        ORGANIZATION_NAME (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{ORGANIZATION_NAME}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": SALAD_API_KEY,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+while True:
+  # Retrieve the transcription result
+  time.sleep(5) # Adjust this value if needed, depending on whether your transcription is long or short.
+  try:
+      result = get_transcription_result(
+          job_id=response["id"],
+          SALAD_API_KEY=SALAD_API_KEY,
+          ORGANIZATION_NAME=ORGANIZATION_NAME
+      )
+      if result["output"]:
+          with open("transcription_result.txt", "w") as f:
+              text = str(result["output"]["text"])
+              f.write(text)
+          print(f'Transcription Result: {result["output"]}')
+          with open('output.json', 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
+          break
+      else:
+          print(f'Current job status is {result["status"]}')
+  except Exception as e:
+      if result["status"] in ["created", "started", "running", "failed"]:
+          print(f'Current job status is {result["status"]}')
+      else: print(f'Error retrieving transcription result: {e}')
+```
+
+If you were to run your script now with this added, it would retrieve the transcription result from the Salad
+Transcription API and save it to a file named `transcription_result.txt` in the directory you run the script if
+complete. It will also print the transcription result to the console. If the job is still processing, it will print the
+current job status.
+
+A JSON file will also be logged containing the entire output of the transcription API response to the same directory
+named `output.json`.
+
+---
+
+### Full Script
+
+Here is the full script combining all the steps:
+
+```Python
+import requests
+from pathlib import Path
+import os
+import json
+import time
+import sys
+
+def upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME, mime_type="audio/mpeg"):
+    """
+    Uploads an audio file to Salad Storage and generates a signed access URL.
+
+    Args:
+        audio_file_path (str): Path to the audio file.
+        SALAD_API_KEY (str): Salad API key for authentication.
+        ORGANIZATION_NAME (str): Name of the Salad organization.
+        mime_type (str): MIME type of the file (default: "audio/mpeg").
+
+    Returns:
+        str: The signed URL for the uploaded file.
+    """
+    try:
+      # Generate the upload URL
+      file_name = f"audio/{Path(audio_file_path).name}"
+      upload_url = f"https://storage-api.salad.com/organizations/{ORGANIZATION_NAME}/files/{file_name}"
+
+      # Prepare headers for authentication
+      headers = {"Salad-Api-Key": SALAD_API_KEY}
+
+      # Prepare data for the upload
+      data = {
+          "mimeType": mime_type,
+          "sign": "true",  # Request a signed URL
+          "signatureExp": 3 * 24 * 60 * 60  # 3 days in seconds
+      }
+
+      # Prepare the file to be uploaded
+      with open(audio_file_path, "rb") as f:
+          files = {"file": (Path(audio_file_path).name, f)}
+          response = requests.put(upload_url, headers=headers, data=data, files=files)
+          response.raise_for_status()
+
+      # Extract and return the signed URL
+      signed_url = response.json().get("url")
+      if not signed_url:
+          raise ValueError("Signed URL not returned by the API.")
+      return signed_url
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error uploading to Salad storage: {e}")
+    except ValueError as ve:
+        print(f"API response error: {ve}")
+    return None
+
+def send_transcription_request(audio_url, ORGANIZATION_NAME, SALAD_API_KEY, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        ORGANIZATION_NAME (str): The name of the organization.
+        SALAD_API_KEY (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": SALAD_API_KEY,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{ORGANIZATION_NAME}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+def get_transcription_result(job_id, SALAD_API_KEY, ORGANIZATION_NAME):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        SALAD_API_KEY (str): The Salad API key for authentication.
+        ORGANIZATION_NAME (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{ORGANIZATION_NAME}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": SALAD_API_KEY,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+# Salad credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# audio file to process
+audio_file_path = "audio/file/path.mp3"  # Replace with the path to the local audio file you want to upload
+
+# Define dynamic input parameters. Learn about all of the available input parameters in the Salad Transcription API documentation
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+storage_url = upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Uploads to Salad Storage
+if storage_url:
+    print(f"Uploaded successfully. Storage URL: {storage_url}")
+    try:
+        response = send_transcription_request(
+            audio_url=storage_url,
+            ORGANIZATION_NAME=ORGANIZATION_NAME,
+            SALAD_API_KEY=SALAD_API_KEY,
+            language_code="en",  # Specify the language code if needed
+            input_params=input_parameters
+        )
+        print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+    except Exception as e:
+        print(f"Error sending transcription request: {e}")
+else:
+    print("Failed to upload file. Exiting.")
+    sys.exit(1)
+
+while True:
+  # Retrieve the transcription result
+  time.sleep(5) # Adjust this value if needed, depending on whether your transcription is long or short.
+  try:
+      result = get_transcription_result(
+          job_id=response["id"],
+          SALAD_API_KEY=SALAD_API_KEY,
+          ORGANIZATION_NAME=ORGANIZATION_NAME
+      )
+      if result["status"] in ["created", "started", "running", "failed"]:
+          print(f'Current job status is {result["status"]}')
+      elif result["output"]:
+          with open("transcription_result.txt", "w") as f:
+              text = str(result["output"]["text"])
+              f.write(text)
+          print(f'Transcription Result: {result["output"]}')
+          with open('output.json', 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=4)
+          break
+      else:
+          print(f'Current job status is {result["status"]}')
+  except Exception as e:
+      print(f'Error retrieving transcription result: {e}')
+```
