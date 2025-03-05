@@ -1097,6 +1097,27 @@ export default {
 }
 ```
 
+Click Deploy, and find your way to the settings tab for the worker function. Here, we are going to disable the domains
+and routes that point to our function, since it doesn't even have an http handler. We will also fill in all of the
+environment variables that we used in our function. Make sure to use the type "Secret" for sensitive values like your
+rabbitmq password and your Salad API key.
+
+<Frame caption="Disabling the domains and routes, and setting the environment variables">
+  <img src="/guides/long-running-tasks/images/rabbitmq-workers-settings.png" alt="Disabling the domains and routes" />
+</Frame>
+
+Finally, we can set a trigger for the function to run every 5 minutes.
+
+<Frame caption="Setting the trigger to run every 5 minutes">
+  <img
+    src="/guides/long-running-tasks/images/rabbitmq-workers-trigger.png"
+    alt="Setting the trigger to run every 5 minutes"
+  />
+</Frame>
+
+Now, if we've done everything correctly, we should see our worker scale up and down based on the number of messages in
+the queue. You can live-tail the logs via the "Logs" tab in the Cloudflare Workers console, or with the wrangler cli.
+
 ### Completed Example
 
 ```javascript
@@ -1214,3 +1235,9 @@ export default {
   },
 }
 ```
+
+## Conclusion
+
+In this guide, we've built a simple worker application that processes jobs from a RabbitMQ queue, and we've deployed it
+to SaladCloud. We've also implemented autoscaling for our worker using a scheduled Cloudflare worker function, so that
+it can automatically scale up and down based on the number of messages in the queue.
