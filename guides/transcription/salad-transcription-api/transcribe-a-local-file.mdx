@@ -32,7 +32,7 @@ from pathlib import Path
 import os
 import json
 import time
-
+import sys
 
 def upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME, mime_type="audio/mpeg"):
     """
@@ -218,7 +218,7 @@ while True:
       else:
           print(f'Current job status is {result["status"]}')
   except Exception as e:
-      if result["status"] == "created" or result["status"] == "started" or result["status"] == "running" or result["status"] == "failed":
+      if result["status"] in ["created", "started", "running", "failed"]:
           print(f'Current job status is {result["status"]}')
       else: print(f'Error retrieving transcription result: {e}')
 ```
@@ -243,7 +243,7 @@ from pathlib import Path
 import os
 import json
 import time
-
+import sys
 
 def upload_to_salad_storage(audio_file_path, SALAD_API_KEY, ORGANIZATION_NAME, mime_type="audio/mpeg"):
     """
@@ -388,7 +388,7 @@ if storage_url:
         print(f"Error sending transcription request: {e}")
 else:
     print("Failed to upload file. Exiting.")
-    exit()
+    sys.exit(1)
 
 while True:
   # Retrieve the transcription result
@@ -399,7 +399,7 @@ while True:
           SALAD_API_KEY=SALAD_API_KEY,
           ORGANIZATION_NAME=ORGANIZATION_NAME
       )
-      if result["status"] == "created" or result["status"] == "started" or result["status"] == "running" or result["status"] == "failed":
+      if result["status"] in ["created", "started", "running", "failed"]:
           print(f'Current job status is {result["status"]}')
       elif result["output"]:
           with open("transcription_result.txt", "w") as f:
