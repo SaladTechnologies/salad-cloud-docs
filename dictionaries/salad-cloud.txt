@@ -1,6 +1,7 @@
 -Jxpf
 -topln
 alwayson
+amqps
 amzn
 Apim
 ASGI
