@@ -27,9 +27,10 @@ We'll use it in the following Python script:
 import requests
 import time
 
-url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
-
 audio_file_url = "url/to/audio/file.mp3"
+
+salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
+organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
 payload = {"input": {
         "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
@@ -42,10 +43,10 @@ headers = {
     "Content-Type": "application/json"
 }
 
-salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
-organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
-response = requests.request("POST", url, json=payload, headers=headers)
+url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+response = requests.post(url, json=payload, headers=headers)
 
 response = response.json()
 job_id=response["id"]
@@ -54,7 +55,7 @@ print (f'Job ID: {job_id}')
 while True:
   time.sleep(5)
   try:
-      result = requests.request("GET", url + "/" + job_id, headers=headers)
+      result = requests.get(f"{url}/{job_id}", headers=headers)
       result = result.json()
       if result["status"] == "created" or result["status"] == "pending" or result["status"] == "started" or result["status"] == "running":
           print(f'Current job status is {result["status"]}')
