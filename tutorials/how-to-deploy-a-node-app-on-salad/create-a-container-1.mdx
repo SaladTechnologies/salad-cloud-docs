@@ -2,12 +2,13 @@
 title: 'Create a container'
 ---
 
+_Last Updated: September 24, 2024_
+
 ## **What is a Container? **
 
 A container is a lightweight standalone executable package that contains everything needed to run an application, such
 as libraries, tools, runtime, settings, or code making it easy to deploy in VMs (Virtual Machines). It can be created as
-many as possible from a **single Docker image  
-**
+many as possible from a **single Docker image **
 
 ## To dockerize a Node.js application, we will need to follow these steps:
 
@@ -21,8 +22,7 @@ many as possible from a **single Docker image
 A dockerfile is an ingredient or set of instructions needed to create a docker image(s). It gets to build the image by
 running the build command.
 
-**Create a file in the root directory called Dockerfile.**  
-First, we need to define which image we want to build from.
+**Create a file in the root directory called Dockerfile.** First, we need to define which image we want to build from.
 
 Here we will use version 16 of the node available as it is the current version of _Nodejs_ as at this time this guide
 was written from Docker Hub :
@@ -51,8 +51,8 @@ CMD [ "npm", "start" ]
 
 ## ** Create a `.dockerignore` file **
 
-**What is a .dockerignore file: **  
-It helps prevent the local module and debug logs from being copied into your Docker image when building a docker image.
+**What is a .dockerignore file: ** It helps prevent the local module and debug logs from being copied into your Docker
+image when building a docker image.
 
 Now, let's create a **`.dockerignorefile`** file so as not to copy unnecessary files to the container during its built
 process from the logs.
@@ -68,7 +68,7 @@ This prevents the local module and debug logs from being interrupted and copied 
 
 ## **What is a Docker Image: **
 
-This is a set of read-only instructions that helps to build a container and makes it possible to run it on a Docker.  
+This is a set of read-only instructions that helps to build a container and makes it possible to run it on a Docker.
 Building your Docker image is quite easy and can be done using a single command.
 
 But before building it, look at the image below to confirm you have the displayed files and directories on your code
@@ -86,17 +86,15 @@ like this image below:
 - **Remote SSH extension **
 
 On the left section of this picture, you can see the **Docker extension, Remote live server,** and **Dev container
-extension icons.  
-**
+extension icons. **
 
-![](https://files.readme.io/70f9396-dockk.PNG 'dockk.PNG')
+![](https://files.readme.io/70f9396-dockk.PNG)
 
 Be sure to install and download these two extensions if you are using Vscode (Visual Studio Code) so you can access your
 images and containers on your visual code editor registry easily.
 
-On the left-hand side of your Vscode via the docker tab.  
-The docker image on the left pane of the code editor shows that it is installed as an extension and you can also access
-the Docker hub and Registry within your Vscode environment.
+On the left-hand side of your Vscode via the docker tab. The docker image on the left pane of the code editor shows that
+it is installed as an extension and you can also access the Docker hub and Registry within your Vscode environment.
 
 It should look something like this below:
 
@@ -120,8 +118,8 @@ The result should look like this in the terminal with a message above **"FINISHE
 
 ![](https://files.readme.io/07dd15c-docker_build.PNG 'docker build.PNG')
 
-You should get something similar to the output above after executing the command.  
-This means that the docker image was created successfully and the app is working.
+You should get something similar to the output above after executing the command. This means that the docker image was
+created successfully and the app is working.
 
 Now that the build is complete, you can check your image or your docker using this docker command below :
 
@@ -144,8 +142,8 @@ You can see your built Nodejs docker image there.
 
 ## **Create a Container using Docker Desktop:**
 
-You will need to create a container from your built image.  
-You can easily do that using your Docket desktop with the following steps.
+You will need to create a container from your built image. You can easily do that using your Docket desktop with the
+following steps.
 
 1. Go to your **Docker desktop** and navigate to your Image tab
 
@@ -156,8 +154,7 @@ You can easily do that using your Docket desktop with the following steps.
 ![](https://files.readme.io/f291669-vogue.PNG 'This pop-up shows you the process to run your created container')
 
 1. Before clicking on "RUN " from the image tab, Click on the “Optional settings “ specify a favorable container name or
-   it will generate a random one for you.  
-   Then route the host to your local server application
+   it will generate a random one for you. Then route the host to your local server application
 
 Example: Localhost:5000. By typing your **`local host port (5000),`** which is what we are using. Yours can be 8080 or
 anything.
@@ -180,8 +177,7 @@ display message " Hello world "
 
 ## **Run a Container Using the terminal or command line **
 
-Do note that a container can be created as many times as you want.  
-Now we can run the docker image using the command:
+Do note that a container can be created as many times as you want. Now we can run the docker image using the command:
 
 ```shell
 docker run -d -p <Host port>:<Docker port><docker-image-name>
