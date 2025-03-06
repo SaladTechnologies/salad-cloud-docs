@@ -18,13 +18,14 @@ FIRST_ENTRY=true
 # Find all mdx files recursively and process them
 find . -type f -name "*.mdx" | sort | while read -r file; do
   # Get the last modification date of the file from git
-  # Extract just the date portion in YYYY-MM-DD format
-  LAST_UPDATE=$(git log -1 --format="%as" -- "$file" 2>/dev/null)
-
-  # If git has no history for this file, it might be new and uncommitted
-  if [ -z "$LAST_UPDATE" ]; then
-    # Use file system modification time as fallback (date only)
-    LAST_UPDATE=$(date -r "$file" +"%Y-%m-%d")
+  # Extract the date and format it as "Month Day, Year"
+  if git log -1 --format="%at" -- "$file" >/dev/null 2>&1; then
+    # Get Unix timestamp and convert to long-form date
+    TIMESTAMP=$(git log -1 --format="%at" -- "$file")
+    LAST_UPDATE=$(date -d @"$TIMESTAMP" +"%B %d, %Y")
+  else
+    # Use file system modification time as fallback
+    LAST_UPDATE=$(date -r "$file" +"%B %d, %Y")
   fi
 
   # Get relative path from the git root
@@ -51,3 +52,55 @@ jq . all-updates.json >all-updates.json.tmp
 mv all-updates.json.tmp all-updates.json
 
 echo "JSON file 'all-updates.json' created successfully!"
+
+# For each file in the JSON
+jq -r 'keys[]' all-updates.json | while read -r file; do
+  # Skip if file doesn't exist (might have been deleted)
+  if [ ! -f "$file" ]; then
+    echo "Warning: File $file not found, skipping." >&2
+    continue
+  fi
+
+  # Get the last update date for this file
+  update_date=$(jq -r --arg file "$file" '.[$file]' all-updates.json)
+
+  echo "Processing $file (Last Updated: $update_date)"
+
+  # Create a temporary file
+  temp_file=$(mktemp)
+
+  # Process the file to add the Last Updated line after YAML frontmatter
+  awk -v date="$update_date" '
+    BEGIN { in_frontmatter = 0; added = 0; }
+    /^---$/ {
+      print $0;
+      if (in_frontmatter) {
+        in_frontmatter = 0;
+        print "";
+        print "*Last Updated: " date "*";
+        print "";
+        added = 1;
+      } else {
+        in_frontmatter = 1;
+      }
+      next;
+    }
+    { print $0; }
+    END {
+      # If no frontmatter was found, add at the beginning
+      if (!added) {
+        print "*Last Updated: " date "*" > "/tmp/header";
+        print "" > "/tmp/header";
+        system("cat /tmp/header " FILENAME " > /tmp/combined && mv /tmp/combined " FILENAME);
+      }
+    }
+  ' "$file" >"$temp_file"
+
+  # Replace the original file with the temporary file
+  mv "$temp_file" "$file"
+done
+
+echo "All MDX files have been updated with 'Last Updated' information."
+
+# Clean up the temporary JSON file
+rm all-updates.json
