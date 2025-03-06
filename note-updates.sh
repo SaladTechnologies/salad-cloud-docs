@@ -66,38 +66,45 @@ jq -r 'keys[]' all-updates.json | while read -r file; do
 
   echo "Processing $file (Last Updated: $update_date)"
 
-  # Create a temporary file
-  temp_file=$(mktemp)
+  if grep -q "\*Last Updated:" "$file"; then
+    # Update the existing "Last Updated" line
+    sed -i "s|\*Last Updated:.*\*|\*Last Updated: $update_date\*|" "$file"
+    echo "  Updated existing 'Last Updated' line"
+  else
+    # Create a temporary file
+    temp_file=$(mktemp)
 
-  # Process the file to add the Last Updated line after YAML frontmatter
-  awk -v date="$update_date" '
-    BEGIN { in_frontmatter = 0; added = 0; }
-    /^---$/ {
-      print $0;
-      if (in_frontmatter) {
-        in_frontmatter = 0;
-        print "";
-        print "*Last Updated: " date "*";
-        print "";
-        added = 1;
-      } else {
-        in_frontmatter = 1;
+    # Process the file to add the Last Updated line after YAML frontmatter
+    awk -v date="$update_date" '
+      BEGIN { in_frontmatter = 0; added = 0; }
+      /^---$/ {
+        print $0;
+        if (in_frontmatter) {
+          in_frontmatter = 0;
+          print "";
+          print "*Last Updated: " date "*";
+          print "";
+          added = 1;
+        } else {
+          in_frontmatter = 1;
+        }
+        next;
       }
-      next;
-    }
-    { print $0; }
-    END {
-      # If no frontmatter was found, add at the beginning
-      if (!added) {
-        print "*Last Updated: " date "*" > "/tmp/header";
-        print "" > "/tmp/header";
-        system("cat /tmp/header " FILENAME " > /tmp/combined && mv /tmp/combined " FILENAME);
+      { print $0; }
+      END {
+        # If no frontmatter was found, add at the beginning
+        if (!added) {
+          print "*Last Updated: " date "*" > "/tmp/header";
+          print "" > "/tmp/header";
+          system("cat /tmp/header " FILENAME " > /tmp/combined && mv /tmp/combined " FILENAME);
+        }
       }
-    }
-  ' "$file" >"$temp_file"
+    ' "$file" >"$temp_file"
 
-  # Replace the original file with the temporary file
-  mv "$temp_file" "$file"
+    # Replace the original file with the temporary file
+    mv "$temp_file" "$file"
+    echo "  Added new 'Last Updated' line"
+  fi
 done
 
 echo "All MDX files have been updated with 'Last Updated' information."
