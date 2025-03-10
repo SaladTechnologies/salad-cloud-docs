@@ -19,3 +19,18 @@
     e.attachEvent ? e.attachEvent('onload', a) : e.addEventListener('load', a, !1)
 })(window, document, window.Beacon || function () {})
 window.Beacon('init', '4f355e62-a67a-4f94-a807-d66284f35ea5')
+
+Beacon('on', 'email-sent', function (params) {
+    var email = params.email
+    if (email) {
+        var _hsq = (window._hsq = window._hsq || [])
+        _hsq.push([
+            'identify',
+            {
+                email: email,
+            },
+        ])
+
+        _hsq.push(['trackPageView'])
+    }
+})
