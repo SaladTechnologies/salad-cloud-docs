@@ -325,6 +325,7 @@
                 "group": "Long-Running Tasks",
                 "pages": [
                   "guides/long-running-tasks/solution-overview",
+                  "guides/long-running-tasks/gcp-pub-sub",
                   "guides/long-running-tasks/rabbitmq",
                   "guides/long-running-tasks/sqs"
                 ]
