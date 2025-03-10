@@ -1,20 +1,17 @@
 ---
-title: How to Extract Quotes from transcriptions
+title: 'How to Identify Hate Speech using Salad Transcription API'
 ---
 
-_Last Updated: March 05, 2025_
-
-By using our integrated custom LLM prompts, you can extract the important quotes from your transcriptions. To use this,
-you just need to add the `custom_prompt` input parameter to your transcription request.
+By using our integrated custom LLM prompts, you can identify hate speech, with confidence ratings and category, in your transcriptions. To use this, you just need to add the `custom_prompt` input parameter to your transcription request.
 
 ## Custom input parameters
 
 In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input
-parameter to extract quotes from the transcription. We'll use the following input parameters:
+parameter to identify any hate speech. We'll use the following input parameters:
 
 ```python
 payload = {"input": {
-        "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
+        "custom_prompt": "Detect whether there is any hate speech in the content. respond only with a confidence rating, where low confidence means you are unsure, and a high number means you are sure, and category in the following format: 'confidence\': x.xx, \'category\': \'x\'",
         "url": audio_file_url,
         "language_code": "en",
         "return_as_file": False
@@ -29,13 +26,13 @@ We'll use it in the following Python script:
 import requests
 import time
 
-audio_file_url = "url/to/audio/file.mp3"
+audio_file_url = "url/to/audio/file.mp3" # replace with your audio file URL
 
 salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
 organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
 payload = {"input": {
-        "custom_prompt": "extract the most engaging quotes from the text. Put quotation marks around the quotes. For example, \"I love Salad\". Do not do any formatting to the list, or include any other text.",
+        "custom_prompt": "Detect whether there is any hate speech in the content. respond only with a confidence rating, where low confidence means you are unsure, and a high number means you are sure, and category in the following format: 'confidence\': x.xx, \'category\': \'x\'",
         "url": audio_file_url,
         "language_code": "en",
         "return_as_file": False
@@ -74,14 +71,14 @@ while True:
         break
 ```
 
-In this script, we're telling Salad to extract the most engaging quotes from the transcription. The quotes will be
+In this script, we're telling the LLM to look for and identify any hate speech in the transcription content and categorize it. It will be
 returned in the `llm_result` field of the response. We're then printing the result of this field to the console. It'll
 look something like this once it finishes:
 
 ### Output
 
 ```bash
-Job ID: abcfaf6c-7323-41e8-b81b-ecc7709066ed
+Job ID: abcdef6c-1234-41e8-b81b-ecc1109033ed
 Current job status is running
 Current job status is running
 Current job status is running
@@ -91,10 +88,5 @@ Current job status is running
 Current job status is running
 Current job status is running
 Current job status is running
-"Deploy AI/ML production models at scale securely on the world's largest distributed cloud network. Save up to 90% on compute costs compared to high-end GPUs & hyperscalers."
-"SaladCloud offered us the lowest GPU prices in the market with incredible scalability."
-"Welcome to the compute-sharing economy! 90% of the world’s compute resources (over 400 million consumer GPUs) sit idle for 20-22 hrs daily."
+"confidence": 0.90, "category": "Hate speech targeting physical characteristics and self-description"
 ```
-
-At this time, timestamps are **not** supported for extracting quotes. The custom `llm_prompt` only views the "text"
-field response from the transcription completion, and so currently is unable to see the timestamps of the quotes.
