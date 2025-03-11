@@ -1,20 +1,22 @@
 ---
-title: 'Salad Transcription API Overview'
+title: 'Salad Transcription APIs Overview'
 description:
   'Transform your audio, video, and text content into accurate transcripts, translations, summaries, and more with Salad
-  Transcription API'
+  Transcription APIs'
 sidebarTitle: 'Overview'
 ---
 
-_Last Updated: January 21, 2025_
+_Last Updated: March 11, 2025_
 
 # Welcome to Salad Transcription
 
-Unlock the full potential of your audio, video, and text content with **Salad Transcription API**. Our powerful suite of
-services transforms your media into accurate transcripts, translations, summaries, captions, and subtitles, enhancing
-accessibility and expanding your global reach.
+Unlock the full potential of your audio, video, and text content with Salad Transcription API and Transcription Lite.
 
-Get up to **10 free audio hours** when you register. [Sign up now](https://portal.salad.com/)
+Whether you need high-accuracy, AI-enhanced transcription or a faster, budget-friendly alternative, we offer a solution
+tailored to your needs. Our APIs transform your media into accurate transcripts, translations, summaries, captions, and
+subtitles, enhancing accessibility and expanding your global reach.
+
+Get up to **12.5 free audio hours** when you register. [Sign up now](https://portal.salad.com/)
 
 ## Key Features
 
@@ -22,8 +24,9 @@ Get up to **10 free audio hours** when you register. [Sign up now](https://porta
 - **Multilingual Transcription**: Transcribe content in over **97 languages**, including English, Spanish, Russian,
   Arabic, and [more](/guides/transcription/salad-transcription-api/speech-to-text#6-language-code).
 - **Advanced AI Translation**: Translate transcriptions into English and between multiple languages, including French,
-  German, Italian, Portuguese, Hindi, Spanish, and Thai.
-- **Summarization**: Automatically generate concise summaries of long transcripts for faster content analysis.
+  German, Italian, Portuguese, Hindi, Spanish, and Thai. _(Only available in Salad Transcription API)_
+- **Summarization**: Automatically generate concise summaries of long transcripts for faster content analysis. _(Only
+  available in Salad Transcription API)_
 - **Speaker Identification**: Easily differentiate between multiple speakers for more precise transcripts.
 - **Time Coding**: Generate sentence and word-level timestamps, crucial for accurate captioning and subtitling.
 - **SRT Output**: Produce industry-standard SRT files ready for use in popular video editors and players.
@@ -40,6 +43,59 @@ Whether you're looking to:
 - **Facilitate Analysis**: Convert speech to text for easier indexing, searching, and analysis of audio content.
 
 Salad Transcription API offers a seamless and powerful solution tailored to your needs.
+
+## Choose the Right Transcription API
+
+| Feature                                                | Salad Transcription API | Transcription Lite |
+| ------------------------------------------------------ | ----------------------- | ------------------ |
+| **Transcription**                                      | ✅ High Accuracy        | ✅ Faster, Cheaper |
+| **Multilingual Support**                               | ✅ 97+ Languages        | ✅ Core Languages  |
+| **Translation to English**                             | ✅ Yes                  | ✅ Yes             |
+| **Speaker Identification**                             | ✅ Yes                  | ✅ Yes             |
+| **Time Coding**                                        | ✅ Yes                  | ✅ Yes             |
+| **SRT Output**                                         | ✅ Yes                  | ✅ Yes             |
+| **Summarization**                                      | ✅ Yes                  | ❌ Not Available   |
+| **SRT Translation**                                    | ✅ Yes                  | ❌ Not Available   |
+| **LLM Translation**                                    | ✅ Yes                  | ❌ Not Available   |
+| **Insights (Summarization, Sentiment Analysis, etc.)** | ✅ Yes                  | ❌ Not Available   |
+| **Cost**                                               | Standard Pricing        | Lower Pricing      |
+
+## Turnaround Times
+
+The Salad Transcription API operates as a batch, async service, not a real-time service. While most jobs are processed
+quickly, turnaround times can vary during peak usage when the queue holds thousands of requests.
+
+### Salad Transcription API Processing Speed
+
+Our multi-step processing model runs audio at approximately 5x the standard playback speed, enabling most transcriptions
+to be completed faster than the actual audio duration. We use a sequential long-form algorithm for transcription,
+prioritizing transcription accuracy over speed.
+
+We use a **sequential long-form algorithm** for transcription, prioritizing **transcription accuracy** over speed, as
+accuracy is our highest priority.
+
+During high-demand periods, there may be increased turnaround times, but our infrastructure is designed to auto-scale as
+needed to ensure no job exceeds a processing time of 2 hours.
+
+#### Standard Response Times for a 15-minute (20 MB) Audio Clip:
+
+- ** < 5 minutes**: 95% of jobs
+- ** 5-30 minutes**: 3% of jobs
+- ** 30-90 minutes**: 2% of jobs
+- ** > 90 minutes**: 1% of jobs
+
+### Transcription Lite Processing Speed
+
+Transcription Lite is optimized for speed, processing audio at approximately **40x** real-time speed, significantly
+reducing turnaround times for transcription-only jobs.
+
+#### Standard Response Times for a 15-minute (20 MB) Audio Clip:
+
+- ** < 30 seconds**: 95% of jobs
+- ** 30 seconds - 2 minutes**: 4% of jobs
+- ** > 2 minutes**: 1% of jobs
+
+_Note_ : These figures are estimates and can vary based on demand.
 
 ## Supported Languages
 
@@ -58,34 +114,14 @@ languages not listed, the model may still generate transcriptions, but the accur
 standards. For the full list of languages supported by Salad Transcription API, please refer to our
 [guides page](/guides/transcription/salad-transcription-api/speech-to-text#6-language-code).
 
-## Turnaround Times
-
-The Salad Transcription API operates as a batch, async service, not a real-time service. While most jobs are processed
-quickly, turnaround times can vary during peak usage when the queue holds thousands of requests. Our multi-step
-processing model runs audio at approximately 5x the standard playback speed, enabling most transcriptions to be
-completed faster than the actual audio duration.
-
-We use a **sequential long-form algorithm** for transcription, prioritizing **transcription accuracy** over speed, as
-accuracy is our highest priority.
-
-During high-demand periods, there may be increased turnaround times, but our infrastructure is designed to auto-scale as
-needed to ensure no job exceeds a processing time of 2 hours.
-
-#### Standard Response Times for a 15-minute (20 MB) Audio Clip:
-
-- ** < 5 minutes**: 95% of jobs
-- ** 5-30 minutes**: 3% of jobs
-- ** 30-90 minutes**: 2% of jobs
-- ** > 90 minutes**: 1% of jobs
-
-_Note_ : These figures are estimates and can vary based on demand.
+Transcription Lite is optimized for core languages to provide faster processing with lower cost.
 
 ## Get Started Quickly
 
 Ready to transform your media content? Get started in minutes:
 
 - **Create a Free Account**: Visit [portal.salad.com](https://portal.salad.com/) to log in or create a free account. New
-  users receive up to **10 free audio hours** ($1) to transcribe at no cost!
+  users receive up to **12.5 free audio hours** ($1) to transcribe at no cost!
 - **Learn How to Use Your Free Credits:** Watch our
   [quick tutorial](https://www.loom.com/share/6d68372eb4de4600927bc20ad31253f3) to make the most of your free
   transcription hours.
