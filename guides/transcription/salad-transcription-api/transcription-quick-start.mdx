@@ -27,7 +27,7 @@ this Organization_ for the org you want to use.
 <img src="/guides/transcription/salad-transcription-api/images/projects.png" alt="Create SaladCloud Organization" />
 ### Get Transcription API URL
 
-_Then,_ click on _Inference Endpoints_ in the left-hand nav and open up the Transcription API.
+_Then,_ click on _Inference Endpoints_ in the left-hand nav and open up the Transcription API or Transcription Lite.
 
 <img
   src="/guides/transcription/salad-transcription-api/images/managed_services.png"
@@ -44,7 +44,7 @@ Copy your SaladCloud API key from your account [here.](https://portal.salad.com/
 
 <img src="/guides/transcription/salad-transcription-api/images/9d9c06f-image.png" alt="Token Instructions" />
 
-## How to Use Transcription API
+## How to Use Transcription APIs
 
 We provide several examples and resources to help you use the API effectively:
 
@@ -53,7 +53,7 @@ We provide several examples and resources to help you use the API effectively:
 - For **easy testing** with our API reference, visit the [API Reference](#api-reference).
 - For **process automation**, see [Transcription Automation](#transcription-automation).
 
-### Example cURL Post Transcript
+### Example cURL Post with Salad Transcription API
 
 ```bash
 curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
@@ -83,6 +83,31 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
    }'
 ```
 
+### Example cURL Post with Transcription Lite
+
+```bash
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcription-lite/jobs \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
+   -d '{
+      "input": {
+         "url": "https://example.com/path/to/file.mp3",
+         "language_code": "en",
+         "return_as_file": false,
+         "sentence_level_timestamps": "true"
+         "word_level_timestamps": false,
+         "diarization": false,
+         "sentence_diarization": true,
+         "srt": false,
+         "translate": "to_eng"
+      },
+    "webhook": {your webhook url},
+	  "metadata": {
+      "my-job-id": 1234
+      }
+   }'
+```
+
 - Fill in the file link instead of "https://example.com/path/to/file.mp3"
 
 - Optional : replace `{your webhook url}` with webhook url if needed. If not, remove the line.
@@ -92,10 +117,17 @@ an event. Instead of having your application periodically poll for updates, a we
 as soon as the event occurs, facilitating instant communication and minimizing latency. In our case transcription result
 gets sent to the webhook.
 
-### Example cURL Get Transcript
+### Example cURL Get Transcript from Salad Transcription API
 
 ```bash
 curl https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs/54e84442-3576-45ca-904c-a1d90bc77baf \
+   -H "Salad-Api-Key: {your-api-key}"
+```
+
+### Example cURL Get Transcript from Transcription Lite
+
+```bash
+curl https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcription-lite/jobs/54e84442-3576-45ca-904c-a1d90bc77baf \
    -H "Salad-Api-Key: {your-api-key}"
 ```
 
@@ -165,6 +197,8 @@ the English translation. All additional parameters may also be used alongside tr
 
 #### "llm_translation"
 
+_(Salad Transcription API only)_
+
 Provide a comma-separated list of target languages to translate the transcription into multiple languages using our LLM
 integration. The original transcription will be returned as normal, along with the translations. **Supported
 languages:** English, French, German, Italian, Portuguese, Hindi, Spanish, Thai
@@ -175,21 +209,44 @@ Set to _"true"_ to generate a .srt output for caption and subtitles. If you don'
 
 #### "srt_translation"
 
+_(Salad Transcription API only)_
+
 Provide a comma-separated list of target languages to translate the generated SRT captions into multiple languages. The
 original transcription and SRT content will be returned as normal. **Supported languages:** English, French, German,
 Italian, Portuguese, Hindi, Spanish, Thai
 
 #### "summarize"
 
+_(Salad Transcription API only)_
+
 Set to an integer value representing the maximum number of words for the summary of the transcription.
 
 #### "custom_vocabulary" (preview)
+
+_(Salad Transcription API only)_
 
 Provide a comma-separated list of custom words or phrases to improve transcription accuracy for domain-specific terms.
 
 #### "custom_prompt" (preview)
 
+_(Salad Transcription API only)_
+
 Provide a custom instruction to perform specific analyses on the transcription using our LLM integration.
+
+#### "classification_labels"
+
+#### "overall_classification"
+
+_(Salad Transcription API only)_
+
+Use the classification_labels parameter in conjunction with overall_classification to classify the entire transcription
+into specified categories using an LLM.
+
+#### "overall_sentiment_analysis"
+
+_(Salad Transcription API only)_
+
+Set "overall_sentiment_analysis": true to perform sentiment analysis.
 
 ### "webhook"
 
