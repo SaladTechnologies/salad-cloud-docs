@@ -8,36 +8,27 @@ script.src = '//js.hs-scripts.com/7230102.js'
 document.head.appendChild(script)
 
 function trackUrlChanges() {
-    let initialPathname = window.location.pathname
-    const originalPushState = history.pushState
-    const originalReplaceState = history.replaceState
+    let lastestPathname = window.location.pathname
 
     function handleUrlChange() {
-        setTimeout(function () {
-            // we need timeout to get url and title (document.title) aligned for tracking, overwise the previous page title will be picked and associated to the latest url
-            const _hsq = (window._hsq = window._hsq || [])
-            const pathname = window.location.pathname
+        const _hsq = (window._hsq = window._hsq || [])
+        const pathname = window.location.pathname
 
-            // avoid double tracking on page load as trackPageVies has been already invoked for this page on hubspot script load
-            if (pathname === initialPathname) {
-                return
-            }
+        if (pathname === lastestPathname) {
+            return
+        }
 
-            initialPathname = null
-            _hsq.push(['setPath', pathname])
-            _hsq.push(['trackPageView'])
-        }, 100)
+        lastestPathname = pathname
+        _hsq.push(['setPath', pathname])
+        _hsq.push(['trackPageView'])
     }
 
-    history.pushState = function (...args) {
-        originalPushState.apply(this, args)
-        handleUrlChange()
-    }
+    // Listen for back/forward navigation
+    window.addEventListener('popstate', handleUrlChange)
 
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(this, args)
-        handleUrlChange()
-    }
+    // Observe title changes (indicating a new page load in SPAs)
+    const observer = new MutationObserver(() => handleUrlChange())
+    observer.observe(document.querySelector('title'), { childList: true })
 }
 
 trackUrlChanges()
