@@ -23,9 +23,6 @@ function trackUrlChanges() {
         _hsq.push(['trackPageView'])
     }
 
-    // Listen for back/forward navigation
-    window.addEventListener('popstate', handleUrlChange)
-
     // Observe title changes (indicating a new page load in SPAs)
     const observer = new MutationObserver(() => handleUrlChange())
     observer.observe(document.querySelector('title'), { childList: true })
