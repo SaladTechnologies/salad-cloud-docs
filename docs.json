@@ -290,7 +290,8 @@
                           "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-gcp-transcription",
                           "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-rev-transcription",
                           "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-assembly-transcription",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-aws-transcription"
+                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-aws-transcription",
+                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription"
                         ]
                       },
                       {
