@@ -331,6 +331,15 @@
                   "guides/long-running-tasks/rabbitmq",
                   "guides/long-running-tasks/sqs"
                 ]
+              },
+              {
+                "group": "Kubernetes Integration",
+                "pages": [
+                  "guides/kubernetes-integration/solution-overview",
+                  "guides/kubernetes-integration/installation-helm-chart",
+                  "guides/kubernetes-integration/application-deployment",
+                  "guides/kubernetes-integration/service-access"
+                ]
               }
             ]
           }
