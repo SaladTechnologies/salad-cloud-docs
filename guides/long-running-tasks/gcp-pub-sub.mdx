@@ -889,3 +889,73 @@ minutes, and sets the number of replicas to be equal to the number of messages i
 
 Navigate to the Cloudflare portal, and select the "Compute (Workers)" tab from the left navigation bar. Click "Create",
 and then choose the "Hello World" template. Go ahead and deploy the default, we're going to edit it in the next step.
+
+<Frame caption="Creating a new Worker">
+  <img src="/guides/long-running-tasks/images/rabbitmq-workers-create.png" alt="Creating a new Worker" />
+</Frame>
+
+Now, we're going to edit the worker code to set the number of replicas to be equal to the number of messages in the
+queue. First, we need some helper functions to interact with the
+[SaladCloud API](https://docs.salad.com/reference/saladcloud-api/container_groups/get-a-container-group).
+
+```javascript
+const saladBaseUrl = 'https://api.salad.com/api/public'
+
+async function getContainerGroup(org, project, containerGroupName, saladApiKey) {
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch container group: ${resp.statusText}`)
+  }
+  return resp.json()
+}
+
+async function startContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Starting container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/start`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to start container group: ${resp.statusText}`)
+  }
+}
+
+async function stopContainerGroup(org, project, containerGroupName, saladApiKey) {
+  console.log('Stopping container group')
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/stop`
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+    },
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to stop container group: ${resp.statusText}`)
+  }
+}
+
+async function setReplicas(org, project, containerGroupName, replicas, saladApiKey) {
+  console.log(`Setting replicas to ${replicas}`)
+  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
+  const resp = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Salad-Api-Key': saladApiKey,
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify({ replicas }),
+  })
+  if (!resp.ok) {
+    throw new Error(`Failed to set replicas: ${resp.statusText}`)
+  }
+}
+```
