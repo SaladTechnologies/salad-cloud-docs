@@ -748,3 +748,141 @@ To run the job submitter, you can use the following command:
 ```shell
 python submitter.py
 ```
+
+## Containerize the Worker Application
+
+Now that we have our worker application and our job submitter, we can package our worker in a docker container, and run
+it on a SaladCloud Container Group.
+
+First, let's make sure our dependencies are documented in `requirements.txt`.
+
+```shell
+boto3
+google-cloud-pubsub
+```
+
+Now, we're going to use create a launch script called `launch.sh` that will decode our base64 encoded GCP service
+account key, and then run our worker application.
+
+```shell
+#! /usr/bin/env bash
+
+# GCP_KEY is the base64 encoded service account key, which is used to authenticate with GCP. We want to write it
+# to a file so that we can use it to authenticate with GCP.
+echo $GCP_KEY | base64 -d > $GOOGLE_APPLICATION_CREDENTIALS
+
+# Run the worker
+python main.py
+```
+
+Now, create a new file called `Dockerfile`. Our application is simple, so a basic python base image should be fine.
+
+```dockerfile
+FROM python:3.10.12-slim-buster
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY main.py .
+COPY launch.sh .
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/credentials.json"
+
+CMD ["./launch.sh"]
+```
+
+Now, build the docker image, and use a tag that makes sense for you.
+
+```shell
+docker build -t saladtechnologies/lrt-worker-examples:gcp-pub-sub .
+```
+
+Now, we can test it locally to make sure it works, before we deploy it to SaladCloud.
+
+```shell
+docker run -it --rm  --env-file worker.env saladtechnologies/lrt-worker-examples:gcp-pub-sub
+```
+
+You should see it start up and begin processing a job. Once this is working, you can go ahead and terminate the
+container with `Ctrl+C`.
+
+Now, we can push the image to Docker Hub.
+
+```shell
+docker push saladtechnologies/lrt-worker-examples:gcp-pub-sub
+```
+
+## Deploying the Worker to SaladCloud
+
+To deploy our worker to SaladCloud, we need to create a new Container Group. This can be done via the API, SDKs, or the
+Portal. We're going to use the Portal.
+
+We're going to create a new Container Group, and we're going to use the image we just pushed to Docker Hub. We're going
+to request 100 replicas (the max via the portal), and we're going to set all of our environment variables from
+`worker.env`.
+
+<Frame caption="Creating a new container group">
+  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-1.png" alt="Creating a new container group" />
+</Frame>
+
+Our application is extremely simple, so we're going to only request 1 vCPU, 1 GB of RAM, and no GPU. Your hardware
+requirements are likely significantly higher than this.
+
+<Frame caption="Setting the hardware requirements">
+  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-2.png" alt="Setting the hardware requirements" />
+</Frame>
+
+All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't need any additional storage for this
+particular application.
+
+<Frame caption="Setting the job priority and storage requirements">
+  <img
+    src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-3.png"
+    alt="Setting the job priority and storage requirements"
+  />
+</Frame>
+
+We do not need the container gateway, as our application pulls its work from a queue. We also do not need health probes,
+as those are primarily for services accessed via Container Gateway. Go ahead and hit deploy, and you'll be taken to the
+container group page, where you can see its status.
+
+<Frame caption="Deploying the container group">
+  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-deploying.png" alt="Deploying the container group" />
+</Frame>
+
+After a few minutes, instances should start to become "Running".
+
+<Frame caption="Container group running">
+  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-running.png" alt="Container group running" />
+</Frame>
+
+## Validating That It Works
+
+Now that our cluster is up and running, we can go to the Subscription console, and look at the "metrics" tab to verify
+there is activity on the subscription.
+
+<Frame caption="Active messages in the subscription">
+  <img
+    src="/guides/long-running-tasks/images/gcp-pubsub-subscription-active.png"
+    alt="Active messages in the subscription"
+  />
+</Frame>
+
+From the R2 console, we can see that our bucket is being filled with checkpoints and results.
+
+<Frame caption="Checkpoints and results in the R2 bucket">
+  <img
+    src="/guides/long-running-tasks/images/r2-bucket-has-objects.png"
+    alt="Checkpoints and results in the R2 bucket"
+  />
+</Frame>
+
+## Autoscaling
+
+Now that we have our worker running, we can set up some simple autoscaling to automatically scale the number of replicas
+up and down based on the number of messages in the queue.
+
+There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
+minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
+(the maximum in the API).
