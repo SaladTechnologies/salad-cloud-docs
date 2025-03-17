@@ -63,7 +63,8 @@ It is highly recommended to provide a unique node name (e.g., **scnode3**) for e
 name is not specified, a default name in the format **saladcloud-node-xxx** with a random suffix will be automatically
 applied.
 
-Now, install the chart using the **helm install** command:
+Now, install the chart using the **helm install** command. Helm follows the same kubeconfig precedence as kubectl, and
+the cluster-admin or equivalent permissions are required to install the chart.
 
 ```
 helm install scnode3 oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.1 \
