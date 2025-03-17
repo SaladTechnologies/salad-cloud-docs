@@ -186,3 +186,4 @@ gamification
 scnode
 kubelet
 vkapp
+kubeconfig
