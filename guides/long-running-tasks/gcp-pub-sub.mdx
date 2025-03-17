@@ -885,4 +885,7 @@ up and down based on the number of messages in the queue.
 
 There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
 minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
-(the maximum in the API).
+(the maximum in the API). To implement this, we're going to use Cloudflare Workers with a schedule trigger.
+
+Navigate to the Cloudflare portal, and select the "Compute (Workers)" tab from the left navigation bar. Click "Create",
+and then choose the "Hello World" template. Go ahead and deploy the default, we're going to edit it in the next step.
