@@ -125,8 +125,8 @@ offline.
 
 We use a proprietary trust rating system to index node performance, forecast availability, and select the optimal
 hardware configuration for deployment. We also run proprietary tests on every GPU to determine their fit for our
-network. For more on performant GPU infrastructure configuration, view our [Build High-Performance Applications]
-(https://docs.salad.com/tutorials/high-performance-apps) tutorial.
+network. For more on performant GPU infrastructure configuration, view our
+[Build High-Performance Applications](/tutorials/high-performance-apps) tutorial.
 
 ## Do you have a checklist to track before deploying a workload to Salad?
 
@@ -135,8 +135,8 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
 - Test your docker container in a local environment
 - Make sure you select enough vCPU, RAM, and vRAM for your application
 - Setup container gateway or a job queue
-- If you are using the container gateway, (make sure your container is setup for IPv6)
-  [https://docs.salad.com/products/sce/gateway/enabling-ipv6].
+- If you are using the container gateway,
+  [make sure your container is setup for IPv6](/products/sce/gateway/enabling-ipv6).
 - Make sure you’re not running an empty container (i.e. Ubuntu) without setting the command to “sleep infinity”.
 - Run your workload with at least 3 replicas to account for latency.
 
@@ -188,3 +188,11 @@ SaladCloud has three product lines:
 
 We are SOC 2 Type 1 compliant. You can read more about our compliance
 [here](https://blog.salad.com/salad-soc-2-certification/).
+
+## RTX 5090 GPUs on SaladCloud?
+
+We have RTX 5090 GPUs on SaladCloud! There are some things you should know before deploying:
+
+- **MINIMUM CUDA VERSION: 12.8** - If your application does not use CUDA 12.8, it will not run on the RTX 5090.
+- As of March 17, 2025, **PyTorch has not released an official build** with support for CUDA 12.8. You can build PyTorch
+  from source with CUDA 12.8 support, or use the "nightly" build.
