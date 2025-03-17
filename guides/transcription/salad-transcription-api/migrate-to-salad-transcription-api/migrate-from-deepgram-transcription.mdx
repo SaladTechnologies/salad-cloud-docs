@@ -1,0 +1,202 @@
+---
+title: 'Migrating from Deepgram Transcription'
+---
+
+_Last Updated: March 14, 2025_
+
+Migrating from Deepgram's Nova-2 and Nova-3 Transcription to Salad Transcription API will require you to replace your
+Deepgram Python functions with Salad compatible ones. Whilst we do not offer an SDK, we do have example Python functions
+that you can use in replacement.
+
+| Features                   | SaladCloud Transcription | Deepgram Transcription |
+| -------------------------- | ------------------------ | ---------------------- |
+| Translation                | ✅                       | ❌                     |
+| Audio Transcription        | ✅                       | ✅                     |
+| Video Transcription        | ✅                       | ✅                     |
+| Multilingual Transcription | ✅                       | ✅                     |
+| Summarization              | ✅                       | ❌                     |
+| Speaker Identification     | ✅                       | ✅                     |
+| SRT Output                 | ✅                       | ❌                     |
+| Transcribe Multiple Files  | ❌                       | ❌                     |
+| Max Length                 | 2.5 Hours                | 2GB                    |
+| Text Sentiment Analysis    | ✅                       | ❌                     |
+| Text Classification        | ✅                       | ❌                     |
+| Custom LLM Prompt          | ✅                       | ❌                     |
+| Custom Vocabulary          | ✅                       | ✅                     |
+
+## 1. Get your Salad API Key.
+
+    - Open up https://portal.salad.com and sign up/log into your account.
+    - Navigate to your profile at the top right, and select API Access. Here you can find your API Key.
+
+## 2. Updating job creation API calls.
+
+The Salad Transcription API uses a Job Queue system for processing transcription requests, rather than a Python function
+that returns the data like Deepgram. With Salad Transcription API, you'll use two steps. Submit the job, and then
+request the results.
+
+### Deepgram Transcription
+
+Your existing Python code for Deepgram Transcription should look something like this:
+
+```Python
+import os
+import logging
+from deepgram.utils import verboselogs
+
+from deepgram import (
+    DeepgramClient,
+    PrerecordedOptions,
+)
+
+AUDIO_URL = {
+    "url": "https://example.com/path/to/file.mp3"
+}
+
+def main():
+    try:
+        deepgram: DeepgramClient = DeepgramClient()
+
+        options: PrerecordedOptions = PrerecordedOptions(
+            model="nova-3",
+            smart_format=True,
+        )
+        response = deepgram.listen.rest.v("1").transcribe_url(AUDIO_URL, options)
+        print(f"response: {response}\n\n")
+
+    except Exception as e:
+        print(f"Exception: {e}")
+
+if __name__ == "__main__":
+    main()
+
+```
+
+### Salad Transcription API Equivalent
+
+When using Salad Transcription API, you’ll update that job creation function to instead look like this:
+
+```Python
+import requests
+
+def salad_transcribe(file, Salad-Api-Key):
+
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+    payload = {
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": False
+        }
+    }
+    headers = {
+        "Salad-Api-Key": Salad-Api-Key,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)
+    return response
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+file = "https://example.com/path/to/file.mp3"
+
+job = salad_transcribe(file)
+print(job.text)
+```
+
+- For this code snippet, you'll need to insert your Salad Organization name into the API url field.
+- You will also need to insert your Salad API Key we obtained earlier lower down in the code snippet.
+- Put the URL to the file to be transcribed into the file string. Please note that Salad Transcription API can only
+  process files up to 2.5 hours. Make sure the URL provided is to a direct download of the file. Header based security
+  is not compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
+  [Salad Simple Storage Service.](https://docs.salad.com/products/s4/salad-simple-storage-service#upload-a-file)
+- The complete options for input parameters can be found in the
+  [API Reference](/reference/transcribe/inference_endpoints/create-an-inference-endpoint-job#body-input)
+
+The response will look like this:
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "inference_endpoint_name": "transcribe",
+  "input": {
+    "property1": "value1",
+    "property2": "value2"
+  },
+  "metadata": null,
+  "organization_name": "example-corp",
+  "status": "pending",
+  "events": [],
+  "create_time": "2025-01-016T19:00:00Z",
+  "update_time": "2025-01-016T19:00:00Z"
+}
+```
+
+## 3. Obtaining job results
+
+In the response from submitting your job with the above step, you'll receive the Job ID which is required to obtain the
+results of your transcription. The Job status and transcription results are combined into a single API call. With this
+Python function, you'll check the status, and once the job is completed it will also retrieve the transcription results.
+
+```Python
+def get_result(job_id, Salad-Api-Key):
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/" + job_id
+
+    headers = {"Salad-Api-Key": Salad-Api-Key}
+
+    response = requests.request("GET", url, headers=headers)
+
+    return response
+
+job_id = "{JOB_ID FROM BEFORE}"
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+result = get_result(job_id, Salad-Api-Key)
+print(result.text)
+```
+
+- Make sure to again update the organization name above to your organization name.
+- You will need to insert the Job ID that you obtained from the previous step as well.
+- And again make sure to include your Salad API Key.
+
+Once the status of your job has reached `succeeded`, the `output` object will include the URL to the completed
+transcription via a directly downloadable URL.
+
+```json
+{
+  "id": "7c425fc0-dd3d-4c6c-8b6a-a010187492dd",
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "return_as_file": False
+  },
+  "inference_endpoint_name": "transcribe",
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2025-01-22T15:57:26.0815348+00:00"
+    },
+    {
+      "action": "started",
+      "time": "2025-01-22T15:57:26.2061428+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2025-01-22T15:58:13.9323189+00:00"
+    }
+  ],
+  "organization_name": "salad",
+  "output": {
+    "text": " That's one small step for man, one giant leap for mankind. It's hard to imagine that nearly every consumer in America walks around with the total computational power of the Apollo 11 mission in their pocket. ",
+    "duration_in_seconds": 11.4135,
+    "duration": 0.09,
+    "processing_time": 2.076966285705566
+  },
+  "create_time": "2025-01-22T15:57:26.0815348+00:00",
+  "update_time": "2025-01-22T15:58:13.9323189+00:00"
+}
+```
