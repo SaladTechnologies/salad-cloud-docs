@@ -27,7 +27,7 @@ you choose to do so.
 
 For this guide, we will build an application that slowly calculates a sum for _n_ steps, sleeping for 30 seconds between
 steps to simulate work. We will set up a job queue and related resources, a storage bucket, a checkpoint saving system,
-and a simple auto-scaling mechanism.
+and review a simple auto-scaling mechanism.
 
 You will need a Google Cloud account, and a Cloudflare account to follow this guide.
 
@@ -883,79 +883,48 @@ From the R2 console, we can see that our bucket is being filled with checkpoints
 Now that we have our worker running, we can set up some simple autoscaling to automatically scale the number of replicas
 up and down based on the number of messages in the queue.
 
-There are many ways to implement autoscaling, but for simplicity, we are going to use a scheduled task that runs every 5
-minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
-(the maximum in the API). To implement this, we're going to use Cloudflare Workers with a schedule trigger.
+There are many ways to implement autoscaling, but for simplicity, we recommend creating a scheduled task that runs every
+5 minutes, and sets the number of replicas to be equal to the number of messages in the queue, limited to 250 replicas
+(the maximum in the API). To implement this, you can use a serverless function, such as Cloudflare workers, or GCP Cloud
+Functions
 
-Navigate to the Cloudflare portal, and select the "Compute (Workers)" tab from the left navigation bar. Click "Create",
-and then choose the "Hello World" template. Go ahead and deploy the default, we're going to edit it in the next step.
+Here is the outline of a python implementation that you can modify to suit your needs.
 
-<Frame caption="Creating a new Worker">
-  <img src="/guides/long-running-tasks/images/rabbitmq-workers-create.png" alt="Creating a new Worker" />
-</Frame>
+```python
+# This is our ideal number of replicas
+total_messages = num_waiting_messages + num_messages_in_flight
 
-Now, we're going to edit the worker code to set the number of replicas to be equal to the number of messages in the
-queue. First, we need some helper functions to interact with the
-[SaladCloud API](https://docs.salad.com/reference/saladcloud-api/container_groups/get-a-container-group).
+# We need to constrain this number by our min and max.
+desired_replicas = min(max(min_replicas, total_messages), max_replicas)
 
-```javascript
-const saladBaseUrl = 'https://api.salad.com/api/public'
+container_group = get_container_group()
+current_replicas = container_group["replicas"]
+print(
+    f"Current replicas: {current_replicas}, Desired replicas: {desired_replicas}")
 
-async function getContainerGroup(org, project, containerGroupName, saladApiKey) {
-  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
-  const resp = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Salad-Api-Key': saladApiKey,
-    },
-  })
-  if (!resp.ok) {
-    throw new Error(`Failed to fetch container group: ${resp.statusText}`)
-  }
-  return resp.json()
-}
+# always one of pending, running, stopped, failed, deploying
+current_state = container_group["current_state"]["status"]
+print(f"Current state: {current_state}")
 
-async function startContainerGroup(org, project, containerGroupName, saladApiKey) {
-  console.log('Starting container group')
-  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/start`
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Salad-Api-Key': saladApiKey,
-    },
-  })
-  if (!resp.ok) {
-    throw new Error(`Failed to start container group: ${resp.statusText}`)
-  }
-}
+if current_state == "stopped" and desired_replicas > 0:
+    start_container_group()
 
-async function stopContainerGroup(org, project, containerGroupName, saladApiKey) {
-  console.log('Stopping container group')
-  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}/stop`
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Salad-Api-Key': saladApiKey,
-    },
-  })
-  if (!resp.ok) {
-    throw new Error(`Failed to stop container group: ${resp.statusText}`)
-  }
-}
+if current_state == "running" and desired_replicas == 0:
+    stop_container_group()
 
-async function setReplicas(org, project, containerGroupName, replicas, saladApiKey) {
-  console.log(`Setting replicas to ${replicas}`)
-  const url = `${saladBaseUrl}/organizations/${org}/projects/${project}/containers/${containerGroupName}`
-  const resp = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      'Salad-Api-Key': saladApiKey,
-      'Content-Type': 'application/merge-patch+json',
-    },
-    body: JSON.stringify({ replicas }),
-  })
-  if (!resp.ok) {
-    throw new Error(`Failed to set replicas: ${resp.statusText}`)
-  }
-}
+if desired_replicas != current_replicas:
+    set_replicas(desired_replicas)
 ```
+
+From the Salad API, you will need the following endpoints:
+
+- [Get Container Group](https://docs.salad.com/reference/saladcloud-api/container_groups/get-a-container-group)
+- [Start Container Group](https://docs.salad.com/reference/saladcloud-api/container_groups/start-a-container-group)
+- [Stop Container Group](https://docs.salad.com/reference/saladcloud-api/container_groups/stop-a-container-group)
+- [Set Replicas](https://docs.salad.com/reference/saladcloud-api/container_groups/update-a-container-group)
+
+## Conclusion
+
+In this guide, we've shown you how to set up a simple long-running task worker on SaladCloud using Google Cloud Pub/Sub
+as a job queue, and R2 as a storage backend. We've also shown you how to deploy the worker to SaladCloud, and how to
+implement autoscaling based on the number of messages in the queue.
