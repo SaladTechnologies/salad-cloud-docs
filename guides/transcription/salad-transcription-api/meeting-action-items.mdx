@@ -14,7 +14,7 @@ parameter to generate the action items. We'll use the following input parameters
 
 ```python
 payload = {"input": {
-        "custom_prompt": "The following is a meeting transcription. Generate a list of action items from the meeting. Format it in a markdown compatible list to make it easy to read.",
+        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
         "url": audio_file_url,
         "diarization": True,
         "language_code": "en",
@@ -37,7 +37,7 @@ salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
 organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
 payload = {"input": {
-        "custom_prompt": "The following is a meeting transcription. Generate a list of action items from the meeting. Format it in a markdown compatible list to make it easy to read.",
+        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
         "url": audio_file_url,
         "diarization": True,
         "language_code": "en",
