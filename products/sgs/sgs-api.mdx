@@ -10,7 +10,8 @@ _Last Updated: March 20, 2025_
 The SGS API enables you to manage streaming capability tags for nodes in your network. By tagging nodes based on their
 ability to handle specific streaming services, you can create optimized routing paths for different workloads.
 
-> **Important:** The SGS API is only available on some SGS servers. Contact your account manager to enable this feature.
+> **Important:** The SGS API is currently in limited release and is only available on some SGS servers. Contact your
+> account manager to enable this feature.
 
 ## Parameter Updates
 
@@ -78,8 +79,8 @@ Returns all active, non-quarantined nodes connected to your SGS server.
     {
       "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
       "tags": {
-        "nflx": 1,
-        "dsnp": 1
+        "internal-nflx": 1,
+        "internal-dsnp": 1
       },
       "update_time": "2023-05-04T05:41:05Z"
     }
@@ -101,8 +102,8 @@ Retrieves information about a specific node.
 {
   "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
   "tags": {
-    "nflx": 1,
-    "dsnp": 1
+    "internal-nflx": 1,
+    "internal-dsnp": 1
   },
   "update_time": "2023-05-04T05:41:05Z"
 }
@@ -111,7 +112,7 @@ Retrieves information about a specific node.
 ### Update a node
 
 ```http
-PATCH /nodes/{machine_id}/tags
+PATCH /nodes/{machineId}/tags
 ```
 
 Updates capability tags for a specific node.
@@ -122,29 +123,23 @@ Tag values must be between 0 and 1, where:
 - Any value `> 0` and `≤ 1` indicates the node can handle the service
   > **Note:** The rational number tag values (between `0` and `1`) enable future weighted load balancing features.
 
-> **Important:** We recommend using a unique prefix (like `internal-`) for your tags to avoid conflicts with Salad's
-> existing DHC labels.
-
-#### Parameters
-
-| Parameter      | Description                                                                           |
-| -------------- | ------------------------------------------------------------------------------------- |
-| `service_name` | Key-value pairs where key is the service name and value is between 0 and 1, inclusive |
+> **Important:** We recommend using a prefix (like `internal-`) for your tags to avoid conflicts with Salad's existing
+> DHC labels.
 
 #### Example request
 
 ```json
 {
-  "nflx": 1,
-  "dsnp": 0,
-  "itv": 0.8
+  "internal-nflx": 1,
+  "internal-dsnp": 0,
+  "internal-itv": 0.8
 }
 ```
 
 ### Remove all tags
 
 ```http
-DELETE /nodes/{machine_id}/tags
+DELETE /nodes/{machineId}/tags
 ```
 
 Removes all capability tags from a node.
@@ -160,21 +155,36 @@ Removes all capability tags from a node.
 
 ### Qualifying nodes for a new service
 
-1. List all nodes to identify machine IDs
-2. Test each node for your new service (e.g., "internal-target-service") by targeting specific nodes:
+1. List all nodes and retrieve their machine IDs:
+   ```bash
+   curl https://{sgs_name}.salad.com:7443/nodes \
+     -H "Authorization: Bearer YOUR_SALAD_JWT" | jq '.nodes[] | .machine_id'
+   ```
+2. For each machine ID, test its connectivity to the target service (e.g., "target-service") by targeting specific
+   nodes:
    ```bash
    # Add the X-Sgs-Machine-Id header to test a specific node
-   # Do not use &tag= in the sessionID during testing
-   curl https://your-streaming-endpoint.example.com \
-     -H "X-Sgs-Machine-Id: 5ebfa363-6e0b-4db1-b9be-70ed4995d0b1"
+   # Do not use &cap= or &tag= in the sessionID during testing
+   curl -X https://{sessionID}:{password}@{sgsName}.salad.com:8443 \
+     -H "X-Sgs-Machine-Id: {machineId}" \
+     https://target-service.com
    ```
-3. Tag successful nodes:
+3. Tag nodes which connected successfully (use a unique name for the tag e.g., "internal-target-service"):
    ```bash
-   curl -X PATCH https://{sgs_name}.salad.com:7443/nodes/{machine_id}/tags \
+   curl PATCH https://{sgs_name}.salad.com:7443/nodes/{machineId}/tags \
      -H "Authorization: Bearer YOUR_SALAD_JWT" \
      -H "Content-Type: application/json" \
      -d '{"internal-target-service": 1}'
    ```
-4. Route traffic to successful nodes by suffixing `&tag=internal-streaming` to your session ID (e.g.,
-   "`https://sessionID1234?cap=internal-target-service:{PASSWORD}@{sgs_name}.salad.com`"), or by adding it as a header
-   in your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
+4. Verify the tags were updated successfully:
+   ```bash
+   curl https://{sgs_name}.salad.com:7443/nodes \
+     -H "Authorization: Bearer YOUR_SALAD_JWT"
+   ```
+5. Adjust your configuration so that any traffic for "target-service" is routed to your tagged nodes by suffixing
+   `&tag=internal-target-service` to your session IDs (e.g.,
+   "`https://sessionID1234&tag=internal-target-service:{password}@{sgsName}.salad.com`"), or by adding it as a header in
+   your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
+6. Because nodes occasionally connect and disconnect from SGS, regularly repeat steps 1-3 to ensure your tags are
+   up-to-date. The frequency of these checks depends on several factors, but we recommend performing them at least every
+   2-3 hours.
