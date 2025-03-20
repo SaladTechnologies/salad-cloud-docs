@@ -54,7 +54,7 @@ All examples above produce identical routing behavior.
 All API requests require your Salad-provided JWT token:
 
 ```bash
-curl https://{sgs_name}.salad.com:7443/nodes \
+curl https://{sgsName}.salad.com:7443/nodes \
   -H "Authorization: Bearer YOUR_SALAD_JWT"
 ```
 
@@ -78,14 +78,15 @@ Returns all active, non-quarantined nodes connected to your SGS server.
     {
       "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
       "tags": {
-        "nflx": 1,
-        "dsnp": 1
+        "internal-nflx": 1,
+        "internal-dsnp": 1
       },
       "update_time": "2023-05-04T05:41:05Z"
     }
   ]
 }
 ```
+Note that labels assigned to nodes by Salad's internal DHC (if present) will not be visible using the SGS API. 
 
 ### Retrieve a node
 
@@ -101,8 +102,8 @@ Retrieves information about a specific node.
 {
   "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
   "tags": {
-    "nflx": 1,
-    "dsnp": 1
+    "internal-nflx": 1,
+    "internal-dsnp": 1
   },
   "update_time": "2023-05-04T05:41:05Z"
 }
@@ -125,19 +126,13 @@ Tag values must be between 0 and 1, where:
 > **Important:** We recommend using a unique prefix (like `internal-`) for your tags to avoid conflicts with Salad's
 > existing DHC labels.
 
-#### Parameters
-
-| Parameter      | Description                                                                           |
-| -------------- | ------------------------------------------------------------------------------------- |
-| `service_name` | Key-value pairs where key is the service name and value is between 0 and 1, inclusive |
-
 #### Example request
 
 ```json
 {
-  "nflx": 1,
-  "dsnp": 0,
-  "itv": 0.8
+  "internal-nflx": 1,
+  "internal-dsnp": 0,
+  "internal-itv": 0.8
 }
 ```
 
@@ -175,6 +170,6 @@ Removes all capability tags from a node.
      -H "Content-Type: application/json" \
      -d '{"internal-target-service": 1}'
    ```
-4. Route traffic to successful nodes by suffixing `&tag=internal-streaming` to your session ID (e.g.,
-   "`https://sessionID1234?cap=internal-target-service:{PASSWORD}@{sgs_name}.salad.com`"), or by adding it as a header
+4. Route traffic to successful nodes by suffixing `&tag=internal-target-service` to your session ID (e.g.,
+   "`https://sessionID1234&tag=internal-target-service:{password}@{sgsName}.salad.com`"), or by adding it as a header
    in your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
