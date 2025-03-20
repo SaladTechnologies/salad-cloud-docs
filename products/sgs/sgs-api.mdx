@@ -55,7 +55,7 @@ All examples above produce identical routing behavior.
 All API requests require your Salad-provided JWT token:
 
 ```bash
-curl https://{sgs_name}.salad.com:7443/nodes \
+curl https://{sgsName}.salad.com:7443/nodes \
   -H "Authorization: Bearer YOUR_SALAD_JWT"
 ```
 
@@ -91,7 +91,7 @@ Returns all active, non-quarantined nodes connected to your SGS server.
 ### Retrieve a node
 
 ```http
-GET /nodes/{machine_id}
+GET /nodes/{machineId}
 ```
 
 Retrieves information about a specific node.
@@ -157,7 +157,7 @@ Removes all capability tags from a node.
 
 1. List all nodes and retrieve their machine IDs:
    ```bash
-   curl https://{sgs_name}.salad.com:7443/nodes \
+   curl https://{sgsName}.salad.com:7443/nodes \
      -H "Authorization: Bearer YOUR_SALAD_JWT" | jq '.nodes[] | .machine_id'
    ```
 2. For each machine ID, test its connectivity to the target service (e.g., "target-service") by targeting specific
@@ -171,14 +171,14 @@ Removes all capability tags from a node.
    ```
 3. Tag nodes which connected successfully (use a unique name for the tag e.g., "internal-target-service"):
    ```bash
-   curl PATCH https://{sgs_name}.salad.com:7443/nodes/{machineId}/tags \
+   curl PATCH https://{sgsName}.salad.com:7443/nodes/{machineId}/tags \
      -H "Authorization: Bearer YOUR_SALAD_JWT" \
      -H "Content-Type: application/json" \
      -d '{"internal-target-service": 1}'
    ```
 4. Verify the tags were updated successfully:
    ```bash
-   curl https://{sgs_name}.salad.com:7443/nodes \
+   curl https://{sgsName}.salad.com:7443/nodes \
      -H "Authorization: Bearer YOUR_SALAD_JWT"
    ```
 5. Adjust your configuration so that any traffic for "target-service" is routed to your tagged nodes by suffixing
