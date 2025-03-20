@@ -8,15 +8,11 @@ _Last Updated: March 20, 2025_
 # The SGS API
 
 The SGS API enables you to manage streaming capability tags for nodes in your network. By tagging nodes based on their
-ability to handle specific streaming services, you can create optimized routing paths for different workloads.
+ability to connect to specific streaming services, you can create optimized routing paths for different workloads. Note
+that it is up to you to develop, run, and maintain any such connectivity tests.
 
 > **Important:** The SGS API is currently in limited release and is only available on some SGS servers. Contact your
 > account manager to enable this feature.
-
-## Parameter Updates
-
-We're introducing a new `&tag=` parameter that replaces the legacy `&cap=` parameter. Both parameters currently function
-identically, but we recommend using `&tag=` for future compatibility.
 
 ## How Node Selection Works
 
@@ -28,25 +24,28 @@ When you specify a tag, our system selects nodes in this order:
 
 ## Usage Examples
 
-### URL Parameters
-
-You can request a node with a specific tag by adding the `&tag=` parameter to the end of your session ID:
-
-```
-{sessionId}&tag={yourTag}
-{sessionId}&cap={yourTag}  (legacy, still supported)
-```
-
 ### HTTP Headers
 
-Alternatively, you can request a node with a specific tag by adding the `X-Sgs-Tag` header to your request:
+Request a node with a specific tag by adding the `X-Sgs-Tag` proxy header to your request:
 
 ```
 X-Sgs-Tag: {yourTag}
 X-Sgs-Capabilities: {yourTag}  (legacy, still supported)
 ```
 
-All examples above produce identical routing behavior.
+### URL Parameters
+
+Alternatively, you can request a node with a specific tag by adding the `&tag=` parameter to the end of your session ID:
+
+```
+{sessionId}&tag={yourTag}
+{sessionId}&cap={yourTag}  (legacy, still supported)
+```
+
+All examples above produce identical routing behavior. Note that the new `X-Sgs-Tag` proxy header replaces the legacy
+`X-Sgs-Capabilities` proxy header, while the `&tag=` parameter replaces the legacy `&cap=` parameter. Both headers and
+parameters currently function identically, but we recommend using either the `X-Sgs-Tag` proxy header or the `&tag=` URL
+parameter for future compatibility.
 
 # Tagging Nodes
 
@@ -59,7 +58,8 @@ curl https://{sgsName}.salad.com:7443/nodes \
   -H "Authorization: Bearer YOUR_SALAD_JWT"
 ```
 
-Requests without proper authentication will receive a `401 Unauthorized` response.
+Requests without proper authentication will receive a `401 Unauthorized` response. JWT tokens were shared with your team
+during initial integration; if you need a JWT token, contact your account manager.
 
 ## Nodes
 
@@ -109,6 +109,23 @@ Retrieves information about a specific node.
 }
 ```
 
+### Retrieve a node's tags
+
+```http
+GET /nodes/{machineId}/tags
+```
+
+Retrieves only the tags for a specific node.
+
+#### Example response
+
+```json
+{
+  "internal-nflx": 1,
+  "internal-dsnp": 1
+}
+```
+
 ### Update a node
 
 ```http
@@ -142,7 +159,7 @@ Tag values must be between 0 and 1, where:
 DELETE /nodes/{machineId}/tags
 ```
 
-Removes all capability tags from a node.
+Removes all capability tags from a node. Note that passing a `0` value for a tag is equivalent to removing it.
 
 ## Routing behavior
 
@@ -165,8 +182,7 @@ Removes all capability tags from a node.
    ```bash
    # Add the X-Sgs-Machine-Id header to test a specific node
    # Do not use &cap= or &tag= in the sessionID during testing
-   curl -X https://{sessionID}:{password}@{sgsName}.salad.com:8443 \
-     -H "X-Sgs-Machine-Id: {machineId}" \
+   curl --proxy-header "X-Sgs-Machine-Id: {machineId}" -X https://{sessionID}:{password}@{sgsName}.salad.com:8443 \
      https://target-service.com
    ```
 3. Tag nodes which connected successfully (use a unique name for the tag e.g., "internal-target-service"):
@@ -183,8 +199,8 @@ Removes all capability tags from a node.
    ```
 5. Adjust your configuration so that any traffic for "target-service" is routed to your tagged nodes by suffixing
    `&tag=internal-target-service` to your session IDs (e.g.,
-   "`https://sessionID1234&tag=internal-target-service:{password}@{sgsName}.salad.com`"), or by adding it as a header in
-   your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
+   "`https://sessionID1234&tag=internal-target-service:{password}@{sgsName}.salad.com`"), or by adding it as a proxy
+   header in your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
 6. Because nodes occasionally connect and disconnect from SGS, regularly repeat steps 1-3 to ensure your tags are
    up-to-date. The frequency of these checks depends on several factors, but we recommend performing them at least every
    2-3 hours.
