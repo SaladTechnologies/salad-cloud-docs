@@ -138,7 +138,8 @@
               "products/sgs/proxy-v2",
               "products/sgs/node-removals",
               "products/sgs/approved-domains",
-              "products/sgs/smart-routing",
+              "products/sgs/destination-health-checks",
+              "products/sgs/sgs-api",
               "products/sgs/faqs"
             ]
           },
