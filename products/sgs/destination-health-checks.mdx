@@ -1,11 +1,11 @@
 ---
-title: 'Smart Routing'
+title: 'Destination Health Checks'
 description: 'Optional feature to increase success rate when connecting to specific domains'
 ---
 
-_Last Updated: September 24, 2024_
+_Last Updated: March 20, 2025_
 
-## About Smart Routing
+## About Destination Health Checks (DHC)
 
 SGS can be configured to periodically monitor its available egress nodes for successful connectivity to particular
 services. This is only recommended for connecting to services which are particularly aggressive about blocking even
@@ -18,7 +18,7 @@ high-quality residential IPs such as those provided by SGS.
   you with a list of capability names, each of which represents one configured connectivity test.
 </Note>
 
-## Requesting Smart Routing capability
+## Requesting DHC capability
 
 When sending SGS a CONNECT request to route traffic that should be routed only via egress nodes that are marked as
 capable of supporting a given capability, the incoming request should specify the capability name (e.g., `nflx`) in one
@@ -28,7 +28,7 @@ of two ways:
 
 ```
 $ curl -v --proxy-header 'X-Sgs-Capabilities: nflx' -x
-'https://user4:<PASSWORD>@sgs-server.salad.com' https://ipinfo.io/ip
+'https://user4:{password}@sgs-server.salad.com' https://ipinfo.io/ip
 * Trying 127.0.0.1:443...
 * Connected to (nil) (127.0.0.1) port 443 (#0)
 * allocate connect buffer!
@@ -45,7 +45,7 @@ $ curl -v --proxy-header 'X-Sgs-Capabilities: nflx' -x
 2. By appending a `&cap=` followed by the capability name, to the username portion of the authorization string.
 
 ```
-$ curl -v -x 'https://user4&cap=nflx:<PASSWORD>@sgs-server.salad.com'
+$ curl -v -x 'https://user4&cap=nflx:{password}@sgs-server.salad.com'
 https://ipinfo.io/ip
 * Trying 127.0.0.1:443...
 * Connected to (nil) (127.0.0.1) port 443 (#0)
