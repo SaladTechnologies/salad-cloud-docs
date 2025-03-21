@@ -39,7 +39,7 @@ name and API key.
 **When using the Salad VK solution, you may need a large number of single-replica container groups on SaladCloud.** Be
 sure to check your organization's quotas, and contact us for adjustments if they are insufficient.
 
-```
+```python
 from salad_cloud_sdk import SaladCloudSdk
 import os
 from dotenv import load_dotenv
@@ -61,7 +61,7 @@ print(result)
 You can deploy multiple container groups of different GPU types on SaladCloud using a Kubernetes deployment manifest,
 and you may require their respective IDs, GPU names, and pricing details.
 
-```
+```python
 from salad_cloud_sdk import SaladCloudSdk
 import os
 from dotenv import load_dotenv
@@ -85,7 +85,7 @@ Before deploying a container group programmatically, you can first manually crea
 can then retrieve the deployment details through its APIs/SDKs, which may greatly help guide your programmatic
 deployment.
 
-```
+```python
 from salad_cloud_sdk import SaladCloudSdk
 import os
 from dotenv import load_dotenv
@@ -113,7 +113,7 @@ print(result)
 
 Now, let's deploy a typical container group on Saladcloud.
 
-```
+```python
 from salad_cloud_sdk import SaladCloudSdk
 from salad_cloud_sdk.models import CreateContainerGroup
 import os
@@ -242,75 +242,75 @@ SaladCloud will allocate a new node to run the image.
 Here is the corresponding Kubernetes deployment manifest to achieve a similar outcome on SaladCloud as the Python code
 above:
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- labels:
-   app: vkapp-demo
- name: vkapp-demo
- namespace: default
+  labels:
+    app: vkapp-demo
+  name: vkapp-demo
+  namespace: default
 spec:
- replicas: 3
- selector:
-   matchLabels:
-     app: vkapp-demo
- template:
-   metadata:
-     annotations:
-       salad.com/container-group-priority: "high"
-       salad.com/country-codes: "us, ca, mx"
-       salad.com/gpu-classes: "a5db5c50-cbcb-4596-ae80-6a0c8090d80f, ed563892-aacd-40f5-80b7-90c9be6c759b"
-       # salad.com/networking-protocol: "http"
-       # salad.com/networking-port: "8888"
-       # salad.com/networking-auth: "false"
-     labels:
-       app: vkapp-demo
-   Spec:
-     imagePullSecrets:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vkapp-demo
+  template:
+    metadata:
+      annotations:
+        salad.com/container-group-priority: 'high'
+        salad.com/country-codes: 'us, ca, mx'
+        salad.com/gpu-classes: 'a5db5c50-cbcb-4596-ae80-6a0c8090d80f, ed563892-aacd-40f5-80b7-90c9be6c759b'
+        # salad.com/networking-protocol: "http"
+        # salad.com/networking-port: "8888"
+        # salad.com/networking-auth: "false"
+      labels:
+        app: vkapp-demo
+    Spec:
+      imagePullSecrets:
         - name: my-docker-hub-registry-secret
-     containers:
-       - image: docker.io/saladtechnologies/misc:0.0.2-test
-         name: misc-test
-         command: ["sh", "-c","sleep infinity"]
-         ports:
-           - containerPort: 8888
-         livenessProbe:
-           exec:
-             command: ["curl", "--fail", "http://localhost:8888/hc"]
-           initialDelaySeconds: 30
-           periodSeconds: 5
-           timeoutSeconds: 3
-           successThreshold: 1
-           failureThreshold: 3
-         resources:
-           requests:
-             cpu: "4"
-             memory: 8Gi
-           limits:
-             cpu: "4"
-             memory: 8Gi
-         env:
-           - name: AWS_ACCESS_KEY_ID
-             value: "abc"
-           - name: AWS_SECRET_ACCESS_KEY
-             value: "efg"
-           - name: HOST
-             value: "::"
-           - name: PORT
-             value: "8888"
-     nodeSelector:
-       kubernetes.io/role: agent
-       type: virtual-kubelet
-     nodeName: scnode1
-     os:
-       name: linux
-     restartPolicy: Always
-     tolerations:
-       - key: virtual-kubelet.io/provider
-         operator: Equal
-         value: saladcloud
-         effect: NoSchedule
+      containers:
+        - image: docker.io/saladtechnologies/misc:0.0.2-test
+          name: misc-test
+          command: ['sh', '-c', 'sleep infinity']
+          ports:
+            - containerPort: 8888
+          livenessProbe:
+            exec:
+              command: ['curl', '--fail', 'http://localhost:8888/hc']
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: '4'
+              memory: 8Gi
+            limits:
+              cpu: '4'
+              memory: 8Gi
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: 'abc'
+            - name: AWS_SECRET_ACCESS_KEY
+              value: 'efg'
+            - name: HOST
+              value: '::'
+            - name: PORT
+              value: '8888'
+      nodeSelector:
+        kubernetes.io/role: agent
+        type: virtual-kubelet
+      nodeName: scnode1
+      os:
+        name: linux
+      restartPolicy: Always
+      tolerations:
+        - key: virtual-kubelet.io/provider
+          operator: Equal
+          value: saladcloud
+          effect: NoSchedule
 ```
 
 ## Mapping from Kubernetes to SaladCloud
