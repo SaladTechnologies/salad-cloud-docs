@@ -28,9 +28,9 @@ Kubernetes environment:**
 
 ## Solution to Scenario 1
 
-This is a widely adopted scenario where client applications and GPU nodes are decoupled, offering enhanced scalability
-and flexibility, and greater resilience to traffic spikes and node failures. Most existing solutions and applications,
-including [real-time inference](/guides/real-time-inference/build-redis-queue),
+This widely adopted scenario decouples client applications and GPU nodes (so they don't communicate directly), offering
+enhanced scalability, flexibility, and improved resilience to traffic spikes and node failures. Most existing solutions
+and applications, including [real-time inference](/guides/real-time-inference/build-redis-queue),
 [batch processing and long-running tasks](/guides/long-running-tasks/solution-overview), and various types of
 applications (streaming/non-streaming, synchronous/asynchronous), can be effectively implemented. Supported use cases
 encompass LLMs, image/video generation, transcription and molecular dynamics simulation, etc.
