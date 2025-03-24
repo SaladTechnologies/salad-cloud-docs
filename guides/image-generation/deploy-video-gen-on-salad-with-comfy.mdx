@@ -899,44 +899,24 @@ docker push saladtechnologies/comfyui:video-gen-example
 
 This may take some time, depending on your network speed. Once it's done, you can deploy your container to SaladCloud.
 
-Navigate to the [SaladCloud portal](https://portal.salad.com), and click on the Container Groups tab. Click "Get
-Started" in the Custom Container Group section.
+Because we are using the Job Queue, we need to create a new Container Group with the
+[Public API](/reference/saladcloud-api/container_groups/create-a-container-group). This functionality is not available
+in the portal.
 
-![](/guides/image-generation/images/create-container-group.png)
-
-We're going to start with 3 replicas, and set the container image to the one we just pushed.
-
-![](/guides/image-generation/images/video-gen-service-create-page-1.png)
-
-We're going to use 4 vCPU, 30GB of RAM, and an RTX 4090 GPU.
-
-![](/guides/image-generation/images/video-gen-service-cpu-and-mem.png)
-
-![](/guides/image-generation/images/video-gen-service-gpu.png)
-
-We're going to set the priority to "High", although if your usecase is not time-sensitive, you can achieve significant
-cost savings by reducing the workload priority. Lower priority workloads can be preempted by higher priority workloads.
-Additionally, we're going to reserve 1GB of additional storage, for the temporary storage of video files. ComfyUI API
-cleans up after itself, but it's good to have a little extra space just in case.
-
-![](/guides/image-generation/images/video-gen-service-priority-and-storage.png)
-
-On the right side of the screen, you'll see a cost estimation that reflects our current selection.
-
-![](/guides/image-generation/images/video-gen-service-cost.png)
-
-Next, we're going to connect the container group to the job queue we made in the previous step. Configure the job queue
-for port 3000 (where our API is running), and set the path to `/workflow/video-clip`, which is the endpoint we created.
-For this tutorial, we won't enable autoscaling, but you
-[learn more about it here](/products/sce/autoscaling/autoscaling#autoscaling-overview).
-
-![](/guides/image-generation/images/video-gen-service-connect-job-queue.png)
-
-Finally, we will configure the readiness probe to check the `/ready` endpoint, and set the container group to start with
-
-![](/guides/image-generation/images/video-gen-service-readiness-probe.png)
-
-Finally, ensure "Autostart container group once image is pulled" is selected, and click "Deploy".
+- We're going to start with 3 replicas, and set the container image to the one we just pushed.
+- We're going to use 4 vCPU, 30GB of RAM, and an RTX 4090 GPU.
+- We're going to set the priority to "High", although if your usecase is not time-sensitive, you can achieve significant
+  cost savings by reducing the workload priority. Lower priority workloads can be preempted by higher priority
+  workloads.
+- Additionally, we're going to reserve 1GB of additional storage, for the temporary storage of video files. ComfyUI API
+  cleans up after itself, but it's good to have a little extra space just in case.
+- We're going to connect the container group to the job queue we made in the previous step. Configure the job queue for
+  port 3000 (where our API is running), and set the path to `/workflow/video-clip`, which is the endpoint we created.
+  For this tutorial, we won't enable autoscaling, but you can
+  [learn more about it here](/products/sce/autoscaling/autoscaling#autoscaling-overview).
+- Finally, we will configure the readiness probe to check the `/ready` endpoint
+- Finally, ensure `autostart_policy` is set to `true` so that the container group starts automatically once the image is
+  pulled into our internal cache.
 
 At this point, Salad will pull the container image into our own high-performance container image cache. You will see
 this as a "preparing" status on the container group page.

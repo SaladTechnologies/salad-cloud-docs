@@ -2,32 +2,22 @@
 title: 'Creating a Job Queue'
 ---
 
-_Last Updated: February 14, 2025_
+_Last Updated: March 24, 2025_
 
 # Using the Public API
 
-Create a Job Queue with the [Job Queue API](/reference/saladcloud-api/queues/create-a-queue).
+Job Queues are not available through the portal, but you can create a Job Queue with the
+[Job Queue API](/reference/saladcloud-api/queues/create-a-queue). You will also need to
+[create your container group](/reference/saladcloud-api/container_groups/create-a-container-group) via the public API in
+order to attach a job queue to it.
+[Ensure your container image includes the job queue worker](products/sce/job-queues/queue-worker)
 
 > 📘 Job Queue Connections
 >
 > A Job Queue can be connected to multiple container groups at once. but a container group can only be connected to at
 > most a single Job Queue.
 
-When configuring a new container group, click the 'Edit' link next to the Job Queues card:
-
-<img src="/products/sce/job-queues/images/portal-enable-job-queue.png" />
-
-Select your previously-created Job Queue from the 'Select a Job Queue' dropdown. (If you haven't yet created a Job
-Queue, press the 'Create New Job Queue' button and do so before returning to this page).
-
-<img src="/products/sce/job-queues/images/portal-configure-job-queue.png" />
-
-Enter the Port and Path of your application that you identified during the
-[Configuring the Job Queue Worker](/products/sce/job-queues/queue-worker) step. This information will be attached to
-jobs sent to the Queue Worker so that it knows where to post them to the application running inside the deployed
-container.
-
-**We also recommend adding a [readiness probe](/products/sce/container-groups/health-probes/readiness-probes) to your
+**We recommend adding a [readiness probe](/products/sce/container-groups/health-probes/readiness-probes) to your
 container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
 receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run
 after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to
@@ -42,8 +32,7 @@ example below, this is what we have. If your container does not contain a way to
 add one of your own. You can usually find any references to this in the readme or documentation for the container image
 you are using. Readiness probes can flip between passing and failing, and will continue to check until it’s ready to go.
 
-```json
-Enabled
+```yml
 Protocol: HTTP/1.X
 Path: /hc
 Port: 8000
@@ -54,8 +43,3 @@ Timeout Seconds: 1
 Success Threshold: 1
 Failure Threshold: 3
 ```
-
-<img src="/products/sce/job-queues/images/portal-configure-readiness-probe.png" />
-
-Finally, finish configuring your container group before deploying it. When selecting your image source, ensure you
-select the container image you configured in the previous step.
