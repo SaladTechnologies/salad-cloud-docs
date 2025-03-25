@@ -87,7 +87,7 @@ Create another new file, and name it `Dockerfile`. This file will contain the in
 image. Add the following content to the file:
 
 ```dockerfile
-FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.12-api1.8.2-torch2.5.0-cuda12.1-devel
+FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-api1.8.2-torch2.6.0-cuda12.4-devel
 
 # Video generation requires a few extra dependencies from the base image
 RUN apt-get update && apt-get install -y \
