@@ -3,7 +3,7 @@ title: 'How to Deploy Flux (ComfyUI)'
 description: 'A guide to deploying Flux1-Schnell on SaladCloud with ComfyUI'
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: March 25, 2025_
 
 ![Deploy Flux on Salad, generated in flux](/guides/image-generation/images/deploy-flux-5.png)
 
@@ -23,9 +23,9 @@ Find a docker image of ComfyUI. Here's one we've verified works on Salad:
 
 **ComfyUI**
 
-- Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
+- Git Repo: [ComfyUI API](https://github.com/SaladTechnologies/comfyui-api)
 - Docker Image:
-  [ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0](http://ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0)
+  [ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-torch2.6.0-cuda12.4-runtime](https://github.com/SaladTechnologies/comfyui-api/pkgs/container/comfyui-api/versions)
 - Model Directory: `/opt/ComfyUI/models`
 - Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
 
@@ -65,10 +65,8 @@ convenient fp8 checkpoint because it runs well on consumer gpus, and allows for 
 
 ```docker
 # We're going to use this verified comfyui image as a base
-FROM ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0
+FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-torch2.6.0-cuda12.4-runtime
 
-# Disable the authentication provided by the base image
-ENV WEB_ENABLE_AUTH=false
 # Startup can take a little longer with larger models.
 # This configures the worker binary's built-in health check.
 ENV STARTUP_CHECK_MAX_TRIES=30
@@ -81,7 +79,7 @@ COPY flux1-schnell-fp8.safetensors ${CHECKPOINT_DIR}/
 # We also need to copy the comfyui-api binary into the image, since ComfyUI
 # is fully asynchronous by default, and has no convenient way to retrieve
 # generated images.
-ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.4.0/comfyui-api .
+ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.8.2/comfyui-api .
 RUN chmod +x comfyui-api
 
 # OPTIONAL: Warmup the server by running a workflow before starting the server.
@@ -103,14 +101,14 @@ receiving the generated images in the response body, or having complete images s
 1. Build the docker image. You should change the specified tag to suit your purpose.
 
 ```bash
-docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-flux1-schnell-fp8 .
+docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8 .
 ```
 
 2.  (Recommended) Run the docker image locally to confirm it works as expected
 
     ```bash
     docker run -it --rm --gpus all -p 3000:3000 -p 8188:8188 --name comfyui \
-    saladtechnologies/comfyui:comfy0.2.0-api1.4.0-flux1-schnell-fp8
+    saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
     ```
 
     Using it here locally, we’re going to expose port 3000, which is required for the wrapper, and port 8188 that will
@@ -266,7 +264,7 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-flux1-schnell-fp8 
 1. Push your docker image up to docker hub (or the container registry of your choice.)
 
 ```bash
-docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-flux1-schnell-fp8
+docker push saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 ```
 
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the

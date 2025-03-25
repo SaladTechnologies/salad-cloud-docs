@@ -3,7 +3,7 @@ title: 'How to Deploy Stable Diffusion (ComfyUI)'
 description: 'A guide to deploying a custom stable diffusion model on SaladCloud with ComfyUI'
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: March 25, 2025_
 
 # High Level
 
@@ -21,9 +21,9 @@ Find a docker image of ComfyUI. Here's one we've verified works on Salad:
 
 **ComfyUI**
 
-- Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
+- Git Repo: [ComfyUI API](https://github.com/SaladTechnologies/comfyui-api)
 - Docker Image:
-  [ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0](http://ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0)
+  [ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-torch2.6.0-cuda12.4-runtime](https://github.com/SaladTechnologies/comfyui-api/pkgs/container/comfyui-api/versions)
 - Model Directory: `/opt/ComfyUI/models`
 - Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
 
@@ -61,10 +61,7 @@ Download any model files you plan to use. For our example, we’re going to use
 
 ```docker
 # We're going to use this verified comfyui image as a base
-FROM ghcr.io/ai-dock/comfyui:v2-cuda-12.1.1-base-22.04-v0.2.0
-
-# Disable the authentication provided by the base image
-ENV WEB_ENABLE_AUTH=false
+FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-torch2.6.0-cuda12.4-runtime
 
 # Now we copy our model into the image
 ENV MODEL_DIR=/opt/ComfyUI/models
@@ -73,7 +70,7 @@ COPY dreamshaper_8.safetensors ${MODEL_DIR}/checkpoints/dreamshaper_8.safetensor
 # We also need to copy the comfyui-api binary into the image, since ComfyUI
 # is fully asynchronous by default, and has no convenient way to retrieve
 # generated images.
-ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.4.0/comfyui-api .
+ADD https://github.com/SaladTechnologies/comfyui-api/releases/download/1.8.2/comfyui-api .
 RUN chmod +x comfyui-api
 
 # OPTIONAL: Warmup the server by running a workflow before starting the server.
@@ -93,17 +90,17 @@ receiving the generated images in the response body, or having complete images s
 ## Build and Test Your Docker Image
 
 1. Build the docker image. You should change the specified tag to suit your purpose. We've chosen to include the ComfyUI
-   version (0.2.0), the API version (1.4.0) and the model name (dreamshaper8) in the tag.
+   version (0.3.27), the API version (1.8.2) and the model name (dreamshaper8) in the tag.
 
 ```bash
-docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
+docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-dreamshaper8 .
 ```
 
 2. (Recommended) Run the docker image locally to confirm it works as expected
 
    ```bash
    docker run -it --rm --gpus all -p 3000:3000 -p 8188:8188 --name comfyui \
-   saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
+   saladtechnologies/comfyui:comfy0.3.27-api1.8.2-dreamshaper8
    ```
 
    Using it here locally, we’re going to expose port 3000, which is required for the wrapper, and port 8188 that will
@@ -257,7 +254,7 @@ docker build -t saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8 .
 1. Push your docker image up to docker hub (or the container registry of your choice.)
 
 ```bash
-docker push saladtechnologies/comfyui:comfy0.2.0-api1.4.0-dreamshaper8
+docker push saladtechnologies/comfyui:comfy0.3.27-api1.8.2-dreamshaper8
 ```
 
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the
