@@ -1,4 +1,5 @@
 #! /usr/bin/bash
+set -e
 
 # path to the schema
 schema=$1
@@ -16,6 +17,17 @@ docsPath=reference/recipes/$recipeName
 mkdir -p $docsPath
 
 menu=$(npx --yes @mintlify/scraping@latest openapi-file $schema -o $docsPath | sed -n '/navigation object suggestion:/,$ p' | sed '1d')
+
+# for each directory in docsPath
+for dir in $docsPath/*; do
+    # continue if not a directory
+    [ -d "$dir" ] || continue
+
+    # move all files of directory to docsPath
+    mv $dir/* $docsPath
+    # remove the directory
+    rmdir $dir
+done
 
 # change the value of .group to the recipe name
 menu=$(echo "$menu" | jq '.[0].group = "'$recipeName'"')

@@ -474,6 +474,40 @@
                     ]
                   },
                   {
+                    "group": "Qwen 2.5 VL 3B Instruct - TGI",
+                    "pages": [
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/template-and-tokenize-chatrequest",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/health-check-method",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/text-generation-inference-endpoint-info",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-from-sagemaker-request",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/prometheus-metrics-scrape-endpoint",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/tokenize-inputs",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-1",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-2",
+                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/get-model-info"
+                    ]
+                  },
+                  {
+                    "group": "Qwen 2.5 VL 7B Instruct - TGI",
+                    "pages": [
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/template-and-tokenize-chatrequest",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/health-check-method",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/text-generation-inference-endpoint-info",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-from-sagemaker-request",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/prometheus-metrics-scrape-endpoint",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/tokenize-inputs",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-1",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-2",
+                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/get-model-info"
+                    ]
+                  },
+                  {
                     "group": "SDXL with Refiner - ComfyUI (API)",
                     "pages": [
                       "reference/recipes/sdxl-with-refiner-comfyui/health-probe",
