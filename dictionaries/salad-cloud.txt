@@ -43,6 +43,7 @@ firstphase
 Flickr
 fooocus
 Fooocus
+gamification
 genpkey
 getenv
 getsize
@@ -67,6 +68,8 @@ italian
 iterrows
 jemison
 konieshadow
+kubeconfig
+kubelet
 LAVIS
 Letzeburgesch
 lib-dynload
@@ -118,6 +121,7 @@ pyenv
 pytorch
 Pytube
 Quickstart
+qwen
 rclone
 Rclone
 REVAI
@@ -142,6 +146,7 @@ saladcloudimdssdkconfig
 saladtechnologies
 salesforce
 schnell
+scnode
 SD.Next
 sdapi
 sdnext
@@ -174,6 +179,8 @@ Uvicorn
 vaeapp
 Valencian
 vCPU
+vimeo
+vkapp
 vram
 webui
 WORKDIR
@@ -183,9 +190,3 @@ yolob8m-custom
 yolov8
 zapier
 zset
-vimeo
-gamification
-scnode
-kubelet
-vkapp
-kubeconfig

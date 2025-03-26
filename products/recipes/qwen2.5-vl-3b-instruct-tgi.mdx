@@ -1,0 +1,90 @@
+---
+title: Qwen 2.5 VL 3B Instruct - TGI
+---
+
+_Last Updated: March 26, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+<Note>See the [Benchmark](https://blog.salad.com/qwen-benchmark/) for performance information.</Note>
+
+## Overview
+
+This recipe deploys the [Qwen2.5 VL 3B Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct) model by Qwen, a
+powerful vision-language model from Alibaba. It uses
+[Huggingface Text Generation Inference (TGI)](https://huggingface.co/docs/text-generation-inference/index) as an
+inference server. The model is capable of generating text from images, and can be used for a variety of tasks such as
+image captioning, document question answering, and more.
+
+## Example Output
+
+**Image**
+
+![](/products/recipes/images/qwen-demo-image.png)
+
+**Prompt**
+
+What is in this image? Include details.
+
+**Output**
+
+The image depicts a street scene in a town with signs for a hotel, shops, and possibly a restaurant. Notable objects in
+the image include:
+
+- A “Peace Way Hotel” sign prominently displayed on the left side of the street. This sign is likely nearby the hotel.
+- Multiple closed storefronts indicating a quiet day and/or area where businesses are closed.
+- A clear road with cars, potentially indicating moderate traffic volume.
+- Buildings with various signs and storefronts, suggesting a commercial area.
+- Smaller signs and billboards, some of which are partially obscured.
+- Raised traffic lights or signals, signaling that the road is a busy one.
+- A large hill or mountain visible in the background, adding to the scenic backdrop.
+- Some electrical or utility poles and wires extending overhead.
+
+Given the setting with sporadic closed shops and hotels, it might suggest a time frame like early morning or low season.
+
+## How To Use This Recipe
+
+### Authentication
+
+When deploying this recipe, you can optionally enable authentication in the container gateway. If you enable
+authentication, all requests to your API will need to include your SaladCloud API key in the header `Salad-Api-Key`. See
+the [documentation](/products/sce/gateway/sending-requests) for more information about authentication.
+
+### Replica Count
+
+The recipe is configured for 3 replicas by default, and we recommend using at least 3 for testing, and at least 5 for
+production workloads. SaladCloud's distributed GPU cloud is powered by idle gaming PCs around the world, in private
+residences, gaming cafes, and eSports arenas. A consequence of this unique infrastructure is that all nodes must be
+considered interruptible without warning. If a Chef (a compute host) decides they want to use their GPU to play a video
+game, or their dog trips on the power cord, or their Wi-Fi goes out, the instance of your workload running on that node
+will be interrupted, and a new instance will be allocated to a different node. This means you will want to slightly
+over-provision the capacity you expect to need in order to have adequate coverage during node reallocations. Don't
+worry, we only charge for instances that are actually running.
+
+### Logging
+
+SaladCloud offers a simple built-in method to view logs from the portal, to facilitate testing and development. For
+production workloads, we highly recommend connecting an external logging source, such as Axiom. This can be done during
+container group creation.
+
+### Deploy It And Wait
+
+When you deploy the recipe, SaladCloud will find the desired number of qualified nodes, and begin the process of
+downloading the container image to the host machine. This particular image is quite large (~13.5 GB), and it may take up
+to tens of minutes to download to some machines, depending on the network conditions of that particular node. Remember,
+these are privately owned pcs with gaming gpus in a variety of networking conditions, and performance will vary across
+different nodes.
+
+Eventually, you will see instances enter the running state, and show a green checkmark in the “Ready” column, indicating
+the workload is passing its readiness probe. Once at least 1 instance is running, the container group will be considered
+running, but for production you will want to wait until an adequate number of nodes have become ready before moving
+traffic over.
+
+### Visit The Docs
+
+Once at least one instance is running, you can navigate to the `/docs` endpoint at the Access Domain Name provided in
+the portal. This will provide you with the Swagger documentation for the API, and allow you to test the API directly
+from the documentation.
+
+## Source Code
+
+[<Icon icon="github" size="24" /> Github Repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/src/tgi-qwen2.5-vl-3b-instruct)
