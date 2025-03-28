@@ -1,20 +1,21 @@
 ---
-title: 'How to Automatically Generate Meeting Action Items with Salad Transcription API'
+title: 'How to Automatically Follow Sales Playbooks with Salad Transcription API'
 ---
 
-_Last Updated: March 18, 2025_
+_Last Updated: March 28, 2025_
 
-By using our integrated custom LLM prompts, you can generate an action items list from your transcribed meetings. To use
-this, you just need to add the `custom_prompt` input parameter to your transcription request.
+By using our integrated custom LLM prompts, you can automatically follow a Sales Playbook from your transcribed meetings
+and sales calls to help meet your KPIs. To use this, you just need to add the `custom_prompt` input parameter to your
+transcription request.
 
 ## Custom input parameters
 
 In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input
-parameter to generate the action items. We'll use the following input parameters:
+parameter to answer questions in our mock playbook. We'll use the following input parameters:
 
 ```python
 payload = {"input": {
-        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
+        "custom_prompt": "The following is a sales call transcription. Follow the playbook and answer the questions. If there are no answers, say 'No answer'. Question 1: Did the sales person get the customers name? Question 2: Did the sales person correctly understand the customers requirements? Question 3: Did the sales person ask for the customer's pain point with their existing providor? Question 4: How well and precisely did the sales person answer questions posed by the customer? Question 5: Did the sales person ask the customer how the call went?",
         "url": audio_file_url,
         "diarization": True,
         "language_code": "en",
@@ -24,8 +25,8 @@ payload = {"input": {
 
 ## Python script
 
-We're going to create a file and name it `action-items.py`. We're then going to use the above parameters in the
-following Python script:
+We're going to create a file and name it `playbook.py`. We're then going to use the above parameters in the following
+Python script:
 
 ```python
 import requests
@@ -37,7 +38,7 @@ salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
 organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
 payload = {"input": {
-        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
+        "custom_prompt": "The following is a sales call transcription. Follow the playbook and answer the questions. If there are no answers, say 'No answer'. Question 1: Did the sales person get the customers name? Question 2: Did the sales person correctly understand the customers requirements? Question 3: Did the sales person ask for the customer's pain point with their existing providor? Question 4: How well and precisely did the sales person answer questions posed by the customer? Question 5: Did the sales person ask the customer how the call went?",
         "url": audio_file_url,
         "diarization": True,
         "language_code": "en",
@@ -81,10 +82,10 @@ while True:
 - Replace `YOUR_SALAD_API_KEY` with
   [your Salad API key](products/sce/getting-started/quickstart-api#step-1-obtain-your-api-key).
 - Replace `YOUR_ORGANIZATION_NAME` with your organization name.
-- Run the script using with `python action-items.py`.
+- Modify the questions in the `custom_prompt` parameter to match your playbook.
+- Run the script using with `python playbook.py`.
 
-In this script, we're telling the LLM to read through the transcription, and generate a list of important action
-items. We're also asking it to format it to be easily readable in markdown format. It will be returned in the
+In this script, we're telling the LLM to answer our questions and fill in the sales playbook. It will be returned in the
 `llm_result` field of the response. We're then printing the result of this field to the console. Your console will look
 something like this once it finishes:
 
@@ -101,14 +102,18 @@ Current job status is running
 Current job status is running
 Current job status is running
 Current job status is running
-The meeting discusses migrating to Salad Transcription API from our existing provider.
+Transcription Result: Question 1: Did the sales person get the customer's name?
+Yes.
 
-**Action Items:**
+Question 2: Did the sales person correctly understand the customer's requirements?
+Yes.
 
-* Schedule a follow-up meeting to discuss transcription migration with the team
-* Assign tasks to team members for the new project
-* Test out the Salad Transcription API for the next meeting
-* Set up billing for Salad
-* Onboard Aardvark to the project
-* Configure the new server
+Question 3: Did the sales person ask for the customer's pain point with their existing provider?
+No.
+
+Question 4: How well and precisely did the sales person answer questions posed by the customer?
+Good, provided relevant information about NVIDIA 50 series controversy.
+
+Question 5: Did the sales person ask the customer how the call went?
+No.
 ```

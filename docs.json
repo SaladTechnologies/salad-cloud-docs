@@ -304,6 +304,7 @@
                         "pages": [
                           "guides/transcription/salad-transcription-api/transcribe-youtube",
                           "guides/transcription/salad-transcription-api/transcribe-vimeo",
+                          "guides/transcription/salad-transcription-api/sales-playbook",
                           "guides/transcription/salad-transcription-api/splitting-large-audio-files",
                           "guides/transcription/salad-transcription-api/get-transcription-quotes",
                           "guides/transcription/salad-transcription-api/transcribe-a-local-file",
