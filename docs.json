@@ -304,8 +304,8 @@
                           "guides/transcription/salad-transcription-api/get-transcription-quotes",
                           "guides/transcription/salad-transcription-api/transcribe-a-local-file",
                           "guides/transcription/salad-transcription-api/identify-hate-speech",
-                          "guides/transcription/salad-transcription-api/audio-chapters",
-                          "guides/transcription/salad-transcription-api/meeting-action-items"
+                          "guides/transcription/salad-transcription-api/meeting-action-items",
+                          "guides/transcription/salad-transcription-api/audio-chapters"
                         ]
                       }
                     ]
