@@ -242,6 +242,7 @@
               {
                 "group": "Computer Vision",
                 "pages": [
+                  "guides/computer-vision/caption-with-vlm",
                   {
                     "group": "YOLOv8",
                     "pages": [
