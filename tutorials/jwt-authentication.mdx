@@ -164,13 +164,13 @@ def get_jwt():
    result = sdk.metadata.get_container_token()
    return result.jwt
 
-# Should call the IMDS once every 2~3 minutes and use the returned JWT for subsequent requests.
+# Call the IMDS every 2–3 minutes and reuse the returned JWT for subsequent requests, rather than requesting a new JWT each time.
 jwt_token = get_jwt()
 
 # Include the JWT in the HTTP Authorization header.
 headers = { "Authorization": f"Bearer {jwt_token}", "Content-Type": "application/json" }
 
-# The external service endpoint
+# The external service endpoint - HTTPS; for the demo, call the local HTTP service
 url = "http://127.0.0.1:8000/protected"
 
 # The job result (e.g., audio transcription)
@@ -219,7 +219,7 @@ def validate_jwt(token, jwks_uri, audience_id):
        if not kid:
            raise ValueError("No 'kid' found in JWT header.")
 
-       # Should fetch the JWKS periodically (e.g., daily), rather than on every validation.
+       # Fetch the JWKS periodically (e.g., daily), rather than on every JWT validation.
        public_key = get_public_key(jwks_uri, kid)
        if not public_key:
            raise ValueError(f"Public key with kid '{kid}' not found in JWKS.")
@@ -247,7 +247,8 @@ def protected():
    token = auth_header.split(" ")[1]  # Extract the token part of the header.
    decoded_payload = validate_jwt(token, jwks_url, audience_salad_org_id) # Validate the JWT.
 
-   if decoded_payload:
+   if decoded_payload: # Signature Verified
+       # Further verify that the 'salad_organization_name' and 'salad_workload_id'('salad_container_group_id') are correct.
        request_data = request.json
        print("\nThe JWT:", json.dumps(decoded_payload,indent=4))
        print("\nReceived data:", request_data)
@@ -262,17 +263,16 @@ if __name__ == '__main__':
 
 Open two terminals on the SaladCloud Portal. First, run external_services.py, then run applications.py.
 
-The application successfully sends the job result to the external service using the JWT.
-
-In the identity broker scenario, the application can now retrieve real credentials for accessing public cloud services,
-such as job queues, databases, and storage, and securely store them in memory.
+The application successfully sends the job result to the external service using the JWT. In the identity broker
+scenario, the application can now retrieve real credentials for accessing public cloud services, such as job queues,
+databases, and storage, and securely store them in memory.
 
 <img src="/tutorials/images/jwt_auth/jwt_5.png" />
 
 The service successfully validates the JWT and receives the result. Additionally, most proxies support JWT
 authentication, allowing us to offload this function to the proxy, enabling services to focus on their core tasks.
 
-For the identity broker, it can create and return the temporary credentials to applications, such as API keys, access
-tokens, or username/passwords.
+For the identity broker, it can create temporary credentials, such as API keys, access tokens, or username/passwords,
+and provide them to applications.
 
 <img src="/tutorials/images/jwt_auth/jwt_6.png" />
