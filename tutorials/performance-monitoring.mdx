@@ -1,0 +1,104 @@
+---
+title: Implementing Performance Monitoring
+description: Learn how to implement performance monitoring in your application.
+---
+
+_Last updated: March 31, 2025_
+
+## Overview
+
+GPU performance can vary over time with factors like utilization and temperature. To ensure your application runs
+smoothly, it's important to monitor these metrics and take action if they exceed certain thresholds. This can be
+accomplished easily using python, `nvidia-smi` and the `psutil` library.
+
+## Getting GPU Stats
+
+To get GPU stats, you can use the `nvidia-smi` command which is available by default in all gpu instances. This command
+provides a wealth of information about the GPU, including utilization, memory usage, temperature, and more. You can see
+the complete list of options by running `nvidia-smi --help-query-gpu`.
+
+To get this information in python, we can use the `subprocess` library to run the command and capture its output. Here's
+an example of how to do this:
+
+```python
+import subprocess
+import csv
+
+def get_gpu_stats(stats_to_query: list = []):
+    """
+    Run nvidia-smi with JSON output format and return the parsed data
+    All options: `nvidia-smi --help-query-gpu`
+    """
+
+    # Run nvidia-smi with csv output format
+    result = subprocess.run(
+        ["nvidia-smi",
+            f"--query-gpu={','.join(stats_to_query)}", "--format=csv,nounits"],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+
+    # Process the CSV output
+    csv_data = result.stdout.strip().splitlines()
+    reader = csv.DictReader(csv_data)
+    stats = []
+    for row in reader:
+        data = {key.strip(): value.strip()
+                for key, value in row.items()}
+        for key, value in data.items():
+            # Convert numeric values to appropriate types
+            if value.isdigit():
+                data[key] = int(value)
+            else:
+                try:
+                    data[key] = float(value)
+                except ValueError:
+                    pass
+        stats.append(data)
+    return stats
+
+# Full list of options available with `nvidia-smi --help-query-gpu`
+gpu_stats_to_query = [
+        "timestamp",
+        "index",
+        "gpu_name",
+        "driver_version",
+        "memory.total",
+        "memory.free",
+        "memory.used",
+        "memory.reserved",
+        "compute_cap",
+        "utilization.gpu",
+        "utilization.memory",
+        "temperature.gpu",
+        "temperature.memory",
+        "power.draw",
+        "power.limit"
+    ]
+gpu_stats = get_gpu_stats(gpu_stats_to_query)
+```
+
+You will get an output like this:
+
+```json
+[
+  {
+    "timestamp": "2025/03/31 15:21:49.377",
+    "index": 0,
+    "name": "NVIDIA GeForce RTX 3080 Ti Laptop GPU",
+    "driver_version": 561.19,
+    "memory.total [MiB]": 16384,
+    "memory.free [MiB]": 14804,
+    "memory.used [MiB]": 1372,
+    "memory.reserved [MiB]": 209,
+    "compute_cap": 8.6,
+    "utilization.gpu [%]": 4,
+    "utilization.memory [%]": 12,
+    "temperature.gpu": 49,
+    "temperature.memory": "N/A",
+    "power.draw [W]": 21.09,
+    "power.limit [W]": "[N/A]"
+  }
+]
+```

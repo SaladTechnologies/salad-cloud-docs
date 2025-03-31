@@ -90,3 +90,5 @@ $RECYCLE.BIN/
 *.vsix
 
 node_modules/
+
+.venv
