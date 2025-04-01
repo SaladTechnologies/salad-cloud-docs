@@ -32,13 +32,13 @@ Python script:
 import requests
 import time
 
-audio_file_url = "url/to/audio/file.mp3" # replace with your audio file URL
+audio_file_url = "https://your-storage.com/path/to/audio.mp3" # replace with your audio file URL
 
 salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
 organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
 
 payload = {"input": {
-        "custom_prompt": "The following is a sales call transcription. Follow the playbook and answer the questions. If there are no answers, say 'No answer'. Question 1: Did the sales person get the customers name? Question 2: Did the sales person correctly understand the customers requirements? Question 3: Did the sales person ask for the customer's pain point with their existing providor? Question 4: How well and precisely did the sales person answer questions posed by the customer? Question 5: Did the sales person ask the customer how the call went?",
+        "custom_prompt": "The following is a sales call transcription. Follow the playbook and answer the questions. If there are no answers, say 'No answer'. Question 1: Did the sales person get the customers name? Question 2: Did the sales person correctly understand the customers requirements? Question 3: Did the sales person ask for the customer's pain point with their existing provider? Question 4: How well and precisely did the sales person answer questions posed by the customer? Question 5: Did the sales person ask the customer how the call went?",
         "url": audio_file_url,
         "diarization": True,
         "language_code": "en",
@@ -78,12 +78,12 @@ while True:
         break
 ```
 
-- Make sure to replace `url/to/audio/file.mp3` with the URL of your audio file.
+- Make sure to replace `https://your-storage.com/path/to/audio.mp3` with the URL of your audio file.
 - Replace `YOUR_SALAD_API_KEY` with
   [your Salad API key](products/sce/getting-started/quickstart-api#step-1-obtain-your-api-key).
 - Replace `YOUR_ORGANIZATION_NAME` with your organization name.
 - Modify the questions in the `custom_prompt` parameter to match your playbook.
-- Run the script using with `python playbook.py`.
+- Run the script using `python playbook.py`.
 
 In this script, we're telling the LLM to answer our questions and fill in the sales playbook. It will be returned in the
 `llm_result` field of the response. We're then printing the result of this field to the console. Your console will look
