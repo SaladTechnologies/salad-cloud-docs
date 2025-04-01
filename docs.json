@@ -189,6 +189,7 @@
               "tutorials/high-performance-storage-solutions",
               "tutorials/jwt-authentication",
               "tutorials/performance-monitoring",
+              "tutorials/pytorch-rtx5090",
               {
                 "group": "Run a Node App",
                 "pages": [
