@@ -192,3 +192,5 @@ yolov8
 zapier
 zset
 dlss
+jsonify
+jwks
