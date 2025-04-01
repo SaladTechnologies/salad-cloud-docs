@@ -188,6 +188,7 @@
               "tutorials/high-performance-apps",
               "tutorials/high-performance-storage-solutions",
               "tutorials/jwt-authentication",
+              "tutorials/performance-monitoring",
               {
                 "group": "Run a Node App",
                 "pages": [
