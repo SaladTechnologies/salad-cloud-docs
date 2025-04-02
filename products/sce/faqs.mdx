@@ -3,7 +3,7 @@ title: 'Salad Container Engine FAQs'
 sidebarTitle: 'FAQs'
 ---
 
-_Last Updated: March 17, 2025_
+_Last Updated: April 1, 2025_
 
 This document is a must-read before getting started with SaladCloud. Here, we detail what SaladCloud is, the nature of
 our network, how SaladCloud works, unique traits of our distributed network, the choice of consumer GPUs over data
@@ -192,6 +192,8 @@ We are SOC 2 Type 1 compliant. You can read more about our compliance
 ## RTX 5090 GPUs on SaladCloud?
 
 We have RTX 5090 GPUs on SaladCloud! There are some things you should know before deploying:
+
+<Tip>[Build your own compatible docker image](/tutorials/pytorch-rtx5090) for the RTX 5090 and RTX 5080.</Tip>
 
 - **MINIMUM CUDA VERSION: 12.8** - If your application does not use CUDA 12.8, it will not run on the RTX 5090.
 - As of March 17, 2025, **PyTorch has not released an official build** with support for CUDA 12.8. You can build PyTorch

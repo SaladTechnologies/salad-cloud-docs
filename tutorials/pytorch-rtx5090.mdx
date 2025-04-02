@@ -1,0 +1,73 @@
+---
+title: Running PyTorch on RTX 5090 and 5080 GPUs
+description: This tutorial provides a step-by-step guide to running PyTorch on the Nvidia RTX 50XX series GPUs
+---
+
+_Last Updated: April 1, 2025_
+
+## Overview
+
+Nvidia's new RTX 5090 and RTX 5080 GPUs require CUDA 12.8, but PyTorch official releases do not yet support it.
+[Check here in case this guide is out of date](https://hub.docker.com/r/pytorch/pytorch/tags).
+
+This tutorial provides a workaround to run PyTorch on the RTX 50-series GPUs using the latest nightly build of PyTorch.
+
+<Info>
+  If you intend to run a workload both on 50-series gpus and older 40- or 30-series gpus, you will need to maintain
+  separate docker images. As of the time of this writing, older GPUs do not have cuda 12.8 support, so the image you
+  have to build for the 50-series will not work on older GPUs.
+</Info>
+
+## Dockerfile
+
+This Dockerfile sets up a container with the necessary dependencies to run PyTorch on RTX 50-series GPUs.
+
+We start with the official nvidia/cuda image, using the "runtime" version of CUDA 12.8.1. There is also a "devel"
+version available. [See all tags.](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cuda/tags)
+
+From there, we set up our python environment, and install torch while setting `--index-url` to the nightly build of
+PyTorch, built for CUDA 12.8.
+
+```dockerfile
+FROM nvcr.io/nvidia/cuda:12.8.1-cudnn-runtime-ubuntu24.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update -y && apt install -y \
+    wget \
+    curl \
+    git \
+    python3 \
+    python3-pip \
+    python3-venv \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN . /opt/venv/bin/activate
+
+RUN pip install --upgrade pip
+RUN pip install --pre torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/nightly/cu128
+```
+
+## Build
+
+```bash
+docker build -t my-registry/pytorch:nightly-cuda12.8-cudnn9-runtime --push .
+```
+
+## Use
+
+Once you've built the image, you can use it in your dockerfile like any other pytorch base image
+
+```dockerfile
+# OLD: pytorch/pytorch:2.6.0-cuda12.6-cudnn8-runtime
+FROM my-registry/pytorch:nightly-cuda12.8-cudnn9-runtime
+
+# Do whatever you want here
+```
+
+## Conclusion
+
+That's all there is to it! Now you can run PyTorch on the RTX 50-series GPUs using the latest nightly build.
