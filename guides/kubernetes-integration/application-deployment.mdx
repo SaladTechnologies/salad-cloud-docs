@@ -14,7 +14,7 @@ Each VK node in the Kubernetes cluster is exclusively tied to an organization's 
 resources not created by the VK node will be automatically removed. VK nodes are also deployed with specific labels,
 annotations, and taints, which are utilized for efficient scheduling. Here is an example:
 
-<img src="/guides/kubernetes-integration/images/k8s-scheduling.png" />
+<img src="/guides/kubernetes-integration/images/k8s-scheduling1.png" />
 
 The node name and labels can be used to schedule pods on one or more VK nodes, offering flexibility in targeting
 specific VK nodes or a group of VK nodes.
@@ -242,7 +242,7 @@ SaladCloud will allocate a new node to run the image.
 Here is the corresponding Kubernetes deployment manifest to achieve a similar outcome on SaladCloud as the Python code
 above:
 
-```yaml
+```yaml vkapp_demo.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -259,8 +259,8 @@ spec:
     metadata:
       annotations:
         salad.com/container-group-priority: 'high'
-        salad.com/country-codes: 'us, ca, mx'
-        salad.com/gpu-classes: 'a5db5c50-cbcb-4596-ae80-6a0c8090d80f, ed563892-aacd-40f5-80b7-90c9be6c759b'
+        salad.com/country-codes: 'us,ca,mx'
+        salad.com/gpu-classes: 'a5db5c50-cbcb-4596-ae80-6a0c8090d80f,ed563892-aacd-40f5-80b7-90c9be6c759b'
         # salad.com/networking-protocol: "http"
         # salad.com/networking-port: "8888"
         # salad.com/networking-auth: "false"
@@ -276,8 +276,11 @@ spec:
           ports:
             - containerPort: 8888
           livenessProbe:
-            exec:
-              command: ['curl', '--fail', 'http://localhost:8888/hc']
+            httpGet:
+              scheme: HTTP
+              path: /hc
+              port: 8888
+              host: localhost
             initialDelaySeconds: 30
             periodSeconds: 5
             timeoutSeconds: 3
@@ -346,13 +349,13 @@ least privilege principles, as environment variables can be dynamically retrieve
 exposure to these sensitive credentials.
 
 For Networking (Container Gateway), the generated URL will be written back to the annotations of each pod upon
-deployment in a future version (not supported in v0.2.1). In the meantime, alternative access methods are available for
-these virtual pods—please refer to [the service access guide](/guides/kubernetes-integration/service-access) for
+deployment in a future version **(not supported in v0.2.3)**. In the meantime, alternative access methods are available
+for these virtual pods—please refer to [the service access guide](/guides/kubernetes-integration/service-access) for
 details.
 
 If the above example does not fully cover the mappings for your use cases, you may test and adjust the deployment
 manifest, check the created resources on SaladCloud, and review
-[the source code](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/blob/main/internal/provider/provider.go)
+[the source code](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/blob/v0.2.3/internal/provider/provider.go)
 for further insights.
 
 There are still [some issues](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/issues) which are being
@@ -382,3 +385,25 @@ setting the replica count to zero.
 
 DevOps tools like Jenkins, Argo CD, Flux, and others can be deployed to automate deployment and management, further
 simplifying the entire process.
+
+## Common Commands
+
+```
+# Deploy and Undeploy
+
+kubectl apply -f vkapp_demo.yaml
+kubectl delete -f vkapp_demo.yaml
+
+# Troubleshooting
+
+kubectl get pod | grep vkapp
+kubectl describe deployment vkapp-demo | grep priority
+kubectl -n default get all
+kubectl describe pod <POD_NAME>
+kubectl logs <POD_NAME> -f
+
+# Scaling
+
+kubectl scale deployment vkapp-demo --replicas=5
+kubectl scale deployment vkapp-demo --replicas=0
+```

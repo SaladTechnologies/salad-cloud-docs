@@ -18,14 +18,14 @@ standard nodes. This enables greater scalability, flexibility, and efficient res
 additional physical nodes.
 
 You can access SaladCloud directly through its APIs/SDKs in your Kubernetes applications. However, with **the Salad
-Virtual Kubelet solution (v0.2.1)**, you can now provision and manage GPU resources on SaladCloud using Kubernetes APIs.
+Virtual Kubelet solution (v0.2.3)**, you can now provision and manage GPU resources on SaladCloud using Kubernetes APIs.
 This solution includes:
 
-- [VK Provider Source Code](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/) - Can be compiled into the
-  VK binary.
-- [Dockerfile](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/blob/v0.2.1/docker/Dockerfile) - Used to
+- [VK Provider Source Code](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/tree/v0.2.3) - Can be
+  compiled into the VK binary.
+- [Dockerfile](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/blob/v0.2.3/docker/Dockerfile) - Used to
   build the VK container image that includes the pre-built VK binary.
-- [Helm Chart](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/tree/v0.2.1/charts/virtual-kubelet-saladcloud-chart) -
+- [Helm Chart](https://github.com/SaladTechnologies/virtual-kubelet-saladcloud/tree/v0.2.3/charts/virtual-kubelet-saladcloud-chart) -
   Deploys the VK image on your Kubernetes cluster.
 
 To ensure compatibility, the versions/tags of the VK solution, provider source code, docker image and Helm chart are

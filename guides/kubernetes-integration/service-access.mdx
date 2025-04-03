@@ -113,7 +113,7 @@ requires some additional effort and doesn’t work out of the box:**
 
 **Another option is to leverage SaladCloud’s Container Gateway.** For each pod created by the VK node, a corresponding
 single-replica container group is deployed on SaladCloud. When the gateway is enabled, the generated URL is
-automatically written back to the pod's annotations for easy access (**currently not supported in v0.2.1**). However,
+automatically written back to the pod's annotations for easy access (**currently not supported in v0.2.3**). However,
 client applications are still responsible for monitoring their health and implementing client-side load balancing.
 
 AI inference times can vary widely and may be significantly longer, while the GPU nodes on SaladCloud are interruptible
