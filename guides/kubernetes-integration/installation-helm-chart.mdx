@@ -46,11 +46,11 @@ If you're still using the legacy UUID-based API key, you will need to create a n
 provider, which will start with `salad_cloud_user_`. **Additionally, make sure to create a dedicated, empty project on
 SaladCloud for each VK instance.**
 
-Then run the **helm template** command to pull the chart (0.2.1) hosted on the OCI registry at GitHub Container Registry
+Then run the **helm template** command to pull the chart (0.2.3) hosted on the OCI registry at GitHub Container Registry
 (GHCR) and render the chart with the above environment variables:
 
 ```
-helm template scnode3-dryrun oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.1 \
+helm template scnode3-dryrun oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.3 \
   --create-namespace \
   --namespace salad-cloud \
   --set salad.apiKey=$SALAD_API_KEY \
@@ -67,7 +67,7 @@ Now, install the chart using the **helm install** command. Helm follows the same
 the cluster-admin or equivalent permissions are required to install the chart.
 
 ```
-helm install scnode3 oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.1 \
+helm install scnode3 oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.3 \
   --create-namespace \
   --namespace salad-cloud \
   --set salad.apiKey=$SALAD_API_KEY \
@@ -121,3 +121,48 @@ the installed releases in the namespace and uninstall the chart:
 Now, remove the node from the Kubernetes cluster:
 
 <img src="/guides/kubernetes-integration/images/k8s-delete-node.png" />
+
+## Common Commands
+
+```
+# Troubleshooting
+
+kubectl get nodes -o wide
+kubectl describe node scnode1
+
+kubectl -n salad-cloud get all,sa,secret
+kubectl -n salad-cloud get all,sa,secret | grep scnode1
+kubectl get clusterrolebinding | grep salad
+
+kubectl -n salad-cloud describe pod <VK_NODE_POD_NAME>
+kubectl -n salad-cloud logs <VK_NODE_POD_NAME> -f
+
+# Install and Uninstall
+
+export SALAD_API_KEY=************
+export SALAD_PROJECT_NAME=************
+export SALAD_ORGANIZATION_NAME=************
+
+helm -n salad-cloud list
+helm -n salad-cloud status scnode1
+
+helm template scnode3-dryrun oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.3 \
+  --create-namespace \
+  --namespace salad-cloud \
+  --set salad.apiKey=$SALAD_API_KEY \
+  --set salad.organizationName=$SALAD_ORGANIZATION_NAME \
+  --set salad.projectName=$SALAD_PROJECT_NAME \
+  --set salad.nodeName=scnode3
+
+helm install scnode3 oci://ghcr.io/saladtechnologies/virtual-kubelet-saladcloud-chart --version 0.2.3 \
+  --create-namespace \
+  --namespace salad-cloud \
+  --set salad.apiKey=$SALAD_API_KEY \
+  --set salad.organizationName=$SALAD_ORGANIZATION_NAME \
+  --set salad.projectName=$SALAD_PROJECT_NAME \
+  --set salad.nodeName=scnode3
+
+helm -n salad-cloud uninstall scnode3
+
+kubectl delete node scnode3
+```
