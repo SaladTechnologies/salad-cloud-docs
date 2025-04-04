@@ -147,6 +147,7 @@
             "group": "Transcription API",
             "pages": [
               "products/transcription/transcription-overview",
+              "products/transcription/accuracy-benchmarks",
               "products/transcription/speech-to-text",
               "products/transcription/translation",
               "products/transcription/captions",
