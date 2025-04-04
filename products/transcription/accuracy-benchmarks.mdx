@@ -11,6 +11,33 @@ datasets. Below is a breakdown of results by language and dataset.
 
 ---
 
+### Languages with Accuracy ≥ 90%
+
+- English
+- Portuguese
+- French
+- Spanish
+- German
+- Italian
+- Russian
+
+---
+
+### Languages with Accuracy between 80%–89%
+
+- Hindi
+- Hebrew
+
+---
+
+### Languages with Accuracy < 80%
+
+- Urdu
+- Kazakh
+- Thai _(in progress)_
+
+---
+
 ## English
 
 | Dataset     | Sub-Dataset                     | Accuracy (Full) | WER (Full) | Accuracy (Lite) | WER (Lite) | Source                                                                                |
@@ -110,32 +137,7 @@ datasets. Below is a breakdown of results by language and dataset.
 | ----------- | ------------------------------- | -------- | ------- | ------------------------------------------------ |
 | CommonVoice | cv-corpus-10.0-delta-2022-07-04 | 33.0%    | 67.0%\* | [Common Voice](https://commonvoice.mozilla.org/) |
 
-## _Note: Thai WER may need a recalculation due to formatting issues._
-
-### Languages with Accuracy ≥ 90%
-
-- English
-- Portuguese
-- French
-- Spanish
-- German
-- Italian
-- Russian
-
----
-
-### Languages with Accuracy between 80%–89%
-
-- Hindi
-- Hebrew
-
----
-
-### Languages with Accuracy < 80%
-
-- Urdu
-- Kazakh
-- Thai _(in progress)_
+<Note>Thai WER may need a recalculation due to formatting issues.</Note>
 
 ---
 
@@ -145,7 +147,8 @@ To ensure fair and repeatable accuracy evaluation, we adopted a benchmarking met
 
 - Public datasets were used for transparency and reproducibility
 - Transcripts were normalized using [Whisper Normalizer](https://pypi.org/project/whisper-normalizer/)
-- Accuracy was calculated using **Word Error Rate (WER)** via the [JiWER](https://pypi.org/project/jiwer/) library
+- Accuracy was calculated using [**Word Error Rate (WER)**](https://en.wikipedia.org/wiki/Word_error_rate) via the
+  [JiWER](https://pypi.org/project/jiwer/) library
 
 This benchmark continues to expand as we test more languages and improve our models.
 
