@@ -83,7 +83,7 @@ Here is a summary of the supported communication scenarios and protocols when in
 After integrating SaladCloud with Tailscale, you can fully utilize Tailscale’s features, solutions, and ecosystem to
 build a wide range of applications:
 
-- Salad nodes can securely connect to systems within the same Tailnet, including on-premises datacenters and private
+- Salad nodes can securely connect to systems within the same tailnet, including on-premises datacenters and private
   services hosted on public clouds. This enables effortless development of distributed applications over TCP or UDP.
 
 - With [Tailscale’s pre-built Kubernetes integration](https://tailscale.com/kb/1185/kubernetes), Salad nodes can
@@ -94,8 +94,9 @@ build a wide range of applications:
   running on Salad nodes.
 
 - You can build clustered applications on Salad nodes using TCP or UDP communication. However, ensure that in-cluster
-  communication uses Tailscale IPs, while intra-node communication uses the localhost. Note that Ray is currently
-  incompatible with the solution because it uses a single IP for both in-cluster and intra-node communication.
+  communication uses Tailscale IPs, while intra-node communication uses the localhost. Note that
+  [Ray](https://www.ray.io/) is currently incompatible with the solution because it uses a single IP for both in-cluster
+  and intra-node communication.
 
 You can begin testing the integration solution with [a Tailscale personal account](https://tailscale.com/pricing), which
 supports up to 100 nodes, allowing you to explore a variety of use cases.
