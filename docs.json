@@ -357,13 +357,7 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": [
-                  "guides/tailscale-integration/solution-overview",
-                  "guides/tailscale-integration/installation-configuration",
-                  "guides/tailscale-integration/ssh-vscode",
-                  "guides/tailscale-integration/secure-private-connections",
-                  "guides/tailscale-integration/mesh-network-communication"
-                ]
+                "pages": ["guides/tailscale-integration/solution-overview"]
               }
             ]
           }

@@ -39,7 +39,7 @@ Integrating Tailscale with SaladCloud unlocks additional use cases, including:
 - **Network Management and Troubleshooting:** Network operators can SSH into Salad nodes for configuration, management,
   and troubleshooting purposes.
 
-- **Node Discovery and Identity Broker:** Detecting when nodes come online or go office, while implementing an identity
+- **Node Discovery and Identity Broker:** Detecting when nodes come online or go offline, while implementing an identity
   broker for private, centralized authentication and authorization. This setup provides temporary credentials to Salad
   nodes for accessing external systems using [JWT authentication](/tutorials/jwt-authentication).
 
@@ -84,7 +84,7 @@ After integrating SaladCloud with Tailscale, you can fully utilize Tailscale’s
 build a wide range of applications:
 
 - Salad nodes can securely connect to systems within the same tailnet, including on-premises datacenters and private
-  services hosted on public clouds. This enables effortless development of distributed applications over TCP or UDP.
+  services hosted on public clouds. This enables simpler development of distributed applications over TCP or UDP.
 
 - With [Tailscale’s pre-built Kubernetes integration](https://tailscale.com/kb/1185/kubernetes), Salad nodes can
   directly access pods and services—such as self-managed RabbitMQ and Redis—within public or private Kubernetes
