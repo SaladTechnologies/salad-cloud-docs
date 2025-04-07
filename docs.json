@@ -355,6 +355,10 @@
                   "guides/kubernetes-integration/application-deployment",
                   "guides/kubernetes-integration/service-access"
                 ]
+              },
+              {
+                "group": "Tailscale Integration",
+                "pages": ["guides/tailscale-integration/solution-overview"]
               }
             ]
           }
