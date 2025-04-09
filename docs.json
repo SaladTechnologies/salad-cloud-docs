@@ -365,10 +365,10 @@
         ]
       },
       {
-        "tab": "Reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "Reference",
+            "group": "API Reference",
             "pages": [
               "reference/api-usage",
               {
