@@ -35,6 +35,14 @@
                   "products/sce/container-groups/container-groups",
                   "products/sce/container-groups/deployment-lifecycle",
                   "products/sce/container-groups/managing-deployments",
+                  {
+                    "group": "Billing and Pricing",
+                    "pages": [
+                      "products/sce/container-groups/billing-and-pricing/billing",
+                      "products/sce/container-groups/billing-and-pricing/priority-pricing",
+                      "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
+                    ]
+                  },
                   "products/sce/container-groups/environment-variables",
                   {
                     "group": "Container Registries",
@@ -76,14 +84,6 @@
                       "products/sce/container-groups/imds/Container-status-endpoint",
                       "products/sce/container-groups/imds/obtaining-an-imds-jwt",
                       "products/sce/container-groups/imds/imds-reallocate"
-                    ]
-                  },
-                  {
-                    "group": "Billing and Pricing",
-                    "pages": [
-                      "products/sce/container-groups/billing-and-pricing/billing",
-                      "products/sce/container-groups/billing-and-pricing/priority-pricing",
-                      "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
                     ]
                   },
                   "products/sce/container-groups/specifying-a-command",
