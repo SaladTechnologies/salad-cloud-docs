@@ -90,8 +90,7 @@
                   "products/sce/container-groups/disk-space",
                   "products/sce/container-groups/system-events",
                   "products/sce/container-groups/container-logs",
-                  "products/sce/container-groups/quotas",
-                  "products/sce/container-groups/faqs"
+                  "products/sce/container-groups/quotas"
                 ]
               },
               {
@@ -869,6 +868,10 @@
     {
       "source": "/products/sce/getting-started/architectual-overview",
       "destination": "/products/sce/getting-started/architectural-overview"
+    },
+    {
+      "source": "products/sce/container-groups/faqs",
+      "destination": "/products/sce/faqs"
     }
   ]
 }
