@@ -50,8 +50,8 @@ curl -X 'POST' \
 
 When deploying this recipe, you can optionally enable authentication in the container gateway. If you enable
 authentication, all requests to your API will need to include your Salad API key in the header `Salad-Api-Key`. See the
-[documentation](https://docs.salad.com/container-engine/gateway/sending-requests#authenticated-requests) for more
-information about authentication.
+[documentation](/container-engine/gateway/sending-requests#authenticated-requests) for more information about
+authentication.
 
 ### Replica Count
 
@@ -108,10 +108,9 @@ etc.
 ### Custom Models And Nodes
 
 To use a different model, you would follow
-[this guide](https://docs.salad.com/container-engine/guides/stable-diffusion/basic-how-to-deploy-stable-diffusion-on-salad-comfy)
-but copy in your custom model instead of the default one, and ensure your warmup workflow references the correct
-checkpoint name. You’d push up the new image to the image registry of your choice, and edit the container group to
-reference the new image.
+[this guide](/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy) but copy in your custom model
+instead of the default one, and ensure your warmup workflow references the correct checkpoint name. You’d push up the
+new image to the image registry of your choice, and edit the container group to reference the new image.
 
 ### Custom Endpoints
 

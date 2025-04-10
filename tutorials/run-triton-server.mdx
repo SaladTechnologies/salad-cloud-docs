@@ -11,8 +11,8 @@ of machine learning models in production environments. Developed by NVIDIA, Trit
 solution for serving deep learning models.
 
 Triton Inference Server supports a wide range of deep learning and machine learning frameworks, including **TensorFlow,
-PyTorch, Python, ONNX, NVIDIA® TensorRT™, RAPIDS™ cuML, XGBoost, scikit-learn RandomForest, OpenVINO, custom C++**,
-and more. Its primary use cases are:
+PyTorch, Python, ONNX, NVIDIA® TensorRT™, RAPIDS™ cuML, XGBoost, scikit-learn RandomForest, OpenVINO, custom C++**, and
+more. Its primary use cases are:
 
 - Serving multiple models from a single server instance.
 - Dynamic model loading and unloading without server restart.
@@ -78,8 +78,7 @@ COPY tmp/triton_repo /models
 
 #### Step 3: Enable IPv6
 
-Refer to the official SaladCloud documentation on enabling IPv6:
-[Enabling IPv6](https://docs.salad.com/products/sce/gateway/enabling-ipv6)
+Refer to the official SaladCloud documentation on enabling IPv6: [Enabling IPv6](/products/sce/gateway/enabling-ipv6)
 
 Create a shell script that will run the Triton server with your model and route traffic from container port 80 to triton
 http-port 8000 using `socat`. That shell script will be an entrypoint in the image.
@@ -128,7 +127,7 @@ CMD ["/start_services.sh"]
 #### Step 6: Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container_groups/create-a-container-group)
 
 Follow this easy steps to deploy your container on salad:
-[Quickstart - SaladCloud](https://docs.salad.com/products/sce/getting-started/quickstart)
+[Quickstart - SaladCloud](/products/sce/getting-started/quickstart)
 
 ## Usage Example
 

@@ -35,7 +35,7 @@ image is available [here](https://github.com/SaladTechnologies/salad-recipes/tre
      - EG: `curl -XPOST -H "Content-type: application/json" -d '{"set": "example_text"}' 'https://{saladURL}/set'`
 2. **Example Environment Variable definitions**: Running ./env_test.sh will echo the example defined Environment
    Variables defined for your container group. We've pre-defined some in this example image by default.
-3. **Example [JWT retrieval](https://docs.salad.com/products/sce/requesting-a-jwt-from-salad) from our Instance Metadata
+3. **Example [JWT retrieval](/products/sce/container-groups/imds/obtaining-an-imds-jwt) from our Instance Metadata
    Service (IMDS)**: Running `python3 jwt.py` will return the current JWT inside the container. Please note, the IMDS
    only runs when deployed on Salad, you cannot access it when running this image locally.
 4. **Readiness probe test**: Running ./readiness-probe.sh will disable the ready status of this container instance for 2
