@@ -66,8 +66,7 @@
                       "products/sce/container-groups/health-probes/health-probes",
                       "products/sce/container-groups/health-probes/startup-probes",
                       "products/sce/container-groups/health-probes/liveness-probes",
-                      "products/sce/container-groups/health-probes/readiness-probes",
-                      "products/sce/container-groups/health-probes/health-probe-examples"
+                      "products/sce/container-groups/health-probes/readiness-probes"
                     ]
                   },
                   {
