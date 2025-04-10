@@ -81,14 +81,13 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 - Next, you’ll add the URL to the file to transcribe into the URL object. Make sure the file length is less than 2.5
   hours, and less than 3GB. Make sure the URL provided is to a direct download of the file. Header based security is not
   compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
-  [Salad Simple Storage Service](https://docs.salad.com/products/s4/salad-simple-storage-service#upload-a-file)
+  [Salad Simple Storage Service](/products/s4/salad-simple-storage-service#upload-a-file)
 
 One key difference between Azure Batch Transcription and Salad Transcription API is that Salad Transcription API is only
 able to transcribe one file per job. Rather than submitting one job containing all of the URLs, you will instead create
 a unique job for each file. Other than this, all other features available on a simple transcription available via Azure
 Batch Transcription are also available via the Salad Transcription API. A breakdown of all our input parameters are
-available
-[here](https://docs.salad.com/guides/transcription/salad-transcription-api/transcription-quick-start#step-2-set-input-parameters).
+available [here](/guides/transcription/salad-transcription-api/transcription-quick-start#step-2-set-input-parameters).
 
 You will receive this JSON body from the POST response. You’ll need to cache the ID you receive, as this is how you’ll
 pull your job results.

@@ -15,7 +15,7 @@
         "groups": [
           {
             "group": "SaladCloud",
-            "pages": ["products/documentation", "products/quickstart"]
+            "pages": ["products/documentation", "products/quickstart", "products/account-security"]
           },
           {
             "group": "Container Engine",
@@ -35,6 +35,14 @@
                   "products/sce/container-groups/container-groups",
                   "products/sce/container-groups/deployment-lifecycle",
                   "products/sce/container-groups/managing-deployments",
+                  {
+                    "group": "Billing and Pricing",
+                    "pages": [
+                      "products/sce/container-groups/billing-and-pricing/billing",
+                      "products/sce/container-groups/billing-and-pricing/priority-pricing",
+                      "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
+                    ]
+                  },
                   "products/sce/container-groups/environment-variables",
                   {
                     "group": "Container Registries",
@@ -66,8 +74,7 @@
                       "products/sce/container-groups/health-probes/health-probes",
                       "products/sce/container-groups/health-probes/startup-probes",
                       "products/sce/container-groups/health-probes/liveness-probes",
-                      "products/sce/container-groups/health-probes/readiness-probes",
-                      "products/sce/container-groups/health-probes/health-probe-examples"
+                      "products/sce/container-groups/health-probes/readiness-probes"
                     ]
                   },
                   {
@@ -79,20 +86,11 @@
                       "products/sce/container-groups/imds/imds-reallocate"
                     ]
                   },
-                  {
-                    "group": "Billing and Pricing",
-                    "pages": [
-                      "products/sce/container-groups/billing-and-pricing/billing",
-                      "products/sce/container-groups/billing-and-pricing/priority-pricing",
-                      "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
-                    ]
-                  },
                   "products/sce/container-groups/specifying-a-command",
                   "products/sce/container-groups/disk-space",
                   "products/sce/container-groups/system-events",
                   "products/sce/container-groups/container-logs",
-                  "products/sce/container-groups/quotas",
-                  "products/sce/container-groups/faqs"
+                  "products/sce/container-groups/quotas"
                 ]
               },
               {
@@ -122,10 +120,6 @@
                   "products/sce/autoscaling/settings",
                   "products/sce/autoscaling/enable-autoscaling"
                 ]
-              },
-              {
-                "group": "Security",
-                "pages": ["products/sce/security/email-security"]
               },
               "products/sce/faqs"
             ]
@@ -185,12 +179,13 @@
           {
             "group": "Tutorials",
             "pages": [
-              "tutorials/docker-run",
               "tutorials/high-performance-apps",
               "tutorials/high-performance-storage-solutions",
+              "tutorials/docker-run",
               "tutorials/jwt-authentication",
+              "tutorials/interactive-terminal",
               "tutorials/performance-monitoring",
-              "tutorials/pytorch-rtx5090",
+              "tutorials/long-running-jobs",
               {
                 "group": "Run a Node App",
                 "pages": [
@@ -202,15 +197,14 @@
                   "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
                 ]
               },
-              "tutorials/interactive-terminal",
               "tutorials/run-a-python-app",
-              "tutorials/ubuntu-image",
-              "tutorials/example-image",
-              "tutorials/run-triton-server",
-              "tutorials/jupyterlab",
               "tutorials/run-cog",
-              "tutorials/long-running-jobs",
-              "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api"
+              "tutorials/jupyterlab",
+              "tutorials/run-triton-server",
+              "tutorials/pytorch-rtx5090",
+              "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
+              "tutorials/example-image",
+              "tutorials/ubuntu-image"
             ]
           }
         ]
@@ -870,6 +864,14 @@
     {
       "source": "/products/sce/getting-started/architectual-overview",
       "destination": "/products/sce/getting-started/architectural-overview"
+    },
+    {
+      "source": "/products/sce/container-groups/faqs",
+      "destination": "/products/sce/faqs"
+    },
+    {
+      "source": "/products/sce/security/email-security",
+      "destination": "/products/account-security"
     }
   ]
 }

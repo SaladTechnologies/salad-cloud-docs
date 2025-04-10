@@ -67,8 +67,9 @@ container group for you once configured.
 You do not need to override the command, and you do not need to enable `Container Gateway`.
 
 While not required, it is recommended to set up an
-[external logging provider](https://docs.salad.com/docs/external-logging) to help you debug when things go wrong. Salad
-has integrated logging to help with debugging, but it is not as full featured as stand-alone products.
+[external logging provider](/products/sce/container-groups/external-logging/external-logging) to help you debug when
+things go wrong. Salad has integrated logging to help with debugging, but it is not as full featured as stand-alone
+products.
 
 You will need to set up some environment variables to enable Kelpie to interact with the Kelpie API, and to enable it to
 sync your checkpoints and outputs to your preferred s3-compatible storage provider. Your `KELPIE_API_KEY` will be
@@ -109,7 +110,7 @@ be able to manage your container group.
 
 In order to make sure your jobs get scheduled on the correct container group, you need to retrieve the container group's
 unique ID via the API. You can do this from the
-[interactive docs](https://docs.salad.com/reference/get_container_group).
+[interactive docs](/reference/saladcloud-api/container_groups/get-a-container-group).
 
 ### (Optional) Create Scaling Rules
 

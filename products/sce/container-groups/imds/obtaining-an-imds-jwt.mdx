@@ -2,98 +2,13 @@
 title: 'Obtaining an IMDS JWT'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: April 10, 2025_
 
-To obtain the JWT, you'll use our Token endpoint. You can access this with either our IMDS SDK, or via a JSON request.
-In this example, we'll use our Python IMDS SDK to retrieve the JWT, and make an API call to an example server using the
-JWT to verify authenticity.
+You can obtain a signed JWT (JSON Web Token) from the SaladCloud IMDS (Instance Metadata Service) that can be verified
+with public keys provided by Salad. This offers a secure way to
+[authenticate to external services](/tutorials/jwt-authentication), such as your own API or a third-party service.
 
-## Getting the JWT
+You can find code samples and the full API reference in the [API Reference Docs](/reference/imds/get-container-token).
 
-First, we'll call the IMDS SDK to retrieve the JWT. Other languages are included for reference only.
-
-<CodeGroup>
-```python Python
-from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
-
-sdk = SaladCloudImdsSdk( base_url=Environment.DEFAULT.value, timeout=10000 )
-
-result = sdk.metadata.get_container_token()
-
-````
-```java Java
-import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
-import com.salad.cloud.imdssdk.models.ContainerToken;
-
-public class Main {
-
-  public static void main(String[] args) {
-    SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
-
-    ContainerToken response = saladCloudImdsSdk.metadataService.getContainerToken();
-
-    System.out.println(response);
-  }
-}
-````
-
-```go Go
-import (
-  "fmt"
-  "encoding/json"
-  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
-  "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-)
-
-config := saladcloudimdssdkconfig.NewConfig()
-client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
-
-response, err := client.Metadata.GetContainerToken(context.Background())
-if err != nil {
-  panic(err)
-}
-
-fmt.Print(response)
-```
-
-```csharp C#
-using Salad.Cloud.IMDS.SDK;
-
-var client = new SaladCloudImdsSdkClient();
-
-var response = await client.Metadata.GetContainerTokenAsync();
-
-Console.WriteLine(response);
-```
-
-```curl Curl
-curl --silent --noproxy "*" --request GET \
-  --header "Metadata: true" \
-  --url http://169.254.169.254/v1/token
-```
-
-</CodeGroup>
-
-When we run this, we'll get our JWT printed out to console.
-
-## Making the API call
-
-Next, we'll use the JWT we retrieved in our API call to an example server.
-
-```python Python
-import requests
-from salad_cloud_imds_sdk import SaladCloudImdsSdk, Environment
-
-sdk = SaladCloudImdsSdk( base_url=Environment.DEFAULT.value, timeout=10000 )
-
-result = sdk.metadata.get_container_token()
-
-url = "https://my-server.com/api/v1/response"
-headers = {'Content-Type': 'application/json'}
-body = {"Example": "Example", "Another Example": "Another Example", "JWT": result}
-
-response = requests.post(url, headers=headers, json=body)
-print(response)
-```
-
-Now, when the server on the other end receives the API call, it can use the JWT to verify authenticity.
+This JWT can also be used to authenticate with [S4](/products/s4/salad-simple-storage-service) for temporary file
+storage.
