@@ -2,10 +2,17 @@
 title: 'Specifying a command'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: April 10, 2025_
 
-Providing “command” overrides the ENTRYPOINT and CMD of a container image, similar to the CLI `docker run --entrypoint`
-flag.
+> 🚧 Caution
+>
+> Specifying a command overrides the CMD and ENTRYPOINT from your dockerfile. This should only be used if you want to
+> override what is already in your dockerfile.
+>
+> This is not synonymous with `docker run`.
+
+Providing the “command” field when creating or updating a container group overrides the ENTRYPOINT and CMD of a
+container image, similar to the CLI `docker run --entrypoint` flag.
 
 The first item in command is executed as the entrypoint, and subsequent items are provided as arguments.
 
@@ -22,10 +29,3 @@ SaladCloud command of
 **Note:** in the portal, you should not include include quotes around arguments. To reproduce the docker command line
 `docker run --entrypoint /bin/bash my-docker/my-container:latest -c "python server.py"`, you would enter `/bin/bash` as
 the command, `-c` as a first argument, and `python server.py` as a second argument, without quotes.
-
-> 🚧 Caution
->
-> Specifying a command overrides the CMD and ENTRYPOINT from your dockerfile. This should only be used if you want to
-> override what is already in your dockerfile.
->
-> This is not synonymous with `docker run`.
