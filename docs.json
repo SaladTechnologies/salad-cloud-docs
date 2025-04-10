@@ -184,12 +184,13 @@
           {
             "group": "Tutorials",
             "pages": [
-              "tutorials/docker-run",
               "tutorials/high-performance-apps",
               "tutorials/high-performance-storage-solutions",
+              "tutorials/docker-run",
               "tutorials/jwt-authentication",
+              "tutorials/interactive-terminal",
               "tutorials/performance-monitoring",
-              "tutorials/pytorch-rtx5090",
+              "tutorials/long-running-jobs",
               {
                 "group": "Run a Node App",
                 "pages": [
@@ -201,15 +202,14 @@
                   "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
                 ]
               },
-              "tutorials/interactive-terminal",
               "tutorials/run-a-python-app",
-              "tutorials/ubuntu-image",
-              "tutorials/example-image",
-              "tutorials/run-triton-server",
-              "tutorials/jupyterlab",
               "tutorials/run-cog",
-              "tutorials/long-running-jobs",
-              "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api"
+              "tutorials/jupyterlab",
+              "tutorials/run-triton-server",
+              "tutorials/pytorch-rtx5090",
+              "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
+              "tutorials/example-image",
+              "tutorials/ubuntu-image"
             ]
           }
         ]
