@@ -1,23 +1,23 @@
 ---
-title: 'Use Cases: SSH, VS Code, JupyterLab, Private Networking and Meshed Communication'
-description: 'Securely integrate unlimited GPU resources from SaladCloud into your applications'
+title: 'Add Tailscale Support into SaladCloud Workloads'
+description:
+  'Secure networking for use cases including SSH, VS Code, JupyterLab, private networking and meshed communication'
 ---
 
 ## Initial Setup
 
-The features demonstrated in this guide are available with a Tailscale personal account and are also fully supported in
-enterprise accounts. To get started, follow [the quickstart guide](https://tailscale.com/kb/1017/install) to create your
-Tailscale account and tailnet, then add your first devices (e.g., your developer machine for accessing Salad GPU nodes).
-You can use either the interactive methods (Admin Console or CLI with the login process) to seamlessly join your devices
-into the tailnet.
+To get started, follow [the quickstart guide](https://tailscale.com/kb/1017/install) to create your Tailscale account
+and tailnet, then add your first devices (e.g., your developer machine for accessing Salad GPU nodes). You can use
+either of the interactive methods (Admin Console or CLI with the login process) to join your devices into the tailnet.
 
-In the example below, two private and isolated devices are connected to the **salad_demo** tailnet and can securely
-access each other.
+In the example below, two private, isolated devices are connected via the **salad_demo** tailnet and can securely
+communicate with each other.
 
-- The **app-server** device on Linux, which simulates hosting applications (such as client applications, databases,
-  queues, proxies, or identity brokers) that securely interact with Salad nodes over the tailnet.
-- The **dev-vscode** device on macOS, representing a development laptop used for testing and debugging code on Salad
-  nodes.
+- **app-server (Linux)**: Simulates a private server hosting applications—such as client services, databases, queues,
+  proxies, or identity brokers—that securely interact with Salad nodes over the tailnet.
+
+- **dev-vscode (macOS)**: Represents a developer laptop used for testing, debugging, and managing code running on Salad
+  nodes through the tailnet.
 
 ```bash app-server
 ubuntu@app-server:~$ tailscale status
@@ -25,43 +25,25 @@ ubuntu@app-server:~$ tailscale status
 100.87.65.60    dev-vscode           salad_demo@ macOS   -
 ```
 
-Tailscale uses [keys](https://tailscale.com/blog/tailscale-key-management) to manage devices across both the control
-plane and data plane. In the control plane, keys are used for device authentication, authorization, and management. In
-the data plane, keys facilitate secure, encrypted communication between devices, ensuring that data is transmitted
-safely within the tailnet.
-
 Tailscale users must periodically reauthenticate on each device, with a maximum reauthentication interval of 180 days
 (which can be adjusted in [the Admin Console](https://login.tailscale.com/admin/settings/device-management)). If
-reauthentication is not completed within this period, the device's keys will expire, causing connections to and from the
-device to stop working.
-
-For devices that need to remain operational for extended periods, such as the **app-server**, you can disable key expiry
-to avoid the need for reauthentication. For detailed instructions, refer to
+reauthentication is not completed within this period,
+[the device's keys](https://tailscale.com/blog/tailscale-key-management) will expire, causing connections to and from
+the device to stop working. **For devices that need to remain operational for extended periods on SaladCloud, such as
+the app-server, you can disable key expiry to avoid the need for reauthentication.** For detailed instructions, refer to
 [this link](https://tailscale.com/kb/1028/key-expiry#disabling-key-expiry).
 
 After successfully installing Tailscale, a virtual network interface (such as **tailscale0** on Linux) is created on
 each device. This interface is assigned a unique Tailscale IP address (consisting of both an IPv4 and an IPv6 address),
-which is used for secure communication within the tailnet. **However, not all devices with the tailscale0 interface can
-access their own Tailscale IPs locally, as this behavior depends on the operating system, network configuration, and
-firewall settings.**
+which is used for secure communication within the tailnet.
 
 ```bash app-server
-ubuntu@app-server:~$ ifconfig tailscale0
-tailscale0: flags=4305<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST>  mtu 1280
-        inet 100.88.37.62  netmask 255.255.255.255  destination 100.88.37.62
-        inet6 fe80::bbe0:c403:ae6d:2af  prefixlen 64  scopeid 0x20<link>
-        inet6 fd7a:115c:a1e0::7901:253f  prefixlen 128  scopeid 0x0<global>
-        unspec 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00  txqueuelen 500  (UNSPEC)
-        RX packets 9268  bytes 693497 (693.4 KB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 5166  bytes 468215 (468.2 KB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-
+# Local Tailscale IP: IPv4 and IPv6
 ubuntu@app-server:~$ tailscale ip
 100.88.37.62
 fd7a:115c:a1e0::7901:253f
 
-# Test the connectivity from app-server to dev-vscode.
+# Test the connectivity from app-server (100.88.37.62) to dev-vscode (100.87.65.60)
 ubuntu@app-server:~$ ping 100.87.65.60 -c 1
 PING 100.87.65.60 (100.87.65.60) 56(84) bytes of data.
 64 bytes from 100.87.65.60: icmp_seq=1 ttl=64 time=9.63 ms
@@ -72,6 +54,9 @@ rtt min/avg/max/mdev = 9.632/9.632/9.632/0.000 ms
 ubuntu@app-server:~$ tailscale ping 100.87.65.60
 pong from dev-vscode (100.87.65.60) via 192.168.68.112:41641 in 9ms
 ```
+
+**Note:** Not all devices with the tailscale0 interface can access their own Tailscale IPs locally. This behavior
+depends on the operating system, network configuration, and firewall settings.
 
 ## Enabling Tailscale SSH
 
@@ -171,9 +156,10 @@ proxychains4 curl http://100.88.37.62:8888/
 
 - Salad nodes cannot access their own Tailscale IPs directly using any protocols.
 - Salad nodes can communicate with each other using TCP and UDP. However, ping does not work due to the use of ICMP;
-  instead, you can use Tailscale ping. The ping appears to work from devices in the default model with the tailscale0
-  interface to Salad nodes, because ICMP packets are intercepted and responded by the Tailscale agent running on these
-  nodes.
+  instead, you can use Tailscale ping.
+
+**Notes:** The ping appears to work from devices in the default model with the tailscale0 interface to Salad nodes,
+because ICMP packets are intercepted and responded by the Tailscale agent running on these nodes.
 
 ## Embedding Tailscale in Container Images
 
@@ -228,7 +214,7 @@ passed.
 
 <img src="/guides/tailscale-integration/images/auth-key.png" />
 
-## Deploying on SaladCloud and Adding Salad Nodes to the Tailnet
+## Deploying SaladCloud Workloads and Joining Them to the Tailnet
 
 Let's create a container group with the following parameters using the SaladCloud Portal. For deployment using
 SaladCloud APIs/SDKs, please refer to
@@ -275,7 +261,7 @@ more details.
 
 ## Supported Use Cases and Validation
 
-Now we have 4 devices in the tailnet, with 2 on SaladCloud:
+We now have 4 devices connected via the tailnet, including 2 running on SaladCloud:
 
 ```bash app-server
 ubuntu@app-server:~$ tailscale status
@@ -424,9 +410,8 @@ root@45d32ff0-8ab4-4cc8-a475-97ded2de3378:~# proxychains4 curl http://100.123.15
 
 ### Case 4: Salad nodes access Internet publicly
 
-Without using the Tailscale proxy, Salad nodes can still access the internet publicly. This allows them to interact with
-external services, receiving requests or jobs, and delivering results, while remaining securely connected to the
-tailnet.
+Without using the Tailscale proxy, Salad nodes can still access Internet. This allows them to interact with external
+services, receiving requests or jobs, and delivering results, while remaining securely connected to the tailnet.
 
 ```bash Salad Node to Internet
 root@45d32ff0-8ab4-4cc8-a475-97ded2de3378:~# ping www.google.com -n 5
