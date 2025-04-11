@@ -199,3 +199,8 @@ tedlium
 LIUM
 reauthentication
 mdev
+POINTOPOINT
+NOARP
+unspec
+txqueuelen
+UNSPEC
