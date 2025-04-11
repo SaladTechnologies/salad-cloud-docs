@@ -164,22 +164,84 @@ because ICMP packets are intercepted and responded by the Tailscale agent runnin
 ## Embedding Tailscale in Container Images
 
 Here is [an example application](https://github.com/SaladTechnologies/tailscale-integration/tree/main/basic) to add
-Tailscale support for container images running on SaladCloud:
+Tailscale support for container images running on SaladCloud.
 
-The Dockerfile creates a containerized environment by using a base image, then installing essential utilities and
-required dependencies. It also copies the required Python code and startup script into the image. Upon running the image
-on a Salad node, the following steps are executed:
+[The Dockerfile](https://github.com/SaladTechnologies/tailscale-integration/blob/main/basic/Dockerfile) creates a
+containerized environment by using a base image, then installing essential utilities and required dependencies. It also
+copies the required Python code and startup script into the image.
 
-- The Salad node is added to a tailnet using a Tailscale [auth key](https://tailscale.com/kb/1085/auth-keys) and its
-  [SALAD_MACHINE_ID](/products/sce/container-groups/environment-variables).
+```Dockerfile Dockerfile
+# Select a base image
+FROM docker.io/pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
-- Start the Tailscale SSH server on the node.
+# Install essential utilities
+RUN apt-get update && apt-get install -y \
+    curl \
+    net-tools \
+    iputils-ping \
+    nano
+
+# Install Tailscale
+RUN curl -fsSL https://tailscale.com/install.sh | sh
+
+# You can use either environment variables (e.g., ALL_PROXY and http_proxy) or tools like proxychains to manage outbound connections
+# Optional: Install and configure proxychains4 to use Tailscale's SOCKS5 proxy
+RUN apt-get install -y proxychains4
+RUN sed -i 's/socks4[[:space:]]\+127\.0\.0\.1[[:space:]]\+9050/socks5  127.0.0.1 1055/' /etc/proxychains4.conf
+
+# Upgrade pip and install Python packages
+RUN pip install --upgrade pip
+RUN pip install flask python-dotenv
+RUN pip install jupyterlab ipywidgets
+
+# Set working directory and copy application files
+WORKDIR /app
+COPY hello.py /app
+COPY start.sh /app
+RUN chmod +x /app/start.sh
+
+# Default startup command
+CMD ["./start.sh"]
+```
+
+When the image runs on a Salad node, the following steps are executed by the
+[startup.sh](https://github.com/SaladTechnologies/tailscale-integration/blob/main/basic/start.sh) script:
+
+- Add the Salad node to the tailnet using a Tailscale [auth key](https://tailscale.com/kb/1085/auth-keys) and its
+  [SALAD_MACHINE_ID](/products/sce/container-groups/environment-variables), and start the Tailscale SSH server.
 
 - Tailscale IP is retrieved and exported as an environment variable. All environment variables are then written to the
   /etc/environment file.
 
 - Two applications are launched: a Python Flask web application listening on port 8888 and a JupyterLab instance running
   on port 8889, both configured with dual-stack support (IPv4 and IPv6).
+
+```bash start.sh
+#!/bin/bash
+
+# Start the Tailscale daemon with userspace networking mode in the background
+tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 &
+sleep 5
+# Disable DNS resolution through Tailscale (customize as needed)
+tailscale set --accept-dns=false
+# Bring up Tailscale using the provided auth key and SALAD_MACHINE_ID or 'LOCAL' as fallback
+tailscale up --auth-key=$TAILSCALE_AUTH_KEY --hostname ${SALAD_MACHINE_ID:-LOCAL}
+sleep 5
+# Run the Tailscale SSH server on this device
+tailscale set --ssh
+
+# Retrieve and export the local Tailscale IP, making it accessible for local applications
+export TAILSCALE_IP=$(tailscale ip | head -n 1)
+# Capture and store all environment variables (you can filter specific variables to be saved)
+printenv > /etc/environment
+
+# Run the web application on port 8888 with dual-stack support (IPv4 and IPv6)
+python hello.py &
+# Run JupyterLab on port 8889 with dual-stack support (IPv4 and IPv6)
+jupyter lab --no-browser --port=8889  --ip=* --allow-root  --NotebookApp.token='' &
+# Keeping the script running indefinitely. The containers running on SaladCloud must have a continuously running process and if the process completes, SaladCloud will automatically reallocate the instances to rerun the image.
+sleep infinity
+```
 
 Once the containers are up and running on Salad nodes, you can securely access them from the **dev-vscode** or
 **app-server** using:
