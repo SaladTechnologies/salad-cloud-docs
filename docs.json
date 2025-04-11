@@ -563,6 +563,14 @@
                   "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
                   "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
                 ]
+              },
+              {
+                "group": "Transcription Lite API",
+                "pages": [
+                  "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
+                  "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
+                  "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
+                ]
               }
             ]
           }

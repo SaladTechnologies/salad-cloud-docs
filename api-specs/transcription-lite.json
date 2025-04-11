@@ -1,0 +1,3901 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Salad Transcription Lite API",
+    "description": "Salad Transcription Lite API",
+    "termsOfService": "https://salad.com/terms",
+    "contact": {
+      "name": "SaladCloud Support",
+      "url": "https://salad.com",
+      "email": "cloud@salad.com"
+    },
+    "license": {
+      "name": "MIT"
+    },
+    "version": "0.9.0-alpha.5"
+  },
+  "servers": [
+    {
+      "url": "https://api.salad.com/api/public"
+    }
+  ],
+  "paths": {
+    "/organizations/{organization_name}/inference-endpoints/transcription-lite": {
+      "summary": "Inference Endpoints",
+      "description": "Operations for an inference endpoint",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint",
+        "summary": "Get Inference Endpoint",
+        "description": "Gets an inference endpoint",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetInferenceEndpoint"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/transcription-lite/jobs": {
+      "summary": "Jobs for Salad Transcription Lite API",
+      "description": "Operations for Salad Transcription Lite API jobs",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_jobs",
+        "summary": "List jobs for Salad Transcription Lite API",
+        "description": "Retrieves a list of jobs for Salad Transcription Lite API",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/page_size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ListSaladCloudTranscriptionLiteAPIJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "post": {
+        "operationId": "create_inference_endpoint_job",
+        "summary": "Create a job for Salad Transcription Lite API",
+        "description": "Creates a job for Salad Transcription Lite API",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateSaladCloudTranscriptionLiteAPIJob"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateSaladCloudTranscriptionLiteAPIJob"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    },
+    "/organizations/{organization_name}/inference-endpoints/transcription-lite/jobs/{job_id}": {
+      "summary": "Job for Salad Transcription Lite API",
+      "description": "Operations for a Salad Transcription Lite API job",
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/organization_name"
+        },
+        {
+          "$ref": "#/components/parameters/job_id"
+        }
+      ],
+      "get": {
+        "operationId": "get_inference_endpoint_job",
+        "summary": "Get job for Salad Transcription Lite API",
+        "description": "Retrieves a job for Salad Transcription Lite API",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetSaladCloudTranscriptionLiteAPIJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      },
+      "delete": {
+        "operationId": "delete_inference_endpoint_job",
+        "summary": "Delete job for Salad Transcription Lite API",
+        "description": "Deletes an inference endpoint job",
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/DeleteInferenceEndpointJob"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "default": {
+            "$ref": "#/components/responses/UnknownError"
+          }
+        },
+        "tags": [
+          "inference_endpoints"
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "container_group_instance_id": {
+        "in": "path",
+        "name": "container_group_instance_id",
+        "description": "The unique instance identifier",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "container_group_name": {
+        "in": "path",
+        "name": "container_group_name",
+        "description": "The unique container group name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        }
+      },
+      "inference_endpoint_job_id": {
+        "in": "path",
+        "name": "inference_endpoint_job_id",
+        "description": "The unique job id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "inference_endpoint_name": {
+        "in": "path",
+        "name": "inference_endpoint_name",
+        "description": "The unique inference endpoint name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2
+        }
+      },
+      "organization_name": {
+        "in": "path",
+        "name": "organization_name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        },
+        "description": "Your organization name. This identifies the billing context for the API operation and represents a security boundary for SaladCloud resources. The organization must be created before using the API, and you must be a member of the organization.",
+        "example": "acme-corp"
+      },
+      "page": {
+        "in": "query",
+        "name": "page",
+        "description": "The page number",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "maximum": 2147483647,
+          "minimum": 1,
+          "nullable": true
+        }
+      },
+      "page_size": {
+        "in": "query",
+        "name": "page_size",
+        "description": "The number of items per page",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "maximum": 100,
+          "minimum": 1,
+          "nullable": true
+        }
+      },
+      "project_name": {
+        "in": "path",
+        "name": "project_name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        },
+        "description": "Your project name. This represents a collection of related SaladCloud resources. The project must be created before using the API.",
+        "example": "default"
+      },
+      "queue_job_id": {
+        "in": "path",
+        "name": "queue_job_id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "The job identifier. This is automatically generated and assigned when the job is created.",
+        "example": "7dcd6922-50e9-4d56-89b5-91cde26f0211"
+      },
+      "queue_name": {
+        "in": "path",
+        "name": "queue_name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 2,
+          "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+        },
+        "description": "The queue name.",
+        "example": "fifo-queue"
+      },
+      "job_id": {
+        "in": "path",
+        "name": "job_id",
+        "description": "The ID of the job for Salad Transcription Lite API",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "schemas": {
+      "ProblemDetails": {
+        "description": "Represents a problem",
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The URI reference that identifies the problem type",
+            "type": "string",
+            "default": "about:blank",
+            "nullable": true
+          },
+          "title": {
+            "description": "A short, human-readable summary of the problem type",
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "description": "The HTTP status code generated by the origin server",
+            "type": "integer",
+            "nullable": true
+          },
+          "detail": {
+            "description": "A human-readable explanation specific to this occurrence of the problem",
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "description": "The URI reference that identifies the specific occurrence of the problem",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CountryCode": {
+        "type": "string",
+        "enum": [
+          "af",
+          "al",
+          "dz",
+          "as",
+          "ad",
+          "ao",
+          "ai",
+          "aq",
+          "ag",
+          "ar",
+          "am",
+          "aw",
+          "au",
+          "at",
+          "az",
+          "bs",
+          "bh",
+          "bd",
+          "bb",
+          "by",
+          "be",
+          "bz",
+          "bj",
+          "bm",
+          "bt",
+          "bo",
+          "bq",
+          "ba",
+          "bw",
+          "bv",
+          "br",
+          "io",
+          "bn",
+          "bg",
+          "bf",
+          "bi",
+          "cv",
+          "kh",
+          "cm",
+          "ca",
+          "ky",
+          "cf",
+          "td",
+          "cl",
+          "cn",
+          "cx",
+          "cc",
+          "co",
+          "km",
+          "cd",
+          "cg",
+          "ck",
+          "cr",
+          "hr",
+          "cu",
+          "cw",
+          "cy",
+          "cz",
+          "ci",
+          "dk",
+          "dj",
+          "dm",
+          "do",
+          "ec",
+          "eg",
+          "sv",
+          "gq",
+          "er",
+          "ee",
+          "sz",
+          "et",
+          "fk",
+          "fo",
+          "fj",
+          "fi",
+          "fr",
+          "gf",
+          "pf",
+          "tf",
+          "ga",
+          "gm",
+          "ge",
+          "de",
+          "gh",
+          "gi",
+          "gr",
+          "gl",
+          "gd",
+          "gp",
+          "gu",
+          "gt",
+          "gg",
+          "gn",
+          "gw",
+          "gy",
+          "ht",
+          "hm",
+          "va",
+          "hn",
+          "hk",
+          "hu",
+          "is",
+          "in",
+          "id",
+          "ir",
+          "iq",
+          "ie",
+          "im",
+          "il",
+          "it",
+          "jm",
+          "jp",
+          "je",
+          "jo",
+          "kz",
+          "ke",
+          "ki",
+          "kp",
+          "kr",
+          "kw",
+          "kg",
+          "la",
+          "lv",
+          "lb",
+          "ls",
+          "lr",
+          "ly",
+          "li",
+          "lt",
+          "lu",
+          "mo",
+          "mg",
+          "mw",
+          "my",
+          "mv",
+          "ml",
+          "mt",
+          "mh",
+          "mq",
+          "mr",
+          "mu",
+          "yt",
+          "mx",
+          "fm",
+          "md",
+          "mc",
+          "mn",
+          "me",
+          "ms",
+          "ma",
+          "mz",
+          "mm",
+          "na",
+          "nr",
+          "np",
+          "nl",
+          "nc",
+          "nz",
+          "ni",
+          "ne",
+          "ng",
+          "nu",
+          "nf",
+          "mp",
+          "no",
+          "om",
+          "pk",
+          "pw",
+          "ps",
+          "pa",
+          "pg",
+          "py",
+          "pe",
+          "ph",
+          "pn",
+          "pl",
+          "pt",
+          "pr",
+          "qa",
+          "mk",
+          "ro",
+          "ru",
+          "rw",
+          "re",
+          "bl",
+          "sh",
+          "kn",
+          "lc",
+          "mf",
+          "pm",
+          "vc",
+          "ws",
+          "sm",
+          "st",
+          "sa",
+          "sn",
+          "rs",
+          "sc",
+          "sl",
+          "sg",
+          "sx",
+          "sk",
+          "si",
+          "sb",
+          "so",
+          "za",
+          "gs",
+          "ss",
+          "es",
+          "lk",
+          "sd",
+          "sr",
+          "sj",
+          "se",
+          "ch",
+          "sy",
+          "tw",
+          "tj",
+          "tz",
+          "th",
+          "tl",
+          "tg",
+          "tk",
+          "to",
+          "tt",
+          "tn",
+          "tr",
+          "tm",
+          "tc",
+          "tv",
+          "ug",
+          "ua",
+          "ae",
+          "gb",
+          "um",
+          "us",
+          "uy",
+          "uz",
+          "vu",
+          "ve",
+          "vn",
+          "vg",
+          "vi",
+          "wf",
+          "eh",
+          "ye",
+          "zm",
+          "zw",
+          "ax"
+        ]
+      },
+      "ContainerGroupStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "running",
+          "stopped",
+          "succeeded",
+          "failed",
+          "deploying"
+        ]
+      },
+      "ContainerRestartPolicy": {
+        "type": "string",
+        "enum": [
+          "always",
+          "on_failure",
+          "never"
+        ]
+      },
+      "ContainerNetworkingProtocol": {
+        "type": "string",
+        "enum": [
+          "http"
+        ]
+      },
+      "ContainerGroup": {
+        "description": "Represents a container group",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/Container"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          },
+          "restart_policy": {
+            "$ref": "#/components/schemas/ContainerRestartPolicy"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "current_state": {
+            "$ref": "#/components/schemas/ContainerGroupState"
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1
+          },
+          "networking": {
+            "$ref": "#/components/schemas/ContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "queue_connection": {
+            "$ref": "#/components/schemas/ContainerGroupQueueConnection"
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pending_change": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "queue_autoscaler": {
+            "$ref": "#/components/schemas/QueueAutoscaler"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "container",
+          "autostart_policy",
+          "restart_policy",
+          "replicas",
+          "current_state",
+          "create_time",
+          "update_time",
+          "pending_change",
+          "version"
+        ]
+      },
+      "ContainerGroupList": {
+        "description": "Represents a list of container groups",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "CreateContainerGroup": {
+        "description": "Represents a request to create a container group",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/CreateContainer"
+          },
+          "autostart_policy": {
+            "type": "boolean"
+          },
+          "restart_policy": {
+            "$ref": "#/components/schemas/ContainerRestartPolicy"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 0
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1
+          },
+          "networking": {
+            "$ref": "#/components/schemas/CreateContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "queue_connection": {
+            "$ref": "#/components/schemas/ContainerGroupQueueConnection"
+          },
+          "queue_autoscaler": {
+            "$ref": "#/components/schemas/QueueAutoscaler"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "container",
+          "restart_policy",
+          "autostart_policy",
+          "replicas"
+        ]
+      },
+      "UpdateContainerGroup": {
+        "description": "Represents a request to update a container group",
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "container": {
+            "$ref": "#/components/schemas/UpdateContainer"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 0,
+            "nullable": true
+          },
+          "country_codes": {
+            "description": "List of countries nodes must be located in. Remove this field to permit nodes from any country.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "nullable": true
+          },
+          "networking": {
+            "$ref": "#/components/schemas/UpdateContainerGroupNetworking"
+          },
+          "liveness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupLivenessProbe"
+          },
+          "readiness_probe": {
+            "$ref": "#/components/schemas/ContainerGroupReadinessProbe"
+          },
+          "startup_probe": {
+            "$ref": "#/components/schemas/ContainerGroupStartupProbe"
+          },
+          "queue_autoscaler": {
+            "$ref": "#/components/schemas/QueueAutoscaler"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateContainerGroupNetworking": {
+        "description": "Represents update container group networking parameters",
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContainerGroupNetworking": {
+        "description": "Represents container group networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/ContainerNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          },
+          "dns": {
+            "type": "string",
+            "format": "url"
+          },
+          "load_balancer": {
+            "type": "string",
+            "default": "round_robin",
+            "enum": [
+              "round_robin",
+              "least_number_of_connections"
+            ]
+          },
+          "single_connection_limit": {
+            "type": "boolean",
+            "default": false
+          },
+          "client_request_timeout": {
+            "type": "integer",
+            "default": 100000,
+            "maximum": 100000,
+            "minimum": 1
+          },
+          "server_response_timeout": {
+            "type": "integer",
+            "default": 100000,
+            "maximum": 100000,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "protocol",
+          "port",
+          "auth",
+          "dns"
+        ]
+      },
+      "CreateContainerGroupNetworking": {
+        "description": "Represents container group networking parameters",
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "$ref": "#/components/schemas/ContainerNetworkingProtocol"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "auth": {
+            "type": "boolean"
+          },
+          "load_balancer": {
+            "type": "string",
+            "default": "round_robin",
+            "enum": [
+              "round_robin",
+              "least_number_of_connections"
+            ]
+          },
+          "single_connection_limit": {
+            "type": "boolean",
+            "default": false
+          },
+          "client_request_timeout": {
+            "type": "integer",
+            "default": 100000,
+            "maximum": 100000,
+            "minimum": 1
+          },
+          "server_response_timeout": {
+            "type": "integer",
+            "default": 100000,
+            "maximum": 100000,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "protocol",
+          "port",
+          "auth"
+        ]
+      },
+      "ContainerGroupStartupProbe": {
+        "description": "Represents the container group startup probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 2,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 1200,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
+      "ContainerGroupLivenessProbe": {
+        "description": "Represents the container group liveness probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
+      "ContainerGroupReadinessProbe": {
+        "description": "Represents the container group readiness probe",
+        "type": "object",
+        "properties": {
+          "tcp": {
+            "$ref": "#/components/schemas/ContainerGroupProbeTcp"
+          },
+          "http": {
+            "$ref": "#/components/schemas/ContainerGroupProbeHttp"
+          },
+          "grpc": {
+            "$ref": "#/components/schemas/ContainerGroupProbeGrpc"
+          },
+          "exec": {
+            "$ref": "#/components/schemas/ContainerGroupProbeExec"
+          },
+          "initial_delay_seconds": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          },
+          "period_seconds": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "success_threshold": {
+            "type": "integer",
+            "default": 1,
+            "minimum": 1
+          },
+          "failure_threshold": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "initial_delay_seconds",
+          "period_seconds",
+          "timeout_seconds",
+          "success_threshold",
+          "failure_threshold"
+        ]
+      },
+      "ContainerProbeHttpScheme": {
+        "type": "string",
+        "enum": [
+          "http"
+        ]
+      },
+      "HttpHeaders": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContainerGroupProbeHttp": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          },
+          "scheme": {
+            "$ref": "#/components/schemas/ContainerProbeHttpScheme"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/HttpHeaders"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "port"
+        ]
+      },
+      "ContainerGroupProbeTcp": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "port"
+        ]
+      },
+      "ContainerGroupProbeGrpc": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65536,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "service",
+          "port"
+        ]
+      },
+      "ContainerGroupProbeExec": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "command"
+        ]
+      },
+      "WorkloadErrorList": {
+        "description": "Represents a list of workload errors",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkloadError"
+            },
+            "maxItems": 50,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "WorkloadError": {
+        "description": "Represents a workload error",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "failed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instance_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "machine_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "allocated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "detail",
+          "failed_at",
+          "instance_id",
+          "machine_id",
+          "allocated_at",
+          "version"
+        ]
+      },
+      "QueueList": {
+        "description": "Represents a list of queues",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of queues.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Queue"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "QueueJobList": {
+        "description": "Represents a list of queue jobs",
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueJob"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "Queue": {
+        "description": "Represents a queue.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The queue identifier. This is automatically generated and assigned when the queue is created.",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The queue name. This must be unique within the project.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "description": "The display name. This may be used as a more human-readable name.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description. This may be used as a space for notes or other information about the queue.",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          },
+          "container_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroup"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          },
+          "create_time": {
+            "description": "The date and time the queue was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "description": "The date and time the queue was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "container_groups",
+          "create_time",
+          "update_time"
+        ]
+      },
+      "CreateQueue": {
+        "description": "Represents a request to create a new queue.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The queue name. This must be unique within the project.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          },
+          "display_name": {
+            "description": "The display name. This may be used as a more human-readable name.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description. This may be used as a space for notes or other information about the queue.",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateQueue": {
+        "description": "Represents a request to update an existing queue.",
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "description": "The display name. This may be used as a more human-readable name.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "nullable": true,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "The description. This may be used as a space for notes or other information about the queue.",
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QueueJob": {
+        "description": "Represents a queue job",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QueueJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "output": {
+            "description": "The job output. May be any valid JSON."
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time"
+        ]
+      },
+      "QueueJobEvent": {
+        "description": "Represents an event for queue job",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "created",
+              "started",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "time"
+        ]
+      },
+      "CreateQueueJob": {
+        "description": "Represents a request to create a queue job",
+        "type": "object",
+        "properties": {
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "input"
+        ]
+      },
+      "Container": {
+        "description": "Represents a container",
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
+          },
+          "resources": {
+            "$ref": "#/components/schemas/ContainerResourceRequirements"
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ContainerGroupPriority"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "environment_variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_token",
+                  "dataset"
+                ]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_key"
+                ]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "ingestion_key"
+                ]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "token"
+                ]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "port"
+                ]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "json",
+                      "json_lines"
+                    ]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "gzip"
+                    ]
+                  }
+                },
+                "required": [
+                  "host",
+                  "port",
+                  "format",
+                  "compression"
+                ]
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "image",
+          "resources",
+          "command"
+        ]
+      },
+      "CreateContainer": {
+        "description": "Represents a container",
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
+          },
+          "resources": {
+            "$ref": "#/components/schemas/ContainerResourceRequirements"
+          },
+          "command": {
+            "description": "Pass a command (and optional arguments) to override the ENTRYPOINT and CMD of a container image.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0,
+            "nullable": true
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ContainerGroupPriority"
+          },
+          "environment_variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_token",
+                  "dataset"
+                ]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_key"
+                ]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "ingestion_key"
+                ]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "token"
+                ]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "port"
+                ]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "json",
+                      "json_lines"
+                    ]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "gzip"
+                    ]
+                  }
+                },
+                "required": [
+                  "host",
+                  "port",
+                  "format",
+                  "compression"
+                ]
+              }
+            }
+          },
+          "registry_authentication": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "basic": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              },
+              "gcp_gcr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "service_key"
+                ]
+              },
+              "aws_ecr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "access_key_id": {
+                    "type": "string"
+                  },
+                  "secret_access_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "access_key_id",
+                  "secret_access_key"
+                ]
+              },
+              "docker_hub": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "personal_access_token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "personal_access_token"
+                ]
+              },
+              "gcp_gar": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "service_key"
+                ]
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "image",
+          "resources"
+        ]
+      },
+      "UpdateContainer": {
+        "description": "Represents an update container object",
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1,
+            "nullable": true
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "cpu": {
+                "type": "integer",
+                "maximum": 16,
+                "minimum": 1,
+                "nullable": true
+              },
+              "memory": {
+                "type": "integer",
+                "maximum": 30720,
+                "minimum": 1024,
+                "nullable": true
+              },
+              "gpu_classes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "nullable": true
+              },
+              "storage_amount": {
+                "type": "integer",
+                "format": "int64",
+                "maximum": 53687091200,
+                "minimum": 1073741824,
+                "nullable": true
+              }
+            }
+          },
+          "command": {
+            "description": "Pass a command (and optional arguments) to override the ENTRYPOINT and CMD of a container image.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 0,
+            "nullable": true
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ContainerGroupPriority"
+          },
+          "environment_variables": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "logging": {
+            "type": "object",
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "axiom": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "dataset": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_token",
+                  "dataset"
+                ]
+              },
+              "datadog": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "api_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "host",
+                  "api_key"
+                ]
+              },
+              "new_relic": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "ingestion_key": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "ingestion_key"
+                ]
+              },
+              "splunk": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "token": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "token"
+                ]
+              },
+              "tcp": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "host",
+                  "port"
+                ]
+              },
+              "http": {
+                "type": "object",
+                "additionalProperties": false,
+                "nullable": true,
+                "properties": {
+                  "host": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "minLength": 1
+                  },
+                  "port": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                  },
+                  "user": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "password": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "path": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "json",
+                      "json_lines"
+                    ]
+                  },
+                  "headers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "name",
+                        "value"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "maxItems": 1000,
+                    "minItems": 0,
+                    "nullable": true
+                  },
+                  "compression": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "gzip"
+                    ]
+                  }
+                },
+                "required": [
+                  "host",
+                  "port",
+                  "format",
+                  "compression"
+                ]
+              }
+            }
+          },
+          "registry_authentication": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "basic": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              },
+              "gcp_gcr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "service_key"
+                ]
+              },
+              "aws_ecr": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "access_key_id": {
+                    "type": "string"
+                  },
+                  "secret_access_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "access_key_id",
+                  "secret_access_key"
+                ]
+              },
+              "docker_hub": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "personal_access_token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "personal_access_token"
+                ]
+              },
+              "gcp_gar": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "service_key": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "service_key"
+                ]
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true
+      },
+      "ContainerResourceRequirements": {
+        "description": "Represents a container resource requirements",
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "integer",
+            "maximum": 16,
+            "minimum": 1
+          },
+          "memory": {
+            "type": "integer",
+            "maximum": 61440,
+            "minimum": 1024
+          },
+          "gpu_classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "storage_amount": {
+            "type": "integer",
+            "format": "int64",
+            "maximum": 53687091200,
+            "minimum": 1073741824,
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "cpu",
+          "memory"
+        ]
+      },
+      "ContainerGroupState": {
+        "description": "Represents a container group state",
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ContainerGroupStatus"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finish_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "instance_status_counts": {
+            "$ref": "#/components/schemas/ContainerGroupInstanceStatusCount"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "start_time",
+          "finish_time",
+          "instance_status_counts"
+        ]
+      },
+      "ContainerGroupInstanceStatusCount": {
+        "description": "Represents a container group instance status count",
+        "type": "object",
+        "properties": {
+          "allocating_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "creating_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "running_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "stopping_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "allocating_count",
+          "creating_count",
+          "running_count",
+          "stopping_count"
+        ]
+      },
+      "ContainerGroupInstance": {
+        "description": "Represents the details of a single container group instance",
+        "type": "object",
+        "properties": {
+          "instance_id": {
+            "description": "The unique instance ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "machine_id": {
+            "description": "The machine ID",
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "description": "The state of the container group instance",
+            "type": "string",
+            "enum": [
+              "allocating",
+              "downloading",
+              "creating",
+              "running",
+              "stopping"
+            ]
+          },
+          "update_time": {
+            "description": "The UTC date & time when the workload on this machine transitioned to the current state",
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "description": "The version of the running container group",
+            "type": "integer",
+            "minimum": 1
+          },
+          "ready": {
+            "description": "Specifies whether the container group instance is currently passing its readiness check. If no readiness probe is defined, is true once fully started.",
+            "type": "boolean"
+          },
+          "started": {
+            "description": "Specifies whether the container group instance passed its startup probe. Is always true when no startup probe is defined.",
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "instance_id",
+          "machine_id",
+          "state",
+          "update_time",
+          "version"
+        ]
+      },
+      "ContainerGroupInstances": {
+        "description": "Represents a list of container group instances",
+        "type": "object",
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContainerGroupInstance"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "instances"
+        ]
+      },
+      "QueueAutoscaler": {
+        "description": "Represents the autoscaling rules for a queue",
+        "type": "object",
+        "properties": {
+          "min_replicas": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "max_replicas": {
+            "type": "integer",
+            "maximum": 250,
+            "minimum": 1
+          },
+          "desired_queue_length": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "polling_period": {
+            "type": "integer",
+            "maximum": 1800,
+            "minimum": 15
+          },
+          "max_upscale_per_minute": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "max_downscale_per_minute": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "min_replicas",
+          "max_replicas",
+          "desired_queue_length"
+        ]
+      },
+      "ContainerGroupQueueConnection": {
+        "description": "Represents container group queue connection",
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "queue_name": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[a-z][a-z0-9-]{0,61}[a-z0-9]$"
+          }
+        },
+        "additionalProperties": false,
+        "nullable": true,
+        "required": [
+          "path",
+          "port",
+          "queue_name"
+        ]
+      },
+      "GpuClass": {
+        "description": "Represents a GPU Class",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The GPU class name",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2
+          },
+          "prices": {
+            "description": "The list of prices for each container group priority",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GpuClassPrice"
+            },
+            "maxItems": 100,
+            "minItems": 1
+          },
+          "is_high_demand": {
+            "description": "Whether the GPU class is in high demand",
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "prices"
+        ]
+      },
+      "GpuClassesList": {
+        "description": "Represents a list of GPU classes",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of GPU classes",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GpuClass"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "GpuClassPrice": {
+        "description": "Represents the price of a GPU class for a given container group priority",
+        "type": "object",
+        "properties": {
+          "priority": {
+            "$ref": "#/components/schemas/ContainerGroupPriority"
+          },
+          "price": {
+            "description": "The price",
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "priority",
+          "price"
+        ]
+      },
+      "ContainerGroupPriority": {
+        "type": "string",
+        "enum": [
+          "high",
+          "medium",
+          "low",
+          "batch"
+        ],
+        "nullable": true
+      },
+      "Quotas": {
+        "description": "Represents the organization quotas",
+        "type": "object",
+        "properties": {
+          "container_groups_quotas": {
+            "$ref": "#/components/schemas/ContainerGroupsQuotas"
+          },
+          "create_time": {
+            "description": "The time the resource was created",
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "description": "The time the resource was last updated",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "container_groups_quotas"
+        ]
+      },
+      "ContainerGroupsQuotas": {
+        "type": "object",
+        "properties": {
+          "max_created_container_groups": {
+            "type": "integer"
+          },
+          "container_instance_quota": {
+            "type": "integer"
+          },
+          "max_container_group_reallocations_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          },
+          "max_container_group_recreates_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          },
+          "max_container_group_restarts_per_minute": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "max_created_container_groups",
+          "container_instance_quota"
+        ]
+      },
+      "InferenceEndpoint": {
+        "description": "Represents an inference endpoint",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier",
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "The inference endpoint display name",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 2,
+            "pattern": "^[ ,-.0-9A-Za-z]+$"
+          },
+          "description": {
+            "description": "a brief description of the inference endpoint",
+            "type": "string"
+          },
+          "endpoint_url": {
+            "description": "The URL of the inference endpoint",
+            "type": "string",
+            "format": "url"
+          },
+          "readme": {
+            "description": "A markdown file containing a detailed description of the inference endpoint",
+            "type": "string"
+          },
+          "price_description": {
+            "description": "A description of the price",
+            "type": "string"
+          },
+          "icon_image": {
+            "description": "The URL of the icon image",
+            "type": "string",
+            "format": "url"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "description",
+          "endpoint_url",
+          "readme",
+          "price_description",
+          "icon_image"
+        ]
+      },
+      "InferenceEndpointsList": {
+        "description": "Represents a list of inference endpoints",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpoint"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "InferenceEndpointJobList": {
+        "description": "Represents a list of inference endpoint jobs",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The list of items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "maxItems": 100,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      },
+      "InferenceEndpointJob": {
+        "description": "Represents a inference endpoint job",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "inference_endpoint_name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "organization_name": {
+            "description": "The organization name",
+            "type": "string"
+          },
+          "output": {
+            "description": "The job output. May be any valid JSON."
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time",
+          "inference_endpoint_name",
+          "organization_name"
+        ]
+      },
+      "InferenceEndpointJobEvent": {
+        "description": "Represents an event for inference endpoint job",
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "created",
+              "started",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "time"
+        ]
+      },
+      "CreateInferenceEndpointJob": {
+        "description": "Represents a request to create a inference endpoint job",
+        "type": "object",
+        "properties": {
+          "input": {
+            "description": "The job input. May be any valid JSON."
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "input"
+        ]
+      },
+      "WebhookSecretKey": {
+        "description": "Represents a webhook secret key",
+        "type": "object",
+        "properties": {
+          "secret_key": {
+            "description": "The webhook secret key",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "secret_key"
+        ]
+      },
+      "SaladCloudTranscriptionLiteAPIInput": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the audio file to process. Must be a downloadable link.",
+            "example": "https://example.com/audiofile.mp3"
+          },
+          "language_code": {
+            "type": "string",
+            "description": "Language code for the transcription. Defaults to 'en' (English).",
+            "example": "en"
+          },
+          "return_as_file": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to return the result as a file."
+          },
+          "sentence_level_timestamps": {
+            "type": "boolean",
+            "default": false,
+            "description": "Return sentence-level timestamps in the transcription."
+          },
+          "word_level_timestamps": {
+            "type": "boolean",
+            "default": false,
+            "description": "Return word-level timestamps in the transcription."
+          },
+          "diarization": {
+            "type": "boolean",
+            "default": false,
+            "description": "Perform speaker diarization (separate speakers in multi-speaker audio)."
+          },
+          "sentence_diarization": {
+            "type": "boolean",
+            "default": false,
+            "description": "Perform sentence-level speaker diarization."
+          },
+          "srt": {
+            "type": "boolean",
+            "default": false,
+            "description": "Generate an SRT file (SubRip Subtitle format)."
+          },
+          "translate": {
+            "type": "string",
+            "description": "Translate the transcription to English (set to 'to eng' to enable translation).",
+            "example": "to_eng"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "additionalProperties": false
+      },
+      "SaladCloudTranscriptionLiteAPIJob": {
+        "description": "Job input schema for Salad Transcription Lite API",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIInput"
+          },
+          "inference_endpoint_name": {
+            "description": "The inference endpoint name",
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InferenceEndpointJobEvent"
+            },
+            "maxItems": 1000,
+            "minItems": 0
+          },
+          "organization_name": {
+            "description": "The organization name",
+            "type": "string"
+          },
+          "output": {
+            "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIOutput"
+          },
+          "create_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "update_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "status",
+          "events",
+          "create_time",
+          "update_time",
+          "inference_endpoint_name",
+          "organization_name"
+        ]
+      },
+      "SaladCloudTranscriptionLiteAPIOutput": {
+        "type": "object",
+        "properties": {
+          "sentence_level_timestamps": {
+            "type": "array",
+            "description": "List of sentences with timestamps, speaker identification, sentiment analysis, and classification.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Transcribed sentence.",
+                  "example": "You know that little voice in your head?"
+                },
+                "timestamp": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "description": "Start and end times of the sentence in seconds.",
+                  "example": [
+                    0,
+                    5.9
+                  ]
+                },
+                "start": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Start time of the sentence in seconds.",
+                  "example": 0
+                },
+                "end": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "End time of the sentence in seconds.",
+                  "example": 5.9
+                },
+                "speaker": {
+                  "type": "string",
+                  "description": "Identified speaker label.",
+                  "example": "SPEAKER_02"
+                },
+                "sentiment": {
+                  "type": "array",
+                  "description": "Sentiment analysis results for the sentence.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "description": "Sentiment label.",
+                        "example": "NEGATIVE"
+                      },
+                      "score": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Confidence score for the sentiment label.",
+                        "example": 0.9837925434112549
+                      }
+                    }
+                  }
+                },
+                "classification": {
+                  "type": "object",
+                  "description": "Classification labels and their confidence scores for the sentence.",
+                  "properties": {
+                    "label": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "List of classification labels.",
+                      "example": [
+                        "VOICEMAIL",
+                        "PHONE_CALL",
+                        "PRESENTATION"
+                      ]
+                    },
+                    "scores": {
+                      "type": "array",
+                      "items": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "description": "Confidence scores corresponding to each classification label.",
+                      "example": [
+                        0.2575797736644745,
+                        0.20001687109470367,
+                        0.15546734631061554
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "start",
+                "end",
+                "speaker"
+              ]
+            }
+          },
+          "word_segments": {
+            "type": "array",
+            "description": "List of words with timestamps, confidence scores, and speaker identification.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "word": {
+                  "type": "string",
+                  "description": "Transcribed word.",
+                  "example": "You"
+                },
+                "start": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Start time of the word in seconds.",
+                  "example": 4.274
+                },
+                "end": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "End time of the word in seconds.",
+                  "example": 4.395
+                },
+                "score": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Confidence score for the transcribed word.",
+                  "example": 0.89
+                },
+                "speaker": {
+                  "type": "string",
+                  "description": "Identified speaker label.",
+                  "example": "SPEAKER_02"
+                }
+              },
+              "required": [
+                "word",
+                "start",
+                "end",
+                "score",
+                "speaker"
+              ]
+            }
+          },
+          "srt_content": {
+            "type": "string",
+            "description": "Generated SRT (SubRip Subtitle) content.",
+            "example": "1\n00:00:04,274 --> 00:00:05,880\nYou know that little voice in your head?\n\n2\n00:00:10,506 --> 00:00:13,240\nThe one that tells you to ignore a tasteless joke?\n..."
+          },
+          "text": {
+            "type": "string",
+            "description": "Full transcribed text from the audio.",
+            "example": "You know that little voice in your head? The one that tells you to ignore a tasteless joke? ..."
+          },
+          "duration": {
+            "type": "number",
+            "format": "float",
+            "description": "Duration of the audio file in hours.",
+            "example": 0.04
+          },
+          "processing_time": {
+            "type": "number",
+            "format": "float",
+            "description": "Time taken to process the transcription in seconds.",
+            "example": 69.79421997070312
+          }
+        },
+        "required": [
+          "text",
+          "duration",
+          "processing_time"
+        ],
+        "additionalProperties": false
+      },
+      "CreateSaladCloudTranscriptionLiteAPIJob": {
+        "description": "Create a job for Salad Transcription Lite API",
+        "type": "object",
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIInput"
+          },
+          "metadata": {
+            "type": "object",
+            "maxProperties": 20,
+            "nullable": true
+          },
+          "webhook": {
+            "type": "string",
+            "format": "url",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "input"
+        ]
+      },
+      "SaladCloudTranscriptionLiteAPIJobList": {
+        "description": "List of jobs for Salad Transcription Lite API",
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIJob"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ]
+      }
+    },
+    "requestBodies": {
+      "CreateSaladCloudTranscriptionLiteAPIJob": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CreateSaladCloudTranscriptionLiteAPIJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "webhook": "https://webhooks.example.com:8080"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Bad Request",
+                  "status": 400,
+                  "detail": "Bad Request",
+                  "instance": "60907fdc"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Unauthorized",
+                  "status": 401,
+                  "detail": "Unauthorized",
+                  "instance": "dc907f60"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "Forbidden",
+                  "instance": "962fc00e"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Not Found",
+                  "status": 404,
+                  "detail": "Not Found",
+                  "instance": "72ea5f29"
+                }
+              }
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Too Many Requests",
+                  "status": 409,
+                  "detail": "Too Many Requests",
+                  "instance": "cd6306ee"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnknownError": {
+        "description": "Unknown Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "type": "about:blank",
+                  "title": "Unknown Error",
+                  "status": 500,
+                  "detail": "Unknown Error",
+                  "instance": "188f9bbb"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetInferenceEndpoint": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpoint"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                  "name": "transcription-lite",
+                  "display_name": "Avatar Generator",
+                  "description": "Generates the best avatars of cartoon characters",
+                  "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/transcription-lite",
+                  "readme": "test-readme",
+                  "price_description": "0.05 credits per inference",
+                  "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/transcription-lite/icon"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListInferenceEndpoints": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointsList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c2440e",
+                      "name": "transcription-lite",
+                      "display_name": "Avatar Generator",
+                      "description": "Generates the best avatars of cartoon characters",
+                      "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/transcription-lite",
+                      "readme": "test-readme",
+                      "price_description": "0.05 credits per inference",
+                      "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/transcription-lite/icon"
+                    },
+                    {
+                      "id": "3cc0c401-4159-4760-a1e1-b2dec9c22893",
+                      "name": "audio-to-waveform",
+                      "display_name": "Audio to Waveform",
+                      "description": "Does something technical with audio",
+                      "endpoint_url": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform",
+                      "readme": "test-readme",
+                      "price_description": "0.10 credits per inference",
+                      "icon_image": "https://api.salad.io/organizations/acme-corp/inference-endpoints/audio-to-waveform/icon"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListInferenceEndpointJobs": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "inference_endpoint_name": "transcription-lite",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174001",
+                      "inference_endpoint_name": "transcription-lite",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateInferenceEndpointJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/inference-endpoints/transcription-lite/jobs/123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "inference_endpoint_name": "transcription-lite",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetInferenceEndpointJob": {
+        "description": "Ok",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InferenceEndpointJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                  "inference_endpoint_name": "transcription-lite",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteInferenceEndpointJob": {
+        "description": "Accepted"
+      },
+      "ListSaladCloudTranscriptionLiteAPIJob": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIJobList"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "items": [
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174000",
+                      "inference_endpoint_name": "transcription-lite",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    },
+                    {
+                      "id": "123e4567-e89b-12d3-a456-426614174001",
+                      "inference_endpoint_name": "transcription-lite",
+                      "input": {
+                        "property1": "value1",
+                        "property2": "value2"
+                      },
+                      "metadata": null,
+                      "organization_name": "acme-corp",
+                      "status": "pending",
+                      "events": [],
+                      "create_time": "2024-05-01T19:00:00Z",
+                      "update_time": "2024-05-01T19:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetSaladCloudTranscriptionLiteAPIJob": {
+        "description": "Ok",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                  "inference_endpoint_name": "transcription-lite",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateSaladCloudTranscriptionLiteAPIJob": {
+        "description": "Created",
+        "headers": {
+          "Location": {
+            "schema": {
+              "type": "string",
+              "example": "/organizations/acme-corp/inference-endpoints/transcription-lite/jobs/123e4567-e89b-12d3-a456-426614174000"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SaladCloudTranscriptionLiteAPIJob"
+            },
+            "examples": {
+              "jsonExample": {
+                "value": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "inference_endpoint_name": "transcription-lite",
+                  "input": {
+                    "property1": "value1",
+                    "property2": "value2"
+                  },
+                  "metadata": null,
+                  "organization_name": "acme-corp",
+                  "status": "pending",
+                  "events": [],
+                  "create_time": "2024-05-01T19:00:00Z",
+                  "update_time": "2024-05-01T19:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Salad-Api-Key"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "container_groups",
+      "description": "Container Groups"
+    },
+    {
+      "name": "inference_endpoints",
+      "description": "Inference Endpoints"
+    },
+    {
+      "name": "organization_data",
+      "description": "Auxiliary organization data and info"
+    },
+    {
+      "name": "queues",
+      "description": "Job Queues"
+    },
+    {
+      "name": "quotas",
+      "description": "quotas"
+    },
+    {
+      "name": "workload_errors",
+      "description": "Workload Errors"
+    },
+    {
+      "name": "webhook_secret_key",
+      "description": "Webhook Secret Key"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}
