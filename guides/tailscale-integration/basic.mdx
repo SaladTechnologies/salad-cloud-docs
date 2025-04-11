@@ -161,6 +161,24 @@ proxychains4 curl http://100.88.37.62:8888/
 **Notes:** The ping appears to work from devices in the default model with the tailscale0 interface to Salad nodes,
 because ICMP packets are intercepted and responded by the Tailscale agent running on these nodes.
 
+## Generating an Auth Key
+
+[Auth keys](https://tailscale.com/kb/1085/auth-keys) allow you to add devices to a tailnet without requiring interactive
+sign-in through a browser. They’re especially useful for automated workflows, such as spinning up containers or
+provisioning devices programmatically.
+
+You can generate a **reusable** and **ephemeral** key for a group of Salad nodes. The ephemeral option is ideal for
+short-lived, interruptible devices, like Salad nodes, which typically run for a few hours to several days at a time.
+[Tailscale automatically removes ephemeral devices from the tailnet after 30 minutes to 48 hours of inactivity](https://tailscale.com/kb/1111/ephemeral-nodes#how-long-before-ephemeral-devices-are-auto-removed).
+If the same device comes online again after removal, it will rejoin the tailnet as a new node.
+
+An auth key automatically expires after the duration specified at the time of creation, with a maximum of 90 days (which
+can be adjusted in [the Admin Console](https://login.tailscale.com/admin/settings/keys)). Devices added using the
+expired key remain authorized, but they will require reauthentication once the configured reauthentication interval has
+passed.
+
+<img src="/guides/tailscale-integration/images/auth-key.png" />
+
 ## Embedding Tailscale in Container Images
 
 Here is [an example application](https://github.com/SaladTechnologies/tailscale-integration/tree/main/basic) to add
@@ -207,7 +225,7 @@ CMD ["./start.sh"]
 When the image runs on a Salad node, the following steps are executed by the
 [startup.sh](https://github.com/SaladTechnologies/tailscale-integration/blob/main/basic/start.sh) script:
 
-- Add the Salad node to the tailnet using a Tailscale [auth key](https://tailscale.com/kb/1085/auth-keys) and its
+- Add the Salad node to the tailnet using a Tailscale auth key and its
   [SALAD_MACHINE_ID](/products/sce/container-groups/environment-variables), and start the Tailscale SSH server.
 
 - Tailscale IP is retrieved and exported as an environment variable. All environment variables are then written to the
@@ -257,24 +275,6 @@ including other Salad nodes, the **dev-vscode**, and **app-server**.
 
 Tailscale Enterprise accounts support Access Control Lists ([ACLs](https://tailscale.com/kb/1018/acls)) for fine-grained
 access control, allowing you to precisely manage which users, devices, and services can communicate.
-
-## Generating an Auth Key
-
-[Auth keys](https://tailscale.com/kb/1085/auth-keys) allow you to add devices to a tailnet without requiring interactive
-sign-in through a browser. They’re especially useful for automated workflows, such as spinning up containers or
-provisioning devices programmatically.
-
-You can generate a **reusable** and **ephemeral** key for a group of Salad nodes. The ephemeral option is ideal for
-short-lived, interruptible devices, like Salad nodes, which typically run for a few hours to several days at a time.
-[Tailscale automatically removes ephemeral devices from the tailnet after 30 minutes to 48 hours of inactivity](https://tailscale.com/kb/1111/ephemeral-nodes#how-long-before-ephemeral-devices-are-auto-removed).
-If the same device comes online again after removal, it will rejoin the tailnet as a new node.
-
-An auth key automatically expires after the duration specified at the time of creation, with a maximum of 90 days (which
-can be adjusted in [the Admin Console](https://login.tailscale.com/admin/settings/keys)). Devices added using the
-expired key remain authorized, but they will require reauthentication once the configured reauthentication interval has
-passed.
-
-<img src="/guides/tailscale-integration/images/auth-key.png" />
 
 ## Deploying SaladCloud Workloads and Joining Them to the Tailnet
 
