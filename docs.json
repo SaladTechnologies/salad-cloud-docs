@@ -358,7 +358,7 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": ["guides/tailscale-integration/solution-overview"]
+                "pages": ["guides/tailscale-integration/solution-overview", "guides/tailscale-integration/basic"]
               }
             ]
           }

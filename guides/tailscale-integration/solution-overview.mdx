@@ -33,8 +33,9 @@ Integrating Tailscale with SaladCloud unlocks additional use cases, including:
 
 <img src="/guides/tailscale-integration/images/networking-overview.png" />
 
-- **Remote Development:** Developers can use [VSCode - Remote SSH](https://code.visualstudio.com/docs/remote/ssh) on Mac
-  or Windows to seamlessly test and debug their code running on Salad GPU nodes.
+- **Remote Development:** Developers can use [VSCode - Remote SSH](https://code.visualstudio.com/docs/remote/ssh) and
+  [JupyterLab](https://jupyter.org/) on Mac or Windows to seamlessly test and debug their code running on Salad GPU
+  nodes.
 
 - **Network Management and Troubleshooting:** Network operators can SSH into Salad nodes for configuration, management,
   and troubleshooting purposes.
@@ -48,6 +49,9 @@ Integrating Tailscale with SaladCloud unlocks additional use cases, including:
 
 - **Enabling Meshed Communication:** Facilitating secure, direct communication between Salad nodes and private systems
   in a mesh network.
+
+Tailscale is fully compatible with SaladCloud's networking. While enabling the new use cases through the integration,
+the Container Gateway and outbound connections in SaladCloud remain unaffected.
 
 ## Scenarios and Protocols
 
@@ -67,7 +71,7 @@ For a node in Tailscale’s userspace network mode, outbound connections to othe
 explicitly configured to use the SOCKS5 or HTTP proxy through
 [environment variables](https://tailscale.com/kb/1112/userspace-networking#configure-your-application-to-use-socks5-or-http)
 or network proxying tools like [proxychains](https://github.com/haad/proxychains), while inbound connections are
-automatically routed through the proxy by Tailscale.
+automatically routed through the SOCKS5 proxy by Tailscale.
 
 Here is a summary of the supported communication scenarios and protocols when integrating SaladCloud with Tailscale.
 
@@ -75,6 +79,9 @@ Here is a summary of the supported communication scenarios and protocols when in
 | :------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Source:<br />Default Mode<br />(Other Systems)**            | The application can access peers via their Tailscale IPs for all traffic types.<br />The application can access itself via its Tailscale IP or the localhost (127.0.0.1) for all traffic types. | The application can access peers using their Tailscale IPs for TCP and UDP traffic.                                                                                                                                                                             |
 | **Source:<br />Userspace Networking Mode<br />(Salad Nodes)** | The application can access peers via their Tailscale IPs for TCP and UDP traffic by using the local proxy provided by Tailscale.                                                                | The application can access peers via their Tailscale IPs for TCP and UDP traffic by using the local proxy provided by Tailscale.<br />The application can access itself via the localhost (127.0.0.1) for all traffic types, but cannot reach its Tailscale IP. |
+
+**Note: Not all devices in the default mode can access their own Tailscale IPs, as this depends on the operating system,
+network configuration, and firewall settings.**
 
 <img src="/guides/tailscale-integration/images/scenarios.png" />
 
