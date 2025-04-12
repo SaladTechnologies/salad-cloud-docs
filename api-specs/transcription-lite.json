@@ -3206,7 +3206,7 @@
         "properties": {
           "sentence_level_timestamps": {
             "type": "array",
-            "description": "List of sentences with timestamps, speaker identification, sentiment analysis, and classification.",
+            "description": "List of sentences with timestamps, speaker identification.",
             "items": {
               "type": "object",
               "properties": {
@@ -3243,57 +3243,6 @@
                   "type": "string",
                   "description": "Identified speaker label.",
                   "example": "SPEAKER_02"
-                },
-                "sentiment": {
-                  "type": "array",
-                  "description": "Sentiment analysis results for the sentence.",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "label": {
-                        "type": "string",
-                        "description": "Sentiment label.",
-                        "example": "NEGATIVE"
-                      },
-                      "score": {
-                        "type": "number",
-                        "format": "float",
-                        "description": "Confidence score for the sentiment label.",
-                        "example": 0.9837925434112549
-                      }
-                    }
-                  }
-                },
-                "classification": {
-                  "type": "object",
-                  "description": "Classification labels and their confidence scores for the sentence.",
-                  "properties": {
-                    "label": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "List of classification labels.",
-                      "example": [
-                        "VOICEMAIL",
-                        "PHONE_CALL",
-                        "PRESENTATION"
-                      ]
-                    },
-                    "scores": {
-                      "type": "array",
-                      "items": {
-                        "type": "number",
-                        "format": "float"
-                      },
-                      "description": "Confidence scores corresponding to each classification label.",
-                      "example": [
-                        0.2575797736644745,
-                        0.20001687109470367,
-                        0.15546734631061554
-                      ]
-                    }
-                  }
                 }
               },
               "required": [
