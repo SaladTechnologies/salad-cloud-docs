@@ -62,9 +62,7 @@ for more details.
 
 Below is an illustration of how applications leverage Dev Tunnels on SaladCloud:
 
-| Client Application                                 | Dev Tunnels CLI <br />(client-side)                                                                                                                         | Azure                                                                                                   | Dev Tunnels CLI<br />(server-side)                                                                                                                  | Server <br />(SaladCloud)                          |
-| :------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------- |
-| Access the remote server via http://localhost:8888 | Authenticate, connect to an existing tunnel and enable port-forwarding.<br /><br />CLI Example: <br />devtunnel user login<br />devtunnel connect tunnel_id | Provide relay infrastructure, tunnel lifecycle management, access control, and authentication services. | Authenticate, create and host a tunnel to expose the local service. <br /><br />CLI Example: <br />devtunnel user login<br />devtunnel host -p 8888 | A server is configured to listen on port **8888**. |
+<img src="/tutorials/images/vscode/devtunnels.png" />
 
 Follow [this link](https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started?tabs=linux#install) to
 install the Dev Tunnels CLI on any machine and familiarize yourself with its features.
@@ -140,10 +138,10 @@ RUN pip install --upgrade pip
 RUN pip install flask python-dotenv
 
 # Install VS Code Server CLI
-RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' --output vscode_cli.tar.gz
-RUN tar -xf vscode_cli.tar.gz
-RUN mv ./code /usr/local/bin/code
-RUN rm vscode_cli.tar.gz
+RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o vscode_cli.tar.gz && \
+    tar -xf vscode_cli.tar.gz && \
+    mv code /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
 
 # Set working directory and copy application files
 WORKDIR /app
@@ -159,40 +157,44 @@ CMD ["./start.sh"]
 
 When the image runs on a Salad node, the
 [startup.sh](https://github.com/SaladTechnologies/vscode-remote-tunnels/blob/main/automatic/start.sh) script launches
-the VS Code Server using an existing tunnel in the background, and then proceeds to execute the original container
-command.
+the VS Code Server using an existing tunnel.
 
 ```bash start.sh
 #!/bin/bash
 
-# Launch the VS Code Server using an existing tunnel
-echo -e "\nCreate a tunnel..."
-#code tunnel --accept-server-license-terms --name $SALAD_MACHINE_ID --tunnel-id $TUNNEL_ID --host-token $ACCESS_TOKEN &
-code tunnel --accept-server-license-terms --name $SALAD_CONTAINER_GROUP_ID --tunnel-id $TUNNEL_ID --host-token $ACCESS_TOKEN &
+echo -e "\nLaunch the VS Code Server using an existing tunnel..."
+# SALAD_CONTAINER_GROUP_ID as the tunnel name
+code tunnel --accept-server-license-terms --name $SALAD_CONTAINER_GROUP_ID --tunnel-id $TUNNEL_ID --host-token $ACCESS_TOKEN
+# SALAD_MACHINE_ID as the tunnel name
+#code tunnel --accept-server-license-terms --name $SALAD_MACHINE_ID --tunnel-id $TUNNEL_ID --host-token $ACCESS_TOKEN
+
+# You may also launch the VS Code Server in the background, then run your original command — such as python hello.py
+# code tunnel --accept-server-license-terms --name $SALAD_CONTAINER_GROUP_ID --tunnel-id $TUNNEL_ID --host-token $ACCESS_TOKEN &
+# python hello.py
 
 # The containers running on SaladCloud must have a continuously running process; and if the process completes, SaladCloud will automatically reallocate the instances to rerun the image.
-echo -e "\nSleeping indefinitely..."
-sleep infinity
+# Sometimes, you can keep the container running with a simple command like this:
+# sleep infinity
 ```
 
-The --name parameter assigns a user-friendly name for the tunnel (uniquely associated with the Salad node), which is
+The `--name` parameter assigns a user-friendly name for the tunnel (uniquely associated with the Salad node), which is
 used when connecting from a browser:
 
 ```
 https://vscode.dev/tunnel/name_of_tunnel
 ```
 
-SALAD_MACHINE_ID is a unique identifier for each Salad node and is easily viewable in the SaladCloud Portal.
-SALAD_CONTAINER_GROUP_ID is available through the SaladCloud APIs or SDKs, and can also be retrieved by running env
-inside the terminal of a container instance or checking the container logs in the SaladCloud Portal. Currently, all
-instances (or replicas) within a container group share the same hostname, which is set to the value of
-SALAD_CONTAINER_GROUP_ID.
+`SALAD_MACHINE_ID` is a unique identifier for each Salad node and is easily viewable in the SaladCloud Portal.
+`SALAD_CONTAINER_GROUP_ID` is available through the SaladCloud APIs or SDKs, and can also be retrieved by running
+**env** inside the terminal of a container instance or checking the container logs in the SaladCloud Portal. Currently,
+all instances (or replicas) within a container group share the same hostname, which is set to the value of
+`SALAD_CONTAINER_GROUP_ID`.
 
-You can use either SALAD_MACHINE_ID or SALAD_CONTAINER_GROUP_ID as the value for the --name parameter.
+You can use either `SALAD_MACHINE_ID` or `SALAD_CONTAINER_GROUP_ID` as the value for the `--name` parameter.
 
-- With SALAD_MACHINE_ID, you can easily connect to a specific node from clients, as the ID is readily accessible from
+- With `SALAD_MACHINE_ID`, you can easily connect to a specific node from clients, as the ID is readily accessible from
   the SaladCloud Portal.
-- Using SALAD_CONTAINER_GROUP_ID (as demonstrated in this example) helps avoid client-side reconfiguration -- such as
+- Using `SALAD_CONTAINER_GROUP_ID` (as demonstrated in this example) helps avoid client-side reconfiguration -- such as
   refreshing clients to reconnect automatically -- after node reallocation or container group restarts, since the value
   remains consistent across instances launched at different time within the same container group.
 
@@ -252,8 +254,8 @@ Environment Variable: TUNNEL_ID, ACCESS_TOKEN
 
 ### Connect to the Salad Node
 
-Once the instance is running, you can retrieve the SALAD_CONTAINER_GROUP_ID and connect to it using both VS Code Desktop
-and a browser.
+Once the instance is running, you can retrieve the `SALAD_CONTAINER_GROUP_ID` and connect to it using both VS Code
+Desktop and a browser.
 
 ```
 https://vscode.dev/tunnel/SALAD_CONTAINER_GROUP_ID
@@ -302,12 +304,12 @@ Tunnel Expiration     : 30 days
 The automatic mode may fit scenarios where you're developing applications across various Salad GPU nodes over an
 extended period. The following summarizes the workflow:
 
-|     | Developer Laptop                                                                                                                                                                                           | SaladCloud                                                                                                                                                                                                                       |
-| :-- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0   | Modify the image to support the automatic mode. <br />Create a 30-day tunnel using the Dev Tunnels API.                                                                                                    |                                                                                                                                                                                                                                  |
-| 1   | Generate an access token each day using the Dev Tunnels API.                                                                                                                                               |                                                                                                                                                                                                                                  |
-| 2   |                                                                                                                                                                                                            | Run the single-replica container group with the tunnel ID and the updated token. <br />When a node goes offline unexpectedly, SaladCloud automatically allocates a new one. <br />Stop the container group when it's not in use. |
-| 3   | Connect using VS Code Desktop or a browser. <br />Commit code changes regularly to the repositories. <br />After node reallocation or container group restart, refresh clients to reconnect automatically. |                                                                                                                                                                                                                                  |
+| Step | Action                                                                                                                                                                                                                           | Performed On     |
+| :--- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- |
+| 0    | Modify the image to support the automatic mode, and create a 30-day tunnel using the Dev Tunnels API.                                                                                                                            | Developer Laptop |
+| 1    | Generate an access token each day using the Dev Tunnels API.                                                                                                                                                                     | Developer Laptop |
+| 2    | Run the single-replica container group with the tunnel ID and the updated token. <br />When a node goes offline unexpectedly, SaladCloud automatically allocates a new one. <br />Stop the container group when it's not in use. | SaladCloud       |
+| 3    | Connect using VS Code Desktop or a browser. <br />Commit code changes regularly to the repositories. <br />After node reallocation or container group restart, refresh clients to reconnect automatically.                       | Developer Laptop |
 
 ## Interactive Mode
 
@@ -323,23 +325,23 @@ include it in your container image during the build process — and start the VS
 # Sign in interactively using a Github account and a device code
 # Even though the command is part of the VS Code Server CLI, it specifically authenticates with the Dev Tunnels service
 
-root@564eafc5-c872-414b-b4f6-a6032163a31f:/# code tunnel user login --provider github
+root@564eafc5-c872-414b-b4f6-a6032163a31f:~$ code tunnel user login --provider github
 To grant access to the server, please log into https://github.com/login/device and use code 8223-8B7E
 
 # Open a browser on your developer laptop, navigate to the provided URL, enter the code, authorize access, and then return to continue.
 
 # Start the VS Code Server in tunnel mode to automatically provision a tunnel, launch the server, and expose it through that tunnel.
 
-root@564eafc5-c872-414b-b4f6-a6032163a31f:/# nohup code tunnel --accept-server-license-terms --name 001 &> output.log &
+root@564eafc5-c872-414b-b4f6-a6032163a31f:~$ nohup code tunnel --accept-server-license-terms --name 001 &> output.log &
 [1] 24
 
 # You can now safely close the terminal
 # Connect using VS Code Desktop or a browser (https://vscode.dev/tunnel/001)
 
-root@564eafc5-c872-414b-b4f6-a6032163a31f:/# code tunnel status
+root@564eafc5-c872-414b-b4f6-a6032163a31f:~$ code tunnel status
 {"tunnel":{"name":"001","started_at":"2025-04-16T21:30:06.255541221Z","tunnel":"Connected","last_connected_at":"2025-04-16T21:30:13.282022913Z","last_disconnected_at":null,"last_fail_reason":null},"service_installed":false}
 
-root@564eafc5-c872-414b-b4f6-a6032163a31f:/# tail -f output.log
+root@564eafc5-c872-414b-b4f6-a6032163a31f:~$ tail -f output.log
 
 [2025-04-16 21:29:55] info Creating tunnel with the name: 001
 Open this link in your browser https://vscode.dev/tunnel/001
@@ -364,7 +366,7 @@ ubuntu@wsl-nuc:~$ devtunnel list
 Found 1 tunnels.
 
 Tunnel ID                           Host Connections     Labels                    Ports                Expiration                Description
-new-hill-7rpsj2g.uks1               1                    001,protocolv4,vscod...   0                    30 days
+new-hill-7rpsj2g.uks1               1                    001,protocolv4,vscode...  0                    30 days
 ```
 
 The VS Code Server CLI doesn't always provision a new tunnel. If you relaunch the server on the same Salad node after a
@@ -376,10 +378,10 @@ created, the older and inactive tunnels would be automatically deleted by Dev Tu
 If you only need occasional access to any Salad node for testing or debugging, this mode is ideal. The following
 summarizes the workflow:
 
-|     | Developer Laptop                                                           | SaladCloud                                                                                                                                                                                                                                                     |
-| :-- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   |                                                                            | Open the terminal of a running instance in the SaladCloud Portal, and install the VS Code Server CLI.                                                                                                                                                          |
-| 2   |                                                                            | Run the VS Code Server CLI to log in to the Dev Tunnels service to receive the URL and an authentication code. <br /><br /> CLI Example: <br />code tunnel user login –provider github                                                                         |
-| 3   | Open a browser, log in using the URL, enter the code and authorize access. |                                                                                                                                                                                                                                                                |
-| 4   |                                                                            | Run the VS Code Server CLI to launch a VS Code Server in tunnel model, and you can safely close the terminal after this step. <br /><br />CLI Example:<br />nohup code tunnel --accept-server-license-terms --name 001 &> output.log &<br />tail -f output.txt |
-| 5   | Connect using VS Code Desktop or a browser.                                |                                                                                                                                                                                                                                                                |
+| Step | Action                                                                                                                                                                                                                                                 | Performed On     |
+| :--- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- |
+| 1    | Open the terminal of a running instance in the SaladCloud Portal, and install the VS Code Server CLI.                                                                                                                                                  | SaladCloud       |
+| 2    | Run the VS Code Server CLI to log in to the Dev Tunnels service to receive the URL and an authentication code. **CLI Example:** <br />code tunnel user login –provider github                                                                          | SaladCloud       |
+| 3    | Open a browser, log in using the URL, enter the code and authorize access.                                                                                                                                                                             | Developer Laptop |
+| 4    | Run the VS Code Server CLI to launch a VS Code Server in tunnel model, and you can safely close the terminal after this step. **CLI Example:**<br />nohup code tunnel --accept-server-license-terms --name 001 &> output.log &<br />tail -f output.txt | SaladCloud       |
+| 5    | Connect using VS Code Desktop or a browser.                                                                                                                                                                                                            | Developer Laptop |
