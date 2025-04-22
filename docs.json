@@ -182,6 +182,7 @@
               "tutorials/high-performance-apps",
               "tutorials/high-performance-storage-solutions",
               "tutorials/docker-run",
+              "tutorials/vscode-remote-development",
               "tutorials/jwt-authentication",
               "tutorials/interactive-terminal",
               "tutorials/performance-monitoring",
