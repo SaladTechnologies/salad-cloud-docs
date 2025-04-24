@@ -14,8 +14,6 @@ Nvidia's new RTX 5090 and RTX 5080 GPUs require CUDA 12.8. As of April 24, 2025,
 - [pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime](https://hub.docker.com/layers/pytorch/pytorch/2.7.0-cuda12.8-cudnn9-runtime/images/sha256-7db0e1bf4b1ac274ea09cf6358ab516f8a5c7d3d0e02311bed445f7e236a5d80)
 - [pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel](https://hub.docker.com/layers/pytorch/pytorch/2.7.0-cuda12.8-cudnn9-devel/images/sha256-e97058f7b9b583517643477cc9a0433e54594038efd85ec4abd7836233d626f3)
 
-This tutorial provides a workaround to run PyTorch on the RTX 50-series GPUs using the latest nightly build of PyTorch.
-
 <Info>
   If you intend to run a workload both on 50-series gpus and older 40- or 30-series gpus, you will need to maintain
   separate docker images. As of the time of this writing, older GPUs and their drivers do not have cuda 12.8 support, so
