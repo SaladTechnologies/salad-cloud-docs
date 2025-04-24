@@ -89,11 +89,11 @@ SaladCloud has three product lines:
 
 We have RTX 5090 GPUs on SaladCloud! There are some things you should know before deploying:
 
-<Tip>[Build your own compatible docker image](/tutorials/pytorch-rtx5090) for the RTX 5090 and RTX 5080.</Tip>
-
-- **MINIMUM CUDA VERSION: 12.8** - If your application does not use CUDA 12.8, it will not run on the RTX 5090.
-- As of March 17, 2025, **PyTorch has not released an official build** with support for CUDA 12.8. You can build PyTorch
-  from source with CUDA 12.8 support, or use the "nightly" build.
+- **MINIMUM CUDA VERSION: 12.8** - If your application does not use CUDA 12.8 or later, it will not run on the RTX 5090.
+- **CUDA 12.8 is not currently compatible with older GPUs** (Apr 24, 2025)- If you are using a docker image that is
+  compatible with the RTX 5090, it will not work on older GPUs. You will need to maintain separate docker images for the
+  RTX 5090 and older GPUs.
+- [More Info](/tutorials/pytorch-rtx5090.mdx)
 
 ## Security and Compliance
 
