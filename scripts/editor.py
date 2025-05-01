@@ -5,6 +5,17 @@ from datetime import datetime
 import re
 import time
 
+usage = f"python {sys.argv[0]} <filename>"
+if len(sys.argv) != 2:
+    print(usage)
+    sys.exit(1)
+if not os.path.exists(sys.argv[1]):
+    print(f"File {sys.argv[1]} does not exist.")
+    sys.exit(1)
+if not os.path.isfile(sys.argv[1]):
+    print(f"File {sys.argv[1]} is not a file.")
+    sys.exit(1)
+
 filename = sys.argv[1]
 with open(filename, "r") as file:
     file_content = file.read()
