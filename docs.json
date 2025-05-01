@@ -182,7 +182,6 @@
               "tutorials/high-performance-apps",
               "tutorials/high-performance-storage-solutions",
               "tutorials/docker-run",
-              "tutorials/vscode-remote-development",
               "tutorials/jwt-authentication",
               "tutorials/interactive-terminal",
               "tutorials/performance-monitoring",
@@ -204,8 +203,8 @@
               "tutorials/run-triton-server",
               "tutorials/pytorch-rtx5090",
               "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
-              "tutorials/example-image",
-              "tutorials/ubuntu-image"
+              "tutorials/ubuntu-image",
+              "tutorials/vscode-remote-development"
             ]
           }
         ]
