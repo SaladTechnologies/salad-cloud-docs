@@ -3,81 +3,202 @@ title: 'Quickstart'
 description: 'Get your first container up and running on SaladCloud in minutes!'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: May 5, 2025_
 
-SaladCloud simplifies container deployment, allowing you to easily manage containers within your organization. In this
-step-by-step guide, we will walk you through the process of deploying a container using the SaladCloud Portal. Let's get
-started!
+<iframe
+  src="https://player.vimeo.com/video/1081576659?transparent=0"
+  width="100%"
+  height="470px"
+  webkitallowfullscreen
+  mozallowfullscreen
+  allowfullscreen
+  allow="fullscreen"
+></iframe>
 
-### Step 1: Log in to the SaladCloud Portal
+## Deploying Your First Application on SaladCloud
 
-1. Open your preferred web browser and navigate to the [SaladCloud Portal](https://portal.salad.com).
-2. Enter your login credentials (username and password) to access your account dashboard.
+Welcome to Salad Container Engine (SCE), a fully managed container service for deploying AI and simulation workloads to
+our global network of idle GPUs. Unlike traditional cloud providers, SaladCloud operates a decentralized marketplace
+where individuals can sell idle compute time on their PCs, and businesses can run workloads at industry-low costs.
 
-<img src="/products/sce/images/45e3e02-image1.png" />
+This guide walks you through deploying a simple FastAPI application on SCE. Before continuing, make sure you have:
 
-### Step 2: Create a new Organization and Project
+- A [SaladCloud account](https://portal.salad.com)
+- An organization created in the portal
+- At least a few dollars in credits added to your account
 
-1. Within the dashboard, click on the "Create New Organization" button. (This assumes you're not already part of an
-   organization that you've been invited to)
+---
 
-<img src="/products/sce/images/0803131-image.png" />
+## Step 1: Prepare Your Application
 
-2. Name the new organization and provide a project name.
-3. Click on "Create" to set up the new organization and project.
-   <img src="/products/sce/images/9aa8a8e-image.png" />
+We'll deploy a simple FastAPI server with a `GET /hello` endpoint and basic probe endpoints (`/started`, `/live`,
+`/ready`). The `/hello` route returns a greeting and the machine ID via environment variable injection at runtime. While
+the probe routes aren't meaningful in this demo, SCE can use them to manage container lifecycle events.
 
-### Step 3: Create a Container Group
+```python app.py
+from fastapi import FastAPI
+import os
 
-1. After creating the organization and project, SaladCloud will prompt you to select a product. Choose "Create Container
-   Group" from the options presented.
-   <img src="/products/sce/images/new-project-screen.png" />
+salad_machine_id = os.getenv("SALAD_MACHINE_ID", "localhost")
 
-### Step 4: Configure the Container Group with the Set Up Wizard
+app = FastAPI()
 
-1. On the configuration page, enter a name for your container group.
-2. Provide the image name and source.
-3. Specify the number of replicas (e.g., "5") that you want to deploy
-4. Optional : Specify Environmental Variables or Commands
 
-   <img src="/products/sce/images/quick-configure.png" />
+@app.get("/hello")
+async def hello_world():
+    return {"message": "Hello, World!", "salad_machine_id": salad_machine_id}
 
-5. Choose your machine hardware on the next page. You will be prompted to chose vCPU, memory size and GPU class. You can
-   choose more than one GPU class if necessary.
 
-   <img src="/products/sce/images/quick-hardware.png" />
+@app.get("/started")
+async def startup_probe():
+    return {"message": "Started!"}
 
-   When users select multiple GPU classes, SaladCloud provides a estimated cost that reflects a range from the cheapest
-   to the most expensive GPU selected within the chosen classes. This estimation helps users understand the cost
-   implications of their GPU selection.
 
-6. Configure your container connections. Note that the Container Gateway cannot be enabled after your container
-   deployment is live.
+@app.get("/ready")
+async def readiness_probe():
+    return {"message": "Ready!"}
 
-   <img src="/products/sce/images/quick-connections.png" />
 
-7. Configure container monitoring and deploy your container.
-   <img src="/products/sce/images/quick-deploy.png" />
+@app.get("/live")
+async def liveness_probe():
+    return {"message": "Live!"}
+```
 
-### Step 5: Start the Container Group
+### Dockerfile
 
-1. After the deployment is successful, navigate to the container configuration page.
+The Dockerfile uses the Python 3.13 base image, installs dependencies, and runs the server with `uvicorn`. Ensure your
+server listens on both IPv4 and IPv6 by using `--host *`, as SaladCloud requires IPv6 compatibility.
 
-<img src="/products/sce/images/quick-start-container-group.png" />
+```dockerfile Dockerfile
+FROM python:3.13-slim
 
-2. You will see the details of your configured container. Click the "Start" button to initiate the container and push it
-   into a running state.
+WORKDIR /app
 
-<img src="/products/sce/images/quick-container-instances.png" />
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-> 👍 Congratulations!
->
-> You have successfully deployed a container using SaladCloud Portal. You can now manage and monitor your containers
-> efficiently through the intuitive SaladCloud interface. Enjoy seamless containerization for your projects and
-> applications.
+COPY app.py .
 
-> 📘 Need higher quotas?
->
-> Remember to regularly review and update your container settings as your project requirements evolve. _If you are ready
-> to expand beyond the limited quotas initially approved by the SaladCloud team, [contact us](mailto:cloud@salad.com) or
-> reach out to your account manager directly._ **Happy deploying!**
+# It is important to use `--host *` to allow access on ipv6
+# networks, such as SaladCloud.
+CMD ["uvicorn", "app:app", "--host", "*", "--port", "8000"]
+```
+
+---
+
+## Step 2: Push Your Container Image
+
+Build and push your container image to a registry. In this example, we use
+[Docker Hub](https://hub.docker.com/layers/saladtechnologies/misc/hello-world/images/sha256-37cd1bf360e4858a1820b0432f278d83a2eb8e8a75f700df79e481686226b8b4):
+
+```shell
+docker build -t saladtechnologies/misc:hello-world .
+docker push saladtechnologies/misc:hello-world
+```
+
+Images up to 35 GB (compressed) are supported.
+
+---
+
+## Step 3: Create a Container Group
+
+In the [SaladCloud Portal](https://portal.salad.com):
+
+1. Navigate to your organization and project (e.g., “salad-benchmarking / Default”).
+2. Click **Create Container Group**.
+3. Choose **Custom** (instead of a preconfigured Recipe).
+4. Set the name to `hello-world`.
+5. Under **Image Source**, enter `saladtechnologies/misc:hello-world`.
+6. Set **Replicas** to 3 for high availability across potentially unreliable nodes.
+7. Skip env vars and command overrides for this example (optional: use `sleep infinity` for debugging).
+8. Configure **Hardware**:
+
+   - CPU: 1 vCPU
+   - RAM: 1 GB
+   - GPU: None (select one or more if needed; Salad matches your workload to one).
+
+9. Skip **Storage** for this example (note: storage is ephemeral).
+
+---
+
+## Step 4: Configure Network Access
+
+- Enable **Container Gateway** to expose your app via a load balancer.
+- Set **Port** to `8000`.
+- Choose **Round Robin** load balancing for this demo (Least Connections is preferred for AI workloads).
+- Authentication is optional—if enabled, include your Salad API key in the `Salad-Api-Key` header.
+- Optionally restrict concurrency to 1 request per instance. Not relevant for this demo, but useful for workloads with
+  high vram usage.
+
+---
+
+## Step 5: Set Health Probes
+
+Configure HTTP probes to manage instance lifecycle:
+
+### Startup Probe (`/started`)
+
+- Initial Delay: `0`
+- Period: `1s`
+- Timeout: `1s`
+- Success Threshold: `1`
+- Failure Threshold: `5`
+
+### Liveness Probe (`/live`)
+
+- Starts after startup probe succeeds
+- Detects deadlocks or unresponsive processes
+- Failure Threshold: `3`
+
+### Readiness Probe (`/ready`)
+
+- Controls load balancer routing
+- Can be used to reject new traffic during internal queue saturation
+
+Refer to the [probe documentation](/products/sce/container-groups/health-probes/health-probes) for full details.
+
+---
+
+## Step 6: Deploy
+
+- Enable **Auto Start**.
+- Click **Deploy**.
+- Watch your instances move through “Allocating” → “Starting” → “Running” → “Ready”.
+- Each replica is assigned to its own machine.
+- You will not be billed while instances are down or being reallocated.
+
+---
+
+## Step 7: Test Your Deployment
+
+- Access the app via the container gateway URL (e.g., `https://tomato-navybean-pm82t0txwjyus8yy.salad.cloud/hello`).
+- The response should include the text `Hello, World!` and a machine ID.
+- Refreshing may show different machine IDs as traffic is distributed.
+
+---
+
+## Step 8: Monitor and Debug
+
+- **Instance Details**: Run shell commands or inspect logs.
+- **System Events**: View instance reallocations, exit codes, and lifecycle events.
+- **Container Logs**: View logs across all instances (use an external provider like [Axiom](https://axiom.co) for
+  production).
+
+---
+
+## Clean Up
+
+- Click **Stop** to terminate the container group and stop billing.
+
+---
+
+## What's Next?
+
+Explore more in the [SaladCloud Docs](https://docs.salad.com), including:
+
+- [Container group recipes](/products/recipes/overview)
+- [Storage](/tutorials/high-performance-storage-solutions) and
+  [checkpointing](/guides/long-running-tasks/solution-overview)
+- [External logging](/products/sce/container-groups/external-logging/external-logging)
+
+Happy building! 🚀

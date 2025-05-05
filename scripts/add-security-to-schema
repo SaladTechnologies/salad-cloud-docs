@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const { parse, stringify } = require('yaml')
 const fs = require('fs')
 const path = require('path')
