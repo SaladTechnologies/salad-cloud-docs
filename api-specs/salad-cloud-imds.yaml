@@ -711,7 +711,7 @@ components:
           description: The JSON Web Token (JWT) that may be used to identify the running
             container. The JWT may be verified using the JSON Web Key Set (JWKS)
             available at
-            https://matrix-rest-api.salad.com/.well-known/stash-jwks.json.
+            https://matrix-rest-api.salad.com/.well-known/workload-jwks.json.
           type: string
           examples:
             - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYmMxMjMiLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjI0OTAyMn0.8EYto39v_-5ZKVRZYPKj0S-xuxtTUfWgeQ4QIFuW8mo
