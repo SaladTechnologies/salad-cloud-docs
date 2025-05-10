@@ -373,51 +373,51 @@
                   {
                     "group": "Container Groups",
                     "pages": [
-                      "reference/saladcloud-api/container_groups/list-container-groups",
-                      "reference/saladcloud-api/container_groups/create-a-container-group",
-                      "reference/saladcloud-api/container_groups/get-a-container-group",
-                      "reference/saladcloud-api/container_groups/update-a-container-group",
-                      "reference/saladcloud-api/container_groups/delete-a-container-group",
-                      "reference/saladcloud-api/container_groups/start-a-container-group",
-                      "reference/saladcloud-api/container_groups/stop-a-container-group",
-                      "reference/saladcloud-api/container_groups/get-container-group-errors",
-                      "reference/saladcloud-api/container_groups/get-container-group-system-logs",
-                      "reference/saladcloud-api/container_groups/list-container-group-instances",
-                      "reference/saladcloud-api/container_groups/get-a-container-group-instance",
-                      "reference/saladcloud-api/container_groups/reallocate-a-container-group-instance",
-                      "reference/saladcloud-api/container_groups/recreate-a-container-group-instance",
-                      "reference/saladcloud-api/container_groups/restart-a-container-group-instance"
+                      "reference/saladcloud-api/container-groups/list-container-groups",
+                      "reference/saladcloud-api/container-groups/create-container-group",
+                      "reference/saladcloud-api/container-groups/get-container-group",
+                      "reference/saladcloud-api/container-groups/update-container-group",
+                      "reference/saladcloud-api/container-groups/delete-container-group",
+                      "reference/saladcloud-api/container-groups/start-container-group",
+                      "reference/saladcloud-api/container-groups/stop-container-group",
+                      "reference/saladcloud-api/container-groups/get-container-group-logs",
+                      "reference/saladcloud-api/container-groups/list-container-group-instances",
+                      "reference/saladcloud-api/container-groups/get-container-group-instance",
+                      "reference/saladcloud-api/container-groups/update-container-group-instance",
+                      "reference/saladcloud-api/container-groups/reallocate-container-group-instance",
+                      "reference/saladcloud-api/container-groups/recreate-container-group-instance",
+                      "reference/saladcloud-api/container-groups/restart-container-group-instance"
                     ]
                   },
                   {
                     "group": "Job Queues",
                     "pages": [
                       "reference/saladcloud-api/queues/list-queues",
-                      "reference/saladcloud-api/queues/create-a-queue",
-                      "reference/saladcloud-api/queues/get-a-queue",
-                      "reference/saladcloud-api/queues/update-a-queue",
-                      "reference/saladcloud-api/queues/delete-a-queue",
-                      "reference/saladcloud-api/queues/list-queue-jobs",
-                      "reference/saladcloud-api/queues/create-a-queue-job",
-                      "reference/saladcloud-api/queues/get-a-queue-job",
-                      "reference/saladcloud-api/queues/delete-a-queue-job"
+                      "reference/saladcloud-api/queues/create-queue",
+                      "reference/saladcloud-api/queues/get-queue",
+                      "reference/saladcloud-api/queues/update-queue",
+                      "reference/saladcloud-api/queues/delete-queue",
+                      "reference/saladcloud-api/queues/list-jobs",
+                      "reference/saladcloud-api/queues/create-job",
+                      "reference/saladcloud-api/queues/get-job",
+                      "reference/saladcloud-api/queues/delete-job"
                     ]
                   },
                   {
                     "group": "Inference Endpoints",
                     "pages": [
-                      "reference/saladcloud-api/inference_endpoints/list-inference-endpoints",
-                      "reference/saladcloud-api/inference_endpoints/get-an-inference-endpoint",
-                      "reference/saladcloud-api/inference_endpoints/list-inference-endpoint-jobs",
-                      "reference/saladcloud-api/inference_endpoints/create-an-inference-endpoint-job",
-                      "reference/saladcloud-api/inference_endpoints/get-an-inference-endpoint-job",
-                      "reference/saladcloud-api/inference_endpoints/delete-an-inference-endpoint-job"
+                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoints",
+                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint",
+                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoint-jobs",
+                      "reference/saladcloud-api/inference-endpoints/create-inference-endpoint-job",
+                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint-job",
+                      "reference/saladcloud-api/inference-endpoints/delete-inference-endpoint-job"
                     ]
                   },
                   {
                     "group": "Organizations",
                     "pages": [
-                      "reference/saladcloud-api/organizations/get-gpu-classes",
+                      "reference/saladcloud-api/organizations/list-gpu-classes",
                       "reference/saladcloud-api/organizations/get-quotas",
                       "reference/saladcloud-api/organizations/get-webhook-secret-key",
                       "reference/saladcloud-api/organizations/update-webhook-secret-key"
