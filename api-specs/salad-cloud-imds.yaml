@@ -1,0 +1,788 @@
+openapi: 3.1.0
+info:
+  title: SaladCloud IMDS
+  description: The SaladCloud Instance Metadata Service (IMDS). Please refer to
+    the [SaladCloud API Documentation](https://docs.salad.com/reference) for
+    more details.
+  termsOfService: https://salad.com/terms
+  contact:
+    name: SaladCloud Support
+    url: https://salad.com
+    email: cloud@salad.com
+  license:
+    name: MIT
+  version: 0.9.0-alpha.2
+servers:
+  - url: http://169.254.169.254
+paths:
+  /v1/deletion-cost:
+    summary: Container Instance Deletion Cost
+    description: Operations to get or replace the deletion cost of the current
+      container instance
+    get:
+      operationId: get_deletion_cost
+      summary: Get Container Instance Deletion Cost
+      description: Gets the deletion cost of the current container instance
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDeletionCost"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+    put:
+      operationId: replace_deletion_cost
+      summary: Replace Container Instance Deletion Cost
+      description: Replaces the deletion cost of the current container instance
+      requestBody:
+        $ref: "#/components/requestBodies/ReplaceDeletionCost"
+      responses:
+        "200":
+          $ref: "#/components/responses/ReplaceDeletionCost"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+  /v1/reallocate:
+    summary: Reallocate Container Instance
+    description: Operations to reallocate the current container instance to another
+      SaladCloud node
+    post:
+      operationId: reallocate
+      summary: Reallocate Container Instance
+      description: Reallocates the current container instance to another SaladCloud node
+      requestBody:
+        $ref: "#/components/requestBodies/Reallocate"
+      responses:
+        "204":
+          $ref: "#/components/responses/204"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+      x-codeSamples:
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+            from salad_cloud_imds_sdk.models import ReallocatePrototype
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            request_body = ReallocatePrototype(
+                reason="Insufficient VRAM"
+            )
+
+            result = sdk.metadata.reallocate(request_body=request_body)
+
+            print(result)
+          lang: Python
+        - source: >-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.ReallocatePrototype;
+
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                ReallocatePrototype reallocatePrototype = ReallocatePrototype.builder().reason("Insufficient VRAM").build();
+
+                saladCloudImdsSdk.metadata.reallocate(reallocatePrototype);
+              }
+            }
+          lang: Java
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Salad.Cloud.IMDS.SDK.Models;
+            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
+
+            var config = new SaladCloudImdsSdkConfig{
+                Environment = Environment.Default
+            };
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            var input = new ReallocatePrototype("Insufficient VRAM");
+
+            await client.Metadata.ReallocateAsync(input);
+          lang: C#
+        - source: >-
+            import { ReallocatePrototype, SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const reallocatePrototype: ReallocatePrototype = {
+                reason: 'Insufficient VRAM',
+              };
+
+              const { data } = await saladCloudImdsSdk.metadata.reallocate(reallocatePrototype);
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+
+            request := metadata.ReallocatePrototype{
+              Reason: util.ToPointer("Reason"),
+            }
+
+
+            response, err := client.Metadata.Reallocate(context.Background(),
+            request)
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+  /v1/recreate:
+    summary: Recreate Container Instance
+    description: Operations to recreate the current container instance on the same
+      SaladCloud node
+    post:
+      operationId: recreate
+      summary: Recreate Container Instance
+      description: Recreates the current container instance on the same SaladCloud node
+      responses:
+        "204":
+          $ref: "#/components/responses/204"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+      x-codeSamples:
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.recreate()
+
+            print(result)
+          lang: Python
+        - source: |-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                saladCloudImdsSdk.metadata.recreate();
+              }
+            }
+          lang: Java
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
+
+            var config = new SaladCloudImdsSdkConfig{
+                Environment = Environment.Default
+            };
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            await client.Metadata.RecreateAsync();
+          lang: C#
+        - source: >-
+            import { SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const { data } = await saladCloudImdsSdk.metadata.recreate();
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+            response, err := client.Metadata.Recreate(context.Background())
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+  /v1/restart:
+    summary: Restart Container Instance
+    description: Operations to restart the current container instance on the same
+      SaladCloud node
+    post:
+      operationId: restart
+      summary: Restart Container Instance
+      description: Restarts the current container instance on the same SaladCloud node
+      responses:
+        "204":
+          $ref: "#/components/responses/204"
+        "400":
+          $ref: "#/components/responses/400"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+      x-codeSamples:
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.restart()
+
+            print(result)
+          lang: Python
+        - source: |-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                saladCloudImdsSdk.metadata.restart();
+              }
+            }
+          lang: Java
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
+
+            var config = new SaladCloudImdsSdkConfig{
+                Environment = Environment.Default
+            };
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            await client.Metadata.RestartAsync();
+          lang: C#
+        - source: >-
+            import { SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const { data } = await saladCloudImdsSdk.metadata.restart();
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+            response, err := client.Metadata.Restart(context.Background())
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+  /v1/status:
+    summary: Container Instance Status
+    description: Operations to get the health statuses of the current container instance
+    get:
+      operationId: get_status
+      summary: Get Container Instance Status
+      description: Gets the health statuses of the current container instance
+      responses:
+        "200":
+          $ref: "#/components/responses/GetStatus"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+      x-codeSamples:
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.get_status()
+
+            print(result)
+          lang: Python
+        - source: |-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+            import com.salad.cloud.imdssdk.models.Status;
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                Status response = saladCloudImdsSdk.metadata.getStatus();
+
+                System.out.println(response);
+              }
+            }
+          lang: Java
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
+
+            var config = new SaladCloudImdsSdkConfig{
+                Environment = Environment.Default
+            };
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            var response = await client.Metadata.GetStatusAsync();
+
+            Console.WriteLine(response);
+          lang: C#
+        - source: >-
+            import { SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const { data } = await saladCloudImdsSdk.metadata.getStatus();
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+            response, err := client.Metadata.GetStatus(context.Background())
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+  /v1/token:
+    summary: Container Instance Token
+    description: Operations to get the identity token of the current container instance
+    get:
+      operationId: get_token
+      summary: Get Container Instance Token
+      description: Gets the identity token of the current container instance
+      responses:
+        "200":
+          $ref: "#/components/responses/GetToken"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - metadata
+      x-codeSamples:
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.get_token()
+
+            print(result)
+          lang: Python
+        - source: |-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+            import com.salad.cloud.imdssdk.models.Token;
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                Token response = saladCloudImdsSdk.metadata.getToken();
+
+                System.out.println(response);
+              }
+            }
+          lang: Java
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
+
+            var config = new SaladCloudImdsSdkConfig{
+                Environment = Environment.Default
+            };
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            var response = await client.Metadata.GetTokenAsync();
+
+            Console.WriteLine(response);
+          lang: C#
+        - source: >-
+            import { SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const { data } = await saladCloudImdsSdk.metadata.getToken();
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+            response, err := client.Metadata.GetToken(context.Background())
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+components:
+  schemas:
+    DeletionCost:
+      description: The deletion cost of the current container instance.
+      type: object
+      properties:
+        deletion_cost:
+          description: An integer value that identifies the relative cost to the
+            application running across the container group if the current
+            container instance is deleted. A higher value indicates a higher
+            cost, and a lower value indicates a lower cost. If the container
+            group is scaled down, the scheduler will attempt to delete the
+            container instances with the lowest deletion costs first.
+          type: integer
+          format: int32
+          examples:
+            - 100
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+        - deletion_cost
+    ReallocatePrototype:
+      description: Represents a request to reallocate the current container instance
+        to another SaladCloud node.
+      type: object
+      properties:
+        reason:
+          description: The reason for reallocating the current container instance. This
+            value is reported to SaladCloud support for quality assurance
+            purposes of SaladCloud nodes.
+          type: string
+          examples:
+            - Insufficient VRAM
+          maxLength: 1000
+          minLength: 1
+      required:
+        - reason
+    SaladCloudImdsError:
+      type: object
+      description: An API error. The `code` and `type` uniquely identify the type of
+        the error. The `code` is a short value that may be used for programmatic
+        error handling. The `type` is an absolute URL that may be resolved for
+        more detailed information. Refer to the [SaladCloud IMDS
+        reference](https://leaf.salad.com/l/saladcloud-imds-errors) for a list
+        of the expected `code` and `type` values. Also, note that all properties
+        are optional. Clients should implement robust error handling to account
+        for unexpected errors.
+      properties:
+        code:
+          type: string
+          description: The error code that identifies the error type. This is a short
+            value that may be used for programmatic error handling.
+          examples:
+            - container-not-found
+          maxLength: 100
+          minLength: 1
+        detail:
+          type: string
+          description: The human-readable explanation specific to this occurrence of the
+            error.
+          examples:
+            - The container instance could not be found.
+          maxLength: 10000
+          minLength: 1
+        errors:
+          $ref: "#/components/schemas/SaladCloudImdsPropertyError"
+        instance:
+          type: string
+          format: url
+          description: The URI reference that identifies the specific occurrence of the
+            error.
+          examples:
+            - https://leaf.salad.com/i/5e76d3ae-6660-444e-a7c4-7a3999023fb6
+          maxLength: 2048
+          minLength: 1
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code generated by the origin server for this
+            occurrence of the error.
+          examples:
+            - 404
+          maximum: 599
+          minimum: 100
+        title:
+          type: string
+          description: The short, human-readable summary of the error type.
+          examples:
+            - Not Found
+          maxLength: 10000
+          minLength: 1
+        type:
+          description: The URI reference that identifies the error type.
+          type: string
+          format: url
+          default: about:blank
+          examples:
+            - https://leaf.salad.com/e/container-group-not-found
+          maxLength: 2048
+          minLength: 1
+    SaladCloudImdsPropertyError:
+      type: object
+      description: The contextualized map of human-readable explanations specific to
+        this occurrence of the error. This is often used to provide
+        property-specific errors, such as validation errors. In these scenarios,
+        the key is the property name and the value is an array of human-readable
+        explanations specific to this property and this occurrence of the error.
+      additionalProperties:
+        type: array
+        items:
+          type: string
+          description: The human-readable explanation specific to this occurrence of the
+            error.
+          examples:
+            - The container instance could not be found.
+          maxLength: 10000
+          minLength: 1
+        maxItems: 200
+        minItems: 0
+      maxProperties: 200
+      minProperties: 0
+    Status:
+      description: The health statuses of the current container instance.
+      type: object
+      properties:
+        ready:
+          description: "`true` if the running container is ready. If a readiness probe is
+            defined, this returns the latest result of the probe. If a readiness
+            probe is not defined but a startup probe is defined, this returns
+            the same value as the `started` property. If neither a readiness
+            probe nor a startup probe are defined, returns `true`."
+          type: boolean
+          examples:
+            - true
+        started:
+          description: "`true` if the running container is started. If a startup probe is
+            defined, this returns the latest result of the probe. If a startup
+            probe is not defined, returns `true`."
+          type: boolean
+          examples:
+            - true
+      required:
+        - ready
+        - started
+    Token:
+      description: The identity token of the current container instance.
+      type: object
+      properties:
+        jwt:
+          description: The JSON Web Token (JWT) that may be used to identify the running
+            container. The JWT may be verified using the JSON Web Key Set (JWKS)
+            available at
+            https://matrix-rest-api.salad.com/.well-known/stash-jwks.json.
+          type: string
+          examples:
+            - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYmMxMjMiLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjI0OTAyMn0.8EYto39v_-5ZKVRZYPKj0S-xuxtTUfWgeQ4QIFuW8mo
+          maxLength: 1000
+          minLength: 1
+      required:
+        - jwt
+  requestBodies:
+    Reallocate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ReallocatePrototype"
+    ReplaceDeletionCost:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeletionCost"
+  responses:
+    "204":
+      description: No Content
+    "400":
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/SaladCloudImdsError"
+    "403":
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/SaladCloudImdsError"
+    "404":
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/SaladCloudImdsError"
+    GetDeletionCost:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeletionCost"
+    GetStatus:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Status"
+    GetToken:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Token"
+    ReplaceDeletionCost:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeletionCost"
+    UnknownError:
+      description: Unknown Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/SaladCloudImdsError"
+tags:
+  - name: metadata
+    description: Instance Metadata Service

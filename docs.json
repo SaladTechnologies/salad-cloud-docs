@@ -428,9 +428,13 @@
               {
                 "group": "Instance Metadata Service",
                 "pages": [
-                  "reference/imds/get-container-status",
-                  "reference/imds/get-container-token",
-                  "reference/imds/reallocate-container"
+                  "reference/imds/get-status",
+                  "reference/imds/get-token",
+                  "reference/imds/get-deletion-cost",
+                  "reference/imds/replace-deletion-cost",
+                  "reference/imds/reallocate",
+                  "reference/imds/recreate",
+                  "reference/imds/restart"
                 ]
               },
               {
@@ -882,6 +886,18 @@
     {
       "source": "/products/sce/security/email-security",
       "destination": "/products/account-security"
+    },
+    {
+      "source": "/reference/imds/get-container-status",
+      "destination": "reference/imds/get-status"
+    },
+    {
+      "source": "reference/imds/get-container-token",
+      "destination": "reference/imds/get-token"
+    },
+    {
+      "source": "reference/imds/reallocate-container",
+      "destination": "reference/imds/reallocate"
     }
   ]
 }
