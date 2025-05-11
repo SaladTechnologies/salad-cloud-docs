@@ -138,9 +138,9 @@ in the cloud, ensure you select the appropriate nodes based on latency and throu
 consider deploying region-specific container groups to maximize throughput.
 
 You can create a container group in specific countries either by using
-[the SaladCloud API](/reference/saladcloud-api/container_groups/create-a-container-group) (not supported by the Portal)
-or by leveraging [the SaladCloud Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python) to streamline
-the process.
+[the SaladCloud API](/reference/saladcloud-api/container-groups/create-container-group) (not supported by the Portal) or
+by leveraging [the SaladCloud Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python) to streamline the
+process.
 
 Before deployment, several parameters need to be considered and decided. The simplest approach is to manually deploy a
 container group via the Portal,
@@ -313,7 +313,7 @@ level is not feasible on SaladCloud, but we may still be able to implement auto-
 
 Implementing auto scaling with a job queue is straightforward: you just need to monitor the number of available jobs in
 the queue regularly and then call
-[the SaladCloud API](/reference/saladcloud-api/container_groups/update-a-container-group) to adjust the replica count of
+[the SaladCloud API](/reference/saladcloud-api/container-groups/update-container-group) to adjust the replica count of
 the running container group. Both Salad Kelpie and Salad Job Queue already offer this feature, saving you the effort of
 implementing it yourself.
 

@@ -878,7 +878,7 @@ RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/relea
 CMD ["bash", "-c", "./salad-http-job-queue-worker & ./comfyui-api"]
 ```
 
-Next, we need to create a Job Queue with the [Job Queue API](/reference/saladcloud-api/queues/create-a-queue).
+Next, we need to create a Job Queue with the [Job Queue API](/reference/saladcloud-api/queues/create-queue).
 
 ## Step 6: Deploy to SaladCloud
 
@@ -900,8 +900,8 @@ docker push saladtechnologies/comfyui:video-gen-example
 This may take some time, depending on your network speed. Once it's done, you can deploy your container to SaladCloud.
 
 Because we are using the Job Queue, we need to create a new Container Group with the
-[Public API](/reference/saladcloud-api/container_groups/create-a-container-group). This functionality is not available
-in the portal.
+[Public API](/reference/saladcloud-api/container-groups/create-container-group). This functionality is not available in
+the portal.
 
 - We're going to start with 3 replicas, and set the container image to the one we just pushed.
 - We're going to use 4 vCPU, 30GB of RAM, and an RTX 4090 GPU.
