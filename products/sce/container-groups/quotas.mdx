@@ -2,15 +2,13 @@
 title: 'Quotas'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: May 12, 2025_
 
-Each Organization has a Quota which defines the maximum number of container groups and replicas that can be deployed on
-SaladCloud. You can request an increase to your Quota via the portal, or by reaching out to our support team
-[here](mailto:cloud@salad.com).
+Each organization has a quota for the total number of replicas used across container groups. This includes replicas from
+all created container groups, whether running or not. If autoscaling is enabled, the “Maximum Replicas” value is counted
+toward your quota. You can distribute these replicas among container groups as needed, but each container group is
+limited to a maximum of 500 replicas.
 
-## There are two quota types on SaladCloud :
-
-- **Container Group Deployments:** The maximum number of container groups you can have deployed at any one time. Note
-  that stopped container group deployments count against your quota.
-- **Container Group Replicas:** The maximum number of individual replicas (instances of your container image) that you
-  can have in a container group.
+If you are running low on quota, you can request an increase via the Portal quotas page, or by contacting our
+[support team](mailto:cloud@salad.com). Alternatively, you can delete unused container groups or reduce their replica
+count.
