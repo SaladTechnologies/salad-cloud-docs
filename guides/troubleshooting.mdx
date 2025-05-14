@@ -10,7 +10,7 @@ The following guide addresses common issues encountered when running container w
 help resolve frequent problems with downloads, container failures, networking, and access. If issues persist after
 applying these fixes, please consult our documentation or contact support.
 
-### **Downloading Times**
+### Downloading Times
 
 Salad nodes often run on residential internet connections, so downloads may take longer than expected. If download times
 takes longer then expected try:
@@ -20,7 +20,7 @@ takes longer then expected try:
 
 _Note that the progress bar is a conservative estimate—actual download time may vary._
 
-### **Repeated Start Failures**
+### Repeated Start Failures
 
 If your container repeatedly fails on startup:
 
@@ -28,7 +28,7 @@ If your container repeatedly fails on startup:
 - Ensure your image is built for AMD64 (not ARM64) and properly configured for GPU workloads.
 - Test the container locally first to rule out configuration issues.
 
-### **Container Exits Unexpectedly**
+### Container Exits Unexpectedly
 
 Salad may restart failed containers on the same machine to minimize downtime.
 
@@ -37,7 +37,7 @@ Check the exit code in system events for debugging:
 - Exit code 137 usually means the container ran out of RAM—try increasing allocation.
 - Most exit codes are application-specific, not SaladCloud issues.
 
-### **503 Errors \- Container Gateway Issues**
+### 503 Errors \- Container Gateway Issues
 
 If you see 503 errors when accessing your workload:
 
@@ -45,7 +45,7 @@ If you see 503 errors when accessing your workload:
 - Double-check that the correct port is exposed.
 - If IPv6 is configured, the server may still be starting—set up a readiness probe to delay traffic until ready.
 
-### **Unable to Access Salad Terminal**
+### Unable to Access Salad Terminal
 
 The Salad terminal is in beta and may sometimes fail to connect. If this occurs try:
 
@@ -55,7 +55,7 @@ The Salad terminal is in beta and may sometimes fail to connect. If this occurs 
   [Tailscale](https://docs.salad.com/guides/tailscale-integration/basic#add-tailscale-support-into-saladcloud-workloads)
   or similar tools.
 
-### **Container Pull Failures**
+### Container Pull Failures
 
 If Salad can’t pull your container image:
 
