@@ -216,6 +216,7 @@
           {
             "group": "How-to Guides",
             "pages": [
+              "guides/troubleshooting",
               {
                 "group": "Image Generation",
                 "pages": [
