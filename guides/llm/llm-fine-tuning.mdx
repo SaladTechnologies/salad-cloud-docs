@@ -324,7 +324,7 @@ SaladCloud Python SDK or add the command via the SaladCloud Portal after the SRC
 the instance using either VS Code Desktop or the integrated terminal in the Portal.
 
 Run [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) interactively for
-specifc steps to observe actual VRAM usage at different batch sizes, estimate task runtime, and review the checkpoint
+specific steps to observe actual VRAM usage at different batch sizes, estimate task runtime, and review the checkpoint
 sizes under various hyperparameter settings.
 
 As a general guideline, we recommend saving one checkpoint per hour. To achieve this, you’ll need to set an appropriate
@@ -346,7 +346,7 @@ upload speed—to avoid upload bottlenecks during task execution.**
 Please refer to
 [the full-coverage functional test results](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-functional-test-results.txt)
 for a task executed via an SRCG on SaladCloud using RTX 4090 nodes. Over a period exceeding 24 hours, the SRCG was
-deliberately stopped, restarted, recreated, and reallocated a total of 8 times to simulate various scenarioes and test
+deliberately stopped, restarted, recreated, and reallocated a total of 8 times to simulate various scenarios and test
 the robustness of the code. A total of three nodes were utilized to complete the task, while one additional node was
 immediately rejected after failing the initial system check.
 
