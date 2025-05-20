@@ -3,6 +3,8 @@ title: 'LLM Fine-tuning On SaladCloud'
 description: 'How to fine-tune Large Language Models on interruptible infrastructure'
 ---
 
+_Last Updated: May 20, 2025_
+
 # Introduction
 
 LLM fine-tuning tasks often require long runtimes—ranging from several hours to multiple days—depending on factors such
@@ -205,8 +207,8 @@ CMD ["python", "ft-interruptible.py"]
 ```
 
 Installing the VS Code Server CLI is optional, allowing you to easily
-[access the running instances using VS Code](/tutorials/vscode-remote-development#interactive-mode) for testing and
-troubleshooting purposes.
+[access the running instances using VS Code Desktop or a browser](/tutorials/vscode-remote-development#interactive-mode)
+for testing and troubleshooting purposes.
 
 [Rclone](/tutorials/high-performance-storage-solutions#integrate-rclone-in-your-applications) is the tool used for data
 synchronization between Salad nodes and cloud storage. Some cloud storage providers charge for egress traffic, while
@@ -221,7 +223,8 @@ docker push docker.io/saladtechnologies/llm-fine-tuning:1.0.0
 
 ### Environment Variables
 
-Ensure all required environment variables are set before running a LLM fine-tuning task.
+Ensure all required environment variables are set before running a LLM fine-tuning task. You can organize them in a
+`.env` file located in the project folder for easy configuration and reuse.
 
 ```bash .env
 # Access to the Cloudflare R2
@@ -236,7 +239,8 @@ FOLDER=<A_FOLDER_IN_THE_BUCKET>
 HF_TOKEN=hf_******
 
 # Call the SaladCloud API to shutdown the instance when the training is completed
-# SaladCloud will introduce a new mechanism that allows the SRCG to shut itself down internally, eliminating the need for the SaladCloud Python SDK and API access.
+# SaladCloud will introduce a new mechanism that allows the SRCG to shut itself
+# down internally, eliminating the need for the SaladCloud Python SDK and API access.
 SALAD_API_KEY=salad_cloud_user_******
 ORGANIZATION_NAME=******
 PROJECT_NAME=******
@@ -263,7 +267,8 @@ ULSPEED=20
 CUDA_RT_VERSION=12.6
 VRAM_AVAILABLE=22000
 
-# If the main thread is unresponsive for the specified duration, the uploader thread triggers reallocation
+# If the main thread is unresponsive for the specified duration, the uploader
+# thread triggers reallocation
 MAX_NO_RESPONSE_TIME=3600
 
 # The pre-built image
@@ -272,8 +277,19 @@ IMAGE=saladtechnologies/llm-fine-tuning:1.0.0
 
 ### Local Run
 
-If you have an RTX 3090 or RTX 4090, you can perform a local test. To avoid downloading the model and dataset every time
-the container runs, mount the host cache directory to the container.
+If you have an RTX 3090 (24GB VRAM) or a higher GPU, you can perform a local test of the fine-tuning task. To avoid
+downloading the model and dataset every time the container runs, mount the host cache directory to the container.
+
+You can use `docker compose` to start the container defined in
+[docker-compose.yaml](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/docker-compose.yaml). The command
+automatically loads environment variables from the .env file in the same directory.
+
+```bash
+docker compose up
+```
+
+Alternatively, you can run the container manually using `docker run` with the required environment variables and volume
+mounts.
 
 ```bash
 docker run --rm -it --gpus all -v /home/ubuntu/.cache:/root/.cache \
@@ -320,15 +336,16 @@ targeted nodes to determine key configuration parameters.**
 
 You can deploy an SRCG using
 [a placeholder command](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/srcg_deploy.py#L61) via the
-SaladCloud Python SDK or add the command via the SaladCloud Portal after the SRCG is created. Once deployed, connect to
-the instance using either VS Code Desktop or the integrated terminal in the Portal.
+SaladCloud Python SDK or add the command via the SaladCloud Portal after the SRCG is created. Once deployed,
+[connect to the instance using either VS Code Desktop (or a browser)](/tutorials/vscode-remote-development#interactive-mode),
+or the integrated terminal in the Portal.
 
 Run [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) interactively for
 specific steps to observe actual VRAM usage at different batch sizes, estimate task runtime, and review the checkpoint
 sizes under various hyperparameter settings.
 
-As a general guideline, we recommend saving one checkpoint per hour. To achieve this, you’ll need to set an appropriate
-**saving_steps** value.
+As a general guideline, we recommend saving at least one checkpoint per hour. To achieve this, you’ll need to set an
+appropriate **saving_steps** value.
 [Most Salad nodes provide upload throughput of at least 20 Mbps](/tutorials/high-performance-storage-solutions#solution-test-using-cloudflare-r2-and-rclone-on-saladcloud),
 which is sufficient to upload approximately 6–7 GB of data to the cloud within an hour.
 
@@ -336,7 +353,9 @@ If your checkpoint size is relatively small, consider lowering the saving_steps 
 checkpoints. This helps reduce progress loss in the event of node reallocation.
 
 For fine-tuning LLMs with larger checkpoint sizes, select nodes with higher upload speeds. Many Salad nodes offer strong
-upload performance, often exceeding 100 Mbps.
+upload performance, often exceeding 100 Mbps. Use
+[the provided code](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/helper.py#L168) to perform the
+network speed test and other initial system checks to filter out nodes that don't meet requirements.
 
 **Finally, ensure adequate buffer between key parameters—such as batch size, saving_steps (checkpoint frequency), and
 upload speed—to avoid upload bottlenecks during task execution.**
@@ -351,9 +370,9 @@ the robustness of the code. A total of three nodes were utilized to complete the
 immediately rejected after failing the initial system check.
 
 During the test—which involved 160,000 training steps (weight updates) over 400,000 samples across 2 epochs, with a
-batch size of 5 and saving_steps set to 4,000 (yielding approximately around 8000 steps and 2 checkpoints per hour)—a
-total of 40 checkpoints (344.6 MB each) were uploaded along with 1 model upload (126.4 MB). Additionally, 6 checkpoints
-were downloaded to successfully resume training.
+batch size of 5, gradient_accumulation_steps set to 1, and saving_steps set to 4,000 (**yielding approximately around
+8000 steps and 2 checkpoints per hour**)—a total of 40 checkpoints (344.6 MB each) were uploaded along with 1 model
+upload (126.4 MB). Additionally, 6 checkpoints were downloaded to successfully resume training.
 
 A separate performance and stability test report will be provided later for standard LLM fine-tuning tasks running on
 SaladCloud.
