@@ -1,0 +1,378 @@
+---
+title: 'LLM Fine-tuning On SaladCloud'
+description: 'How to fine-tune Large Language Models on interruptible infrastructure'
+---
+
+_Last Updated: May 20, 2025_
+
+# Introduction
+
+LLM fine-tuning tasks often require long runtimes—ranging from several hours to multiple days—depending on factors such
+as GPU type, dataset size, and model complexity, etc. SaladCloud operates on a distributed network of interruptible
+nodes, meaning any node running your tasks may shut down unexpectedly. Despite this, most Salad nodes remain stable for
+over 10 hours at a time.
+
+To fine-tune LLMs effectively on SaladCloud, it's important to build resilience into your training workflow. We
+recommend implementing the following strategies:
+
+- Start training from a base model.
+- Periodically save training progress by uploading checkpoints to cloud storage.
+- If interrupted, automatically resume training from the latest checkpoint by downloading it when your instance restarts
+  on a new node.
+
+Hugging Face’s [Trainer](https://huggingface.co/docs/transformers/en/main_classes/trainer) offers robust support for
+training on interruptible infrastructure such as SaladCloud. It enables regular checkpointing and supports custom
+callbacks, allowing you to trigger background uploads of checkpoints to cloud storage without blocking the training
+process. When resuming training, the Trainer can seamlessly restore the full training state—including the model,
+optimizer, scheduler, gradient history, and even the position within the shuffled dataset at the current epoch—ensuring
+continuity and minimizing progress loss after interruptions.
+
+**By using the Trainer along with a few simple functions we provide to handle data synchronization between Salad nodes
+and cloud storage, you can make your existing training script fully compatible with SaladCloud by adding fewer than 10
+lines of code.**
+
+# Single-Replica Container Group vs. Job Queue System
+
+If you're running long-duration LLM fine-tuning tasks—spanning tens of hours or even multiple days—you can simplify
+implementation by creating a dedicated single-replica container group (SRCG) for each task on SaladCloud. Pass
+task-specific configurations to the SRCG via environment variables, including the number of epochs, batch size,
+checkpoint and logging intervals, and the paths to datasets, checkpoints, and final model stored in cloud storage.
+
+Although the task is temporarily paused during node reallocation after interruptions, our testing shows that total
+downtime accounts for less than 4% of the overall runtime in multi-day runs.
+
+On the other hand, if you're running many training tasks—such as hyperparameter sweeps—a job queue becomes essential.
+Systems like GCP Pub/Sub, AWS SQS, Salad Kelpie, or custom solutions using Redis or Kafka can distribute jobs
+(task-specific configurations) across a pool of Salad nodes. If a node fails during job execution, the job queue ensures
+the job is retried immediately on another available node .
+
+You can further implement autoscaling by monitoring the number of available jobs in the queue and dynamically adjusting
+the number of Salad nodes. This approach ensures that your target number of tasks is completed within a defined
+timeframe, while also allowing cost control during periods of lower demand.
+
+This guide focuses on the SRCG-based approach. A separate guide will cover job queue integration.
+
+# Handling Interruptions During Training
+
+Let’s take a look at [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) to see
+how the Trainer handles interruptions during training. You can use
+[the provided Dockerfile](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/Dockerfile.ft) to set up a
+local virtual environment and run the code.
+
+This example code performs supervised fine-tuning of a 4-bit quantized LLaMA 3.1 8B model on a price prediction task
+using LoRA adapters. Instead of updating all **8 billion** base model parameters (approximately **16 GB**), it
+fine-tunes only a small set of adapter weights—about **27.3 million** parameters (**109.1 MB**)—significantly reducing
+memory and compute requirements.
+
+Despite training far fewer parameters, LoRA often matches the performance of full fine-tuning on many tasks. It works by
+injecting learnable low-rank updates into specific attention layers, effectively capturing task-specific patterns while
+preserving the base model’s general knowledge. This makes LoRA especially well-suited for efficiently adapting large
+models to domain-specific tasks.
+
+Here are some samples from
+[the training dataset](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py#L74):
+
+| No  | Samples                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| :-- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | How much does this cost to the nearest dollar?\n\nFurrion Access 4G LTE/WiFi Dual Band Portable Router with 1GB of Data Included. Works Omni-Direction Rooftop Antenna to Provide high-Speed Internet connectivity on The go - White\nWORKS WITH FURRION ACCESS ANTENNA Works exclusively with Furrion Omni-directional rooftop antenna to keep you fully connected when you're on the move. EXTENDED WIFI AND 4G The LTE Wi-Fi Router provides speeds up to (support LTE Band and has a Wi-Fi range extender for improved signal strength. Allows you to connect up to 30 devices and auto-switch between 4G and WiFi. WiFI NETWORK SECURITY Allows you to connect to available 2.4GHz and 5 GHz WiFi signals and gives you peace of mind with WiFi network\n\nPrice is $247.00                                                                                                                                             |
+| 2   | How much does this cost to the nearest dollar?\n\nABBA 36 Gas Cooktop with 5 Sealed Burners - Tempered Glass Surface with SABAF Burners, Natural Gas Stove for Countertop, Home Improvement Essentials, Easy to Clean, 36 x 4.1 x 20.5\ncooktop Gas powered with 4 fast burners and 1 ultra-fast center burner Tempered glass surface with removable grid for easy cleaning Lightweight for easy installation. Installation Manual Included Counter cutout Dimensions 19 3/8 x 34 1/2 (see diagram) Insured shipping for your satisfaction and peace of mind Brand Name ABBA EST. 1956, Weight 30 pounds, Dimensions 20.5\\ D x 36\\ W x 4.1\\ H, Installation Type Count\n\nPrice is $405.00                                                                                                                                                                                                                                |
+| 3   | How much does this cost to the nearest dollar?\n\nPower Stop Rear Z36 Truck and Tow Brake Kit with Calipers\nThe Power Stop Z36 Truck & Tow Performance brake kit provides the superior stopping power demanded by those who tow boats, haul loads, tackle mountains, lift trucks, and play in the harshest conditions. The brake rotors are drilled to keep temperatures down during extreme braking and slotted to sweep away any debris for constant pad contact. Combined with our Z36 Carbon-Fiber Ceramic performance friction formulation, you can confidently push your rig to the limit and look good doing it with red powder brake calipers. Components are engineered to handle the stress of towing, hauling, mountainous driving, and lifted trucks. Dust-free braking performance. Z36 Carbon-Fiber Ceramic formula provides the extreme braking performance demanded by your truck or 4x\n\nPrice is $507.00 |
+
+The training samples consists of a prompt containing product and pricing context, separated by the phrase **“Price is
+$”**. The goal is to fine-tune the model (LoRA adapters) to accurately generate the correct price based on the preceding
+contextual information.
+
+**Here are the key training parameters:**
+
+```txt
+Training Samples: 2,000 (subset of original 400,000), each averaging ~180 tokens
+Batch Size: 5 samples per forward/backward pass
+Gradient Accumulation Steps: 2 batches (or 10 samples) per weight update
+Epochs: 2 full passes over the selected data (0.72M tokens)
+Total weight updates (steps): 400, 2 epochs x (2,000 samples ÷ 5 samples/batch ÷ 2 batches/update)
+Save Steps: A checkpoint is saved every 200 updates (steps)
+```
+
+[A custom callback](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py#L29) is provided after a
+checkpoint is saved to print the training state.
+
+The code takes approximately **690 seconds** to run on an RTX 3090. Please review
+[the output](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal-run-result.txt#L36) to verify the
+results. Scaling this to the full dataset of 400,000 samples (144M tokens, 200× larger) would take an estimated **38
+hours** (690 × 200 ÷ 3600).
+
+After training, 3 directories are created: two checkpoints (at steps 200 and 400) and one final output.
+
+<img src="/guides/llm/images/llm-ft-output.png" />
+
+Each checkpoint includes the LoRA adapter weights, optimizer and scheduler states, and training metadata—totaling
+approximately **344.6 MB**. The final directory contains only the trained LoRA weights and configuration, reducing its
+size to around **126.4 MB**. These sizes may vary depending on
+[the LoRA configuration](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py#L51), such as the
+adapter rank (r), the number of target modules, and the precision used to store the weights.
+
+The [global seed](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py#L43) (unique for each
+task) is set to ensure that the dataset shuffle order remains deterministic across runs and epochs. For example, if
+training is interrupted after checkpoint-200 is saved, it can be resumed seamlessly
+[from that point](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py#L176). The Trainer will
+restore the model state, optimizer, gradients, and the exact position within the shuffled dataset, allowing training to
+continue precisely where it left off.
+
+## Enabling LLM Fine-tuning on SaladCloud
+
+### Required Code Changes
+
+With the provided [helper.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/helper.py)—a lightweight
+400-line module that handles background data synchronization-you only need 4 small code changes, adding just 6 lines to
+make [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) fully compatible with
+SaladCloud. See
+[ft-interruptible.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-interruptible.py) for a complete
+reference.
+
+<img src="/guides/llm/images/llm-ft-workflow.png" />
+
+- [1st Change:](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-interruptible.py#L23) Import helper
+  and call Resume_From_Cloud()
+
+Initializes the environment by reading task-specific configurations, performing system checks, and downloading the
+latest checkpoint if resuming training. It then sets up the local upload queue and starts the uploader thread.
+
+- [2nd Change:](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-interruptible.py#L174) Call the
+  Notify_Uploader() and Get_Checkpoint()
+
+Signals the start of training (optionally measuring the time to download the dataset and model) and retrieves the latest
+checkpoint directory name, if available.
+
+- [3rd Change:](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-interruptible.py#L33)
+  Notify_Uploader()
+
+Notifies the uploader thread to save the latest checkpoint after it is created, allowing training to continue without
+interruption.
+
+- [4th Change:](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-interruptible.py#L188) Call the
+  Close_All() at the end
+
+Waits for all uploads to complete, uploads the final model and shuts down the SRCG.
+
+### Dockerfile Configuration
+
+[The provided Dockerfile](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/Dockerfile.ft) creates a
+containerized environment by using the PyTorch official image, then installing essential utilities (VS Code Server CLI,
+Rclone) and required dependencies for training. It copies the required Python code into the image and sets the default
+command.
+
+```Dockerfile Dockerfile.ft
+# The pre-built image for this Dockerfile: docker.io/saladtechnologies/llm-fine-tuning:1.0.0
+# PyTorch 2.7.0 with Python 3.11, trl 0.12.2, and peft 0.14.0
+FROM docker.io/pytorch/pytorch:2.7.0-cuda12.6-cudnn9-devel
+
+# Install essential utilities
+RUN apt-get update && apt-get install -y curl net-tools iputils-ping
+
+# Optional: Install VS Code Server
+RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o vscode_cli.tar.gz && \
+    tar -xf vscode_cli.tar.gz && \
+    mv code /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
+
+# Install rclone and prepare config directory
+# https://rclone.org/downloads/
+RUN curl -Lk 'https://downloads.rclone.org/v1.69.2/rclone-v1.69.2-linux-amd64.deb' -o rclone-v1.69.2-linux-amd64.deb && \
+    dpkg -i rclone-v1.69.2-linux-amd64.deb && \
+    rm rclone-v1.69.2-linux-amd64.deb && \
+    mkdir -p /root/.config/rclone
+
+# Upgrade pip and install Python packages
+RUN pip install --upgrade pip
+RUN pip install python-dotenv speedtest-cli pythonping salad-cloud-sdk
+RUN pip install peft==0.14.0 trl==0.12.2 huggingface_hub transformers bitsandbytes datasets
+
+# Set working directory and copy application files
+WORKDIR /app
+
+# Copy application files
+COPY ft-normal.py ft-interruptible.py helper.py progress_check.py /app/
+
+# Set default command
+CMD ["python", "ft-interruptible.py"]
+
+
+# Containers running on SaladCloud must maintain an active, continuously running process. If the main process exits, SaladCloud will automatically reallocate the instance and restart the container image.
+# If you’d like to start a container and then log in interactively to run code manually, you can use a simple placeholder command like this:
+# CMD ["sleep","infinity"]
+
+# You may also override both the ENTRYPOINT and CMD after the container group is created:
+# https://docs.salad.com/products/sce/container-groups/specifying-a-command
+# https://docs.salad.com/tutorials/docker-run#command
+```
+
+Installing the VS Code Server CLI is optional, allowing you to easily
+[access the running instances using VS Code Desktop or a browser](/tutorials/vscode-remote-development#interactive-mode)
+for testing and troubleshooting purposes.
+
+[Rclone](/tutorials/high-performance-storage-solutions#integrate-rclone-in-your-applications) is the tool used for data
+synchronization between Salad nodes and cloud storage. Some cloud storage providers charge for egress traffic, while
+ingress traffic is typically free. We recommend a vendor (such as Cloudflare R2) that does not charge egress fees.
+
+Let's build the image and push it to Docker Hub:
+
+```bash
+docker image build -t docker.io/saladtechnologies/llm-fine-tuning:1.0.0 -f Dockerfile.ft .
+docker push docker.io/saladtechnologies/llm-fine-tuning:1.0.0
+```
+
+### Environment Variables
+
+Ensure all required environment variables are set before running a LLM fine-tuning task. You can organize them in a
+`.env` file located in the project folder for easy configuration and reuse.
+
+```bash .env
+# Access to the Cloudflare R2
+CLOUDFLARE_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+CLOUDFLARE_REGION=auto
+CLOUDFLARE_ID=******
+CLOUDFLARE_KEY=******
+BUCKET=<BUCKET_NAME>
+FOLDER=<A_FOLDER_IN_THE_BUCKET>
+
+# Download gated models from Hugging Face
+HF_TOKEN=hf_******
+
+# Call the SaladCloud API to shutdown the instance when the training is completed
+# SaladCloud will introduce a new mechanism that allows the SRCG to shut itself
+# down internally, eliminating the need for the SaladCloud Python SDK and API access.
+SALAD_API_KEY=salad_cloud_user_******
+ORGANIZATION_NAME=******
+PROJECT_NAME=******
+
+# Define the container group name on SaladCloud, unique for each task
+CONTAINER_GROUP_NAME=test
+# The task folder in Cloudflare R2 - 'r2:BUCKET/FOLDER/TASK_NAME', unique for each task
+TASK_NAME=test
+
+# Base Model
+MODEL=meta-llama/Meta-Llama-3.1-8B
+
+# Training parameters
+EPOCHS=2
+BATCH_SIZE=5
+SAVING_STEPS=4000
+
+# Unique for each task
+SEED=24
+
+# Minimum requirements for node filtering
+DLSPEED=50
+ULSPEED=20
+CUDA_RT_VERSION=12.6
+VRAM_AVAILABLE=22000
+
+# If the main thread is unresponsive for the specified duration, the uploader
+# thread triggers reallocation
+MAX_NO_RESPONSE_TIME=3600
+
+# The pre-built image
+IMAGE=saladtechnologies/llm-fine-tuning:1.0.0
+```
+
+### Local Run
+
+If you have an RTX 3090 (24GB VRAM) or a higher GPU, you can perform a local test of the fine-tuning task. To avoid
+downloading the model and dataset every time the container runs, mount the host cache directory to the container.
+
+You can use `docker compose` to start the container defined in
+[docker-compose.yaml](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/docker-compose.yaml). The command
+automatically loads environment variables from the .env file in the same directory.
+
+```bash
+docker compose up
+```
+
+Alternatively, you can run the container manually using `docker run` with the required environment variables and volume
+mounts.
+
+```bash
+docker run --rm -it --gpus all -v /home/ubuntu/.cache:/root/.cache \
+-e SALAD_MACHINE_ID=wsl-asus \
+-e CLOUDFLARE_ENDPOINT_URL=$CLOUDFLARE_ENDPOINT_URL \
+-e CLOUDFLARE_REGION=$CLOUDFLARE_REGION \
+-e CLOUDFLARE_ID=$CLOUDFLARE_ID \
+-e CLOUDFLARE_KEY=$CLOUDFLARE_KEY \
+-e BUCKET=$BUCKET \
+-e FOLDER=$FOLDER \
+-e HF_TOKEN=$HF_TOKEN \
+-e SALAD_API_KEY=$SALAD_API_KEY \
+-e ORGANIZATION_NAME=$ORGANIZATION_NAME \
+-e PROJECT_NAME=$PROJECT_NAME \
+-e CONTAINER_GROUP_NAME=$CONTAINER_GROUP_NAME \
+-e TASK_NAME=$TASK_NAME \
+-e MODEL=$MODEL \
+-e EPOCHS=$EPOCHS \
+-e BATCH_SIZE=$BATCH_SIZE \
+-e SAVING_STEPS=$SAVING_STEPS \
+-e SEED=$SEED \
+-e DLSPEED=$DLSPEED \
+-e ULSPEED=$ULSPEED \
+-e CUDA_RT_VERSION=$CUDA_RT_VERSION \
+-e VRAM_AVAILABLE=$VRAM_AVAILABLE \
+-e MAX_NO_RESPONSE_TIME=$MAX_NO_RESPONSE_TIME \
+docker.io/saladtechnologies/llm-fine-tuning:1.0.0
+```
+
+### Test and Deployment on SaladCloud
+
+See [srcg_deploy.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/srcg_deploy.py) for a deployment
+example of an SRCG with the SaladCloud Python SDK to run the fine-tuning task.
+
+Use [progress_check.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/progress_check.py) to monitor the
+task state (steps, node usage, performance and network throughput) by reading the state file from cloud storage and
+[progress_reset.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/progress_reset.py) to reset the task
+by removing all the state file, checkpoints and the final model stored in the cloud.
+
+### Best Practices
+
+**Before launching a batch of LLM fine-tuning tasks on SaladCloud, it's important to run preliminary tests on the
+targeted nodes to determine key configuration parameters.**
+
+You can deploy an SRCG using
+[a placeholder command](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/srcg_deploy.py#L61) via the
+SaladCloud Python SDK or add the command via the SaladCloud Portal after the SRCG is created. Once deployed,
+[connect to the instance using either VS Code Desktop (or a browser)](/tutorials/vscode-remote-development#interactive-mode),
+or the integrated terminal in the Portal.
+
+Run [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) interactively for
+specific steps to observe actual VRAM usage at different batch sizes, estimate task runtime, and review the checkpoint
+sizes under various hyperparameter settings.
+
+As a general guideline, we recommend saving at least one checkpoint per hour. To achieve this, you’ll need to set an
+appropriate **saving_steps** value.
+[Most Salad nodes provide upload throughput of at least 20 Mbps](/tutorials/high-performance-storage-solutions#solution-test-using-cloudflare-r2-and-rclone-on-saladcloud),
+which is sufficient to upload approximately 6–7 GB of data to the cloud within an hour.
+
+If your checkpoint size is relatively small, consider lowering the saving_steps value to generate more frequent
+checkpoints. This helps reduce progress loss in the event of node reallocation.
+
+For fine-tuning LLMs with larger checkpoint sizes, select nodes with higher upload speeds. Many Salad nodes offer strong
+upload performance, often exceeding 100 Mbps. Use
+[the provided code](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/helper.py#L168) to perform the
+network speed test and other initial system checks to filter out nodes that don't meet requirements.
+
+**Finally, ensure adequate buffer between key parameters—such as batch size, saving_steps (checkpoint frequency), and
+upload speed—to avoid upload bottlenecks during task execution.**
+
+# Functional Test Results
+
+Please refer to
+[the full-coverage functional test results](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-functional-test-results.txt)
+for a task executed via an SRCG on SaladCloud using RTX 4090 nodes. Over a period exceeding 24 hours, the SRCG was
+deliberately stopped, restarted, recreated, and reallocated a total of 8 times to simulate various scenarios and test
+the robustness of the code. A total of three nodes were utilized to complete the task, while one additional node was
+immediately rejected after failing the initial system check.
+
+During the test—which involved 160,000 training steps (weight updates) over 400,000 samples across 2 epochs, with a
+batch size of 5, gradient_accumulation_steps set to 1, and saving_steps set to 4,000 (**yielding approximately around
+8000 steps and 2 checkpoints per hour**)—a total of 40 checkpoints (344.6 MB each) were uploaded along with 1 model
+upload (126.4 MB). Additionally, 6 checkpoints were downloaded to successfully resume training.
+
+A separate performance and stability test report will be provided later for standard LLM fine-tuning tasks running on
+SaladCloud.

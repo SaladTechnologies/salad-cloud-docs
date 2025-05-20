@@ -214,3 +214,10 @@ nohup
 russh
 rpsj
 devtunnels
+SRCG
+srcg
+ULSPEED
+DLSPEED
+SABAF
+Furrion
+FURRION
