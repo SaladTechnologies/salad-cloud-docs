@@ -4,29 +4,27 @@ description: 'Information, Tutorials, How-To Guides and API Reference for SaladC
 sidebarTitle: 'Documentation'
 ---
 
-_Last Updated: March 20, 2025_
+_Last Updated: May 01, 2025_
 
 ## Introduction
 
 SaladCloud is the world's largest fully distributed cloud, suitable for a wide range of compute-intensive applications,
 from generative AI inference to molecular simulations.
 
-Applications on SaladCloud are deployed as docker containers, scaled out horizontally to idle compute resources from
-SaladCloud's network of millions of devices. This allows SaladCloud to offer the most
-[competitive pricing](https://salad.com/pricing) in the industry, while providing the flexibility to scale up or down as
-needed.
+Applications on SaladCloud are deployed as Docker containers and scaled horizontally across idle compute resources from
+SaladCloud's network of millions of devices. This allows SaladCloud to offer some of the most
+[competitive pricing](https://salad.com/pricing) in the industry while providing flexible scaling to meet your needs.
 
-SaladCloud is comprised of millions of privately owned devices, primarily gaming PCs, running the SaladCloud agent. When
-these devices are not in use by their owners, SaladCloud assigns containers to run on them, paying the device owner for
-their compute time. You can think of it like AirBnB for compute.
-[Learn more about how SaladCloud works](/products/sce/introduction), and how we ensure
-[security](https://salad.com/security) and privacy for both device owners and container operators.
+SaladCloud's network is comprised of millions of privately owned devices, primarily gaming PCs, running the SaladCloud
+agent. When these devices are idle, SaladCloud assigns containers to run on them, compensating device owners for their
+compute time. Think of it as AirBnB for compute. [Learn more about how SaladCloud works](/products/sce/introduction),
+and how we ensure [security](https://salad.com/security) and privacy for both device owners and container operators.
 
 ## Migrating From Other Providers
 
 ### Transcription APIs
 
-Check out our step-by-by guides to migrate your transcription workloads from other providers to
+Check out our step-by-step guides to help you migrate your transcription workloads from other providers to the
 [Salad Transcription APIs](/products/transcription).
 
 <CardGroup>
@@ -80,25 +78,24 @@ SaladCloud offers a variety of products to meet your needs. Select a product bel
 
 <CardGroup cols={1}>
   <Card title="Salad Container Engine (SCE)" icon="docker" href="/products/sce/introduction">
-    Deploy your own custom application on SaladCloud's managed container service. Bring your own docker image, choose
-    your hardware, and scale horizontally as needed. We assign your workload to eligible devices in the SaladCloud
-    network, and handle reallocations automatically as devices come on- and offline from the network. It is
-    [billed](/products/sce/container-groups/billing-and-pricing/billing) by the amount of time any workload replica is
-    running.
+    Deploy your own custom applications on SaladCloud's managed container service. Bring your own Docker image, choose
+    your hardware, and scale horizontally as needed. We automatically assign your workload to eligible devices in the
+    SaladCloud network and handle reallocations as devices join or leave the network. You'll be
+    [billed](/products/sce/container-groups/billing-and-pricing/billing) based on the runtime of all workload replicas.
   </Card>
   <Card title="Recipes" icon="rocket" href="/products/recipes/overview">
     The fastest way to get started with [SCE](/products/sce). Recipes are deployment templates for the Container Engine
-    that can be deployed as-is, or easily customized to meet your needs. They are the best way to get up and running
+    that can be deployed as-is or easily customized to meet your needs. They are the best way to get up and running
     quickly with SaladCloud.
   </Card>
   <Card title="Transcription API" icon="code" href="/products/transcription">
-    The lowest cost, highest quality transcription service on the market. This is a fully managed service, with no
-    servers to maintain or infrastructure to manage. It is billed by the audio-minute.
+    The lowest cost, highest quality transcription service on the market. This fully managed service requires no server
+    maintenance or infrastructure management and is billed by the audio minute.
   </Card>
   <Card title="Salad Simple Storage Service (S4)" icon="database" href="/products/s4">
-    Temporarily upload assets for use on SaladCloud. Files are stored for 30 days, and may be up to 100mb. This service
-    is free to use for SaladCloud customers. This can be useful for uploading audio files prior to transcription, or
-    user images for AI image-to-image workflows.
+    Temporarily upload assets for use on SaladCloud. Files are stored for 30 days and may be up to 100MB in size. This
+    service is free for SaladCloud customers, and is useful for uploading audio files before transcription, or for user
+    images in AI image-to-image workflows.
   </Card>
   <Card title="Salad Gateway Service (SGS)" icon="house-signal" href="/products/sgs">
     Safe and secure residential IPs dedicated to streaming media.
