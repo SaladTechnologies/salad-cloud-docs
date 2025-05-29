@@ -68,6 +68,7 @@ ipinfo
 italian
 iterrows
 jemison
+jupyterlite
 konieshadow
 kubeconfig
 kubelet
