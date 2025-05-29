@@ -365,6 +365,16 @@ Two deployment methods are available:
 - Consider trade-offs between speed and cost
 - Evaluate user experience requirements vs. cost controls
 
+**Autoscaling:**
+
+There are two simple autoscaling strategies to match your compute capacity to workload demand:
+
+1. Queue-based autoscaling: Automatically scale up/down based on the number of jobs in the queue. This can be handled
+   automatically by the Salad Job Queue or Kelpie.
+2. Custom Autoscaling: Implement your own autoscaling logic using the
+   [SCE API](/reference/saladcloud-api/container-groups/update-container-group#body-replicas) to update the number of
+   replicas based on real-time metrics you collect from your application.
+
 ### Cost Optimization
 
 **Storage Strategy:**
@@ -411,6 +421,8 @@ Two deployment methods are available:
 - Track success rates and retry patterns
 - Monitor resource utilization across nodes
 - Set up alerts for critical application metrics
+- While SaladCloud offers basic log and terminal access, consider integrating with external logging and monitoring
+  solutions for advanced observability. We like Axiom.
 
 SCE provides unprecedented scale and cost-effectiveness for GPU-intensive workloads while requiring thoughtful
 architecture to handle the unique characteristics of a decentralized, consumer-hardware-based cloud platform.
