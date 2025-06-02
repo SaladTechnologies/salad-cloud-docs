@@ -1,0 +1,67 @@
+---
+title: 'Instance Deletion Cost'
+description: 'Manage scale-in behavior for container groups by setting the instance deletion cost.'
+---
+
+_Last Updated: June 2, 2025_
+
+## Overview
+
+Setting the instance deletion cost is a powerful and flexible way to manage scale-in behavior for container groups.
+Note, however, that this deletion cost only applies when intentional scaling events occur, such as setting replica
+count, or via autoscaling policies. It does not apply to instances that are terminated due to other reasons, such as
+host interruptions or failed instances.
+
+When a salad container group is scaled in via adjusting its replica count or an autoscaling policy, the instance
+deletion cost determines how the system selects which instances to terminate. The instance deletion cost is an integer
+value with a default of `0` that you can assign to each instance in the container group. Instances with a lower deletion
+cost are prioritized for termination when scaling down.
+
+Assigning this value can be done from within the application through the instance metadata service, using the
+[Replace Deletion Cost Endpoint](/reference/imds/replace-deletion-cost). It can also be done externally via the
+[Update Container Group Instance Endpoint](/reference/saladcloud-api/container-groups/update-container-group-instance).
+This function is also available in SaladCloudIMDS SDKs, and the SaladCloud SDKs respectively. **In general, you should
+only use one of these methods to set the deletion cost for an instance, as using both may lead to unexpected behavior.**
+
+**[IMDS Endpoint:](/reference/imds/replace-deletion-cost)**
+
+_Accessed from within the container group instance._
+
+```shell
+curl --request PUT \
+  --url http://169.254.169.254/v1/deletion-cost \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "deletion_cost": 100
+}'
+```
+
+**[SaladCloud API Endpoint:](/reference/saladcloud-api/container-groups/update-container-group-instance)**
+
+_Accessed externally via the SaladCloud API._
+
+```shell
+curl --request PATCH \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id} \
+  --header 'Content-Type: application/merge-patch+json' \
+  --header 'Salad-Api-Key: <api-key>' \
+  --data '{
+  "deletion_cost": 100
+}'
+```
+
+## Example 1: Batch Model Finetuning
+
+Suppose you have a container group running dozens or hundreds of instances, each pulling training jobs from a queue. In
+this situation, you would want idle nodes to set their deletion cost to 0, while nodes that are actively doing work
+could gradually increase their deletion cost as the job progresses. This way, if replica count is reduced, the system
+would not interrupt the training job by terminating an instance that is currently processing a task, but rather
+terminate an idle instance instead.
+
+## Example 2: Image Generation with ComfyUI
+
+In a scenario where you are using ComfyUI for large-scale image generation, instances may accumulate work in their
+internal queues. You can set the deletion cost of the instance to the depth of the queue, so that fewer jobs are lost
+when scaling down. For example, if an instance has a queue depth of 5, you can set its deletion cost to 5. This way, if
+the system needs to scale down, it will prioritize terminating instances with a lower deletion cost, thus preserving
+instances that are actively processing jobs in their queues.
