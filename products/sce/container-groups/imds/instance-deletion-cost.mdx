@@ -3,19 +3,52 @@ title: 'Instance Deletion Cost'
 description: 'Manage scale-in behavior for container groups by setting the instance deletion cost.'
 ---
 
+_Last Updated: June 2, 2025_
+
 ## Overview
 
-When a salad container group is scaled in via adjusting its replica count, the instance deletion cost determines how the
-system selects which instances to terminate. The instance deletion cost is a numeric value that you can assign to each
-instance in the container group. Instances with a lower deletion cost are prioritized for termination when scaling down.
+Setting the instance deletion cost is a powerful and flexible way to manage scale-in behavior for container groups.
+Note, however, that this deletion cost only applies when intentional scaling events occur, such as setting replica
+count, or via autoscaling policies. It does not apply to instances that are terminated due to other reasons, such as
+host interruptions or failed instances.
 
-Assigning this value can be done through the instance metadata service, using the
-[Replace Deletion Cost Endpoint](/reference/imds/replace-deletion-cost). This function is also available in
-SaladCloudIMDS SDKs.
+When a salad container group is scaled in via adjusting its replica count or an autoscaling policy, the instance
+deletion cost determines how the system selects which instances to terminate. The instance deletion cost is an integer
+value with a default of `0` that you can assign to each instance in the container group. Instances with a lower deletion
+cost are prioritized for termination when scaling down.
 
-The deletion cost is an integer value, and the default is `0`. You can set it to any integer value, including negative
-numbers. This allows you to prioritize less busy instances for termination by assigning them a lower deletion cost,
-while keeping more critical instances with a higher deletion cost.
+Assigning this value can be done from within the application through the instance metadata service, using the
+[Replace Deletion Cost Endpoint](/reference/imds/replace-deletion-cost). It can also be done externally via the
+[Update Container Group Instance Endpoint](/reference/saladcloud-api/container-groups/update-container-group-instance).
+This function is also available in SaladCloudIMDS SDKs, and the SaladCloud SDKs respectively. **In general, you should
+only use one of these methods to set the deletion cost for an instance, as using both may lead to unexpected behavior.**
+
+**[IMDS Endpoint:](/reference/imds/replace-deletion-cost)**
+
+_Accessed from within the container group instance._
+
+```shell
+curl --request PUT \
+  --url http://169.254.169.254/v1/deletion-cost \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "deletion_cost": 100
+}'
+```
+
+**[SaladCloud API Endpoint:](/reference/saladcloud-api/container-groups/update-container-group-instance)**
+
+_Accessed externally via the SaladCloud API._
+
+```shell
+curl --request PATCH \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id} \
+  --header 'Content-Type: application/merge-patch+json' \
+  --header 'Salad-Api-Key: <api-key>' \
+  --data '{
+  "deletion_cost": 100
+}'
+```
 
 ## Example 1: Batch Model Finetuning
 
@@ -32,10 +65,3 @@ internal queues. You can set the deletion cost of the instance to the depth of t
 when scaling down. For example, if an instance has a queue depth of 5, you can set its deletion cost to 5. This way, if
 the system needs to scale down, it will prioritize terminating instances with a lower deletion cost, thus preserving
 instances that are actively processing jobs in their queues.
-
-## Conclusion
-
-Setting the instance deletion cost is a powerful and flexible way to manage scale-in behavior for container groups.
-Note, however, that this deletion cost only applies when intentional scaling events occur, such as setting replica
-count, or via autoscaling policies. It does not apply to instances that are terminated due to other reasons, such as
-host interruptions or failed instances.
