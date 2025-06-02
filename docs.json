@@ -83,7 +83,8 @@
                       "products/sce/container-groups/imds/introduction",
                       "products/sce/container-groups/imds/Container-status-endpoint",
                       "products/sce/container-groups/imds/obtaining-an-imds-jwt",
-                      "products/sce/container-groups/imds/imds-reallocate"
+                      "products/sce/container-groups/imds/imds-reallocate",
+                      "products/sce/container-groups/imds/instance-deletion-cost"
                     ]
                   },
                   "products/sce/container-groups/specifying-a-command",
