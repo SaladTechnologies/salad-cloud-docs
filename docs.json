@@ -110,7 +110,8 @@
                   "products/sce/job-queues/job-queues",
                   "products/sce/job-queues/creating-a-job-queue",
                   "products/sce/job-queues/queue-worker",
-                  "products/sce/job-queues/using-queues"
+                  "products/sce/job-queues/using-queues",
+                  "products/sce/job-queues/webhook-signature"
                 ]
               },
               {
