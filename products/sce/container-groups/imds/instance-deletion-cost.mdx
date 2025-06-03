@@ -3,7 +3,7 @@ title: 'Instance Deletion Cost'
 description: 'Manage scale-in behavior for container groups by setting the instance deletion cost.'
 ---
 
-_Last Updated: June 2, 2025_
+_Last Updated: June 3, 2025_
 
 ## Overview
 
@@ -31,6 +31,7 @@ _Accessed from within the container group instance._
 curl --request PUT \
   --url http://169.254.169.254/v1/deletion-cost \
   --header 'Content-Type: application/json' \
+  --header 'Metadata: true' \
   --data '{
   "deletion_cost": 100
 }'
