@@ -230,7 +230,72 @@ Include speaker information at the sentence level.
 
 **Note:** If several speakers are identified in one sentence the most appearing one will be returned.
 
-### 6. language_code
+### 6. `multichannel`
+
+#### Description
+
+Enable multichannel transcription for audio files with separate speaker channels. Requires either `diarization` or
+`sentence_diarization` to return speaker/channel information.
+
+- **Default**: `false`
+- **Type**: `boolean`
+
+If you have a multichannel audio file with multiple speakers, you can transcribe each of them separately. Set
+`"multichannel": true` and pair it with either:
+
+- `"diarization": true` → word-level speaker and channel labeling
+- `"sentence_diarization": true` → sentence-level speaker and channel labeling
+
+If the audio has only one channel, the system will automatically fall back to regular speaker diarization.
+
+Multichannel transcription is supported for **all languages**, has **no channel limit** and incurs **no additional
+cost**. It may increase transcription time by approximately **25%**.
+
+#### Usage
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.wav",
+  "multichannel": true,
+  "diarization": true
+}
+
+```
+
+**Output Format (word-level)** The output will include speaker and channel labels for each word.
+
+```json
+"word_segments": [
+  {
+    "word": "Okay,",
+    "start": 0.324,
+    "end": 0.566,
+    "timestamp": [
+        0.324,
+        0.566
+    ],
+    "speaker": "SPEAKER_0",
+    "channel": 0
+  }
+]
+```
+
+**Output Format (sentence-level)** The output will include speaker and channel labels for each sentence.
+
+```json
+"sentence_level_timestamps": [
+  {
+    "start": 0.324,
+    "end": 1.335,
+    "text": "Okay, how are you?",
+    "speaker": "SPEAKER_0",
+    "channel": "0",
+    "score": 100.0
+  }
+]
+```
+
+### 7. language_code
 
 #### Description
 

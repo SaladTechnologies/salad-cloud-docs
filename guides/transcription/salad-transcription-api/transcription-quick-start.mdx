@@ -68,6 +68,7 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
          "word_level_timestamps": false,
          "diarization": false,
          "sentence_diarization": true,
+         "multichannel": false,
          "srt": false,
          "translate": "",
          "summarize": 50,
@@ -191,6 +192,13 @@ _"pl"_ (Polish), _"hu"_ (Hungarian), _"fi"_ (Finnish), _"fa"_ (Persian), _"el"_ 
 
 Set to `true` to include speaker information at the sentence level. Requires language_code to be specified. Default is
 `false`.
+
+#### “multichannel”
+
+Set to `true` to enable multichannel transcription. Each channel will be transcribed separately and labeled with
+`channel` and `speaker`. Falls back to regular speaker diarization if only one channel is present. Requires
+`diarization` for word-level speaker and channel labeling, or `sentence_diarization` for sentence-level speaker and
+channel labeling.
 
 #### "translate"
 
