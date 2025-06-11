@@ -7,7 +7,7 @@ _Last Updated: March 17, 2025_
 
 # Managing Long-Running Tasks on SaladCloud with Google Cloud Pub/Sub
 
-Managing long running tasks, such as molecular simulations, dreambooth training, and llm finetuning, presents unique
+Managing long running tasks, such as molecular simulations, LoRA training, and LLM finetuning, presents unique
 challenges on SaladCloud, due primarily to the interruptible nature of nodes. At the core of all solutions to this
 problem are a job queue, and progress checkpoints. The job queue is responsible for distributing tasks to workers, and
 detecting when a worker has been interrupted. Workloads should save checkpoints of their progress and upload it to cloud

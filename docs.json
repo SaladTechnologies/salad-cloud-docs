@@ -188,7 +188,6 @@
               "tutorials/jwt-authentication",
               "tutorials/interactive-terminal",
               "tutorials/performance-monitoring",
-              "tutorials/long-running-jobs",
               {
                 "group": "Run a Node App",
                 "pages": [
@@ -342,6 +341,7 @@
                 "group": "Long-Running Tasks",
                 "pages": [
                   "guides/long-running-tasks/solution-overview",
+                  "guides/long-running-tasks/kelpie",
                   "guides/long-running-tasks/gcp-pub-sub",
                   "guides/long-running-tasks/rabbitmq",
                   "guides/long-running-tasks/sqs"
@@ -902,6 +902,10 @@
     {
       "source": "reference/imds/reallocate-container",
       "destination": "reference/imds/reallocate"
+    },
+    {
+      "source": "tutorials/long-running-jobs",
+      "destination": "guides/long-running-tasks/solution-overview"
     }
   ]
 }
