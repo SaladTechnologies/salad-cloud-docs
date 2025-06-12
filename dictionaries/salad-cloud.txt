@@ -222,3 +222,4 @@ yolob8m-custom
 yolov8
 zapier
 zset
+Gbps
