@@ -161,9 +161,11 @@ Throughput measurements are highly influenced by the size of the transferred dat
 throughput due to connection setup time, TCP slow start, and other fixed overheads. In contrast, larger data sizes allow
 the connection to stabilize and better utilize available bandwidth, resulting in more accurate measurements.
 
-For example, a 1 Gbps connection can transfer 100 MB in about 0.8 seconds under ideal conditions. However, with a RTT of
-50 ms and around 200 ms of overhead from connection setup and teardown, the measured throughput may appear up to 20%
-lower.
+For example, a 1 Gbps connection can transfer 100 MB (800Mb) in about 0.8 seconds under ideal conditions. However, with
+a RTT of 50 ms and an estimated 200 ms of overhead from connection setup and teardown, the measured throughput would be
+800 Mbps—approximately 20% below the theoretical maximum. If only 50 MB (400 Mb) is transferred, the impact of fixed
+overhead becomes even more pronounced. With a total transfer time of roughly 0.6 seconds (400 ms for data plus 200 ms
+overhead), the observed throughput drops to about 666 Mbps—around 33% lower than the ideal 1 Gbps rate.
 
 To mitigate this effect—and based on preliminary testing—we used a data size of 300 MB, which provides more stable and
 realistic throughput estimates for most Salad nodes. As a result, each node uploaded and downloaded

@@ -101,20 +101,23 @@ data are removed from the previously allocated nodes. These nodes are then relea
 customers.
 
 Data persistence must be ensured through external cloud storage. When launching a container group, you can use
-environment variables to pass access credentials for the selected cloud storage to the instances.
+environment variables to pass access credentials for the selected cloud storage to its instances.
 
 However, volume mounting using S3FS, FUSE or NFS is not supported in the instances, as these containers do not run in
-privileged mode. The recommended solution is to install and use the Cloud Storage SDK or CLI (e.g., azcopy, aws s3 or
-gsutil) within the container images to sync data from cloud storage.
+privileged mode. The recommended solution is to install and use a cloud storage SDK or CLI (e.g., azcopy, aws s3 or
+gsutil) within the container image to read and write data to the cloud.
 
-Consider using open-source tools like [s3parcp](https://github.com/chanzuckerberg/s3parcp) to optimize performance and
-throughput. It supports chunked parallel downloads and uploads, allowing for more efficient utilization of physical
-bandwidth by leveraging multiple connections.
+Consider using popular open-source CLI tools like [Rclone](https://rclone.org/), which supports a wide range of cloud
+storage providers and can be easily integrated into your applications. Rclone enables chunked, parallel downloads and
+uploads, allowing for more efficient utilization of physical bandwidth by leveraging multiple connections.
+
+For detailed instructions on building a high-performance storage solution on SaladCloud, please refer to
+[the guide](/tutorials/high-performance-storage-solutions)
 
 ## Build Region-Specific Workloads
 
 Assuming unlimited end-to-end bandwidth, TCP throughput is primarily determined by the congestion window size and
-Round-Trip Time (RTT), with the relationship expressed as Throughput ≈ Window Size / RTT. Lower RTT enables faster
+Round-Trip Time (**RTT**), with the relationship expressed as Throughput ≈ Window Size / RTT. Lower RTT enables faster
 acknowledgment, allowing more data to be transmitted and increasing throughput. In contrast, higher RTT slows
 acknowledgment, reducing throughput. For more information, please refer to
 [this link](https://blog.cloudflare.com/optimizing-tcp-for-high-throughput-and-low-latency/).
@@ -125,13 +128,14 @@ bandwidth, and reducing the impact of network limitations on a single connection
 So, minimizing RTT by optimizing network latency and leveraging multiple connections are key strategies for enhancing
 TCP performance, especially in applications requiring high data transfer rates.
 
-The following test results were obtained using over 100 Salad nodes in the US, along with two AWS S3 buckets located in
-the US East and EU Central, demonstrating how physical distance can significantly impact both RTT and throughput.
+The following test results were collected from over 100 Salad nodes located in North America, using storage buckets from
+multiple S3-compatible providers in both the US East and EU Central regions. The data highlights how physical distance
+can significantly affect both RTT and throughput.
 
-| Averaged across 100 nodes                        | Round-Trip Time (ms) | Download Throughput (MB/s) | Upload Throughput (MB/s) |
-| :----------------------------------------------- | :------------------- | :------------------------- | :----------------------- |
-| Salad nodes in US to AWS S3 Bucket in US East    | 56.330               | 62.282                     | 23.528                   |
-| Salad nodes in US to AWS S3 Bucket in EU Central | 142.312              | 47.926                     | 15.359                   |
+| No  | Salad Nodes   | Buckets | Average RTT | Average Upload Throughput | Average Download Throughput |
+| :-- | :------------ | :------ | ----------- | ------------------------- | --------------------------- |
+| 1   | North America | Europe  | 123.30 ms   | 146.50 Mbps               | 299.12 Mbps                 |
+| 2   | North America | US East | 40.35 ms    | 285.79 Mbps               | 463.04 Mbps                 |
 
 If your applications consume large amounts of data from the cloud or generate significant data that needs to be stored
 in the cloud, ensure you select the appropriate nodes based on latency and throughput. To further optimize performance,
@@ -191,9 +195,13 @@ This entire process only takes tens of seconds, with negligible associated costs
 
 The upload speed, download speed, and latency reported by
 [Python's speedtest module](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_network.py#L6)
-are measured using Speedtest.net servers, which may not always accurately reflect real-world network performance. To get
-a more precise measurement, you can assess latency and throughput from the node to your cloud bucket's location using
-tools like
+are measured using Speedtest.net servers, which may not always accurately reflect real-world network performance. In our
+experiments, throughput measured via the speedtest module was consistently lower than the results obtained from actual
+cloud storage transfers. Additionally, around 20% of nodes failed to run the speedtest, likely due to traffic being
+blocked by certain ISPs.
+
+To get a more precise measurement, you can assess latency and throughput from the node to your cloud bucket's location
+using tools like
 [the pythonping module](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_network.py#L23)
 (note that the first ping is often lost or inaccurate) and the cloud-specific SDK/CLI.
 
