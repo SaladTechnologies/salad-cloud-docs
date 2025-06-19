@@ -231,3 +231,5 @@ nsteps
 nsteps
 mdrun
 continuumio
+nompi
+maxh
