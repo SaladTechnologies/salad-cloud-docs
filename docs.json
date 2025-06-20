@@ -359,6 +359,10 @@
               {
                 "group": "Tailscale Integration",
                 "pages": ["guides/tailscale-integration/solution-overview", "guides/tailscale-integration/basic"]
+              },
+              {
+                "group": "Molecular Dynamics Simulation",
+                "pages": ["guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
           }
