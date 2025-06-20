@@ -3,7 +3,7 @@ title: 'Run GROMACS on SaladCloud'
 description: 'How to execute molecular dynamics simulations on interruptible infrastructure'
 ---
 
-_Published: June 20, 2025_
+_Last Updated: June 20, 2025_
 
 ## Introduction
 
@@ -60,7 +60,18 @@ This guide focuses on the SRCG-based approach. A separate guide will cover job q
 To demonstrate how to split a GROMACS simulation into chunks, consider the following example.
 
 ```bash
-gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -s j1.tpr -deffnm j1 -nsteps 200000
+gmx mdrun \                        # Run GROMACS
+  -nb gpu \                        # Use GPU for non-bonded force calculations
+  -pme gpu \                       # Use GPU for Particle-Mesh Ewald (PME) calculations
+  -bonded gpu \                    # Use GPU for bonded interactions
+  -update gpu \                    # Use GPU to update particle positions and velocities
+  -ntmpi 1 \                       # Number of MPI ranks (parallel processes)
+  -ntomp 8 \                       # Number of OpenMP threads per rank
+  -pin on \                        # Enable thread pinning (better performance on some systems)
+  -pinstride 1 \                   # Set pinning stride (1 = consecutive cores)
+  -s j1.tpr \                      # Input run file (TPR format)
+  -deffnm j1 \                     # Base name for output files (e.g., j1.log, j1.trr, j1.edr, etc.)
+  -nsteps 200000                   # Total number of steps to run
 ```
 
 This command runs a 200,000-step GPU-accelerated simulation using the system defined in the `j1.tpr` file. It uses a
@@ -110,11 +121,11 @@ Below are the commands to implement the adapted workflow:
 gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 200000 -maxh 0.016
 
 # Files generated after the first chunk and uploaded to cloud storage:
-j1.cpt
-j1_prev.cpt
-j1.part0001.edr
-j1.part0001.log
-j1.part0001.trr
+# j1.cpt
+# j1_prev.cpt
+# j1.part0001.edr
+# j1.part0001.log
+# j1.part0001.trr
 
 # After node reallocation, the new node only needs to download the input file (j1.tpr) and the checkpoint file (j1.cpt) from cloud storage
 
@@ -125,11 +136,11 @@ gmx dump -cp j1.cpt | grep step
 gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 152800 -maxh 0.016 -cpi j1.cpt
 
 # Files generated after the second chunk (with j1.cpt and j1_prev.cpt updated) and uploaded to cloud storage:
-j1.cpt
-j1_prev.cpt
-j1.part0002.edr
-j1.part0002.log
-j1.part0002.trr
+# j1.cpt
+# j1_prev.cpt
+# j1.part0002.edr
+# j1.part0002.log
+# j1.part0002.trr
 
 # The same logic applies to next chunks until all 200,000 steps are completed.
 gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 105600 -maxh 0.016 -cpi j1.cpt
