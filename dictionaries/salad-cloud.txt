@@ -233,3 +233,5 @@ mdrun
 continuumio
 nompi
 maxh
+kuzco
+Kuzco
