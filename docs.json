@@ -170,7 +170,8 @@
               "products/recipes/sd3.5-large",
               "products/recipes/sd3.5-medium",
               "products/recipes/sdxl-with-refiner-comfyui",
-              "products/recipes/yolov8"
+              "products/recipes/yolov8",
+              "products/recipes/kuzco"
             ]
           }
         ]
