@@ -280,7 +280,9 @@ clearing the cloud folder while preserving the .tpr input file.
 To debug and perform manual tasks, follow [this guide](/tutorials/vscode-remote-development#interactive-mode) to connect
 to the SRCG using VS Code.
 
-## Test Results
+## Test Results and Benchmarks
+
+### Single-Day Simulation Results
 
 The input model for the test is [a huge virus protein](https://zenodo.org/records/3893789) with 1,066,628 atoms. The
 test run 10,000,000 steps with a chunking interval of 30 minutes.
@@ -309,12 +311,61 @@ Interruptions: 2 (the last one was shut down by the test code)
 
 Here are the detailed statistics of each node run:
 
-| ID                                   | GPU                        | Start               | End                 | Duration | Chunks | Steps     | Steps/Second     |
+| Machine ID                           | GPU                        | Start               | End                 | Duration | Chunks | Steps     | Steps/Second     |
 | ------------------------------------ | -------------------------- | ------------------- | ------------------- | -------- | ------ | --------- | ---------------- |
 | c599288a-9974-3858-b1eb-1e8b2e8aa9ab | NVIDIA GeForce RTX 4060 Ti | 2025-06-18 10:45:09 | 2025-06-19 00:11:28 | 13:26:19 | 27     | 3,717,000 | 76.83 steps/sec  |
 | e138daef-c41c-e050-ba2d-889b7b9a08fc | NVIDIA GeForce RTX 4090    | 2025-06-19 00:46:07 | 2025-06-19 01:16:05 | 0:29:58  | 1      | 385,400   | 214.35 steps/sec |
 | e3b930f7-637d-6e57-a67b-3bb9563a2796 | NVIDIA GeForce RTX 4090    | 2025-06-19 01:49:11 | 2025-06-19 10:49:55 | 9:00:44  | 19     | 5,897,600 | 181.78 steps/sec |
 
+### Multi-Day Simulation Results
+
+The test uses the same input model as described above, but runs for 30,000,000 steps, with the simulation chunked into
+10-minute intervals. Here is the summary of
+[the test run results](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/history_2.txt) on SaladCloud:
+
+```txt
+SRCG Resource Type: 16 vCPUs, 24 GB RAM, RTX 4000-series GPUs
+Task Creation Time: 2025-06-19 16:16:59
+First Node Online: 2025-06-19 16:25:00 (8 minutes after task creation)
+Total Task Duration: 4 days, 12:19:12
+Efficient Runtime: 4 days, 11:48:04
+Non-Running time: 0:31:08
+Runtime-to-Duration Ratio: 99.5%
+Interruptions: 1 (the last one was shut down by the test code)
+```
+
+**The 31 minutes of non-running time includes:**
+
+- 1 Interruption: With a 10 minutes chunking interval, the interruption may result in 5 minutes of lost compute time
+  (estimated as N x Chunking Interval / 2). This lost time is not included in the efficient runtime, and can be reduced
+  by using smaller chunking intervals.
+- 2 Node allocation/reallocations. This includes image pulling and environment setup, which are not charged by
+  SaladCloud.
+
+Here are the detailed statistics of each node run:
+
+| Machine ID                           | GPU                              | Start               | End                 | Duration         | Chunks | Steps      | Steps/Second     |
+| ------------------------------------ | -------------------------------- | ------------------- | ------------------- | ---------------- | ------ | ---------- | ---------------- |
+| 602e45b0-1fd8-4352-bddc-f96270e1f048 | NVIDIA GeForce RTX 4060 Ti       | 2025-06-19 16:25:00 | 2025-06-23 12:39:15 | 3 days, 20:14:15 | 544    | 22,254,600 | 67.02 steps/sec  |
+| 3d18a605-08d6-1958-8795-e500065b2377 | NVIDIA GeForce RTX 4070 Ti SUPER | 2025-06-23 13:02:22 | 2025-06-24 04:36:11 | 15:33:49         | 94     | 7,745,400  | 138.24 steps/sec |
+
+### Summary and Conclusions
+
 The SRCG approach is easy to set up and works especially well for long-running simulations—where the longer the runtime,
 the more negligible the non-runtime overhead becomes. However, when running a large number of simulation
 tasks—particularly short ones—a job queue is essential to maintain efficiency and scalability.
+
+A shorter chunking interval helps minimize compute loss during unexpected interruptions, but it can slightly impact
+overall performance. This is because the simulation must pause more frequently to generate output and checkpoint files
+for each chunk. The upload process, however, has no effect on performance, as it is handled asynchronously.
+
+In the above tests using the same node type (RTX 4060 Ti), the configuration with 10-minute chunking intervals
+demonstrated approximately 10% lower performance compared to the 30-minute interval configuration.
+
+Salad nodes equipped with the same GPU type may differ in CPU, RAM, and other hardware characteristics, including vendor
+and model. These differences could introduce variations in processing capacity, which may also fluctuate over time due
+to the shared nature.
+
+To mitigate the impact of underperforming nodes, applications can perform initial checks and
+[continuously monitor performance](/tutorials/performance-monitoring) to filter nodes based on specific criteria. Please
+refer to [this guide](/tutorials/high-performance-apps#implement-real-time-performance-monitoring) for more details.
