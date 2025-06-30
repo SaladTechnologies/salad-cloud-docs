@@ -15,7 +15,11 @@
         "groups": [
           {
             "group": "SaladCloud",
-            "pages": ["products/documentation", "products/quickstart", "products/account-security"]
+            "pages": [
+              "products/documentation",
+              "products/quickstart",
+              "products/account-security"
+            ]
           },
           {
             "group": "Container Engine",
@@ -153,7 +157,9 @@
           },
           {
             "group": "S4 - Salad Simple Storage Service",
-            "pages": ["products/s4/salad-simple-storage-service"]
+            "pages": [
+              "products/s4/salad-simple-storage-service"
+            ]
           },
           {
             "group": "Recipes",
@@ -323,13 +329,18 @@
                   },
                   {
                     "group": "SCE",
-                    "pages": ["guides/transcription/sce/youtube"]
+                    "pages": [
+                      "guides/transcription/sce/youtube"
+                    ]
                   }
                 ]
               },
               {
                 "group": "Text To Speech",
-                "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+                "pages": [
+                  "guides/text-to-speech/metavoice-tts-api",
+                  "guides/text-to-speech/openvoice-api"
+                ]
               },
               {
                 "group": "Real-Time Inference",
@@ -359,11 +370,16 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": ["guides/tailscale-integration/solution-overview", "guides/tailscale-integration/basic"]
+                "pages": [
+                  "guides/tailscale-integration/solution-overview",
+                  "guides/tailscale-integration/basic"
+                ]
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": ["guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
               }
             ]
           }
@@ -373,220 +389,83 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Reference",
+            "group": "container_groups",
             "pages": [
-              "reference/api-usage",
-              {
-                "group": "SaladCloud API",
-                "pages": [
-                  {
-                    "group": "Container Groups",
-                    "pages": [
-                      "reference/saladcloud-api/container-groups/list-container-groups",
-                      "reference/saladcloud-api/container-groups/create-container-group",
-                      "reference/saladcloud-api/container-groups/get-container-group",
-                      "reference/saladcloud-api/container-groups/update-container-group",
-                      "reference/saladcloud-api/container-groups/delete-container-group",
-                      "reference/saladcloud-api/container-groups/start-container-group",
-                      "reference/saladcloud-api/container-groups/stop-container-group",
-                      "reference/saladcloud-api/container-groups/get-container-group-logs",
-                      "reference/saladcloud-api/container-groups/list-container-group-instances",
-                      "reference/saladcloud-api/container-groups/get-container-group-instance",
-                      "reference/saladcloud-api/container-groups/update-container-group-instance",
-                      "reference/saladcloud-api/container-groups/reallocate-container-group-instance",
-                      "reference/saladcloud-api/container-groups/recreate-container-group-instance",
-                      "reference/saladcloud-api/container-groups/restart-container-group-instance"
-                    ]
-                  },
-                  {
-                    "group": "Job Queues",
-                    "pages": [
-                      "reference/saladcloud-api/queues/list-queues",
-                      "reference/saladcloud-api/queues/create-queue",
-                      "reference/saladcloud-api/queues/get-queue",
-                      "reference/saladcloud-api/queues/update-queue",
-                      "reference/saladcloud-api/queues/delete-queue",
-                      "reference/saladcloud-api/queues/list-jobs",
-                      "reference/saladcloud-api/queues/create-job",
-                      "reference/saladcloud-api/queues/get-job",
-                      "reference/saladcloud-api/queues/delete-job"
-                    ]
-                  },
-                  {
-                    "group": "Inference Endpoints",
-                    "pages": [
-                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoints",
-                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint",
-                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoint-jobs",
-                      "reference/saladcloud-api/inference-endpoints/create-inference-endpoint-job",
-                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint-job",
-                      "reference/saladcloud-api/inference-endpoints/delete-inference-endpoint-job"
-                    ]
-                  },
-                  {
-                    "group": "Organizations",
-                    "pages": [
-                      "reference/saladcloud-api/organizations/list-gpu-classes",
-                      "reference/saladcloud-api/organizations/get-quotas",
-                      "reference/saladcloud-api/organizations/get-webhook-secret-key",
-                      "reference/saladcloud-api/organizations/update-webhook-secret-key"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Instance Metadata Service",
-                "pages": [
-                  "reference/imds/get-status",
-                  "reference/imds/get-token",
-                  "reference/imds/get-deletion-cost",
-                  "reference/imds/replace-deletion-cost",
-                  "reference/imds/reallocate",
-                  "reference/imds/recreate",
-                  "reference/imds/restart"
-                ]
-              },
-              {
-                "group": "S4 - Salad Simple Storage Service",
-                "pages": [
-                  "reference/s4/upload-a-file",
-                  "reference/s4/download-a-file",
-                  "reference/s4/delete-a-file",
-                  "reference/s4/list-all-files-that-belong-to-the-organization",
-                  "reference/s4/sign-a-file-and-return-a-signed-url"
-                ]
-              },
-              {
-                "group": "Recipes",
-                "pages": [
-                  {
-                    "group": "Dreamshaper 8 - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/dreamshaper8-comfyui/health-probe",
-                      "reference/recipes/dreamshaper8-comfyui/readiness-probe",
-                      "reference/recipes/dreamshaper8-comfyui/list-models",
-                      "reference/recipes/dreamshaper8-comfyui/submit-prompt",
-                      "reference/recipes/dreamshaper8-comfyui/image-to-image",
-                      "reference/recipes/dreamshaper8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Ollama Llama 3.1",
-                    "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
-                  },
-                  {
-                    "group": "FLUX.1-Dev (FP8) - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/flux1-dev-fp8-comfyui/health-probe",
-                      "reference/recipes/flux1-dev-fp8-comfyui/readiness-probe",
-                      "reference/recipes/flux1-dev-fp8-comfyui/list-models",
-                      "reference/recipes/flux1-dev-fp8-comfyui/submit-prompt",
-                      "reference/recipes/flux1-dev-fp8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/flux1-schnell-fp8-comfyui/health-probe",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/readiness-probe",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/list-models",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/submit-prompt",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/image-to-image",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Qwen 2.5 VL 3B Instruct - TGI",
-                    "pages": [
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/template-and-tokenize-chatrequest",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/health-check-method",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/text-generation-inference-endpoint-info",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-from-sagemaker-request",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/prometheus-metrics-scrape-endpoint",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/tokenize-inputs",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-1",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-2",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/get-model-info"
-                    ]
-                  },
-                  {
-                    "group": "Qwen 2.5 VL 7B Instruct - TGI",
-                    "pages": [
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/template-and-tokenize-chatrequest",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/health-check-method",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/text-generation-inference-endpoint-info",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-from-sagemaker-request",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/prometheus-metrics-scrape-endpoint",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/tokenize-inputs",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-1",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-2",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/get-model-info"
-                    ]
-                  },
-                  {
-                    "group": "SDXL with Refiner - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sdxl-with-refiner-comfyui/health-probe",
-                      "reference/recipes/sdxl-with-refiner-comfyui/readiness-probe",
-                      "reference/recipes/sdxl-with-refiner-comfyui/list-models",
-                      "reference/recipes/sdxl-with-refiner-comfyui/submit-prompt",
-                      "reference/recipes/sdxl-with-refiner-comfyui/image-to-image",
-                      "reference/recipes/sdxl-with-refiner-comfyui/text-to-image-+refiner",
-                      "reference/recipes/sdxl-with-refiner-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Stable Diffusion 3.5 Large - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sd3.5-large/health-probe",
-                      "reference/recipes/sd3.5-large/readiness-probe",
-                      "reference/recipes/sd3.5-large/list-models",
-                      "reference/recipes/sd3.5-large/submit-prompt",
-                      "reference/recipes/sd3.5-large/txt2img"
-                    ]
-                  },
-                  {
-                    "group": "Stable Diffusion 3.5 Medium - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sd3.5-medium/health-probe",
-                      "reference/recipes/sd3.5-medium/readiness-probe",
-                      "reference/recipes/sd3.5-medium/list-models",
-                      "reference/recipes/sd3.5-medium/submit-prompt",
-                      "reference/recipes/sd3.5-medium/txt2img"
-                    ]
-                  },
-                  {
-                    "group": "YOLO v8 (API)",
-                    "pages": [
-                      "reference/recipes/yolov8/process_file",
-                      "reference/recipes/yolov8/process_url",
-                      "reference/recipes/yolov8/health-probe"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Transcription API",
-                "pages": [
-                  "reference/transcribe/inference_endpoints/create-an-inference-endpoint-job",
-                  "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
-                  "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
-                ]
-              },
-              {
-                "group": "Transcription Lite API",
-                "pages": [
-                  "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
-                  "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
-                  "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
-                ]
-              }
+              "api-reference\\container_groups\\list-container-groups",
+              "api-reference\\container_groups\\create-container-group",
+              "api-reference\\container_groups\\get-container-group",
+              "api-reference\\container_groups\\delete-container-group",
+              "api-reference\\container_groups\\update-container-group",
+              "api-reference\\container_groups\\start-container-group",
+              "api-reference\\container_groups\\stop-container-group",
+              "api-reference\\container_groups\\list-container-group-instances",
+              "api-reference\\container_groups\\get-container-group-instance",
+              "api-reference\\container_groups\\update-container-group-instance",
+              "api-reference\\container_groups\\reallocate-container-group-instance",
+              "api-reference\\container_groups\\recreate-container-group-instance",
+              "api-reference\\container_groups\\restart-container-group-instance"
+            ]
+          },
+          {
+            "group": "workload_errors",
+            "pages": [
+              "api-reference\\workload_errors\\get-workload-errors"
+            ]
+          },
+          {
+            "group": "system_logs",
+            "pages": [
+              "api-reference\\system_logs\\get-system-logs"
+            ]
+          },
+          {
+            "group": "queues",
+            "pages": [
+              "api-reference\\queues\\list-queues",
+              "api-reference\\queues\\create-queue",
+              "api-reference\\queues\\get-queue",
+              "api-reference\\queues\\delete-queue",
+              "api-reference\\queues\\update-queue",
+              "api-reference\\queues\\list-jobs",
+              "api-reference\\queues\\create-job",
+              "api-reference\\queues\\get-job",
+              "api-reference\\queues\\delete-job"
+            ]
+          },
+          {
+            "group": "quotas",
+            "pages": [
+              "api-reference\\quotas\\get-quotas"
+            ]
+          },
+          {
+            "group": "inference_endpoints",
+            "pages": [
+              "api-reference\\inference_endpoints\\list-inference-endpoints",
+              "api-reference\\inference_endpoints\\get-an-inference-endpoint",
+              "api-reference\\inference_endpoints\\list-inference-endpoint-jobs",
+              "api-reference\\inference_endpoints\\create-a-new-inference-endpoint-job",
+              "api-reference\\inference_endpoints\\get-an-inference-endpoint-job",
+              "api-reference\\inference_endpoints\\cancel-an-inference-endpoint-job"
+            ]
+          },
+          {
+            "group": "organization_data",
+            "pages": [
+              "api-reference\\organization_data\\list-the-gpu-classes"
+            ]
+          },
+          {
+            "group": "webhook_secret_key",
+            "pages": [
+              "api-reference\\webhook_secret_key\\gets-the-webhook-secret-key",
+              "api-reference\\webhook_secret_key\\updates-the-webhook-secret-key"
+            ]
+          },
+          {
+            "group": "logs",
+            "pages": [
+              "api-reference\\logs\\query-log-entries"
             ]
           }
         ]
@@ -912,5 +791,18 @@
       "source": "tutorials/long-running-jobs",
       "destination": "guides/long-running-tasks/solution-overview"
     }
-  ]
+  ],
+  "api": {
+    "request": {
+      "example": {
+        "languages": [
+          "bash",
+          "python",
+          "typescript",
+          "go",
+          "csharp"
+        ]
+      }
+    }
+  }
 }
