@@ -11,7 +11,7 @@ info:
   license:
     name: MIT License
     identifier: MIT
-  version: 0.9.0-alpha.13
+  version: 0.9.0-alpha.14
 servers:
   - url: https://api.salad.com/api/public
 paths:
@@ -35,22 +35,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.list_container_groups(
-                organization_name="acme-corp",
-                project_name="dev-env"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -78,6 +62,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.listContainerGroups('acme-corp', 'dev-env');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -103,21 +102,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.listContainerGroups('acme-corp', 'dev-env');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -140,6 +124,22 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.list_container_groups(
+                organization_name="acme-corp",
+                project_name="dev-env"
+            )
+
+            print(result)
+          lang: Python
     post:
       operationId: create_container_group
       summary: Create Container Group
@@ -160,233 +160,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            from salad_cloud_sdk.models import ContainerGroupCreationRequest
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            request_body = ContainerGroupCreationRequest(
-                autostart_policy=True,
-                container={
-                    "command": [
-                        "command"
-                    ],
-                    "environment_variables": {},
-                    "image": "acme/:latest",
-                    "image_caching": True,
-                    "logging": {
-                        "axiom": {
-                            "host": "host",
-                            "api_token": "api_token",
-                            "dataset": "dataset"
-                        },
-                        "datadog": {
-                            "host": "host",
-                            "api_key": "api_key",
-                            "tags": [
-                                {
-                                    "name": "name",
-                                    "value": "value"
-                                }
-                            ]
-                        },
-                        "http": {
-                            "host": "host",
-                            "port": 5418,
-                            "user": "user",
-                            "password": "password",
-                            "path": "path",
-                            "format": "json",
-                            "headers": [
-                                {
-                                    "name": "name",
-                                    "value": "value"
-                                }
-                            ],
-                            "compression": "none"
-                        },
-                        "new_relic": {
-                            "host": "host",
-                            "ingestion_key": "ingestion_key"
-                        },
-                        "splunk": {
-                            "host": "host",
-                            "token": "token"
-                        },
-                        "tcp": {
-                            "host": "host",
-                            "port": 44539
-                        }
-                    },
-                    "priority": "high",
-                    "registry_authentication": {
-                        "aws_ecr": {
-                            "access_key_id": "access_key_id",
-                            "secret_access_key": "secret_access_key"
-                        },
-                        "basic": {
-                            "username": "username",
-                            "password": "password"
-                        },
-                        "docker_hub": {
-                            "username": "username",
-                            "personal_access_token": "personal_access_token"
-                        },
-                        "gcp_gar": {
-                            "service_key": "service_key"
-                        },
-                        "gcp_gcr": {
-                            "service_key": "service_key"
-                        }
-                    },
-                    "resources": {
-                        "cpu": 7,
-                        "memory": 55380,
-                        "gpu_classes": [
-                            "gpu_classes"
-                        ],
-                        "storage_amount": 172087948244
-                    }
-                },
-                country_codes=[
-                    "af"
-                ],
-                display_name="Vm1TWq",
-                liveness_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 3,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 150,
-                    "period_seconds": 10,
-                    "success_threshold": 1,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "timeout_seconds": 30
-                },
-                name="name",
-                networking={
-                    "auth": True,
-                    "client_request_timeout": 100000,
-                    "load_balancer": "round_robin",
-                    "port": 60000,
-                    "protocol": "http",
-                    "server_response_timeout": 100000,
-                    "single_connection_limit": True
-                },
-                queue_autoscaler={
-                    "desired_queue_length": 11,
-                    "max_replicas": 285,
-                    "max_downscale_per_minute": 33,
-                    "max_upscale_per_minute": 24,
-                    "min_replicas": 0,
-                    "polling_period": 1562
-                },
-                queue_connection={
-                    "path": "path",
-                    "port": 44195,
-                    "queue_name": "rjeo3wk1tliaumsx88h6r2rtp3ugpq8z1j9rfjywt4fl19-rpsziiz"
-                },
-                readiness_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 3,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 1001,
-                    "period_seconds": 1,
-                    "success_threshold": 1,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "timeout_seconds": 1
-                },
-                replicas=121,
-                restart_policy="always",
-                startup_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 15,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 979,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "period_seconds": 3,
-                    "success_threshold": 2,
-                    "timeout_seconds": 10
-                }
-            )
-
-
-            result = sdk.container_groups.create_container_group(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env"
-            )
-
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -546,6 +319,7 @@ paths:
               Memory: util.ToPointer(int64(123)),
               GpuClasses: []string{},
               StorageAmount: util.ToPointer(int64(123)),
+              ShmSize: util.ToPointer(int64(123)),
             }
 
 
@@ -793,6 +567,261 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import {
+              ContainerConfiguration,
+              ContainerGroupCreationRequest,
+              ContainerGroupLivenessProbe,
+              ContainerGroupQueueConnection,
+              ContainerGroupReadinessProbe,
+              ContainerGroupStartupProbe,
+              ContainerRestartPolicy,
+              CountryCode,
+              CreateContainerGroupNetworking,
+              QueueBasedAutoscalerConfiguration,
+              SaladCloudSdk,
+            } from '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
+                host: 'host',
+                apiToken: 'api_token',
+                dataset: 'dataset',
+              };
+
+              const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
+                host: 'host',
+                apiKey: 'api_key',
+                tags: [datadogTagForContainerLogging],
+              };
+
+              const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
+
+              const containerLoggingHttpHeader: ContainerLoggingHttpHeader = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
+
+              const containerLoggingConfigurationHttp2: ContainerLoggingConfigurationHttp2 = {
+                host: 'host',
+                port: 30450,
+                user: 'user',
+                password: 'password',
+                path: 'path',
+                format: containerLoggingHttpFormat,
+                headers: [containerLoggingHttpHeader],
+                compression: containerLoggingHttpCompression,
+              };
+
+              const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
+                host: 'host',
+                ingestionKey: 'ingestion_key',
+              };
+
+              const containerLoggingSplunkConfiguration: ContainerLoggingSplunkConfiguration = {
+                host: 'host',
+                token: 'token',
+              };
+
+              const tcpLoggingConfiguration: TcpLoggingConfiguration = {
+                host: 'host',
+                port: 64563,
+              };
+
+              const containerConfigurationLogging: ContainerConfigurationLogging = {
+                axiom: axiomLoggingConfiguration,
+                datadog: datadogLoggingConfiguration,
+                http: containerLoggingConfigurationHttp2,
+                newRelic: newRelicLoggingConfiguration,
+                splunk: containerLoggingSplunkConfiguration,
+                tcp: tcpLoggingConfiguration,
+              };
+
+              const containerGroupPriority = ContainerGroupPriority.HIGH;
+
+              const containerRegistryAuthenticationAwsEcr: ContainerRegistryAuthenticationAwsEcr = {
+                accessKeyId: 'access_key_id',
+                secretAccessKey: 'secret_access_key',
+              };
+
+              const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
+                username: 'username',
+                password: 'password',
+              };
+
+              const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
+                username: 'username',
+                personalAccessToken: 'personal_access_token',
+              };
+
+              const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
+                serviceKey: 'service_key',
+              };
+
+              const containerRegistryAuthenticationGcpGcr: ContainerRegistryAuthenticationGcpGcr = {
+                serviceKey: 'service_key',
+              };
+
+              const containerRegistryAuthentication: ContainerRegistryAuthentication = {
+                awsEcr: containerRegistryAuthenticationAwsEcr,
+                basic: containerRegistryAuthenticationBasic,
+                dockerHub: containerRegistryAuthenticationDockerHub,
+                gcpGar: containerRegistryAuthenticationGcpGar,
+                gcpGcr: containerRegistryAuthenticationGcpGcr,
+              };
+
+              const createContainerResourceRequirements: CreateContainerResourceRequirements = {
+                cpu: 7,
+                memory: 58281,
+                gpuClasses: ['gpu_classes'],
+                storageAmount: 233909194963,
+                shmSize: 64,
+              };
+
+              const containerConfiguration: ContainerConfiguration = {
+                command: ['command'],
+                environmentVariables: [],
+                image: 'acme/:latest',
+                imageCaching: true,
+                logging: containerConfigurationLogging,
+                priority: containerGroupPriority,
+                registryAuthentication: containerRegistryAuthentication,
+                resources: createContainerResourceRequirements,
+              };
+
+              const countryCode = CountryCode.AF;
+
+              const containerGroupProbeExec: ContainerGroupProbeExec = {
+                command: ['command'],
+              };
+
+              const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
+                port: 18487,
+                service: 'service',
+              };
+
+              const containerGroupProbeHttpHeader: ContainerGroupProbeHttpHeader = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const httpScheme = HttpScheme.HTTP;
+
+              const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
+                headers: [containerGroupProbeHttpHeader],
+                path: 'path',
+                port: 9705,
+                scheme: httpScheme,
+              };
+
+              const containerGroupTcpProbe: ContainerGroupTcpProbe = {
+                port: 34387,
+              };
+
+              const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 3,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 400,
+                periodSeconds: 10,
+                successThreshold: 1,
+                tcp: containerGroupTcpProbe,
+                timeoutSeconds: 30,
+              };
+
+              const theContainerGroupNetworkingLoadBalancer = TheContainerGroupNetworkingLoadBalancer.ROUND_ROBIN;
+
+              const containerNetworkingProtocol = ContainerNetworkingProtocol.HTTP;
+
+              const createContainerGroupNetworking: CreateContainerGroupNetworking = {
+                auth: true,
+                clientRequestTimeout: 100000,
+                loadBalancer: theContainerGroupNetworkingLoadBalancer,
+                port: 60000,
+                protocol: containerNetworkingProtocol,
+                serverResponseTimeout: 100000,
+                singleConnectionLimit: true,
+              };
+
+              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
+                desiredQueueLength: 49,
+                maxReplicas: 39,
+                maxDownscalePerMinute: 90,
+                maxUpscalePerMinute: 94,
+                minReplicas: 22,
+                pollingPeriod: 1562,
+              };
+
+              const containerGroupQueueConnection: ContainerGroupQueueConnection = {
+                path: 'path',
+                port: 49382,
+                queueName: 'gdiudajp-56rw2k19rew4qfm5kv4vrafvvik8tvkaz2i3insi6uaioh5wfw',
+              };
+
+              const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 3,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 303,
+                periodSeconds: 1,
+                successThreshold: 1,
+                tcp: containerGroupTcpProbe,
+                timeoutSeconds: 1,
+              };
+
+              const containerRestartPolicy = ContainerRestartPolicy.ALWAYS;
+
+              const containerGroupStartupProbe: ContainerGroupStartupProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 15,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 867,
+                tcp: containerGroupTcpProbe,
+                periodSeconds: 3,
+                successThreshold: 2,
+                timeoutSeconds: 10,
+              };
+
+              const containerGroupCreationRequest: ContainerGroupCreationRequest = {
+                autostartPolicy: true,
+                container: containerConfiguration,
+                countryCodes: [countryCode],
+                displayName: 'Q1zk',
+                livenessProbe: containerGroupLivenessProbe,
+                name: 'name',
+                networking: createContainerGroupNetworking,
+                queueAutoscaler: queueBasedAutoscalerConfiguration,
+                queueConnection: containerGroupQueueConnection,
+                readinessProbe: containerGroupReadinessProbe,
+                replicas: 183,
+                restartPolicy: containerRestartPolicy,
+                startupProbe: containerGroupStartupProbe,
+              };
+
+              const { data } = await saladCloudSdk.containerGroups.createContainerGroup(
+                'acme-corp',
+                'dev-env',
+                containerGroupCreationRequest,
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -931,7 +960,7 @@ paths:
 
                 ContainerLoggingConfigurationHttp2 containerLoggingConfigurationHttp2 = ContainerLoggingConfigurationHttp2.builder()
                   .host("host")
-                  .port(27476L)
+                  .port(29750L)
                   .user("user")
                   .password("password")
                   .path("path")
@@ -950,7 +979,7 @@ paths:
 
                 TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
                   .host("host")
-                  .port(57864L)
+                  .port(21602L)
                   .build();
 
                 ContainerConfigurationLogging containerConfigurationLogging = ContainerConfigurationLogging.builder()
@@ -995,10 +1024,11 @@ paths:
 
                 CreateContainerResourceRequirements createContainerResourceRequirements =
                   CreateContainerResourceRequirements.builder()
-                    .cpu(3L)
-                    .memory(8228L)
+                    .cpu(9L)
+                    .memory(61137L)
                     .gpuClasses(gpuClassesList)
-                    .storageAmount(33477965281L)
+                    .storageAmount(50129523289L)
+                    .shmSize(64L)
                     .build();
 
                 ContainerConfiguration containerConfiguration = ContainerConfiguration.builder()
@@ -1019,7 +1049,7 @@ paths:
                 ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder().command(commandList1).build();
 
                 ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
-                  .port(51780L)
+                  .port(28667L)
                   .service("service")
                   .build();
 
@@ -1034,18 +1064,18 @@ paths:
                   ContainerGroupHttpProbeConfiguration.builder()
                     .headers(headersList1)
                     .path("path")
-                    .port(29760L)
+                    .port(53414L)
                     .scheme(HttpScheme.HTTP)
                     .build();
 
-                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(30705L).build();
+                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(62611L).build();
 
                 ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
                   .exec(containerGroupProbeExec)
                   .failureThreshold(3L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(971L)
+                  .initialDelaySeconds(67L)
                   .periodSeconds(10L)
                   .successThreshold(1L)
                   .tcp(containerGroupTcpProbe)
@@ -1053,28 +1083,28 @@ paths:
                   .build();
 
                 CreateContainerGroupNetworking createContainerGroupNetworking = CreateContainerGroupNetworking.builder()
-                  .auth(false)
+                  .auth(true)
                   .clientRequestTimeout(100000L)
                   .loadBalancer(TheContainerGroupNetworkingLoadBalancer.ROUND_ROBIN)
                   .port(60000L)
                   .protocol(ContainerNetworkingProtocol.HTTP)
                   .serverResponseTimeout(100000L)
-                  .singleConnectionLimit(false)
+                  .singleConnectionLimit(true)
                   .build();
 
                 QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
-                  .desiredQueueLength(75L)
-                  .maxReplicas(485L)
-                  .maxDownscalePerMinute(96L)
-                  .maxUpscalePerMinute(55L)
-                  .minReplicas(75L)
-                  .pollingPeriod(352L)
+                  .desiredQueueLength(22L)
+                  .maxReplicas(462L)
+                  .maxDownscalePerMinute(26L)
+                  .maxUpscalePerMinute(52L)
+                  .minReplicas(82L)
+                  .pollingPeriod(509L)
                   .build();
 
                 ContainerGroupQueueConnection containerGroupQueueConnection = ContainerGroupQueueConnection.builder()
                   .path("path")
-                  .port(55986L)
-                  .queueName("pgm5hjm451rnwhnwotbabfm2itldawq")
+                  .port(6006L)
+                  .queueName("oxniyomose4errderfez5m6znpd3zgutjsc-eeb9")
                   .build();
 
                 ContainerGroupReadinessProbe containerGroupReadinessProbe = ContainerGroupReadinessProbe.builder()
@@ -1082,7 +1112,7 @@ paths:
                   .failureThreshold(3L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(198L)
+                  .initialDelaySeconds(226L)
                   .periodSeconds(1L)
                   .successThreshold(1L)
                   .tcp(containerGroupTcpProbe)
@@ -1094,7 +1124,7 @@ paths:
                   .failureThreshold(15L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(172L)
+                  .initialDelaySeconds(1058L)
                   .tcp(containerGroupTcpProbe)
                   .periodSeconds(3L)
                   .successThreshold(2L)
@@ -1105,14 +1135,14 @@ paths:
                   .autostartPolicy(false)
                   .container(containerConfiguration)
                   .countryCodes(countryCodesList)
-                  .displayName("g knhYnV")
+                  .displayName("R81hlLvCDU")
                   .livenessProbe(containerGroupLivenessProbe)
                   .name("name")
                   .networking(createContainerGroupNetworking)
                   .queueAutoscaler(queueBasedAutoscalerConfiguration)
                   .queueConnection(containerGroupQueueConnection)
                   .readinessProbe(containerGroupReadinessProbe)
-                  .replicas(475L)
+                  .replicas(490L)
                   .restartPolicy(ContainerRestartPolicy.ALWAYS)
                   .startupProbe(containerGroupStartupProbe)
                   .build();
@@ -1127,260 +1157,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import {
-              ContainerConfiguration,
-              ContainerGroupCreationRequest,
-              ContainerGroupLivenessProbe,
-              ContainerGroupQueueConnection,
-              ContainerGroupReadinessProbe,
-              ContainerGroupStartupProbe,
-              ContainerRestartPolicy,
-              CountryCode,
-              CreateContainerGroupNetworking,
-              QueueBasedAutoscalerConfiguration,
-              SaladCloudSdk,
-            } from '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
-                host: 'host',
-                apiToken: 'api_token',
-                dataset: 'dataset',
-              };
-
-              const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
-                host: 'host',
-                apiKey: 'api_key',
-                tags: [datadogTagForContainerLogging],
-              };
-
-              const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
-
-              const containerLoggingHttpHeader: ContainerLoggingHttpHeader = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
-
-              const containerLoggingConfigurationHttp2: ContainerLoggingConfigurationHttp2 = {
-                host: 'host',
-                port: 6202,
-                user: 'user',
-                password: 'password',
-                path: 'path',
-                format: containerLoggingHttpFormat,
-                headers: [containerLoggingHttpHeader],
-                compression: containerLoggingHttpCompression,
-              };
-
-              const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
-                host: 'host',
-                ingestionKey: 'ingestion_key',
-              };
-
-              const containerLoggingSplunkConfiguration: ContainerLoggingSplunkConfiguration = {
-                host: 'host',
-                token: 'token',
-              };
-
-              const tcpLoggingConfiguration: TcpLoggingConfiguration = {
-                host: 'host',
-                port: 30603,
-              };
-
-              const containerConfigurationLogging: ContainerConfigurationLogging = {
-                axiom: axiomLoggingConfiguration,
-                datadog: datadogLoggingConfiguration,
-                http: containerLoggingConfigurationHttp2,
-                newRelic: newRelicLoggingConfiguration,
-                splunk: containerLoggingSplunkConfiguration,
-                tcp: tcpLoggingConfiguration,
-              };
-
-              const containerGroupPriority = ContainerGroupPriority.HIGH;
-
-              const containerRegistryAuthenticationAwsEcr: ContainerRegistryAuthenticationAwsEcr = {
-                accessKeyId: 'access_key_id',
-                secretAccessKey: 'secret_access_key',
-              };
-
-              const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
-                username: 'username',
-                password: 'password',
-              };
-
-              const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
-                username: 'username',
-                personalAccessToken: 'personal_access_token',
-              };
-
-              const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
-                serviceKey: 'service_key',
-              };
-
-              const containerRegistryAuthenticationGcpGcr: ContainerRegistryAuthenticationGcpGcr = {
-                serviceKey: 'service_key',
-              };
-
-              const containerRegistryAuthentication: ContainerRegistryAuthentication = {
-                awsEcr: containerRegistryAuthenticationAwsEcr,
-                basic: containerRegistryAuthenticationBasic,
-                dockerHub: containerRegistryAuthenticationDockerHub,
-                gcpGar: containerRegistryAuthenticationGcpGar,
-                gcpGcr: containerRegistryAuthenticationGcpGcr,
-              };
-
-              const createContainerResourceRequirements: CreateContainerResourceRequirements = {
-                cpu: 10,
-                memory: 23078,
-                gpuClasses: ['gpu_classes'],
-                storageAmount: 231563915044,
-              };
-
-              const containerConfiguration: ContainerConfiguration = {
-                command: ['command'],
-                environmentVariables: [],
-                image: 'acme/:latest',
-                imageCaching: true,
-                logging: containerConfigurationLogging,
-                priority: containerGroupPriority,
-                registryAuthentication: containerRegistryAuthentication,
-                resources: createContainerResourceRequirements,
-              };
-
-              const countryCode = CountryCode.AF;
-
-              const containerGroupProbeExec: ContainerGroupProbeExec = {
-                command: ['command'],
-              };
-
-              const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
-                port: 34795,
-                service: 'service',
-              };
-
-              const containerGroupProbeHttpHeader: ContainerGroupProbeHttpHeader = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const httpScheme = HttpScheme.HTTP;
-
-              const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
-                headers: [containerGroupProbeHttpHeader],
-                path: 'path',
-                port: 45356,
-                scheme: httpScheme,
-              };
-
-              const containerGroupTcpProbe: ContainerGroupTcpProbe = {
-                port: 9950,
-              };
-
-              const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 3,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 384,
-                periodSeconds: 10,
-                successThreshold: 1,
-                tcp: containerGroupTcpProbe,
-                timeoutSeconds: 30,
-              };
-
-              const theContainerGroupNetworkingLoadBalancer = TheContainerGroupNetworkingLoadBalancer.ROUND_ROBIN;
-
-              const containerNetworkingProtocol = ContainerNetworkingProtocol.HTTP;
-
-              const createContainerGroupNetworking: CreateContainerGroupNetworking = {
-                auth: true,
-                clientRequestTimeout: 100000,
-                loadBalancer: theContainerGroupNetworkingLoadBalancer,
-                port: 60000,
-                protocol: containerNetworkingProtocol,
-                serverResponseTimeout: 100000,
-                singleConnectionLimit: true,
-              };
-
-              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
-                desiredQueueLength: 37,
-                maxReplicas: 148,
-                maxDownscalePerMinute: 32,
-                maxUpscalePerMinute: 33,
-                minReplicas: 75,
-                pollingPeriod: 43,
-              };
-
-              const containerGroupQueueConnection: ContainerGroupQueueConnection = {
-                path: 'path',
-                port: 10125,
-                queueName: 'vq017tuzl',
-              };
-
-              const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 3,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 349,
-                periodSeconds: 1,
-                successThreshold: 1,
-                tcp: containerGroupTcpProbe,
-                timeoutSeconds: 1,
-              };
-
-              const containerRestartPolicy = ContainerRestartPolicy.ALWAYS;
-
-              const containerGroupStartupProbe: ContainerGroupStartupProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 15,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 1087,
-                tcp: containerGroupTcpProbe,
-                periodSeconds: 3,
-                successThreshold: 2,
-                timeoutSeconds: 10,
-              };
-
-              const containerGroupCreationRequest: ContainerGroupCreationRequest = {
-                autostartPolicy: true,
-                container: containerConfiguration,
-                countryCodes: [countryCode],
-                displayName: 'JRV',
-                livenessProbe: containerGroupLivenessProbe,
-                name: 'name',
-                networking: createContainerGroupNetworking,
-                queueAutoscaler: queueBasedAutoscalerConfiguration,
-                queueConnection: containerGroupQueueConnection,
-                readinessProbe: containerGroupReadinessProbe,
-                replicas: 343,
-                restartPolicy: containerRestartPolicy,
-                startupProbe: containerGroupStartupProbe,
-              };
-
-              const { data } = await saladCloudSdk.containerGroups.createContainerGroup(
-                'acme-corp',
-                'dev-env',
-                containerGroupCreationRequest,
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: >-
             using Salad.Cloud.SDK;
 
@@ -1401,8 +1177,8 @@ paths:
 
             var gpuClasses = new List<string>() { "gpu_classes" };
 
-            var resources = new CreateContainerResourceRequirements(10, 23078,
-            gpuClasses, 231563915044);
+            var resources = new CreateContainerResourceRequirements(2, 14670,
+            gpuClasses, 177143962838, 64);
 
             var command = new List<string>() { "command" };
 
@@ -1421,7 +1197,7 @@ paths:
             var headers = new List<ContainerLoggingHttpHeader>() { headersItem
             };
 
-            var http = new ContainerLoggingConfigurationHttp2("host", 6202,
+            var http = new ContainerLoggingConfigurationHttp2("host", 7688,
             ContainerLoggingHttpFormat.Json,
             ContainerLoggingHttpCompression.None, "user", "password", "path",
             headers);
@@ -1432,7 +1208,7 @@ paths:
             var splunk = new ContainerLoggingSplunkConfiguration("host",
             "token");
 
-            var tcp = new TcpLoggingConfiguration("host", 30603);
+            var tcp = new TcpLoggingConfiguration("host", 56390);
 
             var logging = new ContainerConfigurationLogging(axiom, datadog,
             http, newRelic, splunk, tcp);
@@ -1468,7 +1244,7 @@ paths:
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -1477,28 +1253,28 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var livenessProbe = new ContainerGroupLivenessProbe(3, 384, 10, 1,
+            var livenessProbe = new ContainerGroupLivenessProbe(3, 861, 10, 1,
             30, exec, grpc, http, tcp);
 
             var networking = new CreateContainerGroupNetworking(true, 60000,
             ContainerNetworkingProtocol.Http, 100000,
-            TheContainerGroupNetworkingLoadBalancer.RoundRobin, 100000, true);
+            TheContainerGroupNetworkingLoadBalancer.RoundRobin, 100000, false);
 
-            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(37, 148,
-            75, 32, 33, 43);
+            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(35, 98,
+            0, 65, 1, 356);
 
             var queueConnection = new ContainerGroupQueueConnection("path",
-            10125, "vq017tuzl");
+            60231, "rgn9p9agd07n1lxj");
 
             var command = new List<string>() { "command" };
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -1507,18 +1283,18 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var readinessProbe = new ContainerGroupReadinessProbe(3, 349, 1, 1,
+            var readinessProbe = new ContainerGroupReadinessProbe(3, 302, 1, 1,
             1, exec, grpc, http, tcp);
 
             var command = new List<string>() { "command" };
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -1527,15 +1303,15 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var startupProbe = new ContainerGroupStartupProbe(15, 1087, 3, 2,
-            10, exec, grpc, http, tcp);
+            var startupProbe = new ContainerGroupStartupProbe(15, 145, 3, 2, 10,
+            exec, grpc, http, tcp);
 
             var input = new ContainerGroupCreationRequest(true, container,
-            "name", 343, ContainerRestartPolicy.Always, countryCodes, "JRV",
+            "name", 108, ContainerRestartPolicy.Always, countryCodes, "Pgr",
             livenessProbe, networking, queueAutoscaler, queueConnection,
             readinessProbe, startupProbe);
 
@@ -1547,6 +1323,234 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            from salad_cloud_sdk.models import ContainerGroupCreationRequest
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            request_body = ContainerGroupCreationRequest(
+                autostart_policy=True,
+                container={
+                    "command": [
+                        "command"
+                    ],
+                    "environment_variables": {},
+                    "image": "acme/:latest",
+                    "image_caching": True,
+                    "logging": {
+                        "axiom": {
+                            "host": "host",
+                            "api_token": "api_token",
+                            "dataset": "dataset"
+                        },
+                        "datadog": {
+                            "host": "host",
+                            "api_key": "api_key",
+                            "tags": [
+                                {
+                                    "name": "name",
+                                    "value": "value"
+                                }
+                            ]
+                        },
+                        "http": {
+                            "host": "host",
+                            "port": 30450,
+                            "user": "user",
+                            "password": "password",
+                            "path": "path",
+                            "format": "json",
+                            "headers": [
+                                {
+                                    "name": "name",
+                                    "value": "value"
+                                }
+                            ],
+                            "compression": "none"
+                        },
+                        "new_relic": {
+                            "host": "host",
+                            "ingestion_key": "ingestion_key"
+                        },
+                        "splunk": {
+                            "host": "host",
+                            "token": "token"
+                        },
+                        "tcp": {
+                            "host": "host",
+                            "port": 64563
+                        }
+                    },
+                    "priority": "high",
+                    "registry_authentication": {
+                        "aws_ecr": {
+                            "access_key_id": "access_key_id",
+                            "secret_access_key": "secret_access_key"
+                        },
+                        "basic": {
+                            "username": "username",
+                            "password": "password"
+                        },
+                        "docker_hub": {
+                            "username": "username",
+                            "personal_access_token": "personal_access_token"
+                        },
+                        "gcp_gar": {
+                            "service_key": "service_key"
+                        },
+                        "gcp_gcr": {
+                            "service_key": "service_key"
+                        }
+                    },
+                    "resources": {
+                        "cpu": 7,
+                        "memory": 58281,
+                        "gpu_classes": [
+                            "gpu_classes"
+                        ],
+                        "storage_amount": 233909194963,
+                        "shm_size": 64
+                    }
+                },
+                country_codes=[
+                    "af"
+                ],
+                display_name="Q1zk",
+                liveness_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 3,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 400,
+                    "period_seconds": 10,
+                    "success_threshold": 1,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "timeout_seconds": 30
+                },
+                name="name",
+                networking={
+                    "auth": False,
+                    "client_request_timeout": 100000,
+                    "load_balancer": "round_robin",
+                    "port": 60000,
+                    "protocol": "http",
+                    "server_response_timeout": 100000,
+                    "single_connection_limit": True
+                },
+                queue_autoscaler={
+                    "desired_queue_length": 49,
+                    "max_replicas": 39,
+                    "max_downscale_per_minute": 90,
+                    "max_upscale_per_minute": 94,
+                    "min_replicas": 22,
+                    "polling_period": 1562
+                },
+                queue_connection={
+                    "path": "path",
+                    "port": 49382,
+                    "queue_name": "gdiudajp-56rw2k19rew4qfm5kv4vrafvvik8tvkaz2i3insi6uaioh5wfw"
+                },
+                readiness_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 3,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 303,
+                    "period_seconds": 1,
+                    "success_threshold": 1,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "timeout_seconds": 1
+                },
+                replicas=183,
+                restart_policy="always",
+                startup_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 15,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 867,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "period_seconds": 3,
+                    "success_threshold": 2,
+                    "timeout_seconds": 10
+                }
+            )
+
+
+            result = sdk.container_groups.create_container_group(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env"
+            )
+
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}:
     summary: Container Group
     description: Operations for a container group
@@ -1570,23 +1574,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.get_container_group(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -1614,6 +1601,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.getContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -1639,21 +1641,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.getContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -1676,6 +1663,23 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.get_container_group(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
     patch:
       operationId: update_container_group
       summary: Update Container Group
@@ -1698,215 +1702,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-            from salad_cloud_sdk.models import ContainerGroupPatch
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            request_body = ContainerGroupPatch(
-                display_name="JwDN9dJwtS",
-                container={
-                    "command": [
-                        "command"
-                    ],
-                    "environment_variables": {},
-                    "image": "image",
-                    "image_caching": True,
-                    "logging": {
-                        "axiom": {
-                            "host": "host",
-                            "api_token": "api_token",
-                            "dataset": "dataset"
-                        },
-                        "datadog": {
-                            "host": "host",
-                            "api_key": "api_key",
-                            "tags": [
-                                {
-                                    "name": "name",
-                                    "value": "value"
-                                }
-                            ]
-                        },
-                        "http": {
-                            "host": "host",
-                            "port": 23528,
-                            "user": "user",
-                            "password": "password",
-                            "path": "path",
-                            "format": "json",
-                            "headers": [
-                                {
-                                    "name": "name",
-                                    "value": "value"
-                                }
-                            ],
-                            "compression": "none"
-                        },
-                        "new_relic": {
-                            "host": "host",
-                            "ingestion_key": "ingestion_key"
-                        },
-                        "splunk": {
-                            "host": "host",
-                            "token": "token"
-                        },
-                        "tcp": {
-                            "host": "host",
-                            "port": 44539
-                        }
-                    },
-                    "priority": "high",
-                    "registry_authentication": {
-                        "aws_ecr": {
-                            "access_key_id": "access_key_id",
-                            "secret_access_key": "secret_access_key"
-                        },
-                        "basic": {
-                            "username": "username",
-                            "password": "password"
-                        },
-                        "docker_hub": {
-                            "username": "username",
-                            "personal_access_token": "personal_access_token"
-                        },
-                        "gcp_gar": {
-                            "service_key": "service_key"
-                        },
-                        "gcp_gcr": {
-                            "service_key": "service_key"
-                        }
-                    },
-                    "resources": {
-                        "cpu": 10,
-                        "memory": 27701,
-                        "gpu_classes": [
-                            "gpu_classes"
-                        ],
-                        "storage_amount": 261719208413
-                    }
-                },
-                replicas=411,
-                country_codes=[
-                    "af"
-                ],
-                networking={
-                    "port": 39984
-                },
-                liveness_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 3,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 150,
-                    "period_seconds": 10,
-                    "success_threshold": 1,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "timeout_seconds": 30
-                },
-                readiness_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 3,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 1001,
-                    "period_seconds": 1,
-                    "success_threshold": 1,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "timeout_seconds": 1
-                },
-                startup_probe={
-                    "exec_": {
-                        "command": [
-                            "command"
-                        ]
-                    },
-                    "failure_threshold": 15,
-                    "grpc": {
-                        "port": 20211,
-                        "service": "service"
-                    },
-                    "http": {
-                        "headers": [
-                            {
-                                "name": "name",
-                                "value": "value"
-                            }
-                        ],
-                        "path": "path",
-                        "port": 36714,
-                        "scheme": "http"
-                    },
-                    "initial_delay_seconds": 979,
-                    "tcp": {
-                        "port": 7155
-                    },
-                    "period_seconds": 3,
-                    "success_threshold": 2,
-                    "timeout_seconds": 10
-                },
-                queue_autoscaler={
-                    "desired_queue_length": 11,
-                    "max_replicas": 285,
-                    "max_downscale_per_minute": 33,
-                    "max_upscale_per_minute": 24,
-                    "min_replicas": 0,
-                    "polling_period": 1562
-                }
-            )
-
-            result = sdk.container_groups.update_container_group(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -2064,6 +1859,7 @@ paths:
               Memory: util.ToPointer(util.Nullable[int64]{ Value: int64(123) }),
               GpuClasses: []string{},
               StorageAmount: util.ToPointer(util.Nullable[int64]{ Value: int64(123) }),
+              ShmSize: util.ToPointer(util.Nullable[int64]{ Value: int64(123) }),
             }
 
 
@@ -2282,6 +2078,238 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import {
+              ContainerGroupLivenessProbe,
+              ContainerGroupPatch,
+              ContainerGroupReadinessProbe,
+              ContainerGroupStartupProbe,
+              CountryCode,
+              QueueBasedAutoscalerConfiguration,
+              SaladCloudSdk,
+              UpdateContainer,
+              UpdateContainerGroupNetworking,
+            } from '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
+                host: 'host',
+                apiToken: 'api_token',
+                dataset: 'dataset',
+              };
+
+              const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
+                host: 'host',
+                apiKey: 'api_key',
+                tags: [datadogTagForContainerLogging],
+              };
+
+              const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
+
+              const containerLoggingHttpHeader: ContainerLoggingHttpHeader = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
+
+              const containerLoggingConfigurationHttp1: ContainerLoggingConfigurationHttp1 = {
+                host: 'host',
+                port: 12748,
+                user: 'user',
+                password: 'password',
+                path: 'path',
+                format: containerLoggingHttpFormat,
+                headers: [containerLoggingHttpHeader],
+                compression: containerLoggingHttpCompression,
+              };
+
+              const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
+                host: 'host',
+                ingestionKey: 'ingestion_key',
+              };
+
+              const containerLoggingSplunkConfiguration: ContainerLoggingSplunkConfiguration = {
+                host: 'host',
+                token: 'token',
+              };
+
+              const tcpLoggingConfiguration: TcpLoggingConfiguration = {
+                host: 'host',
+                port: 64563,
+              };
+
+              const updateContainerLogging: UpdateContainerLogging = {
+                axiom: axiomLoggingConfiguration,
+                datadog: datadogLoggingConfiguration,
+                http: containerLoggingConfigurationHttp1,
+                newRelic: newRelicLoggingConfiguration,
+                splunk: containerLoggingSplunkConfiguration,
+                tcp: tcpLoggingConfiguration,
+              };
+
+              const containerGroupPriority = ContainerGroupPriority.HIGH;
+
+              const containerRegistryAuthenticationAwsEcr: ContainerRegistryAuthenticationAwsEcr = {
+                accessKeyId: 'access_key_id',
+                secretAccessKey: 'secret_access_key',
+              };
+
+              const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
+                username: 'username',
+                password: 'password',
+              };
+
+              const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
+                username: 'username',
+                personalAccessToken: 'personal_access_token',
+              };
+
+              const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
+                serviceKey: 'service_key',
+              };
+
+              const containerRegistryAuthenticationGcpGcr: ContainerRegistryAuthenticationGcpGcr = {
+                serviceKey: 'service_key',
+              };
+
+              const containerRegistryAuthentication: ContainerRegistryAuthentication = {
+                awsEcr: containerRegistryAuthenticationAwsEcr,
+                basic: containerRegistryAuthenticationBasic,
+                dockerHub: containerRegistryAuthenticationDockerHub,
+                gcpGar: containerRegistryAuthenticationGcpGar,
+                gcpGcr: containerRegistryAuthenticationGcpGcr,
+              };
+
+              const containerResourceUpdateSchema: ContainerResourceUpdateSchema = {
+                cpu: 14,
+                memory: 39731,
+                gpuClasses: ['gpu_classes'],
+                storageAmount: 148264203889,
+                shmSize: 64,
+              };
+
+              const updateContainer: UpdateContainer = {
+                command: ['command'],
+                environmentVariables: [],
+                image: 'image',
+                imageCaching: true,
+                logging: updateContainerLogging,
+                priority: containerGroupPriority,
+                registryAuthentication: containerRegistryAuthentication,
+                resources: containerResourceUpdateSchema,
+              };
+
+              const countryCode = CountryCode.AF;
+
+              const updateContainerGroupNetworking: UpdateContainerGroupNetworking = {
+                port: 19326,
+              };
+
+              const containerGroupProbeExec: ContainerGroupProbeExec = {
+                command: ['command'],
+              };
+
+              const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
+                port: 18487,
+                service: 'service',
+              };
+
+              const containerGroupProbeHttpHeader: ContainerGroupProbeHttpHeader = {
+                name: 'name',
+                value: 'value',
+              };
+
+              const httpScheme = HttpScheme.HTTP;
+
+              const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
+                headers: [containerGroupProbeHttpHeader],
+                path: 'path',
+                port: 9705,
+                scheme: httpScheme,
+              };
+
+              const containerGroupTcpProbe: ContainerGroupTcpProbe = {
+                port: 34387,
+              };
+
+              const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 3,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 400,
+                periodSeconds: 10,
+                successThreshold: 1,
+                tcp: containerGroupTcpProbe,
+                timeoutSeconds: 30,
+              };
+
+              const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 3,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 303,
+                periodSeconds: 1,
+                successThreshold: 1,
+                tcp: containerGroupTcpProbe,
+                timeoutSeconds: 1,
+              };
+
+              const containerGroupStartupProbe: ContainerGroupStartupProbe = {
+                exec: containerGroupProbeExec,
+                failureThreshold: 15,
+                grpc: containerGroupGRpcProbe,
+                http: containerGroupHttpProbeConfiguration,
+                initialDelaySeconds: 867,
+                tcp: containerGroupTcpProbe,
+                periodSeconds: 3,
+                successThreshold: 2,
+                timeoutSeconds: 10,
+              };
+
+              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
+                desiredQueueLength: 49,
+                maxReplicas: 39,
+                maxDownscalePerMinute: 90,
+                maxUpscalePerMinute: 94,
+                minReplicas: 22,
+                pollingPeriod: 1562,
+              };
+
+              const containerGroupPatch: ContainerGroupPatch = {
+                displayName: '-VfH6',
+                container: updateContainer,
+                replicas: 184,
+                countryCodes: [countryCode],
+                networking: updateContainerGroupNetworking,
+                livenessProbe: containerGroupLivenessProbe,
+                readinessProbe: containerGroupReadinessProbe,
+                startupProbe: containerGroupStartupProbe,
+                queueAutoscaler: queueBasedAutoscalerConfiguration,
+              };
+
+              const { data } = await saladCloudSdk.containerGroups.updateContainerGroup(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                containerGroupPatch,
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -2410,7 +2438,7 @@ paths:
 
                 ContainerLoggingConfigurationHttp1 containerLoggingConfigurationHttp1 = ContainerLoggingConfigurationHttp1.builder()
                   .host("host")
-                  .port(38126L)
+                  .port(34677L)
                   .user("user")
                   .password("password")
                   .path("path")
@@ -2429,7 +2457,7 @@ paths:
 
                 TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
                   .host("host")
-                  .port(57864L)
+                  .port(21602L)
                   .build();
 
                 UpdateContainerLogging updateContainerLogging = UpdateContainerLogging.builder()
@@ -2473,10 +2501,11 @@ paths:
                 List<String> gpuClassesList = Arrays.asList("gpu_classes");
 
                 ContainerResourceUpdateSchema containerResourceUpdateSchema = ContainerResourceUpdateSchema.builder()
-                  .cpu(14L)
-                  .memory(36905L)
+                  .cpu(2L)
+                  .memory(4272L)
                   .gpuClasses(gpuClassesList)
-                  .storageAmount(209586531533L)
+                  .storageAmount(47962159632L)
+                  .shmSize(64L)
                   .build();
 
                 UpdateContainer updateContainer = UpdateContainer.builder()
@@ -2493,7 +2522,7 @@ paths:
                 List<CountryCode> countryCodesList = Arrays.asList(CountryCode.AF);
 
                 UpdateContainerGroupNetworking updateContainerGroupNetworking = UpdateContainerGroupNetworking.builder()
-                  .port(62649L)
+                  .port(17663L)
                   .build();
 
                 List<String> commandList1 = Arrays.asList("command");
@@ -2501,7 +2530,7 @@ paths:
                 ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder().command(commandList1).build();
 
                 ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
-                  .port(51780L)
+                  .port(28667L)
                   .service("service")
                   .build();
 
@@ -2516,18 +2545,18 @@ paths:
                   ContainerGroupHttpProbeConfiguration.builder()
                     .headers(headersList1)
                     .path("path")
-                    .port(29760L)
+                    .port(53414L)
                     .scheme(HttpScheme.HTTP)
                     .build();
 
-                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(30705L).build();
+                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(62611L).build();
 
                 ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
                   .exec(containerGroupProbeExec)
                   .failureThreshold(3L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(971L)
+                  .initialDelaySeconds(67L)
                   .periodSeconds(10L)
                   .successThreshold(1L)
                   .tcp(containerGroupTcpProbe)
@@ -2539,7 +2568,7 @@ paths:
                   .failureThreshold(3L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(198L)
+                  .initialDelaySeconds(226L)
                   .periodSeconds(1L)
                   .successThreshold(1L)
                   .tcp(containerGroupTcpProbe)
@@ -2551,7 +2580,7 @@ paths:
                   .failureThreshold(15L)
                   .grpc(containerGroupGRpcProbe)
                   .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(172L)
+                  .initialDelaySeconds(1058L)
                   .tcp(containerGroupTcpProbe)
                   .periodSeconds(3L)
                   .successThreshold(2L)
@@ -2559,18 +2588,18 @@ paths:
                   .build();
 
                 QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
-                  .desiredQueueLength(75L)
-                  .maxReplicas(485L)
-                  .maxDownscalePerMinute(96L)
-                  .maxUpscalePerMinute(55L)
-                  .minReplicas(75L)
-                  .pollingPeriod(352L)
+                  .desiredQueueLength(22L)
+                  .maxReplicas(462L)
+                  .maxDownscalePerMinute(26L)
+                  .maxUpscalePerMinute(52L)
+                  .minReplicas(82L)
+                  .pollingPeriod(509L)
                   .build();
 
                 ContainerGroupPatch containerGroupPatch = ContainerGroupPatch.builder()
-                  .displayName("UJ2YjU")
+                  .displayName("e2ajyqqvL")
                   .container(updateContainer)
-                  .replicas(40L)
+                  .replicas(436L)
                   .countryCodes(countryCodesList)
                   .networking(updateContainerGroupNetworking)
                   .livenessProbe(containerGroupLivenessProbe)
@@ -2590,237 +2619,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import {
-              ContainerGroupLivenessProbe,
-              ContainerGroupPatch,
-              ContainerGroupReadinessProbe,
-              ContainerGroupStartupProbe,
-              CountryCode,
-              QueueBasedAutoscalerConfiguration,
-              SaladCloudSdk,
-              UpdateContainer,
-              UpdateContainerGroupNetworking,
-            } from '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
-                host: 'host',
-                apiToken: 'api_token',
-                dataset: 'dataset',
-              };
-
-              const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
-                host: 'host',
-                apiKey: 'api_key',
-                tags: [datadogTagForContainerLogging],
-              };
-
-              const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
-
-              const containerLoggingHttpHeader: ContainerLoggingHttpHeader = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
-
-              const containerLoggingConfigurationHttp1: ContainerLoggingConfigurationHttp1 = {
-                host: 'host',
-                port: 18756,
-                user: 'user',
-                password: 'password',
-                path: 'path',
-                format: containerLoggingHttpFormat,
-                headers: [containerLoggingHttpHeader],
-                compression: containerLoggingHttpCompression,
-              };
-
-              const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
-                host: 'host',
-                ingestionKey: 'ingestion_key',
-              };
-
-              const containerLoggingSplunkConfiguration: ContainerLoggingSplunkConfiguration = {
-                host: 'host',
-                token: 'token',
-              };
-
-              const tcpLoggingConfiguration: TcpLoggingConfiguration = {
-                host: 'host',
-                port: 30603,
-              };
-
-              const updateContainerLogging: UpdateContainerLogging = {
-                axiom: axiomLoggingConfiguration,
-                datadog: datadogLoggingConfiguration,
-                http: containerLoggingConfigurationHttp1,
-                newRelic: newRelicLoggingConfiguration,
-                splunk: containerLoggingSplunkConfiguration,
-                tcp: tcpLoggingConfiguration,
-              };
-
-              const containerGroupPriority = ContainerGroupPriority.HIGH;
-
-              const containerRegistryAuthenticationAwsEcr: ContainerRegistryAuthenticationAwsEcr = {
-                accessKeyId: 'access_key_id',
-                secretAccessKey: 'secret_access_key',
-              };
-
-              const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
-                username: 'username',
-                password: 'password',
-              };
-
-              const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
-                username: 'username',
-                personalAccessToken: 'personal_access_token',
-              };
-
-              const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
-                serviceKey: 'service_key',
-              };
-
-              const containerRegistryAuthenticationGcpGcr: ContainerRegistryAuthenticationGcpGcr = {
-                serviceKey: 'service_key',
-              };
-
-              const containerRegistryAuthentication: ContainerRegistryAuthentication = {
-                awsEcr: containerRegistryAuthenticationAwsEcr,
-                basic: containerRegistryAuthenticationBasic,
-                dockerHub: containerRegistryAuthenticationDockerHub,
-                gcpGar: containerRegistryAuthenticationGcpGar,
-                gcpGcr: containerRegistryAuthenticationGcpGcr,
-              };
-
-              const containerResourceUpdateSchema: ContainerResourceUpdateSchema = {
-                cpu: 11,
-                memory: 14598,
-                gpuClasses: ['gpu_classes'],
-                storageAmount: 182679295944,
-              };
-
-              const updateContainer: UpdateContainer = {
-                command: ['command'],
-                environmentVariables: [],
-                image: 'image',
-                imageCaching: true,
-                logging: updateContainerLogging,
-                priority: containerGroupPriority,
-                registryAuthentication: containerRegistryAuthentication,
-                resources: containerResourceUpdateSchema,
-              };
-
-              const countryCode = CountryCode.AF;
-
-              const updateContainerGroupNetworking: UpdateContainerGroupNetworking = {
-                port: 39054,
-              };
-
-              const containerGroupProbeExec: ContainerGroupProbeExec = {
-                command: ['command'],
-              };
-
-              const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
-                port: 34795,
-                service: 'service',
-              };
-
-              const containerGroupProbeHttpHeader: ContainerGroupProbeHttpHeader = {
-                name: 'name',
-                value: 'value',
-              };
-
-              const httpScheme = HttpScheme.HTTP;
-
-              const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
-                headers: [containerGroupProbeHttpHeader],
-                path: 'path',
-                port: 45356,
-                scheme: httpScheme,
-              };
-
-              const containerGroupTcpProbe: ContainerGroupTcpProbe = {
-                port: 9950,
-              };
-
-              const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 3,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 384,
-                periodSeconds: 10,
-                successThreshold: 1,
-                tcp: containerGroupTcpProbe,
-                timeoutSeconds: 30,
-              };
-
-              const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 3,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 349,
-                periodSeconds: 1,
-                successThreshold: 1,
-                tcp: containerGroupTcpProbe,
-                timeoutSeconds: 1,
-              };
-
-              const containerGroupStartupProbe: ContainerGroupStartupProbe = {
-                exec: containerGroupProbeExec,
-                failureThreshold: 15,
-                grpc: containerGroupGRpcProbe,
-                http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 1087,
-                tcp: containerGroupTcpProbe,
-                periodSeconds: 3,
-                successThreshold: 2,
-                timeoutSeconds: 10,
-              };
-
-              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
-                desiredQueueLength: 37,
-                maxReplicas: 148,
-                maxDownscalePerMinute: 32,
-                maxUpscalePerMinute: 33,
-                minReplicas: 75,
-                pollingPeriod: 43,
-              };
-
-              const containerGroupPatch: ContainerGroupPatch = {
-                displayName: 'J4KFGjbt3',
-                container: updateContainer,
-                replicas: 144,
-                countryCodes: [countryCode],
-                networking: updateContainerGroupNetworking,
-                livenessProbe: containerGroupLivenessProbe,
-                readinessProbe: containerGroupReadinessProbe,
-                startupProbe: containerGroupStartupProbe,
-                queueAutoscaler: queueBasedAutoscalerConfiguration,
-              };
-
-              const { data } = await saladCloudSdk.containerGroups.updateContainerGroup(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                containerGroupPatch,
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: >-
             using Salad.Cloud.SDK;
 
@@ -2856,7 +2654,7 @@ paths:
             var headers = new List<ContainerLoggingHttpHeader>() { headersItem
             };
 
-            var http = new ContainerLoggingConfigurationHttp1("host", 18756,
+            var http = new ContainerLoggingConfigurationHttp1("host", 61051,
             ContainerLoggingHttpFormat.Json, headers,
             ContainerLoggingHttpCompression.None, "user", "password", "path");
 
@@ -2866,7 +2664,7 @@ paths:
             var splunk = new ContainerLoggingSplunkConfiguration("host",
             "token");
 
-            var tcp = new TcpLoggingConfiguration("host", 30603);
+            var tcp = new TcpLoggingConfiguration("host", 56390);
 
             var logging = new UpdateContainerLogging(axiom, datadog, http,
             newRelic, splunk, tcp);
@@ -2894,8 +2692,8 @@ paths:
 
             var gpuClasses = new List<string>() { "gpu_classes" };
 
-            var resources = new ContainerResourceUpdateSchema(11, 14598,
-            gpuClasses, 182679295944);
+            var resources = new ContainerResourceUpdateSchema(10, 46660,
+            gpuClasses, 268136673469, 64);
 
             var container = new UpdateContainer(command, new object(), "image",
             true, logging, ContainerGroupPriority.High, registryAuthentication,
@@ -2903,13 +2701,13 @@ paths:
 
             var countryCodes = new List<CountryCode>() { CountryCode.Af };
 
-            var networking = new UpdateContainerGroupNetworking(39054);
+            var networking = new UpdateContainerGroupNetworking(42347);
 
             var command = new List<string>() { "command" };
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -2918,18 +2716,18 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var livenessProbe = new ContainerGroupLivenessProbe(3, 384, 10, 1,
+            var livenessProbe = new ContainerGroupLivenessProbe(3, 861, 10, 1,
             30, exec, grpc, http, tcp);
 
             var command = new List<string>() { "command" };
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -2938,18 +2736,18 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var readinessProbe = new ContainerGroupReadinessProbe(3, 349, 1, 1,
+            var readinessProbe = new ContainerGroupReadinessProbe(3, 302, 1, 1,
             1, exec, grpc, http, tcp);
 
             var command = new List<string>() { "command" };
 
             var exec = new ContainerGroupProbeExec(command);
 
-            var grpc = new ContainerGroupGRpcProbe(34795, "service");
+            var grpc = new ContainerGroupGRpcProbe(10814, "service");
 
             var headersItem = new ContainerGroupProbeHttpHeader("name",
             "value");
@@ -2958,17 +2756,17 @@ paths:
             headersItem };
 
             var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            45356, HttpScheme.Http);
+            1285, HttpScheme.Http);
 
-            var tcp = new ContainerGroupTcpProbe(9950);
+            var tcp = new ContainerGroupTcpProbe(57458);
 
-            var startupProbe = new ContainerGroupStartupProbe(15, 1087, 3, 2,
-            10, exec, grpc, http, tcp);
+            var startupProbe = new ContainerGroupStartupProbe(15, 145, 3, 2, 10,
+            exec, grpc, http, tcp);
 
-            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(37, 148,
-            75, 32, 33, 43);
+            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(35, 98,
+            0, 65, 1, 356);
 
-            var input = new ContainerGroupPatch("J4KFGjbt3", container, 144,
+            var input = new ContainerGroupPatch("ojx", container, 223,
             countryCodes, networking, livenessProbe, readinessProbe,
             startupProbe, queueAutoscaler);
 
@@ -2980,6 +2778,216 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+            from salad_cloud_sdk.models import ContainerGroupPatch
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            request_body = ContainerGroupPatch(
+                display_name="-VfH6",
+                container={
+                    "command": [
+                        "command"
+                    ],
+                    "environment_variables": {},
+                    "image": "image",
+                    "image_caching": True,
+                    "logging": {
+                        "axiom": {
+                            "host": "host",
+                            "api_token": "api_token",
+                            "dataset": "dataset"
+                        },
+                        "datadog": {
+                            "host": "host",
+                            "api_key": "api_key",
+                            "tags": [
+                                {
+                                    "name": "name",
+                                    "value": "value"
+                                }
+                            ]
+                        },
+                        "http": {
+                            "host": "host",
+                            "port": 12748,
+                            "user": "user",
+                            "password": "password",
+                            "path": "path",
+                            "format": "json",
+                            "headers": [
+                                {
+                                    "name": "name",
+                                    "value": "value"
+                                }
+                            ],
+                            "compression": "none"
+                        },
+                        "new_relic": {
+                            "host": "host",
+                            "ingestion_key": "ingestion_key"
+                        },
+                        "splunk": {
+                            "host": "host",
+                            "token": "token"
+                        },
+                        "tcp": {
+                            "host": "host",
+                            "port": 64563
+                        }
+                    },
+                    "priority": "high",
+                    "registry_authentication": {
+                        "aws_ecr": {
+                            "access_key_id": "access_key_id",
+                            "secret_access_key": "secret_access_key"
+                        },
+                        "basic": {
+                            "username": "username",
+                            "password": "password"
+                        },
+                        "docker_hub": {
+                            "username": "username",
+                            "personal_access_token": "personal_access_token"
+                        },
+                        "gcp_gar": {
+                            "service_key": "service_key"
+                        },
+                        "gcp_gcr": {
+                            "service_key": "service_key"
+                        }
+                    },
+                    "resources": {
+                        "cpu": 14,
+                        "memory": 39731,
+                        "gpu_classes": [
+                            "gpu_classes"
+                        ],
+                        "storage_amount": 148264203889,
+                        "shm_size": 64
+                    }
+                },
+                replicas=184,
+                country_codes=[
+                    "af"
+                ],
+                networking={
+                    "port": 19326
+                },
+                liveness_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 3,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 400,
+                    "period_seconds": 10,
+                    "success_threshold": 1,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "timeout_seconds": 30
+                },
+                readiness_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 3,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 303,
+                    "period_seconds": 1,
+                    "success_threshold": 1,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "timeout_seconds": 1
+                },
+                startup_probe={
+                    "exec_": {
+                        "command": [
+                            "command"
+                        ]
+                    },
+                    "failure_threshold": 15,
+                    "grpc": {
+                        "port": 18487,
+                        "service": "service"
+                    },
+                    "http": {
+                        "headers": [
+                            {
+                                "name": "name",
+                                "value": "value"
+                            }
+                        ],
+                        "path": "path",
+                        "port": 9705,
+                        "scheme": "http"
+                    },
+                    "initial_delay_seconds": 867,
+                    "tcp": {
+                        "port": 34387
+                    },
+                    "period_seconds": 3,
+                    "success_threshold": 2,
+                    "timeout_seconds": 10
+                },
+                queue_autoscaler={
+                    "desired_queue_length": 49,
+                    "max_replicas": 39,
+                    "max_downscale_per_minute": 90,
+                    "max_upscale_per_minute": 94,
+                    "min_replicas": 22,
+                    "polling_period": 1562
+                }
+            )
+
+            result = sdk.container_groups.update_container_group(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
     delete:
       operationId: delete_container_group
       summary: Delete Container Group
@@ -2998,23 +3006,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.delete_container_group(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -3042,6 +3033,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.deleteContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -3063,21 +3069,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.deleteContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -3096,6 +3087,23 @@ paths:
             await client.ContainerGroups.DeleteContainerGroupAsync("acme-corp",
             "dev-env", "mandlebrot");
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.delete_container_group(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/errors:
     summary: Workload Errors
     description: Operations for workload errors
@@ -3242,23 +3250,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.start_container_group(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -3286,6 +3277,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.startContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -3307,21 +3313,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.startContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -3340,6 +3331,23 @@ paths:
             await client.ContainerGroups.StartContainerGroupAsync("acme-corp",
             "dev-env", "mandlebrot");
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.start_container_group(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/stop:
     summary: Container Group
     description: Operations for a container group
@@ -3365,23 +3373,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.stop_container_group(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -3409,6 +3400,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.stopContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -3430,21 +3436,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.stopContainerGroup('acme-corp', 'dev-env', 'mandlebrot');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -3463,6 +3454,23 @@ paths:
             await client.ContainerGroups.StopContainerGroupAsync("acme-corp",
             "dev-env", "mandlebrot");
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.stop_container_group(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances:
     summary: Container Group Instances
     description: Operations for container group instances
@@ -3487,23 +3495,6 @@ paths:
         - container_groups
       x-codeSamples:
         - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.container_groups.list_container_group_instances(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot"
-            )
-
-            print(result)
-          lang: Python
-        - source: |-
             import (
               "fmt"
               "encoding/json"
@@ -3522,6 +3513,25 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.listContainerGroupInstances(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3552,25 +3562,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.listContainerGroupInstances(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -3593,6 +3584,23 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.container_groups.list_container_group_instances(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}:
     summary: Container Group Instance
     description: Operations for a container group instance
@@ -3617,27 +3625,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            result = sdk.container_groups.get_container_group_instance(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot",
-                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
-            )
-
-
-            print(result)
-          lang: Python
         - source: |-
             import (
               "fmt"
@@ -3657,6 +3644,26 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.getContainerGroupInstance(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3688,26 +3695,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.getContainerGroupInstance(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -3730,6 +3717,27 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            result = sdk.container_groups.get_container_group_instance(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot",
+                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
+            )
+
+
+            print(result)
+          lang: Python
     patch:
       operationId: update_container_group_instance
       summary: Update Container Group Instance
@@ -3752,35 +3760,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            from salad_cloud_sdk.models import ContainerGroupInstancePatch
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            request_body = ContainerGroupInstancePatch(
-                deletion_cost=64506
-            )
-
-
-            result = sdk.container_groups.update_container_group_instance(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot",
-                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
-            )
-
-
-            print(result)
-          lang: Python
         - source: |-
             import (
               "fmt"
@@ -3807,6 +3786,31 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { ContainerGroupInstancePatch, SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const containerGroupInstancePatch: ContainerGroupInstancePatch = {
+                deletionCost: 72277,
+              };
+
+              const { data } = await saladCloudSdk.containerGroups.updateContainerGroupInstance(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
+                containerGroupInstancePatch,
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -3828,7 +3832,7 @@ paths:
                 SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
                 ContainerGroupInstancePatch containerGroupInstancePatch = ContainerGroupInstancePatch.builder()
-                  .deletionCost(26090L)
+                  .deletionCost(54318L)
                   .build();
 
                 ContainerGroupInstance response = saladCloudSdk.containerGroups.updateContainerGroupInstance(
@@ -3843,31 +3847,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { ContainerGroupInstancePatch, SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const containerGroupInstancePatch: ContainerGroupInstancePatch = {
-                deletionCost: 362,
-              };
-
-              const { data } = await saladCloudSdk.containerGroups.updateContainerGroupInstance(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
-                containerGroupInstancePatch,
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: >-
             using Salad.Cloud.SDK;
 
@@ -3886,7 +3865,7 @@ paths:
             var client = new SaladCloudSdkClient(config);
 
 
-            var input = new ContainerGroupInstancePatch(362);
+            var input = new ContainerGroupInstancePatch(75683);
 
 
             var response = await
@@ -3897,6 +3876,35 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            from salad_cloud_sdk.models import ContainerGroupInstancePatch
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            request_body = ContainerGroupInstancePatch(
+                deletion_cost=72277
+            )
+
+
+            result = sdk.container_groups.update_container_group_instance(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot",
+                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
+            )
+
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/reallocate:
     summary: Container Group Instance
     description: Operations for a container group instance
@@ -3921,27 +3929,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            result = sdk.container_groups.reallocate_container_group_instance(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot",
-                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
-            )
-
-
-            print(result)
-          lang: Python
         - source: |-
             import (
               "fmt"
@@ -3961,6 +3948,26 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.reallocateContainerGroupInstance(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3987,26 +3994,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.reallocateContainerGroupInstance(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: |-
             using Salad.Cloud.SDK;
             using Salad.Cloud.SDK.Config;
@@ -4020,6 +4007,27 @@ paths:
 
             await client.ContainerGroups.ReallocateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            result = sdk.container_groups.reallocate_container_group_instance(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot",
+                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
+            )
+
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/recreate:
     summary: Container Group Instance
     description: Operations for a container group instance
@@ -4045,27 +4053,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            result = sdk.container_groups.recreate_container_group_instance(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot",
-                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
-            )
-
-
-            print(result)
-          lang: Python
         - source: |-
             import (
               "fmt"
@@ -4085,6 +4072,26 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.recreateContainerGroupInstance(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4111,26 +4118,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.recreateContainerGroupInstance(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: |-
             using Salad.Cloud.SDK;
             using Salad.Cloud.SDK.Config;
@@ -4144,6 +4131,27 @@ paths:
 
             await client.ContainerGroups.RecreateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            result = sdk.container_groups.recreate_container_group_instance(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot",
+                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
+            )
+
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances/{container_group_instance_id}/restart:
     summary: Container Group Instance
     description: Operations for a container group instance
@@ -4168,27 +4176,6 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: >-
-            from salad_cloud_sdk import SaladCloudSdk
-
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-
-            result = sdk.container_groups.restart_container_group_instance(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                container_group_name="mandlebrot",
-                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
-            )
-
-
-            print(result)
-          lang: Python
         - source: |-
             import (
               "fmt"
@@ -4208,6 +4195,26 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.containerGroups.restartContainerGroupInstance(
+                'acme-corp',
+                'dev-env',
+                'mandlebrot',
+                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4234,26 +4241,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.containerGroups.restartContainerGroupInstance(
-                'acme-corp',
-                'dev-env',
-                'mandlebrot',
-                'db3a4591-efc3-46c0-b06a-3d820c0ec100',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: |-
             using Salad.Cloud.SDK;
             using Salad.Cloud.SDK.Config;
@@ -4267,6 +4254,27 @@ paths:
 
             await client.ContainerGroups.RestartContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
           lang: C#
+        - source: >-
+            from salad_cloud_sdk import SaladCloudSdk
+
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+
+            result = sdk.container_groups.restart_container_group_instance(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                container_group_name="mandlebrot",
+                container_group_instance_id="db3a4591-efc3-46c0-b06a-3d820c0ec100"
+            )
+
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/queues:
     summary: Queues
     description: Operations for queues
@@ -4289,22 +4297,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.list_queues(
-                organization_name="acme-corp",
-                project_name="dev-env"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -4331,6 +4323,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.listQueues('acme-corp', 'dev-env');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -4356,21 +4363,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.listQueues('acme-corp', 'dev-env');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -4392,6 +4384,22 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.list_queues(
+                organization_name="acme-corp",
+                project_name="dev-env"
+            )
+
+            print(result)
+          lang: Python
     post:
       operationId: create_queue
       summary: Create Queue
@@ -4412,30 +4420,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-            from salad_cloud_sdk.models import QueuePrototype
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            request_body = QueuePrototype(
-                name="name",
-                display_name="I8,6",
-                description="description"
-            )
-
-            result = sdk.queues.create_queue(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -4471,6 +4455,27 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { QueuePrototype, SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const queuePrototype: QueuePrototype = {
+                name: 'name',
+                displayName: 'ZK',
+                description: 'description',
+              };
+
+              const { data } = await saladCloudSdk.queues.createQueue('acme-corp', 'dev-env', queuePrototype);
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -4493,7 +4498,7 @@ paths:
 
                 QueuePrototype queuePrototype = QueuePrototype.builder()
                   .name("name")
-                  .displayName("tSVsIBN8O5On")
+                  .displayName("5h")
                   .description("description")
                   .build();
 
@@ -4503,27 +4508,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { QueuePrototype, SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const queuePrototype: QueuePrototype = {
-                name: 'name',
-                displayName: 'gH1J1Lwjx',
-                description: 'description',
-              };
-
-              const { data } = await saladCloudSdk.queues.createQueue('acme-corp', 'dev-env', queuePrototype);
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: >-
             using Salad.Cloud.SDK;
 
@@ -4542,7 +4526,7 @@ paths:
             var client = new SaladCloudSdkClient(config);
 
 
-            var input = new QueuePrototype("name", "gH1J1Lwjx", "description");
+            var input = new QueuePrototype("name", "NEdv", "description");
 
 
             var response = await client.Queues.CreateQueueAsync(input,
@@ -4551,6 +4535,30 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+            from salad_cloud_sdk.models import QueuePrototype
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            request_body = QueuePrototype(
+                name="name",
+                display_name="ZK",
+                description="description"
+            )
+
+            result = sdk.queues.create_queue(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/queues/{queue_name}:
     summary: Queue
     description: Operations for a queue
@@ -4574,23 +4582,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.get_queue(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -4617,6 +4608,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.getQueue('acme-corp', 'dev-env', 'fifo-queue');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -4642,21 +4648,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.getQueue('acme-corp', 'dev-env', 'fifo-queue');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -4678,6 +4669,23 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.get_queue(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue"
+            )
+
+            print(result)
+          lang: Python
     patch:
       operationId: update_queue
       summary: Update Queue
@@ -4698,30 +4706,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-            from salad_cloud_sdk.models import QueuePatch
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            request_body = QueuePatch(
-                display_name="iy1",
-                description="description"
-            )
-
-            result = sdk.queues.update_queue(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -4756,6 +4740,26 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { QueuePatch, SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const queuePatch: QueuePatch = {
+                displayName: '9JRVzVfkJ4',
+                description: 'description',
+              };
+
+              const { data } = await saladCloudSdk.queues.updateQueue('acme-corp', 'dev-env', 'fifo-queue', queuePatch);
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -4776,7 +4780,7 @@ paths:
 
                 SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
-                QueuePatch queuePatch = QueuePatch.builder().displayName("axw").description("description").build();
+                QueuePatch queuePatch = QueuePatch.builder().displayName("a83U5a").description("description").build();
 
                 Queue response = saladCloudSdk.queues.updateQueue("acme-corp", "dev-env", "fifo-queue", queuePatch);
 
@@ -4784,26 +4788,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { QueuePatch, SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const queuePatch: QueuePatch = {
-                displayName: 'N,',
-                description: 'description',
-              };
-
-              const { data } = await saladCloudSdk.queues.updateQueue('acme-corp', 'dev-env', 'fifo-queue', queuePatch);
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: >-
             using Salad.Cloud.SDK;
 
@@ -4822,7 +4806,7 @@ paths:
             var client = new SaladCloudSdkClient(config);
 
 
-            var input = new QueuePatch("N,", "description");
+            var input = new QueuePatch("NUUZxsuy", "description");
 
 
             var response = await client.Queues.UpdateQueueAsync(input,
@@ -4831,6 +4815,30 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+            from salad_cloud_sdk.models import QueuePatch
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            request_body = QueuePatch(
+                display_name="9JRVzVfkJ4",
+                description="description"
+            )
+
+            result = sdk.queues.update_queue(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue"
+            )
+
+            print(result)
+          lang: Python
     delete:
       operationId: delete_queue
       summary: Delete Queue
@@ -4847,23 +4855,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.delete_queue(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -4890,6 +4881,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.deleteQueue('acme-corp', 'dev-env', 'fifo-queue');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -4911,21 +4917,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.deleteQueue('acme-corp', 'dev-env', 'fifo-queue');
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -4944,6 +4935,23 @@ paths:
             await client.Queues.DeleteQueueAsync("acme-corp", "dev-env",
             "fifo-queue");
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.delete_queue(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs:
     summary: Jobs in a Queue
     description: Operations for jobs in a queue
@@ -4970,25 +4978,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.list_queue_jobs(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue",
-                page=1,
-                page_size=1
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -5022,6 +5011,24 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.listQueueJobs('acme-corp', 'dev-env', 'fifo-queue', {
+                page: 1,
+                pageSize: 1,
+              });
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5057,24 +5064,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.listQueueJobs('acme-corp', 'dev-env', 'fifo-queue', {
-                page: 1,
-                pageSize: 1,
-              });
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -5096,6 +5085,25 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.list_queue_jobs(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue",
+                page=1,
+                page_size=1
+            )
+
+            print(result)
+          lang: Python
     post:
       operationId: create_queue_job
       summary: Create Job
@@ -5116,31 +5124,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-            from salad_cloud_sdk.models import QueueJobPrototype
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            request_body = QueueJobPrototype(
-                input="",
-                metadata={},
-                webhook="webhook"
-            )
-
-            result = sdk.queues.create_queue_job(
-                request_body=request_body,
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -5176,6 +5159,27 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { QueueJobPrototype, SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const queueJobPrototype: QueueJobPrototype = {
+                input: [],
+                metadata: {},
+                webhook: 'webhook',
+              };
+
+              const { data } = await saladCloudSdk.queues.createQueueJob('acme-corp', 'dev-env', 'fifo-queue', queueJobPrototype);
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -5209,27 +5213,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { QueueJobPrototype, SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const queueJobPrototype: QueueJobPrototype = {
-                input: [],
-                metadata: {},
-                webhook: 'webhook',
-              };
-
-              const { data } = await saladCloudSdk.queues.createQueueJob('acme-corp', 'dev-env', 'fifo-queue', queueJobPrototype);
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -5257,6 +5240,31 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+            from salad_cloud_sdk.models import QueueJobPrototype
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            request_body = QueueJobPrototype(
+                input="",
+                metadata={},
+                webhook="webhook"
+            )
+
+            result = sdk.queues.create_queue_job(
+                request_body=request_body,
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/projects/{project_name}/queues/{queue_name}/jobs/{queue_job_id}:
     summary: Jobs in a Queue
     description: Operations for jobs in a queue
@@ -5281,24 +5289,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.get_queue_job(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue",
-                queue_job_id="7dcd6922-50e9-4d56-89b5-91cde26f0211"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -5324,6 +5314,26 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.getQueueJob(
+                'acme-corp',
+                'dev-env',
+                'fifo-queue',
+                '7dcd6922-50e9-4d56-89b5-91cde26f0211',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5355,26 +5365,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.getQueueJob(
-                'acme-corp',
-                'dev-env',
-                'fifo-queue',
-                '7dcd6922-50e9-4d56-89b5-91cde26f0211',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -5396,6 +5386,24 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.get_queue_job(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue",
+                queue_job_id="7dcd6922-50e9-4d56-89b5-91cde26f0211"
+            )
+
+            print(result)
+          lang: Python
     delete:
       operationId: delete_queue_job
       summary: Delete Job
@@ -5412,24 +5420,6 @@ paths:
       tags:
         - queues
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.queues.delete_queue_job(
-                organization_name="acme-corp",
-                project_name="dev-env",
-                queue_name="fifo-queue",
-                queue_job_id="7dcd6922-50e9-4d56-89b5-91cde26f0211"
-            )
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -5456,6 +5446,26 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.queues.deleteQueueJob(
+                'acme-corp',
+                'dev-env',
+                'fifo-queue',
+                '7dcd6922-50e9-4d56-89b5-91cde26f0211',
+              );
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -5477,26 +5487,6 @@ paths:
             }
           lang: Java
         - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.queues.deleteQueueJob(
-                'acme-corp',
-                'dev-env',
-                'fifo-queue',
-                '7dcd6922-50e9-4d56-89b5-91cde26f0211',
-              );
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
             using Salad.Cloud.SDK;
 
             using Salad.Cloud.SDK.Config;
@@ -5515,6 +5505,24 @@ paths:
             await client.Queues.DeleteQueueJobAsync("acme-corp", "dev-env",
             "fifo-queue", "7dcd6922-50e9-4d56-89b5-91cde26f0211");
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.queues.delete_queue_job(
+                organization_name="acme-corp",
+                project_name="dev-env",
+                queue_name="fifo-queue",
+                queue_job_id="7dcd6922-50e9-4d56-89b5-91cde26f0211"
+            )
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/quotas:
     summary: Quotas
     description: Operations for quotas
@@ -5536,19 +5544,6 @@ paths:
       tags:
         - quotas
       x-codeSamples:
-        - source: |-
-            from salad_cloud_sdk import SaladCloudSdk
-
-            sdk = SaladCloudSdk(
-                api_key="YOUR_API_KEY",
-                api_key_header="YOUR_API_KEY_HEADER",
-                timeout=10000
-            )
-
-            result = sdk.quotas.get_quotas(organization_name="acme-corp")
-
-            print(result)
-          lang: Python
         - source: >-
             import (
               "fmt"
@@ -5575,6 +5570,21 @@ paths:
             fmt.Println(response)
           lang: Go
         - source: >-
+            import { SaladCloudSdk } from
+            '@saladtechnologies-oss/salad-cloud-sdk';
+
+
+            (async () => {
+              const saladCloudSdk = new SaladCloudSdk({
+                apiKey: 'YOUR_API_KEY',
+              });
+
+              const { data } = await saladCloudSdk.quotas.getQuotas('acme-corp');
+
+              console.log(data);
+            })();
+          lang: TypeScript
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -5599,21 +5609,6 @@ paths:
               }
             }
           lang: Java
-        - source: >-
-            import { SaladCloudSdk } from
-            '@saladtechnologies-oss/salad-cloud-sdk';
-
-
-            (async () => {
-              const saladCloudSdk = new SaladCloudSdk({
-                apiKey: 'YOUR_API_KEY',
-              });
-
-              const { data } = await saladCloudSdk.quotas.getQuotas('acme-corp');
-
-              console.log(data);
-            })();
-          lang: TypeScript
         - source: |-
             using Salad.Cloud.SDK;
             using Salad.Cloud.SDK.Config;
@@ -5629,6 +5624,19 @@ paths:
 
             Console.WriteLine(response);
           lang: C#
+        - source: |-
+            from salad_cloud_sdk import SaladCloudSdk
+
+            sdk = SaladCloudSdk(
+                api_key="YOUR_API_KEY",
+                api_key_header="YOUR_API_KEY_HEADER",
+                timeout=10000
+            )
+
+            result = sdk.quotas.get_quotas(organization_name="acme-corp")
+
+            print(result)
+          lang: Python
   /organizations/{organization_name}/inference-endpoints:
     summary: Inference Endpoints
     description: Operations for inference endpoints
@@ -5836,6 +5844,33 @@ paths:
           $ref: "#/components/responses/UnknownError"
       tags:
         - webhook_secret_key
+  /organizations/{organization_name}/log-entries:
+    parameters:
+      - $ref: "#/components/parameters/organization_name"
+    post:
+      operationId: query_log_entries
+      summary: Query Log Entries
+      description: Retrieve a collection of _log entries_ for the _organization_
+        identified by `{organization_name}` matching the log query.
+      requestBody:
+        $ref: "#/components/requestBodies/QueryLogEntries"
+      responses:
+        "200":
+          $ref: "#/components/responses/QueryLogEntries"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "429":
+          $ref: "#/components/responses/429"
+        default:
+          $ref: "#/components/responses/UnknownError"
+      tags:
+        - logs
 components:
   parameters:
     Page:
@@ -6022,6 +6057,10 @@ components:
           $ref: "#/components/schemas/ContainerGroupQueueConnection"
         readiness_probe:
           $ref: "#/components/schemas/ContainerGroupReadinessProbe"
+        readme:
+          type: string
+          maxLength: 65000
+          minLength: 2
         replicas:
           $ref: "#/components/schemas/ContainerGroupReplicas"
         restart_policy:
@@ -7348,6 +7387,14 @@ components:
           format: int64
           maximum: 268435456000
           minimum: 1073741824
+        shm_size:
+          description: The size of the shared memory (/dev/shm) in MB. If not specified,
+            defaults to 64MB.
+          type: integer
+          format: int32
+          default: 64
+          maximum: 2147483647
+          minimum: 64
       required:
         - cpu
         - memory
@@ -7799,6 +7846,14 @@ components:
           format: int64
           maximum: 268435456000
           minimum: 1073741824
+        shm_size:
+          description: The size of the shared memory (/dev/shm) in MB. If not specified,
+            defaults to 64MB.
+          type: integer
+          format: int32
+          default: 64
+          maximum: 2147483647
+          minimum: 64
       required:
         - cpu
         - memory
@@ -7842,6 +7897,39 @@ components:
         is_high_demand:
           description: Whether the GPU class is in high demand
           type: boolean
+        gpu_class_type:
+          description: The type of GPU class
+          type: string
+          enum:
+            - community
+            - secure
+        min_vcpu:
+          description: The minimum vCPU count
+          type: integer
+          format: int32
+          minimum: 0
+        max_vcpu:
+          description: The maximum vCPU count
+          type: integer
+          format: int32
+        min_ram:
+          description: The minimum RAM amount in GB
+          type: integer
+          format: int32
+          minimum: 0
+        max_ram:
+          description: The maximum RAM amount in GB
+          type: integer
+          format: int32
+        min_storage:
+          description: The minimum storage amount in GB
+          type: integer
+          format: int32
+          minimum: 0
+        max_storage:
+          description: The maximum storage amount in GB
+          type: integer
+          format: int32
       required:
         - id
         - name
@@ -8126,6 +8214,146 @@ components:
       minLength: 2
       pattern: ^[a-z][a-z0-9-]{0,61}[a-z0-9]$
       title: Inference Endpoint Name
+    LogEntry:
+      type: object
+      properties:
+        json_log:
+          description: The log message in JSON format.
+          type: object
+          additionalProperties: true
+        parent_span_id:
+          description: The parent span ID of the log entry
+          type: string
+          maxLength: 1000
+          minLength: 1
+        receive_time:
+          description: The time when the log entry was received
+          type: string
+          format: date-time
+        resource:
+          $ref: "#/components/schemas/LogEntryResource"
+        severity:
+          $ref: "#/components/schemas/LogEntrySeverity"
+        span_Id:
+          description: The span ID of the log entry
+          type: string
+          maxLength: 1000
+          minLength: 1
+        text_log:
+          description: The log message in text format.
+          type: string
+          maxLength: 10000
+          minLength: 0
+        time:
+          description: The timestamp of the log entry
+          type: string
+          format: date-time
+        trace_Id:
+          description: The trace ID of the log entry
+          type: string
+          maxLength: 1000
+          minLength: 1
+      required:
+        - receive_time
+        - resource
+        - severity
+        - time
+    LogEntryCollection:
+      description: Represents a page of organization logs
+      type: object
+      properties:
+        items:
+          description: A collection of log entries
+          type: array
+          items:
+            $ref: "#/components/schemas/LogEntry"
+          maxItems: 10000
+          minItems: 0
+        organization_name:
+          $ref: "#/components/schemas/OrganizationName"
+        page_max_time:
+          description: The maximum time page boundary. This may be used when getting
+            paginated results.
+          type: string
+          format: date-time
+        page_min_time:
+          description: The minimum time page boundary. This may be used when getting
+            paginated results.
+          type: string
+          format: date-time
+      required:
+        - items
+        - organization_name
+        - page_max_time
+        - page_min_time
+    LogEntryQuery:
+      description: Represents a query for logs
+      type: object
+      properties:
+        end_time:
+          description: The end time of the time range
+          type: string
+          format: date-time
+        page_size:
+          $ref: "#/components/schemas/PageSize"
+        query:
+          description: The query string for filtering logs
+          type: string
+          maxLength: 20000
+          minLength: 0
+        sort_order:
+          $ref: "#/components/schemas/LogEntryQuerySortOrder"
+        start_time:
+          description: The start time of the time range
+          type: string
+          format: date-time
+      required:
+        - end_time
+        - query
+        - start_time
+    LogEntryQuerySortOrder:
+      description: The sort order of the log entries. `asc` will sort the log entries
+        in chronological order. `desc` will sort the log entries in reverse
+        chronological order.
+      type: string
+      default: desc
+      enum:
+        - desc
+        - asc
+    LogEntryResource:
+      description: The resource associated with the log entry
+      type: object
+      properties:
+        labels:
+          description: The labels associated with the resource
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 1000
+          maxProperties: 100
+          minProperties: 0
+        type:
+          description: The type of the resource
+          type: string
+          maxLength: 1000
+          minLength: 1
+      additionalProperties: false
+      required:
+        - labels
+        - type
+    LogEntrySeverity:
+      description: The severity level of the log entry
+      type: string
+      enum:
+        - debug
+        - info
+        - notice
+        - warning
+        - error
+        - critical
+        - alert
+        - emergency
     OrganizationName:
       description: The organization name.
       type: string
@@ -8641,6 +8869,16 @@ components:
           format: int64
           maximum: 268435456000
           minimum: 1073741824
+        shm_size:
+          description: The size of the shared memory (/dev/shm) in MB. If not specified,
+            defaults to 64MB.
+          type:
+            - integer
+            - "null"
+          format: int32
+          default: 64
+          maximum: 2147483647
+          minimum: 64
       title: Container Resource Update Schema
     WebhookSecretKey:
       description: Represents a webhook secret key
@@ -8736,6 +8974,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/QueueJobPrototype"
+    QueryLogEntries:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LogEntryQuery"
     UpdateContainerGroup:
       required: true
       content:
@@ -8966,6 +9210,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/WorkloadErrorList"
+    QueryLogEntries:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LogEntryCollection"
     ReallocateContainerGroupInstance:
       description: Accepted
     RecreateContainerGroupInstance:
@@ -9028,5 +9278,7 @@ tags:
     description: System Logs
   - name: webhook_secret_key
     description: Webhook Secret Key
+  - name: logs
+    description: Platform and Application Log Entries
 security:
   - ApiKeyAuth: []

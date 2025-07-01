@@ -424,6 +424,10 @@
                     ]
                   },
                   {
+                    "group": "Log Entries",
+                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
+                  },
+                  {
                     "group": "Organizations",
                     "pages": [
                       "reference/saladcloud-api/organizations/list-gpu-classes",
