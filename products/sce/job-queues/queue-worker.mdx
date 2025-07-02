@@ -47,6 +47,7 @@ primary application and the Job Queue Worker process. Here's how to do it.
    RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
    CMD ["uvicorn", "main:app", "--host", "*", "--port", "80"]
    ```
+
    1. Navigate to the
       [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base)
       directory and run `docker build -t foobar .`
@@ -84,6 +85,7 @@ primary application and the Job Queue Worker process. Here's how to do it.
    ENTRYPOINT ["/init"]
    CMD ["/usr/local/bin/salad-job-queue-worker"]
    ```
+
    1. The s6 configuration files are stored in
       [samples/mandelbrot/with-s6-overlay/s6/s6-overlay/s6-rc.d/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/with-s6-overlay/s6/s6-overlay/s6-rc.d).
       You'll find the configuration for the sample service already there. The configuration must have two files, type
@@ -154,6 +156,7 @@ Here's how to do it.
    RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
    CMD ["uvicorn", "main:app", "--host", "*", "--port", "80"]
    ```
+
    1. Navigate to the
       [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base)
       directory and run `docker build -t foobar .`
@@ -175,6 +178,7 @@ Here's how to do it.
 
    CMD ["/app/run.sh"]
    ```
+
    1. Locate the line `FROM foobar` and replace `foobar` with whatever name you used in the previous step.
    2. Save the file.
    3. Open the shell script `run.sh`:

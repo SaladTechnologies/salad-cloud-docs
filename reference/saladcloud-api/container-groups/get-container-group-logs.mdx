@@ -1,7 +1,14 @@
 ---
 openapi:
-  salad-cloud get
+  /api-specs/salad-cloud.yaml get
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/system-logs
+deprecated: true
 ---
 
-_Last Updated: May 10, 2025_
+_Last Updated: July 1, 2025_
+
+<Warning>
+  This API endpoint is deprecated and will be removed in a future version of the SaladCloud API. The new [Query Log
+  Entries](/reference/saladcloud-api/logs/query-log-entries) API endpoint replaces this endpoint, providing a powerful
+  query interface for troubleshooting deployments and jobs.
+</Warning>
