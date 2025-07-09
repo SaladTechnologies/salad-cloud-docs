@@ -160,8 +160,8 @@
             "pages": [
               "products/recipes/overview",
               "products/recipes/comfyui",
+              "products/recipes/ollama",
               "products/recipes/tgi",
-              "products/recipes/ollama-llama3.1",
               "products/recipes/sogni-flux-worker",
               "products/recipes/sogni-stable-diffusion-worker",
               "products/recipes/yolov8",
@@ -941,6 +941,10 @@
     {
       "source": "products/recipes/qwen2.5-vl-7b-instruct-tgi",
       "destination": "products/recipes/tgi"
+    },
+    {
+      "source": "products/recipes/ollama-llama3.1",
+      "destination": "products/recipes/ollama"
     }
   ]
 }

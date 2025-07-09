@@ -1,7 +1,7 @@
 ---
-title: Text Generation Inference (TGI) API Recipes
-sidebarTitle: Text Generation Inference (TGI)
-description: Deploy large language models with Text Generation Inference (TGI) API on Salad Container Engine.
+title: Ollama Recipes
+sidebarTitle: Ollama
+description: Deploy any language model from the Ollama catalog with Ollama on Salad Container Engine.
 ---
 
 _Last Updated: July 9, 2025_
@@ -10,28 +10,20 @@ _Last Updated: July 9, 2025_
 
 ## Overview
 
-Inference is powered by [Text Generation Inference (TGI)](https://github.com/huggingface/text-generation-inference), a
-toolkit for deploying and serving Large Language Models (LLMs) developed by Hugging Face. TGI provides optimized
-inference for text generation models with features like continuous batching, tensor parallelism, and efficient memory
-management.
+Inference is powered by [Ollama](https://ollama.com/), a lightweight, extensible framework for building and running
+language models on your machine. Ollama provides a simple API for creating, running, and managing models, and has a
+library of pre-built models that can be easily used.
 
-Several models are available, including:
+You can deploy any model from the [Ollama Model Library](https://ollama.com/library) by providing the model name via
+environment variable. Popular models include:
 
-- [Qwen 2.5 VL 3B Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct) - A 3 billion parameter vision-language
-  model for multimodal understanding and generation tasks.
-- [Qwen 2.5 VL 7B Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct) - A 7 billion parameter vision-language
-  model with enhanced capabilities for complex multimodal tasks.
-- [Qwen 3 8B](https://huggingface.co/Qwen/Qwen3-8B) - An 8 billion parameter language model with improved performance
-  and efficiency.
-- [Llama 3.1 8B Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct) - Meta's 8 billion parameter
-  instruction-tuned model for conversational AI and text generation.
-- [Mistral 7B 0.3 Instruct](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) - Mistral AI's 7 billion
-  parameter instruction-tuned model optimized for chat and reasoning tasks.
-- [Llama 3.2 11B Vision-Instruct](https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct) - Meta's 11 billion
-  parameter vision-language model for multimodal understanding and generation.
-- **Custom Model** - Deploy any
-  [TGI-compatible model](https://huggingface.co/docs/text-generation-inference/supported_models) by providing the model
-  name via environment variable.
+- **Code Generation**: `codellama`, `codegemma`, `starcoder2`
+- **Chat Models**: `llama3.1`, `llama3.2`, `mistral`, `gemma2`, `qwen2.5`
+- **Specialized Models**: `llava` (vision), `nomic-embed-text` (embeddings), `all-minilm` (embeddings)
+- **Custom Models**: Any model available in the Ollama library
+
+Don't see the model you want? Check the complete [Ollama Model Library](https://ollama.com/library) for all available
+models, or create your own custom model using a Modelfile.
 
 ## Example request
 
@@ -46,48 +38,56 @@ curl -X POST https://vegetable-words-3e487ysdyhfkvjah.salad.cloud/v1/chat/comple
 
 ```json request.json
 {
-  "model": "tgi",
+  "model": "llama3.1",
   "messages": [
     {
       "role": "user",
-      "content": "Explain quantum computing in simple terms:"
+      "content": "Write a Python function to calculate fibonacci numbers:"
     }
   ],
-  "max_tokens": 200,
+  "max_tokens": 300,
   "temperature": 0.7,
-  "top_p": 0.95,
-  "frequency_penalty": 0.1,
   "stream": false
 }
 ```
 
 You will get back a json response with the generated text:
 
-```json
+````json
 {
   "id": "chatcmpl-1234567890abcdef",
   "object": "chat.completion",
   "created": 1704067200,
-  "model": "tgi",
+  "model": "llama3.1",
   "choices": [
     {
       "index": 0,
       "message": {
         "role": "assistant",
-        "content": "Quantum computing is a revolutionary approach to computation that harnesses the principles of quantum mechanics..."
+        "content": "Here's a Python function to calculate Fibonacci numbers:\n\n```python\ndef fibonacci(n):\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    elif n == 2:\n        return [0, 1]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        fib_sequence.append(fib_sequence[i-1] + fib_sequence[i-2])\n    \n    return fib_sequence\n```"
       },
       "finish_reason": "stop"
     }
   ],
   "usage": {
-    "prompt_tokens": 8,
-    "completion_tokens": 156,
-    "total_tokens": 164
+    "prompt_tokens": 12,
+    "completion_tokens": 145,
+    "total_tokens": 157
   }
 }
-```
+````
 
 ## How To Use This Recipe
+
+### Model Selection
+
+When deploying this recipe, you can specify any model from the [Ollama Model Library](https://ollama.com/library) by
+setting the `OLLAMA_MODEL_NAME` environment variable. For example:
+
+- `OLLAMA_MODEL_NAME=llama3.1` - Meta's Llama 3.1 8B model
+- `OLLAMA_MODEL_NAME=mistral` - Mistral 7B model
+- `OLLAMA_MODEL_NAME=codellama` - Code Llama for code generation
+- `OLLAMA_MODEL_NAME=llava` - Llava vision-language model
 
 ### Authentication
 
@@ -115,20 +115,20 @@ container group creation.
 ### Deploy It And Wait
 
 When you deploy the recipe, SaladCloud will find the desired number of qualified nodes, and begin the process of
-downloading the container image to the host machine. Depending on the preloaded model, the docker image can be quite
-large (Up to 22GB), and it may take up to tens of minutes to download to some machines, depending on the network
-conditions of that particular node. Remember, these are residential PCs with residential internet connections, and
-performance will vary across different nodes.
+downloading the container image to the host machine. The model will be downloaded before the container will pass its
+readiness probe, to avoid traffic being routed to nodes that do not have the model downloaded yet. This may take several
+minutes depending on the model size and network conditions of that particular node. Remember, these are residential PCs
+with residential internet connections, and performance will vary across different nodes.
 
 Eventually, you will see instances enter the running state, and show a green checkmark in the "Ready" column, indicating
 the workload is passing its readiness probe. Once at least 1 instance is running, the container group will be considered
 running, but for production you will want to wait until an adequate number of nodes have become ready before moving
 traffic over.
 
-![](/products/recipes/images/tgi-deploy.jpg)
+![](/products/recipes/images/ollama-deploy.jpg)
 
 You will find helpful links and information in the readme on the container group page once deployed.
 
 ## Source Code
 
-[<Icon icon="github" size="24" /> Github Repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/tgi)
+[<Icon icon="github" size="24" /> Github Repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/ollama)
