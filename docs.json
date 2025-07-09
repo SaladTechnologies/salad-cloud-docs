@@ -163,7 +163,7 @@
               "products/recipes/ollama",
               "products/recipes/tgi",
               "products/recipes/sogni-fast-worker",
-              "products/recipes/yolov8",
+              "products/recipes/yolo",
               "products/recipes/kuzco"
             ]
           }
@@ -559,7 +559,7 @@
                     ]
                   },
                   {
-                    "group": "YOLO v8 (API)",
+                    "group": "YOLO Object Detection (API)",
                     "pages": [
                       "reference/recipes/yolov8/process_file",
                       "reference/recipes/yolov8/process_url",
@@ -952,6 +952,10 @@
     {
       "source": "products/recipes/sogni-stable-diffusion-worker",
       "destination": "products/recipes/sogni-fast-worker"
+    },
+    {
+      "source": "products/recipes/yolov8",
+      "destination": "products/recipes/yolo"
     }
   ]
 }
