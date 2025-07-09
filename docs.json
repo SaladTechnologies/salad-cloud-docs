@@ -159,7 +159,7 @@
             "group": "Recipes",
             "pages": [
               "products/recipes/overview",
-              "products/recipes/dreamshaper8-comfyui",
+              "products/recipes/comfyui",
               "products/recipes/flux1-dev-fp8-comfyui",
               "products/recipes/flux1-schnell-fp8-comfyui",
               "products/recipes/ollama-llama3.1",
@@ -915,6 +915,30 @@
     {
       "source": "tutorials/long-running-jobs",
       "destination": "guides/long-running-tasks/solution-overview"
+    },
+    {
+      "source": "products/recipes/dreamshaper8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/flux1-dev-fp8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/flux1-schnell-fp8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sd3.5-large",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sd3.5-medium",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sdxl-with-refiner-comfyui",
+      "destination": "products/recipes/comfyui"
     }
   ]
 }
