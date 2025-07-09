@@ -162,8 +162,7 @@
               "products/recipes/comfyui",
               "products/recipes/ollama",
               "products/recipes/tgi",
-              "products/recipes/sogni-flux-worker",
-              "products/recipes/sogni-stable-diffusion-worker",
+              "products/recipes/sogni-fast-worker",
               "products/recipes/yolov8",
               "products/recipes/kuzco"
             ]
@@ -945,6 +944,14 @@
     {
       "source": "products/recipes/ollama-llama3.1",
       "destination": "products/recipes/ollama"
+    },
+    {
+      "source": "products/recipes/sogni-flux-worker",
+      "destination": "products/recipes/sogni-fast-worker"
+    },
+    {
+      "source": "products/recipes/sogni-stable-diffusion-worker",
+      "destination": "products/recipes/sogni-fast-worker"
     }
   ]
 }
