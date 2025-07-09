@@ -40,6 +40,7 @@ primary application and the Job Queue Worker process. Here's how to do it.
    [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base) -
    this is a simple container that receives requests and returns images of the mandelbrot set. It uses `uvicorn` to
    listen on port 80 on the `generate` path for requests to be handled by the mandelbrot generation code.
+
    ```dockerfile dockerfile
    FROM python:3.11-slim
    WORKDIR /app
@@ -53,6 +54,7 @@ primary application and the Job Queue Worker process. Here's how to do it.
       directory and run `docker build -t foobar .`
    2. Notice that the name of the output container image in this case is `foobar`; you may substitute any name you like.
       The image with that name will not be pushed to any registry and will remain solely on your local disk.
+
 3. Because the resulting container will run two processes, we will use the `s6-overlay` hypervisor to manage them. It
    has to be configured with the way to start your application, as probably indicated in CMD or ENTRYPOINT lines in the
    original Dockerfile. As an example, see
@@ -149,6 +151,7 @@ Here's how to do it.
    [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base) -
    this is a simple container that receives JSON requests on port 80 at the `generate` path and returns images of the
    mandelbrot set. It uses `uvicorn` to listen on port 80 for requests to be handled by the mandelbrot generation code.
+
    ```dockerfile dockerfile
    FROM python:3.11-slim
    WORKDIR /app
@@ -162,6 +165,7 @@ Here's how to do it.
       directory and run `docker build -t foobar .`
    2. Notice that the name of the output container image in this case is `foobar`; you may substitute any name you like.
       The image with that name will not be pushed to any registry and will remain solely on your local disk.
+
 3. Because the resulting container will run two processes we will use a shell script run.sh to manage the multiple
    processes. The relevant sample is in the
    [samples/mandelbrot/with-shell-script/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/with-shell-script):
