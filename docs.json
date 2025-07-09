@@ -443,16 +443,7 @@
                   "reference/imds/restart"
                 ]
               },
-              {
-                "group": "S4 - Salad Simple Storage Service",
-                "pages": [
-                  "reference/s4/upload-a-file",
-                  "reference/s4/download-a-file",
-                  "reference/s4/delete-a-file",
-                  "reference/s4/list-all-files-that-belong-to-the-organization",
-                  "reference/s4/sign-a-file-and-return-a-signed-url"
-                ]
-              },
+
               "reference/recipes",
               {
                 "group": "Transcription API",
@@ -468,6 +459,16 @@
                   "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
                   "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
                   "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
+                ]
+              },
+              {
+                "group": "S4 - Salad Simple Storage Service",
+                "pages": [
+                  "reference/s4/upload-a-file",
+                  "reference/s4/download-a-file",
+                  "reference/s4/delete-a-file",
+                  "reference/s4/list-all-files-that-belong-to-the-organization",
+                  "reference/s4/sign-a-file-and-return-a-signed-url"
                 ]
               }
             ]
