@@ -127,19 +127,6 @@
             ]
           },
           {
-            "group": "Gateway Service",
-            "pages": [
-              "products/sgs/introduction",
-              "products/sgs/quickstart",
-              "products/sgs/proxy-v2",
-              "products/sgs/node-removals",
-              "products/sgs/approved-domains",
-              "products/sgs/destination-health-checks",
-              "products/sgs/sgs-api",
-              "products/sgs/faqs"
-            ]
-          },
-          {
             "group": "Transcription API",
             "pages": [
               "products/transcription/transcription-overview",
@@ -152,27 +139,34 @@
             ]
           },
           {
-            "group": "S4 - Salad Simple Storage Service",
-            "pages": ["products/s4/salad-simple-storage-service"]
-          },
-          {
             "group": "Recipes",
             "pages": [
               "products/recipes/overview",
-              "products/recipes/dreamshaper8-comfyui",
-              "products/recipes/flux1-dev-fp8-comfyui",
-              "products/recipes/flux1-schnell-fp8-comfyui",
-              "products/recipes/ollama-llama3.1",
-              "products/recipes/qwen2.5-vl-3b-instruct-tgi",
-              "products/recipes/qwen2.5-vl-7b-instruct-tgi",
-              "products/recipes/sogni-flux-worker",
-              "products/recipes/sogni-stable-diffusion-worker",
-              "products/recipes/sd3.5-large",
-              "products/recipes/sd3.5-medium",
-              "products/recipes/sdxl-with-refiner-comfyui",
-              "products/recipes/yolov8",
+              "products/recipes/comfyui",
+              "products/recipes/ollama",
+              "products/recipes/tgi",
+              "products/recipes/sogni-fast-worker",
+              "products/recipes/yolo",
               "products/recipes/kuzco"
             ]
+          },
+          {
+            "group": "Gateway Service",
+            "pages": [
+              "products/sgs/introduction",
+              "products/sgs/quickstart",
+              "products/sgs/proxy-v2",
+              "products/sgs/node-removals",
+              "products/sgs/approved-domains",
+              "products/sgs/destination-health-checks",
+              "products/sgs/sgs-api",
+              "products/sgs/faqs"
+            ]
+          },
+
+          {
+            "group": "S4 - Salad Simple Storage Service",
+            "pages": ["products/s4/salad-simple-storage-service"]
           }
         ]
       },
@@ -450,131 +444,8 @@
                   "reference/imds/restart"
                 ]
               },
-              {
-                "group": "S4 - Salad Simple Storage Service",
-                "pages": [
-                  "reference/s4/upload-a-file",
-                  "reference/s4/download-a-file",
-                  "reference/s4/delete-a-file",
-                  "reference/s4/list-all-files-that-belong-to-the-organization",
-                  "reference/s4/sign-a-file-and-return-a-signed-url"
-                ]
-              },
-              {
-                "group": "Recipes",
-                "pages": [
-                  {
-                    "group": "Dreamshaper 8 - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/dreamshaper8-comfyui/health-probe",
-                      "reference/recipes/dreamshaper8-comfyui/readiness-probe",
-                      "reference/recipes/dreamshaper8-comfyui/list-models",
-                      "reference/recipes/dreamshaper8-comfyui/submit-prompt",
-                      "reference/recipes/dreamshaper8-comfyui/image-to-image",
-                      "reference/recipes/dreamshaper8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Ollama Llama 3.1",
-                    "pages": ["reference/recipes/ollama-llama3.1/generate", "reference/recipes/ollama-llama3.1/show"]
-                  },
-                  {
-                    "group": "FLUX.1-Dev (FP8) - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/flux1-dev-fp8-comfyui/health-probe",
-                      "reference/recipes/flux1-dev-fp8-comfyui/readiness-probe",
-                      "reference/recipes/flux1-dev-fp8-comfyui/list-models",
-                      "reference/recipes/flux1-dev-fp8-comfyui/submit-prompt",
-                      "reference/recipes/flux1-dev-fp8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "FLUX.1-Schnell (FP8) - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/flux1-schnell-fp8-comfyui/health-probe",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/readiness-probe",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/list-models",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/submit-prompt",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/image-to-image",
-                      "reference/recipes/flux1-schnell-fp8-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Qwen 2.5 VL 3B Instruct - TGI",
-                    "pages": [
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/template-and-tokenize-chatrequest",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/health-check-method",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/text-generation-inference-endpoint-info",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-from-sagemaker-request",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/prometheus-metrics-scrape-endpoint",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/tokenize-inputs",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-1",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/generate-tokens-2",
-                      "reference/recipes/qwen2.5-vl-3b-instruct-tgi/get-model-info"
-                    ]
-                  },
-                  {
-                    "group": "Qwen 2.5 VL 7B Instruct - TGI",
-                    "pages": [
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-if-`stream-==-false`-or-a-stream-of-token-if-`stream-==-true`",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/template-and-tokenize-chatrequest",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-a-stream-of-token-using-server-sent-events",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/health-check-method",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/text-generation-inference-endpoint-info",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-from-sagemaker-request",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/prometheus-metrics-scrape-endpoint",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/tokenize-inputs",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-1",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/generate-tokens-2",
-                      "reference/recipes/qwen2.5-vl-7b-instruct-tgi/get-model-info"
-                    ]
-                  },
-                  {
-                    "group": "SDXL with Refiner - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sdxl-with-refiner-comfyui/health-probe",
-                      "reference/recipes/sdxl-with-refiner-comfyui/readiness-probe",
-                      "reference/recipes/sdxl-with-refiner-comfyui/list-models",
-                      "reference/recipes/sdxl-with-refiner-comfyui/submit-prompt",
-                      "reference/recipes/sdxl-with-refiner-comfyui/image-to-image",
-                      "reference/recipes/sdxl-with-refiner-comfyui/text-to-image-+refiner",
-                      "reference/recipes/sdxl-with-refiner-comfyui/text-to-image"
-                    ]
-                  },
-                  {
-                    "group": "Stable Diffusion 3.5 Large - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sd3.5-large/health-probe",
-                      "reference/recipes/sd3.5-large/readiness-probe",
-                      "reference/recipes/sd3.5-large/list-models",
-                      "reference/recipes/sd3.5-large/submit-prompt",
-                      "reference/recipes/sd3.5-large/txt2img"
-                    ]
-                  },
-                  {
-                    "group": "Stable Diffusion 3.5 Medium - ComfyUI (API)",
-                    "pages": [
-                      "reference/recipes/sd3.5-medium/health-probe",
-                      "reference/recipes/sd3.5-medium/readiness-probe",
-                      "reference/recipes/sd3.5-medium/list-models",
-                      "reference/recipes/sd3.5-medium/submit-prompt",
-                      "reference/recipes/sd3.5-medium/txt2img"
-                    ]
-                  },
-                  {
-                    "group": "YOLO v8 (API)",
-                    "pages": [
-                      "reference/recipes/yolov8/process_file",
-                      "reference/recipes/yolov8/process_url",
-                      "reference/recipes/yolov8/health-probe"
-                    ]
-                  }
-                ]
-              },
+
+              "reference/recipes",
               {
                 "group": "Transcription API",
                 "pages": [
@@ -589,6 +460,16 @@
                   "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
                   "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
                   "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
+                ]
+              },
+              {
+                "group": "S4 - Salad Simple Storage Service",
+                "pages": [
+                  "reference/s4/upload-a-file",
+                  "reference/s4/download-a-file",
+                  "reference/s4/delete-a-file",
+                  "reference/s4/list-all-files-that-belong-to-the-organization",
+                  "reference/s4/sign-a-file-and-return-a-signed-url"
                 ]
               }
             ]
@@ -915,6 +796,58 @@
     {
       "source": "tutorials/long-running-jobs",
       "destination": "guides/long-running-tasks/solution-overview"
+    },
+    {
+      "source": "products/recipes/dreamshaper8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/flux1-dev-fp8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/flux1-schnell-fp8-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sd3.5-large",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sd3.5-medium",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/sdxl-with-refiner-comfyui",
+      "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/qwen2.5-vl-3b-instruct-tgi",
+      "destination": "products/recipes/tgi"
+    },
+    {
+      "source": "products/recipes/qwen2.5-vl-7b-instruct-tgi",
+      "destination": "products/recipes/tgi"
+    },
+    {
+      "source": "products/recipes/ollama-llama3.1",
+      "destination": "products/recipes/ollama"
+    },
+    {
+      "source": "products/recipes/sogni-flux-worker",
+      "destination": "products/recipes/sogni-fast-worker"
+    },
+    {
+      "source": "products/recipes/sogni-stable-diffusion-worker",
+      "destination": "products/recipes/sogni-fast-worker"
+    },
+    {
+      "source": "products/recipes/yolov8",
+      "destination": "products/recipes/yolo"
+    },
+    {
+      "source": "reference/recipes/*",
+      "destination": "reference/recipes"
     }
   ]
 }
