@@ -160,9 +160,8 @@
             "pages": [
               "products/recipes/overview",
               "products/recipes/comfyui",
+              "products/recipes/tgi",
               "products/recipes/ollama-llama3.1",
-              "products/recipes/qwen2.5-vl-3b-instruct-tgi",
-              "products/recipes/qwen2.5-vl-7b-instruct-tgi",
               "products/recipes/sogni-flux-worker",
               "products/recipes/sogni-stable-diffusion-worker",
               "products/recipes/yolov8",
@@ -934,6 +933,14 @@
     {
       "source": "products/recipes/sdxl-with-refiner-comfyui",
       "destination": "products/recipes/comfyui"
+    },
+    {
+      "source": "products/recipes/qwen2.5-vl-3b-instruct-tgi",
+      "destination": "products/recipes/tgi"
+    },
+    {
+      "source": "products/recipes/qwen2.5-vl-7b-instruct-tgi",
+      "destination": "products/recipes/tgi"
     }
   ]
 }
