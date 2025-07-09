@@ -127,19 +127,6 @@
             ]
           },
           {
-            "group": "Gateway Service",
-            "pages": [
-              "products/sgs/introduction",
-              "products/sgs/quickstart",
-              "products/sgs/proxy-v2",
-              "products/sgs/node-removals",
-              "products/sgs/approved-domains",
-              "products/sgs/destination-health-checks",
-              "products/sgs/sgs-api",
-              "products/sgs/faqs"
-            ]
-          },
-          {
             "group": "Transcription API",
             "pages": [
               "products/transcription/transcription-overview",
@@ -152,10 +139,6 @@
             ]
           },
           {
-            "group": "S4 - Salad Simple Storage Service",
-            "pages": ["products/s4/salad-simple-storage-service"]
-          },
-          {
             "group": "Recipes",
             "pages": [
               "products/recipes/overview",
@@ -166,6 +149,24 @@
               "products/recipes/yolo",
               "products/recipes/kuzco"
             ]
+          },
+          {
+            "group": "Gateway Service",
+            "pages": [
+              "products/sgs/introduction",
+              "products/sgs/quickstart",
+              "products/sgs/proxy-v2",
+              "products/sgs/node-removals",
+              "products/sgs/approved-domains",
+              "products/sgs/destination-health-checks",
+              "products/sgs/sgs-api",
+              "products/sgs/faqs"
+            ]
+          },
+
+          {
+            "group": "S4 - Salad Simple Storage Service",
+            "pages": ["products/s4/salad-simple-storage-service"]
           }
         ]
       },
