@@ -143,11 +143,12 @@
             "pages": [
               "products/recipes/overview",
               "products/recipes/comfyui",
+              "products/recipes/kuzco",
               "products/recipes/ollama",
-              "products/recipes/tgi",
               "products/recipes/sogni-fast-worker",
-              "products/recipes/yolo",
-              "products/recipes/kuzco"
+              "products/recipes/tgi",
+              "products/recipes/ubuntu",
+              "products/recipes/yolo"
             ]
           },
           {
