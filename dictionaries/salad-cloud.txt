@@ -132,6 +132,7 @@ numpy
 nvcc
 NVCC
 nvcr
+nvtop
 ollama
 Ollama
 ONNX
