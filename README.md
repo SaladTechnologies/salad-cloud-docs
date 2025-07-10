@@ -14,7 +14,7 @@ You can preview changes by running the SaladCloud documentation locally. To get 
 
 1. Install [Node.js](https://nodejs.org/en/) on your machine.
 2. Clone this repository to your machine.
-3. Run `npx mintlify dev` from the root directory of the cloned repository.
+3. Run `npx -y mint dev` from the root directory of the cloned repository.
 
 ## Licenses
 
