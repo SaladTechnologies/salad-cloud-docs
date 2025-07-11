@@ -21,6 +21,7 @@
             "group": "Container Engine",
             "pages": [
               "products/sce/introduction",
+              "products/sce/saladcloud-secure",
               {
                 "group": "Getting Started",
                 "pages": [
