@@ -1,0 +1,91 @@
+---
+title: 'SaladCloud Secure'
+---
+
+_Last Updated: July 14, 2025_
+
+**SaladCloud Secure** is our high-trust infrastructure tier designed for enterprise customers with elevated compliance,
+reliability, and security requirements. Unlike SaladCloud Community, which offers cost-effective compute from idle GPUs
+in residential environments, SaladCloud Secure provides access to powerful GPUs hosted in professionally managed and
+physically secured datacenters — with the same cost-saving model under the hood.
+
+## What Does Security Look Like on SaladCloud Secure?
+
+SaladCloud Secure nodes are hosted in professionally managed datacenters operated by partners with strong security
+postures and third-party compliance audits. These facilities are designed for high-trust workloads and meet the
+expectations of enterprise AI teams.
+
+Key security attributes:
+
+- **SOC 2 Type 2 attested** datacenter partners
+- **Restricted physical access**, including 24/7 surveillance and badge-based entry controls
+- **Hardware-level isolation** — no shared cores or memory across tenants
+- **Local storage is isolated per job and wiped after use**
+- **All data in transit is encrypted**
+- Salad workloads run in isolated, containerized environments with **no cross-job memory access**
+
+While the underlying compute resources are dynamically scheduled based on availability, the infrastructure itself meets
+high standards for privacy, data handling, and operational security.
+
+## Datacenter-Grade Infrastructure
+
+SaladCloud Secure deployments are built on modern infrastructure that matches best practices from leading enterprise GPU
+clouds.
+
+### Network & Performance
+
+SaladCloud Secure nodes are provisioned with **a minimum of 1 Gbps bandwidth per server**, ensuring fast data transfers
+and low-latency performance for AI/ML workloads.
+
+- **External bandwidth**: ≥ 1 Gbps per node (up/down)
+- **Redundant internet uplinks** for automatic failover
+- **DDoS mitigation systems** in place
+- Internal switching designed for **multi-100 Gbps aggregate throughput**
+- Datacenter targets:
+  - Packet loss < 0.1%
+  - P95 RTT < 4ms
+  - P95 jitter < 3ms
+
+### Storage Expectations
+
+SaladCloud Secure servers are equipped with **high-speed local storage** designed for performance during active compute
+jobs.
+
+- Each node provides **fast, isolated local storage** for use during job execution — ideal for temporary datasets, model
+  layers, and intermediate outputs
+- **Local storage is not persistent across interruptions**; data is **cleared** if a node is reclaimed or rebooted
+- For workloads requiring persistence, you can optionally **integrate external object storage (e.g., S3-compatible)** or
+  configure periodic syncing from your container
+
+> **Note**: SaladCloud Secure does not currently provide persistent volumes across job interruptions. If your workload
+> requires long-term data retention, we recommend syncing with remote storage or using checkpointing.
+
+## Performance, Uptime & Cost
+
+- **GPU Types Available**:
+  - 8x **NVIDIA A100 (80 GB)** Perfect for large-scale training and production inference
+  - 8x **NVIDIA A100 (40 GB)** Great for models fine-tuning, and production inference workloads
+  - 8x **NVIDIA L40S (48 GB)** Ready for generative AI, rendering, and production inference
+- **Provisioned in full 8-GPU sets** for maximum performance and bandwidth across multi-GPU jobs
+- **Uptime**: Machines remain interruptible but are hosted in stable datacenters with redundant power and secured
+  environments — ensuring significantly higher uptime than residential nodes.
+- **Cost**: Despite datacenter-grade hardware and security, **SaladCloud Secure is priced significantly lower than other
+  enterprise GPU offerings.** Datacenters often have idle capacity between large reservations — SaladCloud takes
+  advantage of these gaps to access premium GPUs at the lowest possible cost and pass those savings directly to our
+  customers.
+
+## How Do I Access or Monitor GPU Availability?
+
+You’ll soon be able to check and reserve SaladCloud Secure inventory directly from the Salad Portal or via API. For
+early access or bulk reservations, [contact our team](mailto:cloud@salad.com).
+
+## SaladCloud Community vs. Secure
+
+| Feature           | **SaladCloud Community**      | **SaladCloud Secure**                  |
+| ----------------- | ----------------------------- | -------------------------------------- |
+| **Environment**   | Idle gaming PCs (residential) | Idle GPUs in secure datacenters        |
+| **Security**      | SOC 2                         | SOC 2 Type 2, 24/7 datacenter security |
+| **GPU Types**     | Consumer-grade                | A100 (80GB), A100 (40GB), L40S (48GB)  |
+| **Resource Unit** | Single GPU                    | Full sets of 8 GPUs per Instance       |
+| **Uptime**        | Best-effort                   | Higher stability, still interruptible  |
+| **Pricing**       | Lowest on the market          | Still lowest on the market             |
