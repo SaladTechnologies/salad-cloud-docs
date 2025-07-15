@@ -36,10 +36,7 @@
                   "container-engine/explanation/core-concepts/architectural-overview",
                   "container-engine/explanation/core-concepts/recipes-overview",
                   "container-engine/explanation/core-concepts/faqs",
-                  "container-engine/explanation/core-concepts/saladcloud-secure",
-                  "container-engine/explanation/core-concepts/container-registries",
-                  "container-engine/explanation/core-concepts/external-logging",
-                  "container-engine/explanation/core-concepts/job-queues"
+                  "container-engine/explanation/core-concepts/saladcloud-secure"
                 ]
               },
               {
@@ -53,39 +50,30 @@
                 ]
               },
               {
-                "group": "Networking & Security",
-                "pages": ["container-engine/explanation/networking-security/networking"]
+                "group": "Infrastructure & Platform",
+                "pages": [
+                  "container-engine/explanation/core-concepts/container-registries",
+                  "container-engine/explanation/core-concepts/external-logging",
+                  "container-engine/explanation/networking-security/networking",
+                  "container-engine/explanation/health-probes/health-probes",
+                  "container-engine/explanation/health-probes/startup-probes",
+                  "container-engine/explanation/health-probes/readiness-probes",
+                  "container-engine/explanation/health-probes/liveness-probes",
+                  "container-engine/explanation/imds/introduction",
+                  "container-engine/explanation/imds/instance-deletion-cost"
+                ]
               },
               {
-                "group": "Billing & Pricing",
+                "group": "Scaling & Resource Management",
                 "pages": [
+                  "container-engine/explanation/autoscaling/autoscaling",
                   "container-engine/explanation/billing-pricing/billing",
                   "container-engine/explanation/billing-pricing/priority-pricing",
                   "container-engine/explanation/billing-pricing/prepaid-billing-faqs"
                 ]
               },
               {
-                "group": "Autoscaling",
-                "pages": ["container-engine/explanation/autoscaling/autoscaling"]
-              },
-              {
-                "group": "Health Probes",
-                "pages": [
-                  "container-engine/explanation/health-probes/health-probes",
-                  "container-engine/explanation/health-probes/liveness-probes",
-                  "container-engine/explanation/health-probes/readiness-probes",
-                  "container-engine/explanation/health-probes/startup-probes"
-                ]
-              },
-              {
-                "group": "IMDS",
-                "pages": [
-                  "container-engine/explanation/imds/introduction",
-                  "container-engine/explanation/imds/instance-deletion-cost"
-                ]
-              },
-              {
-                "group": "Gateway",
+                "group": "Networking & Gateway",
                 "pages": [
                   "container-engine/explanation/gateway/load-balancer-options",
                   "container-engine/explanation/gateway/websockets",
@@ -93,28 +81,26 @@
                 ]
               },
               {
-                "group": "Computer Vision",
-                "pages": ["container-engine/explanation/computer-vision/yolov8-overview"]
+                "group": "Job Processing",
+                "pages": [
+                  "container-engine/explanation/core-concepts/job-queues",
+                  "container-engine/explanation/long-running-tasks/solution-overview"
+                ]
               },
               {
-                "group": "Long-Running Tasks",
-                "pages": ["container-engine/explanation/long-running-tasks/solution-overview"]
+                "group": "AI & Machine Learning",
+                "pages": [
+                  "container-engine/explanation/llm/overview",
+                  "container-engine/explanation/image-generation/overview",
+                  "container-engine/explanation/computer-vision/yolov8-overview"
+                ]
               },
               {
-                "group": "Kubernetes Integration",
-                "pages": ["container-engine/explanation/kubernetes-integration/solution-overview"]
-              },
-              {
-                "group": "Tailscale Integration",
-                "pages": ["container-engine/explanation/tailscale-integration/solution-overview"]
-              },
-              {
-                "group": "Image Generation",
-                "pages": ["container-engine/explanation/image-generation/overview"]
-              },
-              {
-                "group": "LLM",
-                "pages": ["container-engine/explanation/llm/overview"]
+                "group": "Platform Integrations",
+                "pages": [
+                  "container-engine/explanation/kubernetes-integration/solution-overview",
+                  "container-engine/explanation/tailscale-integration/solution-overview"
+                ]
               }
             ]
           },
@@ -124,14 +110,10 @@
               "container-engine/tutorials/quickstart",
               "container-engine/tutorials/quickstart-api",
               {
-                "group": "Machine Learning",
+                "group": "Getting Started",
                 "pages": [
-                  "container-engine/tutorials/machine-learning/pytorch-rtx5090",
-                  "container-engine/tutorials/machine-learning/run-triton-server",
-                  "container-engine/tutorials/machine-learning/run-cog",
-                  "container-engine/tutorials/machine-learning/jupyterlab",
-                  "container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api",
-                  "container-engine/tutorials/machine-learning/llm-fine-tuning"
+                  "container-engine/tutorials/getting-started/ubuntu-image",
+                  "container-engine/tutorials/getting-started/example-image"
                 ]
               },
               {
@@ -153,6 +135,25 @@
                 ]
               },
               {
+                "group": "Machine Learning",
+                "pages": [
+                  "container-engine/tutorials/machine-learning/pytorch-rtx5090",
+                  "container-engine/tutorials/machine-learning/run-triton-server",
+                  "container-engine/tutorials/machine-learning/run-cog",
+                  "container-engine/tutorials/machine-learning/jupyterlab",
+                  "container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api",
+                  "container-engine/tutorials/machine-learning/llm-fine-tuning"
+                ]
+              },
+              {
+                "group": "Computer Vision",
+                "pages": [
+                  "container-engine/tutorials/computer-vision/yolov8-quickstart",
+                  "container-engine/tutorials/computer-vision/yolov8-deployment-tutorial",
+                  "container-engine/tutorials/computer-vision/yolov8-model-training"
+                ]
+              },
+              {
                 "group": "Development Tools",
                 "pages": [
                   "container-engine/tutorials/development-tools/vscode-remote-development",
@@ -169,21 +170,6 @@
                   "container-engine/tutorials/performance/performance-monitoring",
                   "container-engine/tutorials/performance/high-performance-apps",
                   "container-engine/tutorials/performance/high-performance-storage-solutions"
-                ]
-              },
-              {
-                "group": "Getting Started",
-                "pages": [
-                  "container-engine/tutorials/getting-started/ubuntu-image",
-                  "container-engine/tutorials/getting-started/example-image"
-                ]
-              },
-              {
-                "group": "Computer Vision",
-                "pages": [
-                  "container-engine/tutorials/computer-vision/yolov8-quickstart",
-                  "container-engine/tutorials/computer-vision/yolov8-deployment-tutorial",
-                  "container-engine/tutorials/computer-vision/yolov8-model-training"
                 ]
               }
             ]
@@ -216,48 +202,68 @@
             "pages": [
               "container-engine/how-to-guides/managing-deployments",
               "container-engine/how-to-guides/environment-variables",
-              {
-                "group": "Autoscaling",
-                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
-              },
               "container-engine/how-to-guides/specifying-a-command",
+              "container-engine/how-to-guides/troubleshooting",
               {
-                "group": "Registries",
+                "group": "Container Registries",
                 "pages": [
                   "container-engine/how-to-guides/registries/dockerhub",
                   "container-engine/how-to-guides/registries/aws-ecr",
                   "container-engine/how-to-guides/registries/azure-acr",
                   "container-engine/how-to-guides/registries/gcp-gar",
-                  "container-engine/how-to-guides/registries/quay",
-                  "container-engine/how-to-guides/registries/github-ghcr"
+                  "container-engine/how-to-guides/registries/github-ghcr",
+                  "container-engine/how-to-guides/registries/quay"
                 ]
               },
               {
-                "group": "IMDS",
-                "pages": [
-                  "container-engine/how-to-guides/imds/obtaining-an-imds-jwt",
-                  "container-engine/how-to-guides/imds/container-status-endpoint",
-                  "container-engine/how-to-guides/imds/imds-reallocate"
-                ]
+                "group": "Autoscaling & Resource Management",
+                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
               },
               {
-                "group": "Job Queues",
-                "pages": [
-                  "container-engine/how-to-guides/job-queues/creating-a-job-queue",
-                  "container-engine/how-to-guides/job-queues/using-queues",
-                  "container-engine/how-to-guides/job-queues/queue-worker",
-                  "container-engine/how-to-guides/job-queues/webhook-signature"
-                ]
-              },
-              {
-                "group": "Gateway",
+                "group": "Gateway & Networking",
                 "pages": [
                   "container-engine/how-to-guides/gateway/enabling-ipv6",
                   "container-engine/how-to-guides/gateway/sending-requests"
                 ]
               },
               {
-                "group": "External Logging",
+                "group": "AI & Machine Learning",
+                "pages": [
+                  "container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
+                  "container-engine/how-to-guides/llm/run-ollama",
+                  "container-engine/how-to-guides/llm/run-tgi-text-generation-interface",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+                  "container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy",
+                  "container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
+                  "container-engine/how-to-guides/computer-vision/image-captioning-with-vlm",
+                  "container-engine/how-to-guides/computer-vision/deploy-blip-with-cog",
+                  "container-engine/how-to-guides/computer-vision/yolov8-batch-processing",
+                  "container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+                ]
+              },
+              {
+                "group": "Job Processing & Queues",
+                "pages": [
+                  "container-engine/how-to-guides/job-queues/creating-a-job-queue",
+                  "container-engine/how-to-guides/job-queues/using-queues",
+                  "container-engine/how-to-guides/job-queues/queue-worker",
+                  "container-engine/how-to-guides/job-queues/webhook-signature",
+                  "container-engine/how-to-guides/real-time-inference/use-container-gateway",
+                  "container-engine/how-to-guides/real-time-inference/build-redis-queue",
+                  "container-engine/how-to-guides/long-running-tasks/kelpie",
+                  "container-engine/how-to-guides/long-running-tasks/gcp-pub-sub",
+                  "container-engine/how-to-guides/long-running-tasks/rabbitmq",
+                  "container-engine/how-to-guides/long-running-tasks/sqs"
+                ]
+              },
+              {
+                "group": "Monitoring & Logging",
                 "pages": [
                   "container-engine/how-to-guides/external-logging/axiom",
                   "container-engine/how-to-guides/external-logging/datadog",
@@ -267,76 +273,25 @@
                   "container-engine/how-to-guides/external-logging/tcp-logging"
                 ]
               },
-              "container-engine/how-to-guides/troubleshooting",
               {
-                "group": "Image Generation",
+                "group": "Advanced Features",
                 "pages": [
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
-                  "container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy",
-                  "container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models"
+                  "container-engine/how-to-guides/imds/obtaining-an-imds-jwt",
+                  "container-engine/how-to-guides/imds/container-status-endpoint",
+                  "container-engine/how-to-guides/imds/imds-reallocate"
                 ]
               },
               {
-                "group": "Transcription",
-                "pages": ["container-engine/how-to-guides/transcription/youtube-transcription-pipeline"]
-              },
-              {
-                "group": "LLM",
-                "pages": [
-                  "container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
-                  "container-engine/how-to-guides/llm/run-ollama",
-                  "container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
-                ]
-              },
-              {
-                "group": "Computer Vision",
-                "pages": [
-                  "container-engine/how-to-guides/computer-vision/image-captioning-with-vlm",
-                  "container-engine/how-to-guides/computer-vision/deploy-blip-with-cog",
-                  "container-engine/how-to-guides/computer-vision/yolov8-batch-processing"
-                ]
-              },
-              {
-                "group": "Audio Processing",
-                "pages": [
-                  "container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
-                  "container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
-                ]
-              },
-              {
-                "group": "Real-Time Inference",
-                "pages": [
-                  "container-engine/how-to-guides/real-time-inference/use-container-gateway",
-                  "container-engine/how-to-guides/real-time-inference/build-redis-queue"
-                ]
-              },
-              {
-                "group": "Long-Running Tasks",
-                "pages": [
-                  "container-engine/how-to-guides/long-running-tasks/kelpie",
-                  "container-engine/how-to-guides/long-running-tasks/gcp-pub-sub",
-                  "container-engine/how-to-guides/long-running-tasks/rabbitmq",
-                  "container-engine/how-to-guides/long-running-tasks/sqs"
-                ]
-              },
-              {
-                "group": "Kubernetes Integration",
+                "group": "Platform Integrations",
                 "pages": [
                   "container-engine/how-to-guides/kubernetes-integration/installation-helm-chart",
                   "container-engine/how-to-guides/kubernetes-integration/application-deployment",
-                  "container-engine/how-to-guides/kubernetes-integration/service-access"
+                  "container-engine/how-to-guides/kubernetes-integration/service-access",
+                  "container-engine/how-to-guides/tailscale-integration/basic"
                 ]
               },
               {
-                "group": "Tailscale Integration",
-                "pages": ["container-engine/how-to-guides/tailscale-integration/basic"]
-              },
-              {
-                "group": "Molecular Dynamics Simulation",
+                "group": "Specialized Workloads",
                 "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
@@ -476,15 +431,24 @@
                 "group": "SaladCloud API",
                 "pages": [
                   {
+                    "group": "Organizations",
+                    "pages": [
+                      "reference/saladcloud-api/organizations/list-gpu-classes",
+                      "reference/saladcloud-api/organizations/get-quotas",
+                      "reference/saladcloud-api/organizations/get-webhook-secret-key",
+                      "reference/saladcloud-api/organizations/update-webhook-secret-key"
+                    ]
+                  },
+                  {
                     "group": "Container Groups",
                     "pages": [
                       "reference/saladcloud-api/container-groups/list-container-groups",
                       "reference/saladcloud-api/container-groups/create-container-group",
                       "reference/saladcloud-api/container-groups/get-container-group",
                       "reference/saladcloud-api/container-groups/update-container-group",
-                      "reference/saladcloud-api/container-groups/delete-container-group",
                       "reference/saladcloud-api/container-groups/start-container-group",
                       "reference/saladcloud-api/container-groups/stop-container-group",
+                      "reference/saladcloud-api/container-groups/delete-container-group",
                       "reference/saladcloud-api/container-groups/get-container-group-logs",
                       "reference/saladcloud-api/container-groups/list-container-group-instances",
                       "reference/saladcloud-api/container-groups/get-container-group-instance",
@@ -522,15 +486,6 @@
                   {
                     "group": "Log Entries",
                     "pages": ["reference/saladcloud-api/logs/query-log-entries"]
-                  },
-                  {
-                    "group": "Organizations",
-                    "pages": [
-                      "reference/saladcloud-api/organizations/list-gpu-classes",
-                      "reference/saladcloud-api/organizations/get-quotas",
-                      "reference/saladcloud-api/organizations/get-webhook-secret-key",
-                      "reference/saladcloud-api/organizations/update-webhook-secret-key"
-                    ]
                   }
                 ]
               },
@@ -565,14 +520,23 @@
               {
                 "group": "S4 - Salad Simple Storage Service",
                 "pages": [
+                  "reference/s4/list-all-files-that-belong-to-the-organization",
                   "reference/s4/upload-a-file",
                   "reference/s4/download-a-file",
-                  "reference/s4/delete-a-file",
-                  "reference/s4/list-all-files-that-belong-to-the-organization",
-                  "reference/s4/sign-a-file-and-return-a-signed-url"
+                  "reference/s4/sign-a-file-and-return-a-signed-url",
+                  "reference/s4/delete-a-file"
                 ]
               }
             ]
+          }
+        ]
+      },
+      {
+        "tab": "Support",
+        "groups": [
+          {
+            "group": "Support",
+            "pages": ["support", "support/contact"]
           }
         ]
       }
@@ -591,10 +555,6 @@
       {
         "label": "Community",
         "href": "https://discord.gg/ApSm4Kn7Aq"
-      },
-      {
-        "label": "Support",
-        "href": "https://docs.salad.com/support"
       }
     ],
     "primary": {
