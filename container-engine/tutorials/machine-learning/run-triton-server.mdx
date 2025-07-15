@@ -78,7 +78,7 @@ COPY tmp/triton_repo /models
 
 #### Step 3: Enable IPv6
 
-Refer to the official SaladCloud documentation on [Enabling IPv6](/products/sce/gateway/enabling-ipv6).
+Refer to the official SaladCloud documentation on [Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6).
 
 Create a shell script that will run the Triton server with your model and route traffic from container port 80 to triton
 http-port 8000 using `socat`. That shell script will be an entrypoint in the image.
@@ -127,7 +127,7 @@ CMD ["/start_services.sh"]
 #### Step 6: Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container-groups/create-container-group)
 
 Follow this easy steps to deploy your container on salad:
-[Quickstart - SaladCloud](/products/sce/getting-started/quickstart)
+[Quickstart - SaladCloud](/container-engine/tutorials/quickstart)
 
 ## Usage Example
 

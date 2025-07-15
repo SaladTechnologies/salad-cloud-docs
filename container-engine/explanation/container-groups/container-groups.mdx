@@ -12,7 +12,7 @@ of running the group and maintaining the desired replica count.
 
 ## Container Group Components
 
-- **[Container Registry and Image](/products/sce/container-groups/registries/container-registries)**: Specify the
+- **[Container Registry and Image](/container-engine/explanation/core-concepts/container-registries)**: Specify the
   container image you want to run in the Container Group. Use public or private images from most container registries.
 - **Resource Requirements**:
   - **Replica Count**: Replicas are the desired number of instances for your container group deployment. We recommend
@@ -33,24 +33,24 @@ of running the group and maintaining the desired replica count.
 
 ## Additional Configuration
 
-- **[Environment Variables](/products/sce/container-groups/environment-variables)**: Define environment variables to
+- **[Environment Variables](/container-engine/how-to-guides/environment-variables)**: Define environment variables to
   customize your container's environment. You can do this via the key-value editor, or via the bulk editor.
   ![](/container-engine/images/portal-environment-variables-key-value-edit.png)
   ![](/container-engine/images/portal-environment-variables-bulk-edit.png)
-- **[Command](/products/sce/container-groups/specifying-a-command)**: Specify the command to run when the container
+- **[Command](/container-engine/how-to-guides/specifying-a-command)**: Specify the command to run when the container
   starts. This command will override the default command and entrypoint specified in the container image.
 
 ## Monitoring and Observability
 
-- **[Startup Probe](/products/sce/container-groups/health-probes/startup-probes)**: Set up a startup probe to check if
+- **[Startup Probe](/container-engine/explanation/health-probes/startup-probes)**: Set up a startup probe to check if
   the container has started as expected. Recommended for all applications using the Container Gateway.
-- **[Liveness Probe](/products/sce/container-groups/health-probes/liveness-probes)**: Configure a liveness probe to
+- **[Liveness Probe](/container-engine/explanation/health-probes/liveness-probes)**: Configure a liveness probe to
   check if the container is healthy. Recommended for all applications using the Container Gateway.
-- **[Readiness Probe](/products/sce/container-groups/health-probes/readiness-probes)**: Set up a readiness probe to
+- **[Readiness Probe](/container-engine/explanation/health-probes/readiness-probes)**: Set up a readiness probe to
   check if the container is ready to accept traffic. Recommended for all applications using the Container Gateway.
-- **[Container Gateway](/products/sce/networking)**: Choose between authentication or no authentication for external
+- **[Container Gateway](/container-engine/explanation/networking-security/networking)**: Choose between authentication or no authentication for external
   requests and port number for enabling networking inside of container.
-- **[External Logging Service](/products/sce/container-groups/external-logging/external-logging)**: Optionally configure
+- **[External Logging Service](/container-engine/explanation/core-concepts/external-logging)**: Optionally configure
   an external logging service for container logs. Recommended for production deployments.
 
 <img src="/container-engine/images/portal-monitoring-config.png" />

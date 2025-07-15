@@ -6,7 +6,7 @@ _Last Updated: November 18, 2024_
 
 This tutorial will guide you through the process of running a container locally and deploying a GPU-accelerated
 application on SaladCloud, following best practices. Before you begin, please complete
-[the quickstart guide](/products/quickstart) to set up your account, organization and project on SaladCloud. This
+[the quickstart guide](/general/tutorials/account-setup) to set up your account, organization and project on SaladCloud. This
 tutorial assumes you have a basic understanding of containers and images, Python, Docker commands, job queues, and load
 balancers.
 
@@ -188,7 +188,7 @@ Let’s create a container group by providing the docker run command through the
 ### Environment Variables
 
 The -e flag in the docker run command is used to pass information to the container, which can be directly mapped to
-[the Environment Variables](/products/sce/container-groups/environment-variables) settings on SaladCloud.
+[the Environment Variables](/container-engine/how-to-guides/environment-variables) settings on SaladCloud.
 
 By utilizing this feature, you can customize system behavior and grant access to additional resources, such as cloud
 storage or job queues or APIs, for your containers running on SaladCloud.
@@ -200,7 +200,7 @@ storage or job queues or APIs, for your containers running on SaladCloud.
 One container group can run only one container image at this moment.
 
 Ensure the repository, image name and tag are all correct in
-[the Image Source](/products/sce/container-groups/registries/container-registries). If the container image is from a
+[the Image Source](/container-engine/explanation/core-concepts/container-registries). If the container image is from a
 private repository, you will need to provide both the username and access token. These credentials will be used by
 SaladCloud to pull the image.
 
@@ -211,7 +211,7 @@ image will be delivered to the SaladCloud nodes running your instances. When the
 SaladCloud nodes will be released and the images on these nodes will be also removed.
 
 If your image has changed since the container group was created, you will need to
-[update the image source](/products/sce/container-groups/managing-deployments#editing-your-container-group-deployment)
+[update the image source](/container-engine/how-to-guides/managing-deployments#editing-your-container-group-deployment)
 to run the new version. This can be done whether the container group is stopped or running, prompting SaladCloud to pull
 the latest image.
 
@@ -250,7 +250,7 @@ process, you would only be charged for the running time of a single replica.
 The --gpus all option in the command allocates all available GPUs on the host to the container, enabling GPU support for
 applications running inside it. SaladCloud currently supports only one GPU per container. When creating a container
 group, you can select multiple GPU types at a priority level
-[(Batch/Low/Medium/High)](/products/sce/container-groups/billing-and-pricing/priority-pricing), along with the required
+[(Batch/Low/Medium/High)](/container-engine/explanation/billing-pricing/priority-pricing), along with the required
 vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that match these selections
 to run the container group.
 
@@ -266,7 +266,7 @@ priority level.
 If you are using the SaladCloud Job Queue to manage the tasks for your container group, you can use SaladCloud Job Queue
 Worker (an executable binary) to replace io_worker.py in the example. This worker is designed to handle input/output
 operations and interact with your inference server. For more information about SaladCloud Job Queue, please refer to
-[this link](/products/sce/job-queues/job-queues).
+[this link](/container-engine/explanation/core-concepts/job-queues).
 
 ### Substitutes
 
@@ -275,7 +275,7 @@ however, alternative solutions are available.
 
 The -it flag allows you to interact with a container through a terminal. While SaladCloud does not offer this option
 during container group creation, you can still interact with running instances using
-[the interactive terminal](/tutorials/interactive-terminal) after the group has been created to perform tests or
+[the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) after the group has been created to perform tests or
 troubleshoot issues.
 
 The -v flag is used to mount a volume by mapping a directory from the host system to the container. SaladCloud currently
@@ -405,7 +405,7 @@ preferred method in most cases, as it directs requests to the least busy instanc
 By default, the container gateway sends multiple requests to an instance simultaneously. However, it can be configured
 to send only one request to an instance at a time, with subsequent requests waiting in the gateway until the current one
 is completed. For more information on load balancing options and how to adjust these settings to fit your needs, please
-refer to [this guide](/products/sce/gateway/load-balancer-options).
+refer to [this guide](/container-engine/explanation/gateway/load-balancer-options).
 
 Avoid sending very large requests (hundreds of MB or more) to instances through the container gateway, as this can
 significantly reduce end-to-end performance.
@@ -420,12 +420,12 @@ contain only the status and metadata.
 
 ### Health Probes
 
-[Health probes](/products/sce/container-groups/health-probes/health-probes) offer an automated mechanism to initiate
+[Health probes](/container-engine/explanation/health-probes/health-probes) offer an automated mechanism to initiate
 specific actions based on the status of containers within a container group. **You can think of a probe as a piece of
 code running alongside the inference server within the same container, allowing it to access the service locally or the
 shared file system**.
 
-[Readiness probes](/products/sce/container-groups/health-probes/readiness-probes) are essential when deploying a
+[Readiness probes](/container-engine/explanation/health-probes/readiness-probes) are essential when deploying a
 container gateway, as they ensure that requests are only forwarded to an instance when it is fully prepared—for example,
 when the model has been loaded and warmed up.
 
@@ -455,7 +455,7 @@ Failure Threshold: 3
 
 <img src="/container-engine/images/docker_run19.png" />
 
-You can also use the [exec protocol](/products/sce/container-groups/health-probes/health-probes#exec-protocol) to create
+You can also use the [exec protocol](/container-engine/explanation/health-probes/health-probes#exec-protocol) to create
 a custom script for the readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the

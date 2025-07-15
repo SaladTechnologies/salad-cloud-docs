@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 def load_redirects(docs_json_path: str) -> Dict[str, str]:
     """Load redirect mappings from docs.json"""
@@ -173,6 +173,14 @@ def extract_links(content: str) -> List[Tuple[str, str, str]]:
         # For images, we'll use the URL as the "text" since there's no link text
         matches.append((full_match, "", url))
     
+    # Pattern to match href attributes: href="url" or href='url'
+    href_pattern = r'href=["\']([^"\']+)["\']'
+    for match in re.finditer(href_pattern, content):
+        full_match = match.group(0)
+        url = match.group(1)
+        # For href attributes, we'll use the URL as the "text"
+        matches.append((full_match, "", url))
+    
     return matches
 
 def update_links_in_content(content: str, redirects: Dict[str, str]) -> Tuple[str, List[str]]:
@@ -241,6 +249,12 @@ def update_links_in_content(content: str, redirects: Dict[str, str]) -> Tuple[st
                 if '<img' in full_match:
                     # For image tags, replace the src attribute
                     new_link = full_match.replace(f'src="{url}"', f'src="{new_url}"').replace(f"src='{url}'", f"src='{new_url}'")
+                elif full_match.startswith('href='):
+                    # For href attributes, replace with new URL preserving quotes
+                    if f'href="{url}"' in full_match:
+                        new_link = f'href="{new_url}"'
+                    else:
+                        new_link = f"href='{new_url}'"
                 else:
                     # For markdown links
                     new_link = f'[{link_text}]({new_url})'

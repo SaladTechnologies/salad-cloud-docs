@@ -6,7 +6,7 @@ _Last Updated: March 12, 2025_
 
 Vimeo URLs are not natively downloadable, which can be a challenge when working with the Salad Transcription API, which
 requires downloadable audio links. However, you can extract audio from Vimeo videos, upload it to
-[Salad Simple Storage Service](/products/s4/salad-simple-storage-service/) free of charge, and use the resulting link
+[Salad Simple Storage Service](/storage/explanation/overview) free of charge, and use the resulting link
 with the API.
 
 This guide will walk you through the process to batch transcribe multiple Vimeo URLs and save the outputs.
@@ -194,7 +194,7 @@ print("Batch processing complete. URL mappings saved to url_mappings.json.")
 ```
 
 - Salad Storage supports a max file size of 100MB. If the Vimeo video is too long, you may need to
-  [split the audio](/guides/transcription/salad-transcription-api/splitting-large-audio-files) or use a different
+  [split the audio](/transcription/how-to-guides/technical/splitting-large-audio-files) or use a different
   storage solution.
 
 ## **Step 5: Send Prepared URLs to the Salad Transcription API**
@@ -205,7 +205,7 @@ these URLs to the Salad Transcription API for processing.
 You can find detailed instructions on how to send requests a to the Salad Transcription API in the official
 documentation:
 
-[Salad Transcription API Documentation](/guides/transcription/salad-transcription-api/transcription-quick-start)
+[Salad Transcription API Documentation](/transcription/tutorials/transcription-quick-start)
 
 Below, we provide a function to send a transcription request to the API and retrieve the `job_id`.
 

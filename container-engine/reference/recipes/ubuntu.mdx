@@ -66,7 +66,7 @@ to get a fully functional Ubuntu environment where you can:
 To enable VS Code server integration:
 
 1. Follow the
-   [VS Code Remote Development guide](/tutorials/vscode-remote-development#create-a-tunnel-and-generate-access-tokens)
+   [VS Code Remote Development guide](/container-engine/tutorials/development-tools/vscode-remote-development#create-a-tunnel-and-generate-access-tokens)
    to create a tunnel and generate access tokens
 2. During deployment, provide your `TUNNEL_ID` and `ACCESS_TOKEN` as environment variables
 3. If omitted, JupyterLab and web terminal access will still be available
@@ -104,7 +104,7 @@ Recommended practices:
 
 When deploying this recipe, we recommend **against** enabling authentication, as it can complicate accessing JupyterLab.
 If you enable authentication, all requests to your development environment will need to include your SaladCloud API key
-in the header `Salad-Api-Key`. See the [documentation](/products/sce/gateway/sending-requests) for more information
+in the header `Salad-Api-Key`. See the [documentation](/container-engine/how-to-guides/gateway/sending-requests) for more information
 about authentication.
 
 ### Deploy It And Wait

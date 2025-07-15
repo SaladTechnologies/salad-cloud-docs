@@ -25,7 +25,7 @@ another unless explicitly allowed.
 ## Use Cases
 
 SaladCloud primarily handles GPU-intensive workloads across most use cases, while also interacting with external
-services or systems to receive requests or jobs and deliver results. [Its native networking](/products/sce/networking)
+services or systems to receive requests or jobs and deliver results. [Its native networking](/container-engine/explanation/networking-security/networking)
 allows all nodes to initiate outbound connections to these systems. When the Container Gateway is enabled, the external
 systems can also send HTTP requests to a group of Salad nodes and receive responses seamlessly.
 
@@ -42,7 +42,7 @@ Integrating Tailscale with SaladCloud unlocks additional use cases, including:
 
 - **Node Discovery and Identity Broker:** Detecting when nodes come online or go offline, while implementing an identity
   broker for private, centralized authentication and authorization. This setup provides temporary credentials to Salad
-  nodes for accessing external systems using [JWT authentication](/tutorials/jwt-authentication).
+  nodes for accessing external systems using [JWT authentication](/container-engine/tutorials/security/jwt-authentication).
 
 - **Accessing Private Services:** Connecting Salad nodes to private services hosted on-premises or in the cloud,
   including databases, message queues, Kubernetes clusters, and proxies.

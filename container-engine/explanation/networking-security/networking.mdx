@@ -41,11 +41,11 @@ to ensure that SaladCloud can automatically create a static URL with a load bala
 directly to your container group. As you scale your container group up or down, SaladCloud will automatically manage the
 load balancer, allowing you scale without additional configuration. Additionally, your container will need to accept
 IPv6 connections. To test and if needed enable IPv6 connections, see
-[Sending authenticated requests to your container](/products/sce/gateway/sending-requests)
+[Sending authenticated requests to your container](/container-engine/how-to-guides/gateway/sending-requests)
 
 We support options for both authenticated (recommended) and unauthenticated networking. If authentication is selected,
 you must include your SaladCloud API key when making requests to your application, see
-[Sending authenticated requests to your container](/products/sce/gateway/sending-requests). If authentication is not
+[Sending authenticated requests to your container](/container-engine/how-to-guides/gateway/sending-requests). If authentication is not
 selected, any traffic to the domain name will go to your container. In this case authentication should be completed by
 your container.
 

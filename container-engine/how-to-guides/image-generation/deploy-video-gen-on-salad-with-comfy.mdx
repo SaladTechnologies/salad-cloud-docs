@@ -860,7 +860,7 @@ second ide request timeout that SaladCloud's container gateway imposes.
 
 ## Step 5: Add A Job Queue
 
-To handle long-running requests like this, we can use [SaladCloud's Job Queue](/products/sce/job-queues/job-queues).
+To handle long-running requests like this, we can use [SaladCloud's Job Queue](/container-engine/explanation/core-concepts/job-queues).
 With the job queue, we can submit our prompt, and then either poll for the result, or receive a webhook when the job is
 complete. Additionally, the job queue will automatically handle retrying failed requests, buffer overflow requests, and
 includes some basic autoscaling functionality.
@@ -913,7 +913,7 @@ the portal.
 - We're going to connect the container group to the job queue we made in the previous step. Configure the job queue for
   port 3000 (where our API is running), and set the path to `/workflow/video-clip`, which is the endpoint we created.
   For this tutorial, we won't enable autoscaling, but you can
-  [learn more about it here](/products/sce/autoscaling/autoscaling#autoscaling-overview).
+  [learn more about it here](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview).
 - Finally, we will configure the readiness probe to check the `/ready` endpoint
 - Finally, ensure `autostart_policy` is set to `true` so that the container group starts automatically once the image is
   pulled into our internal cache.
@@ -1333,7 +1333,7 @@ main().catch(console.error)
 Customize the request object in `example.ts` to your liking, and copy the following script into a file
 `run-ts-example.sh`, replacing the placeholders with your organization, project, and queue names. Make sure to set the
 `SALAD_API_KEY` environment variable. For help finding your API Key,
-[see this guide](/products/sce/getting-started/quickstart-api#step-1-obtain-your-api-key).
+[see this guide](/container-engine/tutorials/quickstart-api#step-1-obtain-your-api-key).
 
 ```bash
 #!/bin/bash
@@ -1382,7 +1382,7 @@ git commit -m "Video Generation API with Job Queue"
 
 Now that you have a working video generation service, and the beginnings of a client that can submit jobs to the job
 queue, you can start to integrate the video generation service into your own applications. You can also start
-experimenting with [autoscaling](/products/sce/autoscaling/autoscaling#autoscaling-overview) to handle more requests,
+experimenting with [autoscaling](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview) to handle more requests,
 and reduce costs during periods of low demand.
 
 ComfyUI API also supports sending workflow

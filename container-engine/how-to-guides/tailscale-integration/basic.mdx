@@ -122,7 +122,7 @@ file. This file is read by the system on login, making the variables available t
 
 ## Using Userspace Networking Mode
 
-[Tailscale must run in userspace networking mode on Salad nodes](/guides/tailscale-integration/solution-overview#scenarios-and-protocols),
+[Tailscale must run in userspace networking mode on Salad nodes](/container-engine/explanation/tailscale-integration/solution-overview#scenarios-and-protocols),
 which differs from the default mode. In this mode, Tailscale does not create a virtual network interface. Instead, it
 provides a local SOCKS5 and HTTP proxy for network communication. Outbound connections to other devices in the tailnet,
 including other Salad nodes, must be explicitly configured to route through the SOCKS5 or HTTP proxy. In contrast,
@@ -226,7 +226,7 @@ When the image runs on a Salad node, the following steps are executed by the
 [startup.sh](https://github.com/SaladTechnologies/tailscale-integration/blob/main/basic/start.sh) script:
 
 - Add the Salad node to the tailnet using a Tailscale auth key and its
-  [SALAD_MACHINE_ID](/products/sce/container-groups/environment-variables), and start the Tailscale SSH server.
+  [SALAD_MACHINE_ID](/container-engine/how-to-guides/environment-variables), and start the Tailscale SSH server.
 
 - Tailscale IP is retrieved and exported as an environment variable. All environment variables are then written to the
   /etc/environment file.
@@ -280,7 +280,7 @@ access control, allowing you to precisely manage which users, devices, and servi
 
 Let's create a container group with the following parameters using the SaladCloud Portal. For deployment using
 SaladCloud APIs/SDKs, please refer to
-[this link](/guides/kubernetes-integration/application-deployment#using-saladcloud-apis%2Fsdks).
+[this link](/container-engine/how-to-guides/kubernetes-integration/application-deployment#using-saladcloud-apis%2Fsdks).
 
 ```
 Image Source: docker.io/saladtechnologies/tailscale:0.0.1-basic-gpu

@@ -135,7 +135,7 @@ forward concurrent requests to the inference servers in a container group. The s
 how long the container gateway will wait for a response from an instance after sending a request, with a maximum limit
 of 100 seconds. This timeout affects the maximum length of generated text (for non-streaming) and the number of requests
 that can queue locally on inference servers. For more information on load balancing options and how to adjust these
-settings to fit your needs, please refer to [this guide](/products/sce/gateway/load-balancer-options).
+settings to fit your needs, please refer to [this guide](/container-engine/explanation/gateway/load-balancer-options).
 
 **To use this solution effectively, system requirements and capabilities should be clearly defined and planned to
 properly configure the inference servers.** Deploying the Readiness Probes is also essential to ensure that requests are
@@ -174,7 +174,7 @@ applications on SaladCloud, demonstrating the following advantages:
 - More resilient to burst traffic, node failures, and the variability in AI inference times, while allowing easy
   customization for specific applications.
 
-Please refer to [this guide](/guides/real-time-inference/build-redis-queue) for more details.
+Please refer to [this guide](/container-engine/how-to-guides/real-time-inference/build-redis-queue) for more details.
 
 # Local Deployment To SaladCloud
 

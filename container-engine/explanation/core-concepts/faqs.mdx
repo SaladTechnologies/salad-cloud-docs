@@ -59,18 +59,18 @@ per month on SaladCloud as a reward that they exchange for games, gift cards and
 
 ### What are SaladCloud Endpoints/APIs?
 
-SaladCloud has one API offering today - a full-featured [Transcription API](/products/transcription). We will be adding
+SaladCloud has one API offering today - a full-featured [Transcription API](/transcription/explanation/overview). We will be adding
 more APIs to our suite in the coming months.
 
 ### What is the right SaladCloud product for my workload?
 
 SaladCloud has three product lines:
 
-- [Salad Container Engine (SCE)](/products/sce/getting-started/quickstart): a managed container engine built for
+- [Salad Container Engine (SCE)](/container-engine/tutorials/quickstart): a managed container engine built for
   deploying GPU-intensive containers at a massive scale.
-- [Salad Gateway Service (SGS)](/products/sgs/introduction): a proxy service that routes requests from VPN operators or
+- [Salad Gateway Service (SGS)](/gateway-service/explanation/overview): a proxy service that routes requests from VPN operators or
   other customers who need distributed residential IP infrastructure to SaladCloud nodes.
-- [Salad Transcription API](/products/transcription/transcription-overview): the lowest-priced transcription service in
+- [Salad Transcription API](/transcription/explanation/overview): the lowest-priced transcription service in
   the market with unparalleled accuracy.
 
 ### How does the billing work?
@@ -83,7 +83,7 @@ SaladCloud has three product lines:
 
 - Bandwidth is not metered, and there are no "stale charges" related to storage for containers that are not running.
 
-- [Learn More About Billing](/products/sce/container-groups/billing-and-pricing/billing)
+- [Learn More About Billing](/container-engine/explanation/billing-pricing/billing)
 
 ### RTX 5090 GPUs on SaladCloud?
 
@@ -93,7 +93,7 @@ We have RTX 5090 GPUs on SaladCloud! There are some things you should know befor
 - **CUDA 12.8 is not currently compatible with older GPUs** (Apr 24, 2025)- If you are using a docker image that is
   compatible with the RTX 5090, it will not work on older GPUs. You will need to maintain separate docker images for the
   RTX 5090 and older GPUs.
-- [More Info](/tutorials/pytorch-rtx5090)
+- [More Info](/container-engine/tutorials/machine-learning/pytorch-rtx5090)
 
 ## Security and Compliance
 
@@ -139,8 +139,8 @@ ensure your latency requirements are met.
 We use a proprietary trust rating system to index node performance, forecast availability, and select the optimal
 hardware configuration for deployment. We also run proprietary tests on every GPU to determine their fit for our
 network. For more on performant GPU infrastructure configuration, view our
-[Build High-Performance Applications](/tutorials/high-performance-apps) tutorial and our
-[Performance Monitoring](/tutorials/performance-monitoring) tutorial.
+[Build High-Performance Applications](/container-engine/tutorials/performance/high-performance-apps) tutorial and our
+[Performance Monitoring](/container-engine/tutorials/performance/performance-monitoring) tutorial.
 
 ### Are consumer-grade GPUs good for AI workloads?
 
@@ -152,12 +152,12 @@ our [benchmarks here](https://blog.salad.com/).
 ### How do I troubleshoot issues on Salad?
 
 All SaladCloud users have access to logs by configuring
-[external logging](/products/sce/container-groups/external-logging/external-logging). Axiom is our preferred external
+[external logging](/container-engine/explanation/core-concepts/external-logging). Axiom is our preferred external
 logging service provider. Your logs are seamlessly transmitted to Axiom for troubleshooting.
 
-SaladCloud users can also view their logs [directly in the portal](/products/sce/container-groups/container-logs).
+SaladCloud users can also view their logs [directly in the portal](/container-engine/explanation/container-groups/container-logs).
 
-SaladCloud users can [access a terminal](/tutorials/interactive-terminal) in a running container instance.
+SaladCloud users can [access a terminal](/container-engine/tutorials/development-tools/interactive-terminal) in a running container instance.
 
 ### What should I be aware of before deploying a workload to Salad?
 
@@ -166,14 +166,14 @@ SaladCloud users can [access a terminal](/tutorials/interactive-terminal) in a r
 - Instances will be interrupted with no warning. Architect your application accordingly, such as retrying failed
   requests, and running multiple replicas to provide coverage during automatic fail-overs.
 
-- Network performance will [vary from node to node](/products/sce/introduction#performance-variability), due the
+- Network performance will [vary from node to node](/container-engine/explanation/core-concepts/overview#performance-variability), due the
   distributed, residential nature of the network.
 
 - For Mac developers, be sure to build your containers for amd64, not arm64.
 
 If you're looking to implement networking on your instances within a container group by leveraging
-[SaladCloud's container gateway](/products/sce/networking), you'll need to
-[configure IPv6](/products/sce/gateway/enabling-ipv6) within your container image.
+[SaladCloud's container gateway](/container-engine/explanation/networking-security/networking), you'll need to
+[configure IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6) within your container image.
 
 ### What happens if a GPU goes offline?
 
@@ -188,7 +188,7 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
 - Make sure you select enough vCPU, RAM, and vRAM for your application
 - Setup container gateway or a job queue
 - If you are using the container gateway,
-  [make sure your container is setup for IPv6](/products/sce/gateway/enabling-ipv6).
+  [make sure your container is setup for IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6).
 - Make sure you’re not running an empty container (i.e. Ubuntu) without setting the command to “sleep infinity”.
 - Run your workload with at least 3 replicas to account for latency.
 
@@ -198,7 +198,7 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
   reliability of 90%-95% (meaning, in a container group of 100 nodes, you will usually have 90+ running nodes at any
   given time), the combined reliability of the system is higher, thanks to redundancy and higher no. of nodes.
 - Similar to "spot" instances, SaladCloud using a
-  [Priority Pricing](/products/sce/container-groups/billing-and-pricing/priority-pricing.mdx) model, where you can
+  [Priority Pricing](/container-engine/explanation/billing-pricing/priority-pricing) model, where you can
   choose the priority of your container group based on your workload requirements. Higher priority workloads may
   interrupt lower priority workloads.
 - Here is a real example over 24 hours for a production AI image generation workload with 100 requested nodes. As we
@@ -211,7 +211,7 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
 ### How do I use SSH with Salad?
 
 Salad does not support SSH access to containers. If you need to access a running container, you can use the
-[SaladCloud Terminal](/tutorials/interactive-terminal) to execute commands on the container.
+[SaladCloud Terminal](/container-engine/tutorials/development-tools/interactive-terminal) to execute commands on the container.
 
 ### I need a unique URL for each node. How do I do that?
 

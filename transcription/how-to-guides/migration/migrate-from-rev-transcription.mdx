@@ -68,10 +68,10 @@ curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/in
 - Next, you’ll add the URL to the file to transcribe into the URL object. Make sure the file length is less than 2.5
   hours, and less than 3GB. Make sure the URL provided is to a direct download of the file. Header based security is not
   compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
-  [Salad Simple Storage Service](/products/s4/salad-simple-storage-service#upload-a-file)
+  [Salad Simple Storage Service](/storage/explanation/overview#upload-a-file)
 
 A breakdown of all our input parameters are available
-[here](/guides/transcription/salad-transcription-api/transcription-quick-start#step-2-set-input-parameters).
+[here](/transcription/tutorials/transcription-quick-start#step-2-set-input-parameters).
 
 You will receive this JSON body from the POST response. You’ll need to cache the ID you receive, as this is how you’ll
 pull your job results.

@@ -19,7 +19,7 @@ SaladCloud Portal page for your container group.
 
 ### Instance Status System Events
 
-These events describe phases of the [deployment lifecycle](/products/sce/container-groups/deployment-lifecycle) on
+These events describe phases of the [deployment lifecycle](/container-engine/explanation/container-groups/deployment-lifecycle) on
 SaladCloud.
 
 - `Instance Allocated`
@@ -33,9 +33,9 @@ SaladCloud.
 - `Instance Reallocated by Platform`: We automatically reallocated an instance that is not meeting internal checks for
   time-to-start or networking.
 - `Instance Interrupted (Priority)`: The instances was interrupted by a higher priority workload. Consider increasing
-  the [priority](/products/sce/container-groups/billing-and-pricing/priority-pricing#priority-levels) of your workload.
+  the [priority](/container-engine/explanation/billing-pricing/priority-pricing#priority-levels) of your workload.
 - `Instance Interrupted (Node Offline)`: The node running the instance has gone offline. This is expected to occur with
-  our [infrastructure](/products/sce/container-groups/billing-and-pricing/priority-pricing#saladcloud-infrastructure).
+  our [infrastructure](/container-engine/explanation/billing-pricing/priority-pricing#saladcloud-infrastructure).
 
 ### Instance Exit System Events
 
@@ -48,7 +48,7 @@ These System Events record exits and the exit code provided by your container.
 
 ### Health Probe System Events
 
-If you have setup [health probes](/products/sce/container-groups/health-probes/health-probes) for your container group,
+If you have setup [health probes](/container-engine/explanation/health-probes/health-probes) for your container group,
 these System Events record state changes of those probes.
 
 - `Instance Interrupted (Liveness Probe Failure)`

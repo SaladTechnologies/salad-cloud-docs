@@ -30,8 +30,8 @@ Kubernetes environment:**
 
 This widely adopted scenario decouples client applications and GPU nodes (so they don't communicate directly), offering
 enhanced scalability, flexibility, and improved resilience to traffic spikes and node failures. Most existing solutions
-and applications, including [real-time inference](/guides/real-time-inference/build-redis-queue),
-[batch processing and long-running tasks](/guides/long-running-tasks/solution-overview), and various types of
+and applications, including [real-time inference](/container-engine/how-to-guides/real-time-inference/build-redis-queue),
+[batch processing and long-running tasks](/container-engine/explanation/long-running-tasks/solution-overview), and various types of
 applications (streaming/non-streaming, synchronous/asynchronous), can be effectively implemented. Supported use cases
 encompass LLMs, image/video generation, transcription and molecular dynamics simulation, etc.
 
@@ -66,7 +66,7 @@ In both approaches, you can pass the necessary access credentials to SaladCloud 
 the process can be simplified by using the JWT-based authentication.
 
 - Your applications running on SaladCloud GPU nodes can obtain a JWT by
-  [querying the local SaladCloud Instance Metadata Service](/products/sce/container-groups/imds/obtaining-an-imds-jwt)
+  [querying the local SaladCloud Instance Metadata Service](/container-engine/how-to-guides/imds/obtaining-an-imds-jwt)
   (IMDS), and use it to access the Kubernetes services.
 - Within the Kubernetes cluster, the Ingress (or individual services) can be configured to validate the JWT using
   [the public key](https://matrix-rest-api.salad.com/.well-known/workload-jwks.json).
@@ -125,4 +125,4 @@ and may shut down without prior notice. To ensure success in this scenario, addi
 - **Client-Side Traffic Control:** Applications can implement traffic management strategies to pause new user requests
   during high congestion.
 
-Please check [this link](/guides/real-time-inference/use-container-gateway#key-considerations) for more details.
+Please check [this link](/container-engine/how-to-guides/real-time-inference/use-container-gateway#key-considerations) for more details.

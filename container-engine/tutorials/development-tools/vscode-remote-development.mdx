@@ -7,8 +7,8 @@ description: 'Run, test and debug your AI applications on live Salad GPU nodes'
 
 AI developers using macOS or Windows can seamlessly connect to over 30 types of Salad GPU nodes via VS Code, enabling
 real-time testing and debugging in live environments — before moving to production. This gives them full access to GPU
-resources, [environment variables](/products/sce/container-groups/environment-variables),
-[IMDS endpoints](/products/sce/container-groups/imds/introduction), and more. Developers can validate VRAM usage,
+resources, [environment variables](/container-engine/how-to-guides/environment-variables),
+[IMDS endpoints](/container-engine/explanation/imds/introduction), and more. Developers can validate VRAM usage,
 network behavior, and external resource access; fine-tune application parameters such as local queue lengths, batch
 sizes, and thread counts; and catch rare, real-world edge cases that static testing often misses.
 
@@ -19,7 +19,7 @@ and UDP-based applications. Using the [Remote - SSH extension](https://code.visu
 Desktop, you can connect to a Salad node over its Tailscale IP, which launches a VS Code Server on the node. This allows
 you to easily open remote folders or clone GitHub repositories to begin development and testing directly on the node.
 **This solution is simple to deploy, scales greatly, and is highly recommended.** For more details on integrating
-Tailscale with workloads on SaladCloud, please refer to [this guide](/guides/tailscale-integration/solution-overview).
+Tailscale with workloads on SaladCloud, please refer to [this guide](/container-engine/explanation/tailscale-integration/solution-overview).
 
 <img src="/container-engine/images/ssh.png" />
 
@@ -241,7 +241,7 @@ established before the expiration will typically remain valid.
 
 Now your can create a container group with the following parameters using the SaladCloud Portal. For deployment using
 SaladCloud APIs/SDKs, please refer to
-[this link](/guides/kubernetes-integration/application-deployment#using-saladcloud-apis%2Fsdks).
+[this link](/container-engine/how-to-guides/kubernetes-integration/application-deployment#using-saladcloud-apis%2Fsdks).
 
 ```
 Image Source: docker.io/saladtechnologies/vscode-remote-tunnels:0.0.1-vscode-remote-tunnels:0.0.1-automatic

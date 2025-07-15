@@ -10,14 +10,14 @@ Job Queues are not available through the portal, but you can create a Job Queue 
 [Job Queue API](/reference/saladcloud-api/queues/create-queue). You will also need to
 [create your container group](/reference/saladcloud-api/container-groups/create-container-group) via the public API in
 order to attach a job queue to it.
-[Ensure your container image includes the job queue worker](products/sce/job-queues/queue-worker)
+[Ensure your container image includes the job queue worker](/container-engine/how-to-guides/job-queues/queue-worker)
 
 > 📘 Job Queue Connections
 >
 > A Job Queue can be connected to multiple container groups at once. but a container group can only be connected to at
 > most a single Job Queue.
 
-**We recommend adding a [readiness probe](/products/sce/container-groups/health-probes/readiness-probes) to your
+**We recommend adding a [readiness probe](/container-engine/explanation/health-probes/readiness-probes) to your
 container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
 receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run
 after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to

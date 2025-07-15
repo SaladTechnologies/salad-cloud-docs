@@ -207,10 +207,10 @@ CMD ["python", "ft-interruptible.py"]
 ```
 
 Installing the VS Code Server CLI is optional, allowing you to easily
-[access the running instances using VS Code Desktop or a browser](/tutorials/vscode-remote-development#interactive-mode)
+[access the running instances using VS Code Desktop or a browser](/container-engine/tutorials/development-tools/vscode-remote-development#interactive-mode)
 for testing and troubleshooting purposes.
 
-[Rclone](/tutorials/high-performance-storage-solutions#integrate-rclone-in-your-applications) is the tool used for data
+[Rclone](/container-engine/tutorials/performance/high-performance-storage-solutions#integrate-rclone-in-your-applications) is the tool used for data
 synchronization between Salad nodes and cloud storage. Some cloud storage providers charge for egress traffic, while
 ingress traffic is typically free. We recommend a vendor (such as Cloudflare R2) that does not charge egress fees.
 
@@ -337,7 +337,7 @@ targeted nodes to determine key configuration parameters.**
 You can deploy an SRCG using
 [a placeholder command](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/srcg_deploy.py#L61) via the
 SaladCloud Python SDK or add the command via the SaladCloud Portal after the SRCG is created. Once deployed,
-[connect to the instance using either VS Code Desktop (or a browser)](/tutorials/vscode-remote-development#interactive-mode),
+[connect to the instance using either VS Code Desktop (or a browser)](/container-engine/tutorials/development-tools/vscode-remote-development#interactive-mode),
 or the integrated terminal in the Portal.
 
 Run [ft-normal.py](https://github.com/SaladTechnologies/llm-fine-tuning/blob/main/ft-normal.py) interactively for
@@ -346,7 +346,7 @@ sizes under various hyperparameter settings.
 
 As a general guideline, we recommend saving at least one checkpoint per hour. To achieve this, you’ll need to set an
 appropriate **saving_steps** value.
-[Most Salad nodes provide upload throughput of at least 20 Mbps](/tutorials/high-performance-storage-solutions#solution-test-using-cloudflare-r2-and-rclone-on-saladcloud),
+[Most Salad nodes provide upload throughput of at least 20 Mbps](/container-engine/tutorials/performance/high-performance-storage-solutions#solution-test-using-cloudflare-r2-and-rclone-on-saladcloud),
 which is sufficient to upload approximately 6–7 GB of data to the cloud within an hour.
 
 If your checkpoint size is relatively small, consider lowering the saving_steps value to generate more frequent
