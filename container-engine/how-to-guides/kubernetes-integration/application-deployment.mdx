@@ -14,7 +14,7 @@ Each VK node in the Kubernetes cluster is exclusively tied to an organization's 
 resources not created by the VK node will be automatically removed. VK nodes are also deployed with specific labels,
 annotations, and taints, which are utilized for efficient scheduling. Here is an example:
 
-<img src="/guides/kubernetes-integration/images/k8s-scheduling1.png" />
+<img src="/container-engine/images/k8s-scheduling1.png" />
 
 The node name and labels can be used to schedule pods on one or more VK nodes, offering flexibility in targeting
 specific VK nodes or a group of VK nodes.
@@ -371,17 +371,17 @@ apply the change. This triggers the default rolling update strategy, which gradu
 (**rather than updating existing ones via the SaladCloud Update APIs**). This strategy helps minimize downtime, ensuring
 that the application remains available throughout the update process.
 
-<img src="/guides/kubernetes-integration/images/k8s-rolling1.png" />
+<img src="/container-engine/images/k8s-rolling1.png" />
 
 If the new update doesn’t work as expected, we can easily roll back to the previous version or any of the earlier
 versions, restoring the application to its prior state.
 
-<img src="/guides/kubernetes-integration/images/k8s-rolling2.png" />
+<img src="/container-engine/images/k8s-rolling2.png" />
 
 We can easily scale the workload up or down based on demands, including temporarily shutting down the application by
 setting the replica count to zero.
 
-<img src="/guides/kubernetes-integration/images/k8s-rolling3.png" />
+<img src="/container-engine/images/k8s-rolling3.png" />
 
 DevOps tools like Jenkins, Argo CD, Flux, and others can be deployed to automate deployment and management, further
 simplifying the entire process.

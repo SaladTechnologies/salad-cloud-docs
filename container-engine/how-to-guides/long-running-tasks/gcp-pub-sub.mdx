@@ -15,7 +15,7 @@ storage, so that they can be resumed from the last checkpoint in the event of an
 upload completed artifacts to cloud storage.
 
 <Frame caption="Basic architecture for long-running tasks on SaladCloud">
-  <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
+  <img src="/container-engine/images/lrt-basic-arch.png" alt="Basic Architecture" />
 </Frame>
 
 We will be using [Google Cloud Pub/Sub](https://cloud.google.com/pubsub) as our job queue, and
@@ -78,7 +78,7 @@ the default subscription. Go ahead and select the schema we just created, and us
 key.
 
 <Frame caption="Creating a new topic">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-create-topic.png" alt="Creating a new topic" />
+  <img src="/container-engine/images/gcp-pubsub-create-topic.png" alt="Creating a new topic" />
 </Frame>
 
 Create a second topic called `deadletter` that we will use for failed jobs. For this one, we do not want the schema, and
@@ -91,7 +91,7 @@ doesn't acknowledge the message, or extend the deadline within 60 seconds, the m
 worker.
 
 <Frame caption="Creating a new subscription">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-create-subscription.png" alt="Creating a new subscription" />
+  <img src="/container-engine/images/gcp-pubsub-create-subscription.png" alt="Creating a new subscription" />
 </Frame>
 
 We will enable exactly once delivery, to ensure that our long-running, presumably expensive tasks do not get run more
@@ -99,7 +99,7 @@ than once. We will also enable dead-lettering, and set the dead-letter topic to 
 earlier. Maximum delivery attempts can be the minimum value of 5. We want failed jobs to be immediately retried.
 
 <Frame caption="Creating a new subscription">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-create-subscription-2.png" alt="Creating a new subscription" />
+  <img src="/container-engine/images/gcp-pubsub-create-subscription-2.png" alt="Creating a new subscription" />
 </Frame>
 
 Once this is created, go ahead and create another subscription called `deadletter`, and attach it to the `deadletter`
@@ -120,21 +120,21 @@ therefore may incur egress fees from other providers.
 From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
 
 <Frame caption="The R2 Object Storage Console">
-  <img src="/guides/long-running-tasks/images/r2-console.png" alt="The R2 Object Storage Console" />
+  <img src="/container-engine/images/r2-console.png" alt="The R2 Object Storage Console" />
 </Frame>
 
 Give your bucket a meaningful name, and select an appropriate location. We are going to use the standard storage class,
 and automatic location.
 
 <Frame caption="Creating a new bucket">
-  <img src="/guides/long-running-tasks/images/r2-create-bucket.png" alt="Creating a new bucket" />
+  <img src="/container-engine/images/r2-create-bucket.png" alt="Creating a new bucket" />
 </Frame>
 
 Once your bucket is created, you will need to create an access key and secret key. Select "Manage API tokens" from the
 "\{ \} API" menu, and click "Create Token".
 
 <Frame caption="You still need an API token to access your bucket">
-  <img src="/guides/long-running-tasks/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
+  <img src="/container-engine/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
 </Frame>
 
 Create a token with "Object Read & Write" permissions, and only grant it access to the bucket we've just created. Since
@@ -823,14 +823,14 @@ to request 100 replicas (the max via the portal), and we're going to set all of 
 `worker.env`.
 
 <Frame caption="Creating a new container group">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-1.png" alt="Creating a new container group" />
+  <img src="/container-engine/images/gcp-pubsub-cg-create-1.png" alt="Creating a new container group" />
 </Frame>
 
 Our application is extremely simple, so we're going to only request 1 vCPU, 1 GB of RAM, and no GPU. Your hardware
 requirements are likely significantly higher than this.
 
 <Frame caption="Setting the hardware requirements">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-2.png" alt="Setting the hardware requirements" />
+  <img src="/container-engine/images/gcp-pubsub-cg-create-2.png" alt="Setting the hardware requirements" />
 </Frame>
 
 All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't need any additional storage for this
@@ -838,7 +838,7 @@ particular application.
 
 <Frame caption="Setting the job priority and storage requirements">
   <img
-    src="/guides/long-running-tasks/images/gcp-pubsub-cg-create-3.png"
+    src="/container-engine/images/gcp-pubsub-cg-create-3.png"
     alt="Setting the job priority and storage requirements"
   />
 </Frame>
@@ -848,13 +848,13 @@ as those are primarily for services accessed via Container Gateway. Go ahead and
 container group page, where you can see its status.
 
 <Frame caption="Deploying the container group">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-deploying.png" alt="Deploying the container group" />
+  <img src="/container-engine/images/gcp-pubsub-cg-deploying.png" alt="Deploying the container group" />
 </Frame>
 
 After a few minutes, instances should start to become "Running".
 
 <Frame caption="Container group running">
-  <img src="/guides/long-running-tasks/images/gcp-pubsub-cg-running.png" alt="Container group running" />
+  <img src="/container-engine/images/gcp-pubsub-cg-running.png" alt="Container group running" />
 </Frame>
 
 ## Validating That It Works
@@ -864,7 +864,7 @@ there is activity on the subscription.
 
 <Frame caption="Active messages in the subscription">
   <img
-    src="/guides/long-running-tasks/images/gcp-pubsub-subscription-active.png"
+    src="/container-engine/images/gcp-pubsub-subscription-active.png"
     alt="Active messages in the subscription"
   />
 </Frame>
@@ -873,7 +873,7 @@ From the R2 console, we can see that our bucket is being filled with checkpoints
 
 <Frame caption="Checkpoints and results in the R2 bucket">
   <img
-    src="/guides/long-running-tasks/images/r2-bucket-has-objects.png"
+    src="/container-engine/images/r2-bucket-has-objects.png"
     alt="Checkpoints and results in the R2 bucket"
   />
 </Frame>

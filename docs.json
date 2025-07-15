@@ -15,68 +15,7 @@
         "groups": [
           {
             "group": "How-to Guides",
-            "pages": [
-              {
-                "group": "Transcription",
-                "pages": [
-                  {
-                    "group": "Salad Transcription API",
-                    "pages": [
-                      {
-                        "group": "Migrate to Salad Transcription API",
-                        "pages": [
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-azure-batch",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-gcp-transcription",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-rev-transcription",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-assembly-transcription",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-aws-transcription",
-                          "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription"
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Real-Time Inference",
-                "pages": [
-                  "guides/real-time-inference/use-container-gateway",
-                  "guides/real-time-inference/build-redis-queue"
-                ]
-              },
-              {
-                "group": "Long-Running Tasks",
-                "pages": [
-                  "guides/long-running-tasks/solution-overview",
-                  "guides/long-running-tasks/kelpie",
-                  "guides/long-running-tasks/gcp-pub-sub",
-                  "guides/long-running-tasks/rabbitmq",
-                  "guides/long-running-tasks/sqs"
-                ]
-              },
-              {
-                "group": "Kubernetes Integration",
-                "pages": [
-                  "guides/kubernetes-integration/solution-overview",
-                  "guides/kubernetes-integration/installation-helm-chart",
-                  "guides/kubernetes-integration/application-deployment",
-                  "guides/kubernetes-integration/service-access"
-                ]
-              },
-              {
-                "group": "Tailscale Integration",
-                "pages": [
-                  "guides/tailscale-integration/solution-overview",
-                  "guides/tailscale-integration/basic"
-                ]
-              },
-              {
-                "group": "Molecular Dynamics Simulation",
-                "pages": [
-                  "guides/molecular-dynamics-simulation/gromacs-srcg"
-                ]
-              }
-            ]
+            "pages": []
           }
         ]
       },
@@ -291,6 +230,24 @@
                 "pages": [
                   "container-engine/explanation/computer-vision/yolov8-overview"
                 ]
+              },
+              {
+                "group": "Long Running Tasks",
+                "pages": [
+                  "container-engine/explanation/long-running-tasks/solution-overview"
+                ]
+              },
+              {
+                "group": "Kubernetes Integration",
+                "pages": [
+                  "container-engine/explanation/kubernetes-integration/solution-overview"
+                ]
+              },
+              {
+                "group": "Tailscale Integration",
+                "pages": [
+                  "container-engine/explanation/tailscale-integration/solution-overview"
+                ]
               }
             ]
           },
@@ -490,6 +447,42 @@
                   "container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
                   "container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
                 ]
+              },
+              {
+                "group": "Real Time Inference",
+                "pages": [
+                  "container-engine/how-to-guides/real-time-inference/use-container-gateway",
+                  "container-engine/how-to-guides/real-time-inference/build-redis-queue"
+                ]
+              },
+              {
+                "group": "Long Running Tasks",
+                "pages": [
+                  "container-engine/how-to-guides/long-running-tasks/kelpie",
+                  "container-engine/how-to-guides/long-running-tasks/gcp-pub-sub",
+                  "container-engine/how-to-guides/long-running-tasks/rabbitmq",
+                  "container-engine/how-to-guides/long-running-tasks/sqs"
+                ]
+              },
+              {
+                "group": "Kubernetes Integration",
+                "pages": [
+                  "container-engine/how-to-guides/kubernetes-integration/installation-helm-chart",
+                  "container-engine/how-to-guides/kubernetes-integration/application-deployment",
+                  "container-engine/how-to-guides/kubernetes-integration/service-access"
+                ]
+              },
+              {
+                "group": "Tailscale Integration",
+                "pages": [
+                  "container-engine/how-to-guides/tailscale-integration/basic"
+                ]
+              },
+              {
+                "group": "Molecular Dynamics Simulation",
+                "pages": [
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
               }
             ]
           }
@@ -574,6 +567,17 @@
                 "group": "Technical",
                 "pages": [
                   "transcription/how-to-guides/technical/splitting-large-audio-files"
+                ]
+              },
+              {
+                "group": "Migration",
+                "pages": [
+                  "transcription/how-to-guides/migration/migrate-from-azure-batch",
+                  "transcription/how-to-guides/migration/migrate-from-gcp-transcription",
+                  "transcription/how-to-guides/migration/migrate-from-rev-transcription",
+                  "transcription/how-to-guides/migration/migrate-from-assembly-transcription",
+                  "transcription/how-to-guides/migration/migrate-from-aws-transcription",
+                  "transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
                 ]
               }
             ]
@@ -1651,6 +1655,86 @@
     {
       "source": "/guides/text-to-speech/openvoice-api",
       "destination": "/container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
+    },
+    {
+      "source": "/guides/real-time-inference/use-container-gateway",
+      "destination": "/container-engine/how-to-guides/real-time-inference/use-container-gateway"
+    },
+    {
+      "source": "/guides/real-time-inference/build-redis-queue",
+      "destination": "/container-engine/how-to-guides/real-time-inference/build-redis-queue"
+    },
+    {
+      "source": "/guides/long-running-tasks/solution-overview",
+      "destination": "/container-engine/explanation/long-running-tasks/solution-overview"
+    },
+    {
+      "source": "/guides/long-running-tasks/kelpie",
+      "destination": "/container-engine/how-to-guides/long-running-tasks/kelpie"
+    },
+    {
+      "source": "/guides/long-running-tasks/gcp-pub-sub",
+      "destination": "/container-engine/how-to-guides/long-running-tasks/gcp-pub-sub"
+    },
+    {
+      "source": "/guides/long-running-tasks/rabbitmq",
+      "destination": "/container-engine/how-to-guides/long-running-tasks/rabbitmq"
+    },
+    {
+      "source": "/guides/long-running-tasks/sqs",
+      "destination": "/container-engine/how-to-guides/long-running-tasks/sqs"
+    },
+    {
+      "source": "/guides/kubernetes-integration/solution-overview",
+      "destination": "/container-engine/explanation/kubernetes-integration/solution-overview"
+    },
+    {
+      "source": "/guides/kubernetes-integration/installation-helm-chart",
+      "destination": "/container-engine/how-to-guides/kubernetes-integration/installation-helm-chart"
+    },
+    {
+      "source": "/guides/kubernetes-integration/application-deployment",
+      "destination": "/container-engine/how-to-guides/kubernetes-integration/application-deployment"
+    },
+    {
+      "source": "/guides/kubernetes-integration/service-access",
+      "destination": "/container-engine/how-to-guides/kubernetes-integration/service-access"
+    },
+    {
+      "source": "/guides/tailscale-integration/solution-overview",
+      "destination": "/container-engine/explanation/tailscale-integration/solution-overview"
+    },
+    {
+      "source": "/guides/tailscale-integration/basic",
+      "destination": "/container-engine/how-to-guides/tailscale-integration/basic"
+    },
+    {
+      "source": "/guides/molecular-dynamics-simulation/gromacs-srcg",
+      "destination": "/container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-azure-batch",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-azure-batch"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-gcp-transcription",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-gcp-transcription"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-rev-transcription",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-rev-transcription"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-assembly-transcription",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-assembly-transcription"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-aws-transcription",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-aws-transcription"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription",
+      "destination": "/transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
     }
   ]
 }

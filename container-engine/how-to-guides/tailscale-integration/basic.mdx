@@ -69,14 +69,14 @@ Tailscale keys for authentication and encryption, simplifying access without req
 Additionally, Tailscale SSH can operate seamlessly alongside any existing SSH server, ensuring that non-Tailscale SSH
 connections to the same host are unaffected.
 
-<img src="/guides/tailscale-integration/images/ts-ssh.png" />
+<img src="/container-engine/images/ts-ssh.png" />
 
 The default SSH policy in [the Admin Console](https://login.tailscale.com/admin/acls/file) uses
 [the check mode](https://tailscale.com/kb/1193/tailscale-ssh#check-mode), which requires users to periodically
 reauthenticate on the source devices for accessing the target devices on a specified check period, but we can change it
 to [the accept action](https://tailscale.com/kb/1193/tailscale-ssh#action) for simplicity.
 
-<img src="/guides/tailscale-integration/images/ssh-policy.png" />
+<img src="/container-engine/images/ssh-policy.png" />
 
 With the above SSH policy, for example, if a Tailscale user adds 10 devices to the tailnet, they can access any of those
 devices (either as a nonroot or root user on those devices) from any other device, regardless of whether the devices
@@ -129,7 +129,7 @@ including other Salad nodes, must be explicitly configured to route through the 
 inbound connections are automatically directed through the SOCKS5 proxy by Tailscale without requiring additional
 configuration.
 
-<img src="/guides/tailscale-integration/images/proxy.png" />
+<img src="/container-engine/images/proxy.png" />
 
 Many widely used networking tools, such as curl and wget, natively support proxy configuration by utilizing environment
 variables like **ALL_PROXY**, **HTTP_PROXY** and **http_proxy**. You may need to experiment to see which ones your
@@ -177,7 +177,7 @@ can be adjusted in [the Admin Console](https://login.tailscale.com/admin/setting
 expired key remain authorized, but they will require reauthentication once the configured reauthentication interval has
 passed.
 
-<img src="/guides/tailscale-integration/images/auth-key.png" />
+<img src="/container-engine/images/auth-key.png" />
 
 ## Embedding Tailscale in Container Images
 
@@ -333,7 +333,7 @@ ubuntu@app-server:~$ tailscale status
 100.87.65.60    dev-vscode           salad_demo@ macOS   -
 ```
 
-<img src="/guides/tailscale-integration/images/portal.png" />
+<img src="/container-engine/images/portal.png" />
 
 ### Case 1: Access Salad nodes publicly from Internet via the Container Gateway
 
@@ -395,7 +395,7 @@ SALAD_CONTAINER_GROUP_ID. This may be updated in the future to use the individua
 AI Developers can use Visual Studio Code Remote - SSH extension to securely access Salad nodes via Tailscale SSH,
 enabling you to fully leverage VS Code's development features along with the power of SaladCloud GPUs.
 
-<img src="/guides/tailscale-integration/images/vscode.png" />
+<img src="/container-engine/images/vscode.png" />
 
 The VS Code Remote - SSH extension does not automatically forward all environment variables from the remote system to
 the local instance. For configuration options and possible workarounds, refer to
@@ -406,7 +406,7 @@ the local instance. For configuration options and possible workarounds, refer to
 Data scientists can use JupyterLab with various GPUs on SaladCloud to explore and analyze data, run machine learning
 models, and develop data-driven insights efficiently.
 
-<img src="/guides/tailscale-integration/images/jupyterlab.png" />
+<img src="/container-engine/images/jupyterlab.png" />
 
 #### AI Inference for Client Applications
 

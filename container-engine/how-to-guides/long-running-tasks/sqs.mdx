@@ -15,7 +15,7 @@ storage, so that they can be resumed from the last checkpoint in the event of an
 upload completed artifacts to cloud storage.
 
 <Frame caption="Basic architecture for long-running tasks on SaladCloud">
-  <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
+  <img src="/container-engine/images/lrt-basic-arch.png" alt="Basic Architecture" />
 </Frame>
 
 We will be using [Amazon SQS](https://aws.amazon.com/sqs/) as our job queue, and
@@ -39,13 +39,13 @@ the queue, and the workers will need to be able to read and delete jobs from the
 [IAM console](https://console.aws.amazon.com/iam/), and select "Users" from the left-hand menu. Click "Create User".
 
 <Frame caption="The IAM Users Console">
-  <img src="/guides/long-running-tasks/images/iam-users-console.png" alt="The IAM Console" />
+  <img src="/container-engine/images/iam-users-console.png" alt="The IAM Console" />
 </Frame>
 
 We're going to name our user `job-submitter`. It does not need console access.
 
 <Frame caption="Creating the job-submitter user">
-  <img src="/guides/long-running-tasks/images/iam-submitter-st1.png" alt="Creating the job-submitter user" />
+  <img src="/container-engine/images/iam-submitter-st1.png" alt="Creating the job-submitter user" />
 </Frame>
 
 On the next screen, we're going to grant no permissions the the user. We will be using a resource-based policy later to
@@ -53,7 +53,7 @@ grant the user access to the queue.
 
 <Frame caption="Granting no permissions to the job-submitter user">
   <img
-    src="/guides/long-running-tasks/images/iam-submitter-st2.png"
+    src="/container-engine/images/iam-submitter-st2.png"
     alt="Granting no permissions to the job-submitter user"
   />
 </Frame>
@@ -62,7 +62,7 @@ Finally, give the user any tags that will make it easier to find and organize la
 "project: sqs-demo".
 
 <Frame caption="Tagging the job-submitter user">
-  <img src="/guides/long-running-tasks/images/iam-submitter-st3.png" alt="Tagging the job-submitter user" />
+  <img src="/container-engine/images/iam-submitter-st3.png" alt="Tagging the job-submitter user" />
 </Frame>
 
 Repeat that process to create a user called `job-worker`. Once you're done, leave this tab open, because we will need
@@ -74,7 +74,7 @@ keep track of which set of keys belongs to which user, since they have different
 
 <Frame caption="Creating an access key for the job-worker user">
   <img
-    src="/guides/long-running-tasks/images/iam-worker-create-key.png"
+    src="/container-engine/images/iam-worker-create-key.png"
     alt="Creating an access key for the job-worker user"
   />
 </Frame>
@@ -109,11 +109,11 @@ per month, the cost should be negligible.
 To create an SQS queue, navigate to the [SQS console](https://console.aws.amazon.com/sqs/), and click "Create queue".
 
 <Frame caption="The SQS Console">
-  <img src="/guides/long-running-tasks/images/sqs-console.png" alt="The SQS Console" />
+  <img src="/container-engine/images/sqs-console.png" alt="The SQS Console" />
 </Frame>
 
 <Frame caption="Creating a new FIFO queue">
-  <img src="/guides/long-running-tasks/images/sqs-create-queue.png" alt="Creating a new FIFO queue" />
+  <img src="/container-engine/images/sqs-create-queue.png" alt="Creating a new FIFO queue" />
 </Frame>
 
 You may want to choose a better name than I have, but for the purposes of this guide, we'll call our queue
@@ -158,14 +158,14 @@ We're going to use a basic access policy, which allows the job-submitter user to
 job-worker user to receive and delete messages from the queue.
 
 <Frame caption="Assigning permissions to the users we previously created.">
-  <img src="/guides/long-running-tasks/images/sqs-assign-permissions.png" alt="Assigning permissions to the users" />
+  <img src="/container-engine/images/sqs-assign-permissions.png" alt="Assigning permissions to the users" />
 </Frame>
 
 For now, we're not going to enable "Redrive allow policy,"" or "Dead-letter queue", because we haven't created our dead
 letter queue yet. Once we have, we will come back and enable this feature.
 
 <Frame caption="Skipping the dead-letter queue for now">
-  <img src="/guides/long-running-tasks/images/sqs-no-dlq-yet.png" alt="Skipping the dead-letter queue for now" />
+  <img src="/container-engine/images/sqs-no-dlq-yet.png" alt="Skipping the dead-letter queue for now" />
 </Frame>
 
 Again, I'm going to tag the queue with "project: sqs-demo". Being religious about tagging resources will save you a lot
@@ -177,7 +177,7 @@ permissions to allow `job-worker` to _send_ messages to it. For this one, we wil
 allow our first queue as the source queue.
 
 <Frame caption="Enable access from our main queue to the dead-letter queue">
-  <img src="/guides/long-running-tasks/images/sqs-create-dlq-redrive.png" alt="Creating a dead-letter queue" />
+  <img src="/container-engine/images/sqs-create-dlq-redrive.png" alt="Creating a dead-letter queue" />
 </Frame>
 
 Once this dead-letter queue is created, we can go back and edit our original queue, and enable the dead-letter queue.
@@ -185,13 +185,13 @@ We'll choose our dead-letter queue as the destination, and set the maximum recei
 is received 3 times without being deleted, it will be moved to the dead-letter queue.
 
 <Frame caption="Enable the dead-letter queue on the main queue">
-  <img src="/guides/long-running-tasks/images/sqs-assign-dlq.png" alt="Enabling the dead-letter queue" />
+  <img src="/container-engine/images/sqs-assign-dlq.png" alt="Enabling the dead-letter queue" />
 </Frame>
 
 For our application to use these queues, we will need the Queue URL, available on the queue's details page.
 
 <Frame caption="The Queue URL">
-  <img src="/guides/long-running-tasks/images/sqs-get-queue-url.png" alt="The Queue URL" />
+  <img src="/container-engine/images/sqs-get-queue-url.png" alt="The Queue URL" />
 </Frame>
 
 ## Cloud Storage: R2
@@ -203,21 +203,21 @@ therefore may incur egress fees from other providers.
 From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
 
 <Frame caption="The R2 Object Storage Console">
-  <img src="/guides/long-running-tasks/images/r2-console.png" alt="The R2 Object Storage Console" />
+  <img src="/container-engine/images/r2-console.png" alt="The R2 Object Storage Console" />
 </Frame>
 
 Give your bucket a meaningful name, and select an appropriate location. We are going to use the standard storage class,
 and automatic location.
 
 <Frame caption="Creating a new bucket">
-  <img src="/guides/long-running-tasks/images/r2-create-bucket.png" alt="Creating a new bucket" />
+  <img src="/container-engine/images/r2-create-bucket.png" alt="Creating a new bucket" />
 </Frame>
 
 Once your bucket is created, you will need to create an access key and secret key. Select "Manage API tokens" from the
 "\{ \} API" menu, and click "Create Token".
 
 <Frame caption="You still need an API token to access your bucket">
-  <img src="/guides/long-running-tasks/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
+  <img src="/container-engine/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
 </Frame>
 
 Create a token with "Object Read & Write" permissions, and only grant it access to the bucket we've just created. Since
@@ -1092,7 +1092,7 @@ Once that has run, we can see in the SQS console that our queue has 10000 messag
 
 <Frame caption="The SQS Console showing 10000 messages in the queue">
   <img
-    src="/guides/long-running-tasks/images/sqs-10k-messages.png"
+    src="/container-engine/images/sqs-10k-messages.png"
     alt="The SQS Console showing 10000 messages in the queue"
   />
 </Frame>
@@ -1155,14 +1155,14 @@ to request 100 replicas (the max via the portal), and we're going to set all of 
 `worker.env`.
 
 <Frame caption="Creating a new Container Group">
-  <img src="/guides/long-running-tasks/images/sqs-cg-create-1.png" alt="Creating a new Container Group" />
+  <img src="/container-engine/images/sqs-cg-create-1.png" alt="Creating a new Container Group" />
 </Frame>
 
 Our application is extremely simple, so we're going to only request 1 vCPU, 1 GB of RAM, and no GPU. Your hardware
 requirements are likely significantly higher than this.
 
 <Frame caption="Setting the hardware requirements">
-  <img src="/guides/long-running-tasks/images/sqs-cg-create-2.png" alt="Setting the hardware requirements" />
+  <img src="/container-engine/images/sqs-cg-create-2.png" alt="Setting the hardware requirements" />
 </Frame>
 
 All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't need any additional storage for this
@@ -1170,7 +1170,7 @@ particular application.
 
 <Frame caption="Setting the job priority and storage requirements">
   <img
-    src="/guides/long-running-tasks/images/sqs-cg-create-3.png"
+    src="/container-engine/images/sqs-cg-create-3.png"
     alt="Setting the job priority and storage requirements"
   />
 </Frame>
@@ -1182,19 +1182,19 @@ container group page, where you can see its status.
 First, it will prepare by pulling the container image into our high-performance cache.
 
 <Frame caption="Preparing the container">
-  <img src="/guides/long-running-tasks/images/sqs-cg-preparing.png" alt="Preparing the container" />
+  <img src="/container-engine/images/sqs-cg-preparing.png" alt="Preparing the container" />
 </Frame>
 
 Once it's prepared, it will start allocating replicas, and downloading the container image to those replicas.
 
 <Frame caption="Downloading the images to the replicas">
-  <img src="/guides/long-running-tasks/images/sqs-cg-deploying.png" alt="Downloading the images to the replicas" />
+  <img src="/container-engine/images/sqs-cg-deploying.png" alt="Downloading the images to the replicas" />
 </Frame>
 
 After a minute or so, we should see our instances up and running.
 
 <Frame caption="Instances up and running">
-  <img src="/guides/long-running-tasks/images/sqs-cg-running.png" alt="Instances up and running" />
+  <img src="/container-engine/images/sqs-cg-running.png" alt="Instances up and running" />
 </Frame>
 
 ## Validating That It Works
@@ -1202,14 +1202,14 @@ After a minute or so, we should see our instances up and running.
 Now that our cluster is up and running, we can go to the SQS console, and see that we have in-flight messages now.
 
 <Frame caption="In-flight messages in the SQS queue">
-  <img src="/guides/long-running-tasks/images/sqs-messages-in-flight.png" alt="In-flight messages in the SQS queue" />
+  <img src="/container-engine/images/sqs-messages-in-flight.png" alt="In-flight messages in the SQS queue" />
 </Frame>
 
 From the R2 console, we can see that our bucket is being filled with checkpoints and results.
 
 <Frame caption="Checkpoints and results in the R2 bucket">
   <img
-    src="/guides/long-running-tasks/images/r2-bucket-has-objects.png"
+    src="/container-engine/images/r2-bucket-has-objects.png"
     alt="Checkpoints and results in the R2 bucket"
   />
 </Frame>
@@ -1228,20 +1228,20 @@ compute platforms.
 Navigate to the Lambda console, and create a new function.
 
 <Frame caption="Creating a new Lambda function">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-console.png" alt="Creating a new Lambda function" />
+  <img src="/container-engine/images/sqs-lambda-console.png" alt="Creating a new Lambda function" />
 </Frame>
 
 We're going to use Python 3.13, and we'll run it with `arm64`, because it is cheaper, and we aren't doing anything
 architecture-specific. We can leave the default permissions for now.
 
 <Frame caption="Setting the runtime and architecture">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-create.png" alt="Setting the runtime and architecture" />
+  <img src="/container-engine/images/sqs-lambda-create.png" alt="Setting the runtime and architecture" />
 </Frame>
 
 Once your function has been created, you'll land on the function overview page.
 
 <Frame caption="The function overview page">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-editor.png" alt="The function overview page" />
+  <img src="/container-engine/images/sqs-lambda-editor.png" alt="The function overview page" />
 </Frame>
 
 Next, we need to give this lambda the correct permissions to interact with our SQS queue.
@@ -1249,20 +1249,20 @@ Next, we need to give this lambda the correct permissions to interact with our S
 First, we need to get the ARN for the _execution role_ of the function, not the ARN of the function itself.
 
 <Frame caption="Find The Execution Role">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-find-execution-role.png" alt="The ARN of the execution role" />
+  <img src="/container-engine/images/sqs-lambda-find-execution-role.png" alt="The ARN of the execution role" />
 </Frame>
 
 Clicking that link will take you the IAM console page for that role, where you can then copy the ARN.
 
 <Frame caption="The ARN of the execution role">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-find-role-arn.png" alt="The ARN of the execution role" />
+  <img src="/container-engine/images/sqs-lambda-find-role-arn.png" alt="The ARN of the execution role" />
 </Frame>
 
 We're going to do this by editing the policy created by the queue. Back in the SQS console, on the details page for our
 queue, navigate to the "Queue Policies" tab.
 
 <Frame caption="The Queue Policies tab">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-permissions.png" alt="The Queue Policies tab" />
+  <img src="/container-engine/images/sqs-lambda-permissions.png" alt="The Queue Policies tab" />
 </Frame>
 
 Add this additional statement to the Access policy, replacing the ARN with the ARN of the execution role of the lambda
@@ -1541,7 +1541,7 @@ Now, deploy and test your lambda. You can use the default test event, as our lam
 the event itself.
 
 <Frame caption="Testing the Lambda">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-deploy-and-test.png" alt="Testing the Lambda" />
+  <img src="/container-engine/images/sqs-lambda-deploy-and-test.png" alt="Testing the Lambda" />
 </Frame>
 
 You should see it log the current and desired replicas, and the current state of the container group. Then, if you've
@@ -1551,11 +1551,11 @@ The final step is adding a trigger for our lambda. We're going to use a CloudWat
 based on a schedule. We're going to set it to run every 5 minutes.
 
 <Frame caption="Creating a new CloudWatch Event">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-add-trigger.png" alt="Creating a new CloudWatch Event" />
+  <img src="/container-engine/images/sqs-lambda-add-trigger.png" alt="Creating a new CloudWatch Event" />
 </Frame>
 
 <Frame caption="Setting the schedule">
-  <img src="/guides/long-running-tasks/images/sqs-lambda-configure-trigger.png" alt="Setting the schedule" />
+  <img src="/container-engine/images/sqs-lambda-configure-trigger.png" alt="Setting the schedule" />
 </Frame>
 
 ## Conclusion

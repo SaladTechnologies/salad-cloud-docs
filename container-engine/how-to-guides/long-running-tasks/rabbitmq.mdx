@@ -15,7 +15,7 @@ storage, so that they can be resumed from the last checkpoint in the event of an
 upload completed artifacts to cloud storage.
 
 <Frame caption="Basic architecture for long-running tasks on SaladCloud">
-  <img src="/guides/long-running-tasks/images/lrt-basic-arch.png" alt="Basic Architecture" />
+  <img src="/container-engine/images/lrt-basic-arch.png" alt="Basic Architecture" />
 </Frame>
 
 We will be using [RabbitMQ](https://www.rabbitmq.com/) hosted on [CloudAMQP](https://www.cloudamqp.com/) as our job
@@ -62,7 +62,7 @@ for this guide, which is $50/month (billed by the second). You can choose a diff
 resources.
 
 <Frame caption="Creating a new instance on CloudAMQP">
-  <img src="/guides/long-running-tasks/images/rabbitmq-create-1.png" alt="Creating a new instance on CloudAMQP" />
+  <img src="/container-engine/images/rabbitmq-create-1.png" alt="Creating a new instance on CloudAMQP" />
 </Frame>
 
 Next, you can choose the datacenter and region for your instance. We will be using DigitalOcean's New York 3 datacenter
@@ -70,7 +70,7 @@ for this guide, but if you have other application components (besides the worker
 consider deploying the broker to the same cloud and region as your other components.
 
 <Frame caption="Choosing a Datacenter and Region">
-  <img src="/guides/long-running-tasks/images/rabbitmq-create-2.png" alt="Choosing a datacenter and region" />
+  <img src="/container-engine/images/rabbitmq-create-2.png" alt="Choosing a datacenter and region" />
 </Frame>
 
 Next, select the number of nodes you want to deploy, and the version of RabbitMQ. We will be using a single node, and
@@ -78,7 +78,7 @@ the latest version of RabbitMQ (4.0.5 as of the time of this writing)
 
 <Frame caption="Choosing the number of nodes and RabbitMQ version">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-create-3.png"
+    src="/container-engine/images/rabbitmq-create-3.png"
     alt="Choosing the number of nodes and RabbitMQ version"
   />
 </Frame>
@@ -87,7 +87,7 @@ Confirm all of your settings on the next page, and deploy your instance. Once de
 this on the CloudAMQP console:
 
 <Frame caption="CloudAMQP Console">
-  <img src="/guides/long-running-tasks/images/cloudamqp-console.png" alt="CloudAMQP Console" />
+  <img src="/container-engine/images/cloudamqp-console.png" alt="CloudAMQP Console" />
 </Frame>
 
 Click the name of the instance to pull up the details page. Later, you will need info from this page to connect to your
@@ -97,7 +97,7 @@ timeout.
 
 <Frame caption="Disabling the consumer timeout">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-disable-consumer-timeout.png"
+    src="/container-engine/images/rabbitmq-disable-consumer-timeout.png"
     alt="Disabling the consumer timeout"
   />
 </Frame>
@@ -108,7 +108,7 @@ objects, as well as publish and consume messages. There is an HTTP API for this 
 will be using the web interface.
 
 <Frame caption="RabbitMQ Manager">
-  <img src="/guides/long-running-tasks/images/rabbitmq-manager.png" alt="RabbitMQ Manager" />
+  <img src="/container-engine/images/rabbitmq-manager.png" alt="RabbitMQ Manager" />
 </Frame>
 
 ### Deadletter Exchange
@@ -124,7 +124,7 @@ From the RabbitMQ Manager, navigate to the Exchanges tab, and add a new exchange
 
 <Frame caption="Adding a deadletter exchange">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-create-deadletter-exchange.png"
+    src="/container-engine/images/rabbitmq-create-deadletter-exchange.png"
     alt="Adding a deadletter exchange"
   />
 </Frame>
@@ -135,7 +135,7 @@ Next, navigate to the Queues tab, and add a new queue called "deadletter". Make 
 the exchange.
 
 <Frame caption="Adding a deadletter queue">
-  <img src="/guides/long-running-tasks/images/rabbitmq-create-deadletter-queue.png" alt="Adding a deadletter queue" />
+  <img src="/container-engine/images/rabbitmq-create-deadletter-queue.png" alt="Adding a deadletter queue" />
 </Frame>
 
 Once the queue is created, click on it in the list of queues, and create a binding from the deadletter exchange to the
@@ -143,7 +143,7 @@ deadletter queue. This will ensure that messages sent to the deadletter exchange
 
 <Frame caption="Binding the deadletter exchange to the deadletter queue">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-bind-dlq.png"
+    src="/container-engine/images/rabbitmq-bind-dlq.png"
     alt="Binding the deadletter exchange to the deadletter queue"
   />
 </Frame>
@@ -156,7 +156,7 @@ the exchange we created earlier, and setting the delivery limit to 3. This will 
 before being sent to the deadletter exchange.
 
 <Frame caption="Creating the main job queue">
-  <img src="/guides/long-running-tasks/images/rabbitmq-create-queue.png" alt="Creating the main job queue" />
+  <img src="/container-engine/images/rabbitmq-create-queue.png" alt="Creating the main job queue" />
 </Frame>
 
 ## Cloud Storage: R2
@@ -168,21 +168,21 @@ therefore may incur egress fees from other providers.
 From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
 
 <Frame caption="The R2 Object Storage Console">
-  <img src="/guides/long-running-tasks/images/r2-console.png" alt="The R2 Object Storage Console" />
+  <img src="/container-engine/images/r2-console.png" alt="The R2 Object Storage Console" />
 </Frame>
 
 Give your bucket a meaningful name, and select an appropriate location. We are going to use the standard storage class,
 and automatic location.
 
 <Frame caption="Creating a new bucket">
-  <img src="/guides/long-running-tasks/images/r2-create-bucket.png" alt="Creating a new bucket" />
+  <img src="/container-engine/images/r2-create-bucket.png" alt="Creating a new bucket" />
 </Frame>
 
 Once your bucket is created, you will need to create an access key and secret key. Select "Manage API tokens" from the
 "\{ \} API" menu, and click "Create Token".
 
 <Frame caption="You still need an API token to access your bucket">
-  <img src="/guides/long-running-tasks/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
+  <img src="/container-engine/images/r2-api-tokens.png" alt="Navigate to manage api tokens" />
 </Frame>
 
 Create a token with "Object Read & Write" permissions, and only grant it access to the bucket we've just created. Since
@@ -831,7 +831,7 @@ Once that has run, we can see in the RabbitMQ management interface
 
 <Frame caption="RabbitMQ Management Interface showing a full queue">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-10k-messages.png"
+    src="/container-engine/images/rabbitmq-10k-messages.png"
     alt="RabbitMQ Management Interface showing a full queue"
   />
 </Frame>
@@ -894,14 +894,14 @@ to request 100 replicas (the max via the portal), and we're going to set all of 
 `worker.env`.
 
 <Frame caption="Creating a new Container Group">
-  <img src="/guides/long-running-tasks/images/rabbitmq-cg-create-1.png" alt="Creating a new Container Group" />
+  <img src="/container-engine/images/rabbitmq-cg-create-1.png" alt="Creating a new Container Group" />
 </Frame>
 
 Our application is extremely simple, so we're going to only request 1 vCPU, 1 GB of RAM, and no GPU. Your hardware
 requirements are likely significantly higher than this.
 
 <Frame caption="Setting the hardware requirements">
-  <img src="/guides/long-running-tasks/images/rabbitmq-cg-create-2.png" alt="Setting the hardware requirements" />
+  <img src="/container-engine/images/rabbitmq-cg-create-2.png" alt="Setting the hardware requirements" />
 </Frame>
 
 All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't need any additional storage for this
@@ -909,7 +909,7 @@ particular application.
 
 <Frame caption="Setting the job priority and storage requirements">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-cg-create-3.png"
+    src="/container-engine/images/rabbitmq-cg-create-3.png"
     alt="Setting the job priority and storage requirements"
   />
 </Frame>
@@ -921,19 +921,19 @@ container group page, where you can see its status.
 First, it will prepare by pulling the container image into our high-performance cache.
 
 <Frame caption="Preparing the container">
-  <img src="/guides/long-running-tasks/images/rabbitmq-cg-preparing.png" alt="Preparing the container" />
+  <img src="/container-engine/images/rabbitmq-cg-preparing.png" alt="Preparing the container" />
 </Frame>
 
 Once it's prepared, it will start allocating replicas, and downloading the container image to those replicas.
 
 <Frame caption="Downloading the images to the replicas">
-  <img src="/guides/long-running-tasks/images/rabbitmq-cg-deploying.png" alt="Downloading the images to the replicas" />
+  <img src="/container-engine/images/rabbitmq-cg-deploying.png" alt="Downloading the images to the replicas" />
 </Frame>
 
 After a minute or so, we should see our instances up and running.
 
 <Frame caption="Instances up and running">
-  <img src="/guides/long-running-tasks/images/rabbitmq-cg-running.png" alt="Instances up and running" />
+  <img src="/container-engine/images/rabbitmq-cg-running.png" alt="Instances up and running" />
 </Frame>
 
 ## Validating That It Works
@@ -942,14 +942,14 @@ Now that our cluster is up and running, we can go to the RabbitMQ management con
 messages now.
 
 <Frame caption="In-flight messages in our queue">
-  <img src="/guides/long-running-tasks/images/rabbitmq-messages-in-flight.png" alt="In-flight messages in the queue" />
+  <img src="/container-engine/images/rabbitmq-messages-in-flight.png" alt="In-flight messages in the queue" />
 </Frame>
 
 From the R2 console, we can see that our bucket is being filled with checkpoints and results.
 
 <Frame caption="Checkpoints and results in the R2 bucket">
   <img
-    src="/guides/long-running-tasks/images/r2-bucket-has-objects.png"
+    src="/container-engine/images/r2-bucket-has-objects.png"
     alt="Checkpoints and results in the R2 bucket"
   />
 </Frame>
@@ -967,7 +967,7 @@ Navigate to the Cloudflare portal, and select the "Compute (Workers)" tab from t
 and then choose the "Hello World" template. Go ahead and deploy the default, we're going to edit it in the next step.
 
 <Frame caption="Creating a new Worker">
-  <img src="/guides/long-running-tasks/images/rabbitmq-workers-create.png" alt="Creating a new Worker" />
+  <img src="/container-engine/images/rabbitmq-workers-create.png" alt="Creating a new Worker" />
 </Frame>
 
 Now, we're going to edit the worker code to set the number of replicas to be equal to the number of messages in the
@@ -1106,14 +1106,14 @@ environment variables that we used in our function. Make sure to use the type "S
 rabbitmq password and your Salad API key.
 
 <Frame caption="Disabling the domains and routes, and setting the environment variables">
-  <img src="/guides/long-running-tasks/images/rabbitmq-workers-settings.png" alt="Disabling the domains and routes" />
+  <img src="/container-engine/images/rabbitmq-workers-settings.png" alt="Disabling the domains and routes" />
 </Frame>
 
 Finally, we can set a trigger for the function to run every 5 minutes.
 
 <Frame caption="Setting the trigger to run every 5 minutes">
   <img
-    src="/guides/long-running-tasks/images/rabbitmq-workers-trigger.png"
+    src="/container-engine/images/rabbitmq-workers-trigger.png"
     alt="Setting the trigger to run every 5 minutes"
   />
 </Frame>

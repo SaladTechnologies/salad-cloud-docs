@@ -51,12 +51,12 @@ API server and managing GPU resources for **a single project** within your organ
 APIs/SDKs. Multiple VK instances can run simultaneously, allowing you to simulate multiple virtual nodes in your cluster
 and manage multiple different projects on SaladCloud.
 
-<img src="/guides/kubernetes-integration/images/k8s-architecture.png" />
+<img src="/container-engine/images/k8s-architecture.png" />
 
 Here is an example of a Kubernetes cluster with 3 regular nodes (**k8s1, k8s2, k8s3**) and 2 virtual nodes (**scnode1,
 scnode2**) using the Salad VK provider:
 
-<img src="/guides/kubernetes-integration/images/k8s-nodes.png" />
+<img src="/container-engine/images/k8s-nodes.png" />
 
 When you schedule **a pod** with GPU support on the selected virtual node using Kubernetes APIs, the Salad VK provider
 will create **a GPU-powered, single-replica container group** on SaladCloud by using its APIs/SDKs. This container group
@@ -68,12 +68,12 @@ Let's consider another example: In the default namespace, there are 2 deployment
   **vkapp-gpu-4090** deployment, with 2 virtual pods (vkapp-gpu-4090-xxxxxxxx-xxxxx) running on the scnode1 virtual
   node.
 
-<img src="/guides/kubernetes-integration/images/k8s-deployment.png" />
+<img src="/container-engine/images/k8s-deployment.png" />
 
 - **The 2 virtual pods correspond to 2 single-replica container groups** on SaladCloud. You can further adjust the GPU
   node count , update or rollback through the Kubernetes vkapp-gpu-4090 deployment.
 
-<img src="/guides/kubernetes-integration/images/k8s-cg.png" />
+<img src="/container-engine/images/k8s-cg.png" />
 
 ## Key Specifications and Known Limitations
 
