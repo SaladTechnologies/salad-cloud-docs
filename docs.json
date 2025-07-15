@@ -11,42 +11,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Tutorials",
-        "groups": [
-          {
-            "group": "Tutorials",
-            "pages": [
-              "tutorials/high-performance-apps",
-              "tutorials/high-performance-storage-solutions",
-              "tutorials/docker-run",
-              "tutorials/vscode-remote-development",
-              "tutorials/jwt-authentication",
-              "tutorials/interactive-terminal",
-              "tutorials/performance-monitoring",
-              {
-                "group": "Run a Node App",
-                "pages": [
-                  "tutorials/how-to-deploy-a-node-app-on-salad/index",
-                  "tutorials/how-to-deploy-a-node-app-on-salad/create-your-first-hello-world-1",
-                  "tutorials/how-to-deploy-a-node-app-on-salad/create-a-container-1",
-                  "tutorials/how-to-deploy-a-node-app-on-salad/save-to-docker-hub",
-                  "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-portal",
-                  "tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api"
-                ]
-              },
-              "tutorials/run-a-python-app",
-              "tutorials/run-cog",
-              "tutorials/jupyterlab",
-              "tutorials/run-triton-server",
-              "tutorials/pytorch-rtx5090",
-              "tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
-              "tutorials/example-image",
-              "tutorials/ubuntu-image"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "How-to Guides",
         "groups": [
           {
@@ -423,7 +387,63 @@
             "group": "Tutorials",
             "pages": [
               "container-engine/tutorials/quickstart",
-              "container-engine/tutorials/quickstart-api"
+              "container-engine/tutorials/quickstart-api",
+              {
+                "group": "Machine Learning",
+                "pages": [
+                  "container-engine/tutorials/machine-learning/pytorch-rtx5090",
+                  "container-engine/tutorials/machine-learning/run-triton-server",
+                  "container-engine/tutorials/machine-learning/run-cog",
+                  "container-engine/tutorials/machine-learning/jupyterlab",
+                  "container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api"
+                ]
+              },
+              {
+                "group": "Deployment",
+                "pages": [
+                  "container-engine/tutorials/deployment/docker-run",
+                  "container-engine/tutorials/deployment/run-a-python-app"
+                ]
+              },
+              {
+                "group": "Nodejs",
+                "pages": [
+                  "container-engine/tutorials/nodejs/create-a-container",
+                  "container-engine/tutorials/nodejs/how-to-deploy-a-node-app-on-salad",
+                  "container-engine/tutorials/nodejs/create-your-first-hello-world",
+                  "container-engine/tutorials/nodejs/save-to-docker-hub",
+                  "container-engine/tutorials/nodejs/deploy-via-portal",
+                  "container-engine/tutorials/nodejs/deploy-via-api"
+                ]
+              },
+              {
+                "group": "Development Tools",
+                "pages": [
+                  "container-engine/tutorials/development-tools/vscode-remote-development",
+                  "container-engine/tutorials/development-tools/interactive-terminal"
+                ]
+              },
+              {
+                "group": "Security",
+                "pages": [
+                  "container-engine/tutorials/security/jwt-authentication"
+                ]
+              },
+              {
+                "group": "Performance",
+                "pages": [
+                  "container-engine/tutorials/performance/performance-monitoring",
+                  "container-engine/tutorials/performance/high-performance-apps",
+                  "container-engine/tutorials/performance/high-performance-storage-solutions"
+                ]
+              },
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "container-engine/tutorials/getting-started/ubuntu-image",
+                  "container-engine/tutorials/getting-started/example-image"
+                ]
+              }
             ]
           },
           {
@@ -1326,6 +1346,98 @@
     {
       "source": "/products/transcription/accuracy-benchmarks",
       "destination": "/transcription/reference/accuracy-benchmarks"
+    },
+    {
+      "source": "/tutorials/pytorch-rtx5090",
+      "destination": "/container-engine/tutorials/machine-learning/pytorch-rtx5090"
+    },
+    {
+      "source": "/tutorials/run-triton-server",
+      "destination": "/container-engine/tutorials/machine-learning/run-triton-server"
+    },
+    {
+      "source": "/tutorials/run-cog",
+      "destination": "/container-engine/tutorials/machine-learning/run-cog"
+    },
+    {
+      "source": "/tutorials/jupyterlab",
+      "destination": "/container-engine/tutorials/machine-learning/jupyterlab"
+    },
+    {
+      "source": "/tutorials/docker-run",
+      "destination": "/container-engine/tutorials/deployment/docker-run"
+    },
+    {
+      "source": "/tutorials/run-a-python-app",
+      "destination": "/container-engine/tutorials/deployment/run-a-python-app"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/index",
+      "destination": "/container-engine/tutorials/deployment/how-to-deploy-a-node-app-on-salad"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/create-your-first-hello-world-1",
+      "destination": "/container-engine/tutorials/deployment/create-your-first-hello-world"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/create-a-container-1",
+      "destination": "/container-engine/tutorials/nodejs/create-a-container"
+    },
+    {
+      "source": "/container-engine/tutorials/deployment/how-to-deploy-a-node-app-on-salad",
+      "destination": "/container-engine/tutorials/nodejs/how-to-deploy-a-node-app-on-salad"
+    },
+    {
+      "source": "/container-engine/tutorials/deployment/create-your-first-hello-world",
+      "destination": "/container-engine/tutorials/nodejs/create-your-first-hello-world"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/save-to-docker-hub",
+      "destination": "/container-engine/tutorials/nodejs/save-to-docker-hub"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-portal",
+      "destination": "/container-engine/tutorials/nodejs/deploy-via-portal"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-node-app-on-salad/deploy-via-api",
+      "destination": "/container-engine/tutorials/nodejs/deploy-via-api"
+    },
+    {
+      "source": "/tutorials/vscode-remote-development",
+      "destination": "/container-engine/tutorials/development-tools/vscode-remote-development"
+    },
+    {
+      "source": "/tutorials/interactive-terminal",
+      "destination": "/container-engine/tutorials/development-tools/interactive-terminal"
+    },
+    {
+      "source": "/tutorials/jwt-authentication",
+      "destination": "/container-engine/tutorials/security/jwt-authentication"
+    },
+    {
+      "source": "/tutorials/performance-monitoring",
+      "destination": "/container-engine/tutorials/performance/performance-monitoring"
+    },
+    {
+      "source": "/tutorials/high-performance-apps",
+      "destination": "/container-engine/tutorials/performance/high-performance-apps"
+    },
+    {
+      "source": "/tutorials/high-performance-storage-solutions",
+      "destination": "/container-engine/tutorials/performance/high-performance-storage-solutions"
+    },
+    {
+      "source": "/tutorials/ubuntu-image",
+      "destination": "/container-engine/tutorials/getting-started/ubuntu-image"
+    },
+    {
+      "source": "/tutorials/example-image",
+      "destination": "/container-engine/tutorials/getting-started/example-image"
+    },
+    {
+      "source": "/tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
+      "destination": "/container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api"
     }
   ]
 }
