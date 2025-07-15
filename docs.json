@@ -1688,66 +1688,6 @@
     {
       "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription",
       "destination": "/transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
-    },
-    {
-      "source": "/container-engine/explanation/disk-space",
-      "destination": "/container-engine/explanation/container-groups/disk-space"
-    },
-    {
-      "source": "/container-engine/explanation/container-logs",
-      "destination": "/container-engine/explanation/container-groups/container-logs"
-    },
-    {
-      "source": "/container-engine/explanation/system-events",
-      "destination": "/container-engine/explanation/container-groups/system-events"
-    },
-    {
-      "source": "/container-engine/explanation/container-registries",
-      "destination": "/container-engine/explanation/core-concepts/container-registries"
-    },
-    {
-      "source": "/container-engine/explanation/external-logging",
-      "destination": "/container-engine/explanation/core-concepts/external-logging"
-    },
-    {
-      "source": "/container-engine/explanation/job-queues",
-      "destination": "/container-engine/explanation/core-concepts/job-queues"
-    },
-    {
-      "source": "/container-engine/explanation/image-generation-overview",
-      "destination": "/container-engine/explanation/image-generation/overview"
-    },
-    {
-      "source": "/container-engine/explanation/llm-inference-overview",
-      "destination": "/container-engine/explanation/llm/overview"
-    },
-    {
-      "source": "/container-engine/explanation/solution-overviews/image-generation-overview",
-      "destination": "/container-engine/explanation/image-generation/overview"
-    },
-    {
-      "source": "/container-engine/explanation/solution-overviews/llm-inference-overview",
-      "destination": "/container-engine/explanation/llm/overview"
-    },
-    {
-      "source": "/container-engine/explanation/advanced-features/external-logging",
-      "destination": "/container-engine/explanation/core-concepts/external-logging"
-    },
-    {
-      "source": "/container-engine/explanation/advanced-features/job-queues",
-      "destination": "/container-engine/explanation/core-concepts/job-queues"
-    },
-    {
-      "source": "/container-engine/explanation/system-operations/disk-space",
-      "destination": "/container-engine/explanation/container-groups/disk-space"
-    },
-    {
-      "source": "/container-engine/explanation/system-operations/container-logs",
-      "destination": "/container-engine/explanation/container-groups/container-logs"
-    },
-    {
-      "source": "/container-engine/explanation/system-operations/system-events",
-      "destination": "/container-engine/explanation/container-groups/system-events"
     }
   ]
 }
