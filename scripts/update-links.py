@@ -13,11 +13,16 @@ import json
 import re
 import os
 import sys
+import logging
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+
 def load_redirects(docs_json_path: str) -> Dict[str, str]:
     """Load redirect mappings from docs.json"""
+    logging.debug(f"Loading redirects from {docs_json_path}")
     with open(docs_json_path, 'r') as f:
         docs = json.load(f)
     
@@ -27,6 +32,8 @@ def load_redirects(docs_json_path: str) -> Dict[str, str]:
         destination = redirect.get('destination', '').strip()
         if source and destination:
             redirects[source] = destination
+    
+    logging.debug(f"Loaded {len(redirects)} redirects from docs.json")
     
     # Add additional redirects based on our recent file moves
     additional_redirects = {
@@ -79,8 +86,51 @@ def load_redirects(docs_json_path: str) -> Dict[str, str]:
     
     # Add the additional redirects
     redirects.update(additional_redirects)
+    logging.debug(f"Added {len(additional_redirects)} additional redirects")
+    logging.debug(f"Total redirects available: {len(redirects)}")
+    
+    # Log some specific redirects we're interested in
+    test_redirects = [
+        '/products/sce',
+        '/products/transcription', 
+        '/products/s4',
+        '/products/sgs',
+        '/products/recipes',
+        '/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-azure-batch'
+    ]
+    
+    for test_redirect in test_redirects:
+        if test_redirect in redirects:
+            logging.debug(f"✅ Found redirect: {test_redirect} -> {redirects[test_redirect]}")
+        else:
+            logging.warning(f"❌ Missing redirect: {test_redirect}")
     
     return redirects
+
+def resolve_redirect_chain(url: str, redirects: Dict[str, str], max_depth: int = 10) -> str:
+    """
+    Follow redirect chains to find the final destination
+    Returns the final URL after following all redirects
+    """
+    current_url = url
+    visited = set()
+    depth = 0
+    
+    while current_url in redirects and depth < max_depth:
+        if current_url in visited:
+            logging.warning(f"Circular redirect detected: {url} -> {current_url}")
+            break
+        
+        visited.add(current_url)
+        next_url = redirects[current_url]
+        logging.debug(f"Redirect chain: {current_url} -> {next_url}")
+        current_url = next_url
+        depth += 1
+    
+    if depth >= max_depth:
+        logging.warning(f"Max redirect depth reached for {url}")
+    
+    return current_url
 
 def find_markdown_files(root_dir: str) -> List[Path]:
     """Find all markdown files in the repository"""
@@ -163,20 +213,26 @@ def update_links_in_content(content: str, redirects: Dict[str, str]) -> Tuple[st
             
             # Try exact match first
             if base_url in redirects:
-                new_base_url = redirects[base_url]
+                new_base_url = resolve_redirect_chain(base_url, redirects)
                 redirect_found = True
+                logging.debug(f"Found exact redirect: {base_url} -> {new_base_url}")
             # Try without file extension
             elif clean_base_url in redirects:
-                new_base_url = redirects[clean_base_url]
+                new_base_url = resolve_redirect_chain(clean_base_url, redirects)
                 redirect_found = True
+                logging.debug(f"Found clean redirect: {clean_base_url} -> {new_base_url}")
             # Try with trailing slash removed
             elif base_url.rstrip('/') in redirects:
-                new_base_url = redirects[base_url.rstrip('/')]
+                new_base_url = resolve_redirect_chain(base_url.rstrip('/'), redirects)
                 redirect_found = True
+                logging.debug(f"Found trimmed redirect: {base_url.rstrip('/')} -> {new_base_url}")
             # Try clean URL without trailing slash
             elif clean_base_url.rstrip('/') in redirects:
-                new_base_url = redirects[clean_base_url.rstrip('/')]
+                new_base_url = resolve_redirect_chain(clean_base_url.rstrip('/'), redirects)
                 redirect_found = True
+                logging.debug(f"Found clean trimmed redirect: {clean_base_url.rstrip('/')} -> {new_base_url}")
+            else:
+                logging.debug(f"No redirect found for: {base_url}")
             
             if redirect_found and new_base_url:
                 new_url = new_base_url + fragment
@@ -200,12 +256,21 @@ def process_file(file_path: Path, redirects: Dict[str, str]) -> Tuple[bool, List
     Returns (was_modified, list_of_changes)
     """
     try:
+        logging.debug(f"Processing file: {file_path}")
         with open(file_path, 'r', encoding='utf-8') as f:
             original_content = f.read()
+        
+        # Extract links to see what we're working with
+        links = extract_links(original_content)
+        if links:
+            logging.debug(f"Found {len(links)} links in {file_path}")
+            for full_match, link_text, url in links[:5]:  # Log first 5 links
+                logging.debug(f"  Link: {url}")
         
         updated_content, changes = update_links_in_content(original_content, redirects)
         
         if changes:
+            logging.debug(f"Making {len(changes)} changes to {file_path}")
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(updated_content)
             return True, changes
@@ -213,7 +278,7 @@ def process_file(file_path: Path, redirects: Dict[str, str]) -> Tuple[bool, List
         return False, []
         
     except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+        logging.error(f"Error processing {file_path}: {e}")
         return False, []
 
 def main():
@@ -241,7 +306,20 @@ def main():
     total_changes = 0
     
     print("\n🚀 Processing files...")
+    
+    # Target files with known broken links
+    broken_link_files = [
+        'general/explanation/overview.mdx',
+        'general/tutorials/account-setup.mdx'
+    ]
+    
     for file_path in markdown_files:
+        rel_path = file_path.relative_to(Path(root_dir))
+        
+        # Add extra logging for files with known broken links
+        if str(rel_path) in broken_link_files:
+            logging.info(f"🎯 Processing file with known broken links: {rel_path}")
+        
         was_modified, changes = process_file(file_path, redirects)
         
         if was_modified:
