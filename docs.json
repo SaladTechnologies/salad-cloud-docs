@@ -37,14 +37,19 @@
                   "container-engine/explanation/core-concepts/recipes-overview",
                   "container-engine/explanation/core-concepts/faqs",
                   "container-engine/explanation/core-concepts/saladcloud-secure",
-                  "container-engine/explanation/core-concepts/container-registries"
+                  "container-engine/explanation/core-concepts/container-registries",
+                  "container-engine/explanation/core-concepts/external-logging",
+                  "container-engine/explanation/core-concepts/job-queues"
                 ]
               },
               {
                 "group": "Container Groups",
                 "pages": [
                   "container-engine/explanation/container-groups/container-groups",
-                  "container-engine/explanation/container-groups/deployment-lifecycle"
+                  "container-engine/explanation/container-groups/deployment-lifecycle",
+                  "container-engine/explanation/container-groups/disk-space",
+                  "container-engine/explanation/container-groups/container-logs",
+                  "container-engine/explanation/container-groups/system-events"
                 ]
               },
               {
@@ -104,26 +109,12 @@
                 "pages": ["container-engine/explanation/tailscale-integration/solution-overview"]
               },
               {
-                "group": "System Operations",
-                "pages": [
-                  "container-engine/explanation/system-operations/disk-space",
-                  "container-engine/explanation/system-operations/container-logs",
-                  "container-engine/explanation/system-operations/system-events"
-                ]
+                "group": "Image Generation",
+                "pages": ["container-engine/explanation/image-generation/overview"]
               },
               {
-                "group": "Advanced Features",
-                "pages": [
-                  "container-engine/explanation/advanced-features/external-logging",
-                  "container-engine/explanation/advanced-features/job-queues"
-                ]
-              },
-              {
-                "group": "Solution Overviews",
-                "pages": [
-                  "container-engine/explanation/solution-overviews/image-generation-overview",
-                  "container-engine/explanation/solution-overviews/llm-inference-overview"
-                ]
+                "group": "LLM",
+                "pages": ["container-engine/explanation/llm/overview"]
               }
             ]
           },
@@ -1729,6 +1720,34 @@
     {
       "source": "/container-engine/explanation/llm-inference-overview",
       "destination": "/container-engine/explanation/solution-overviews/llm-inference-overview"
+    },
+    {
+      "source": "/container-engine/explanation/solution-overviews/image-generation-overview",
+      "destination": "/container-engine/explanation/image-generation/overview"
+    },
+    {
+      "source": "/container-engine/explanation/solution-overviews/llm-inference-overview",
+      "destination": "/container-engine/explanation/llm/overview"
+    },
+    {
+      "source": "/container-engine/explanation/advanced-features/external-logging",
+      "destination": "/container-engine/explanation/core-concepts/external-logging"
+    },
+    {
+      "source": "/container-engine/explanation/advanced-features/job-queues",
+      "destination": "/container-engine/explanation/core-concepts/job-queues"
+    },
+    {
+      "source": "/container-engine/explanation/system-operations/disk-space",
+      "destination": "/container-engine/explanation/container-groups/disk-space"
+    },
+    {
+      "source": "/container-engine/explanation/system-operations/container-logs",
+      "destination": "/container-engine/explanation/container-groups/container-logs"
+    },
+    {
+      "source": "/container-engine/explanation/system-operations/system-events",
+      "destination": "/container-engine/explanation/container-groups/system-events"
     }
   ]
 }
