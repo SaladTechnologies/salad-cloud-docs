@@ -315,7 +315,11 @@
           },
           {
             "group": "Reference",
-            "pages": ["transcription/reference/accuracy-benchmarks", "transcription/reference/faq"]
+            "pages": [
+              "transcription/reference/api",
+              "transcription/reference/accuracy-benchmarks",
+              "transcription/reference/faq"
+            ]
           },
           {
             "group": "Tutorials",
@@ -418,6 +422,10 @@
           {
             "group": "Explanation",
             "pages": ["storage/explanation/overview"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["storage/reference/api"]
           }
         ]
       },
