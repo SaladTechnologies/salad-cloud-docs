@@ -287,7 +287,7 @@ This video was created with the following workflow:
 You an import the workflow to ComfyUI by saving the above JSON to a file, and then dragging and dropping the file onto
 the ComfyUI interface. You should see the nodes and links appear in the interface. Click "Queue" to run the workflow.
 
-![](/guides/image-generation/images/export-comfy-ltx-workflow.png)
+![](/container-engine/images/export-comfy-ltx-workflow.png)
 
 Make any adjustments to the workflow you'd like, and then export the workflow in the API format. This will generate a
 JSON file that we're going to use in the next step.
@@ -819,7 +819,7 @@ You should see the ComfyUI API server start up, and the warmup workflow run. Nav
 your browser to see the Swagger documentation for your API. You should see a new endpoint called `/video-clip` that
 accepts the parameters we defined in our custom endpoint.
 
-![](/guides/image-generation/images/video-clip-endpoint.png)
+![](/container-engine/images/video-clip-endpoint.png)
 
 You can use this endpoint to generate video clips from prompts. Here is an example request:
 
@@ -921,19 +921,19 @@ the portal.
 At this point, Salad will pull the container image into our own high-performance container image cache. You will see
 this as a "preparing" status on the container group page.
 
-![](/guides/image-generation/images/video-gen-service-preparing.png)
+![](/container-engine/images/video-gen-service-preparing.png)
 
 Once this has completed, SaladCloud will start to download the container image to compatible nodes in the network. This
 will take some time, as the container image is quite large, and bandwidth can vary significantly between nodes.
 
-![](/guides/image-generation/images/video-gen-service-deploying.png)
+![](/container-engine/images/video-gen-service-deploying.png)
 
 While this is happening, you can click on the "System Events" tab to see various events related to the deployment, such
 as allocating an instance, and downloading the image.
 
 Eventually, you will see the container group status change to "Running" when at least 1 instance is up and running.
 
-![](/guides/image-generation/images/video-gen-service-running.png)
+![](/container-engine/images/video-gen-service-running.png)
 
 ## Step 7: Using the API
 

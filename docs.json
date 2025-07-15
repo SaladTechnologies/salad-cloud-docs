@@ -16,24 +16,9 @@
           {
             "group": "How-to Guides",
             "pages": [
-              "guides/troubleshooting",
-              {
-                "group": "Image Generation",
-                "pages": [
-                  "guides/image-generation/image-gen-general",
-                  "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
-                  "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
-                  "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
-                  "guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-                  "guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
-                  "guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
-                  "guides/image-generation/deploy-video-gen-on-salad-with-comfy"
-                ]
-              },
               {
                 "group": "Large Language Models",
                 "pages": [
-                  "guides/llm/llm-general",
                   "guides/llm/llm-fine-tuning",
                   "guides/llm/ollama-hf",
                   "guides/llm/run-tgi-text-generation-interface-by-huggingface",
@@ -63,33 +48,6 @@
                   {
                     "group": "Salad Transcription API",
                     "pages": [
-                      "guides/transcription/salad-transcription-api/transcription-quick-start",
-                      {
-                        "group": "Features",
-                        "pages": [
-                          "guides/transcription/salad-transcription-api/speech-to-text",
-                          "guides/transcription/salad-transcription-api/translation",
-                          "guides/transcription/salad-transcription-api/captions",
-                          "guides/transcription/salad-transcription-api/llm-features"
-                        ]
-                      },
-                      {
-                        "group": "Downloadable Files",
-                        "pages": [
-                          "guides/transcription/salad-transcription-api/awsdownloadablefile",
-                          "guides/transcription/salad-transcription-api/azuredownloadablefile",
-                          "guides/transcription/salad-transcription-api/dropboxdownloadable",
-                          "guides/transcription/salad-transcription-api/googledrivedownloadable"
-                        ]
-                      },
-                      {
-                        "group": "Integrations",
-                        "pages": [
-                          "guides/transcription/salad-transcription-api/pabblyintegration",
-                          "guides/transcription/salad-transcription-api/zapiertranscriptionguide"
-                        ]
-                      },
-                      "guides/transcription/salad-transcription-api/transcriptionfaq",
                       {
                         "group": "Migrate to Salad Transcription API",
                         "pages": [
@@ -100,29 +58,7 @@
                           "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-aws-transcription",
                           "guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription"
                         ]
-                      },
-                      {
-                        "group": "Cookbooks",
-                        "pages": [
-                          "guides/transcription/salad-transcription-api/transcribe-youtube",
-                          "guides/transcription/salad-transcription-api/transcribe-vimeo",
-                          "guides/transcription/salad-transcription-api/transcribe-facebook",
-                          "guides/transcription/salad-transcription-api/sales-playbook",
-                          "guides/transcription/salad-transcription-api/splitting-large-audio-files",
-                          "guides/transcription/salad-transcription-api/get-transcription-quotes",
-                          "guides/transcription/salad-transcription-api/transcribe-a-local-file",
-                          "guides/transcription/salad-transcription-api/identify-hate-speech",
-                          "guides/transcription/salad-transcription-api/summarizing-meetings",
-                          "guides/transcription/salad-transcription-api/meeting-action-items",
-                          "guides/transcription/salad-transcription-api/audio-chapters"
-                        ]
                       }
-                    ]
-                  },
-                  {
-                    "group": "SCE",
-                    "pages": [
-                      "guides/transcription/sce/youtube"
                     ]
                   }
                 ]
@@ -380,7 +316,9 @@
                   "container-engine/explanation/gateway/websockets",
                   "container-engine/explanation/gateway/error-pages"
                 ]
-              }
+              },
+              "container-engine/explanation/image-generation-overview",
+              "container-engine/explanation/llm-inference-overview"
             ]
           },
           {
@@ -528,6 +466,25 @@
                   "container-engine/how-to-guides/external-logging/splunk-logging",
                   "container-engine/how-to-guides/external-logging/tcp-logging"
                 ]
+              },
+              "container-engine/how-to-guides/troubleshooting",
+              {
+                "group": "Image Generation",
+                "pages": [
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+                  "container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy",
+                  "container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models"
+                ]
+              },
+              {
+                "group": "Transcription",
+                "pages": [
+                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+                ]
               }
             ]
           }
@@ -550,7 +507,70 @@
           {
             "group": "Reference",
             "pages": [
-              "transcription/reference/accuracy-benchmarks"
+              "transcription/reference/accuracy-benchmarks",
+              "transcription/reference/faq"
+            ]
+          },
+          {
+            "group": "Tutorials",
+            "pages": [
+              "transcription/tutorials/transcription-quick-start"
+            ]
+          },
+          {
+            "group": "How-to Guides",
+            "pages": [
+              "transcription/how-to-guides/speech-to-text",
+              "transcription/how-to-guides/transcribe-a-local-file",
+              {
+                "group": "Platform Integrations",
+                "pages": [
+                  "transcription/how-to-guides/platform-integrations/transcribe-youtube",
+                  "transcription/how-to-guides/platform-integrations/transcribe-vimeo",
+                  "transcription/how-to-guides/platform-integrations/transcribe-facebook"
+                ]
+              },
+              {
+                "group": "Cloud Storage",
+                "pages": [
+                  "transcription/how-to-guides/cloud-storage/aws-downloadable-file",
+                  "transcription/how-to-guides/cloud-storage/azure-downloadable-file",
+                  "transcription/how-to-guides/cloud-storage/dropbox-downloadable-file",
+                  "transcription/how-to-guides/cloud-storage/google-drive-downloadable-file"
+                ]
+              },
+              {
+                "group": "Automation Integrations",
+                "pages": [
+                  "transcription/how-to-guides/automation-integrations/zapier-integration",
+                  "transcription/how-to-guides/automation-integrations/pabbly-integration"
+                ]
+              },
+              {
+                "group": "Features",
+                "pages": [
+                  "transcription/how-to-guides/features/translation",
+                  "transcription/how-to-guides/features/captions",
+                  "transcription/how-to-guides/features/llm-features"
+                ]
+              },
+              {
+                "group": "Use Cases",
+                "pages": [
+                  "transcription/how-to-guides/use-cases/meeting-action-items",
+                  "transcription/how-to-guides/use-cases/summarizing-meetings",
+                  "transcription/how-to-guides/use-cases/audio-chapters",
+                  "transcription/how-to-guides/use-cases/sales-playbook",
+                  "transcription/how-to-guides/use-cases/extract-quotes",
+                  "transcription/how-to-guides/use-cases/identify-hate-speech"
+                ]
+              },
+              {
+                "group": "Technical",
+                "pages": [
+                  "transcription/how-to-guides/technical/splitting-large-audio-files"
+                ]
+              }
             ]
           }
         ]
@@ -1438,6 +1458,142 @@
     {
       "source": "/tutorials/how-to-deploy-a-truss-container-to-salad-portal-and-api",
       "destination": "/container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api"
+    },
+    {
+      "source": "/guides/troubleshooting",
+      "destination": "/container-engine/how-to-guides/troubleshooting"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
+      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
+      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext"
+    },
+    {
+      "source": "/guides/image-generation/deploy-video-gen-on-salad-with-comfy",
+      "destination": "/container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy"
+    },
+    {
+      "source": "/guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
+      "destination": "/container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models"
+    },
+    {
+      "source": "/guides/image-generation/image-gen-general",
+      "destination": "/container-engine/explanation/image-generation-overview"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcription-quick-start",
+      "destination": "/transcription/tutorials/transcription-quick-start"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/speech-to-text",
+      "destination": "/transcription/how-to-guides/speech-to-text"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcribe-a-local-file",
+      "destination": "/transcription/how-to-guides/transcribe-a-local-file"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcribe-youtube",
+      "destination": "/transcription/how-to-guides/platform-integrations/transcribe-youtube"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcribe-vimeo",
+      "destination": "/transcription/how-to-guides/platform-integrations/transcribe-vimeo"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcribe-facebook",
+      "destination": "/transcription/how-to-guides/platform-integrations/transcribe-facebook"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/awsdownloadablefile",
+      "destination": "/transcription/how-to-guides/cloud-storage/aws-downloadable-file"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/azuredownloadablefile",
+      "destination": "/transcription/how-to-guides/cloud-storage/azure-downloadable-file"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/dropboxdownloadable",
+      "destination": "/transcription/how-to-guides/cloud-storage/dropbox-downloadable-file"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/googledrivedownloadable",
+      "destination": "/transcription/how-to-guides/cloud-storage/google-drive-downloadable-file"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/zapiertranscriptionguide",
+      "destination": "/transcription/how-to-guides/automation-integrations/zapier-integration"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/pabblyintegration",
+      "destination": "/transcription/how-to-guides/automation-integrations/pabbly-integration"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/translation",
+      "destination": "/transcription/how-to-guides/features/translation"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/captions",
+      "destination": "/transcription/how-to-guides/features/captions"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/llm-features",
+      "destination": "/transcription/how-to-guides/features/llm-features"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/meeting-action-items",
+      "destination": "/transcription/how-to-guides/use-cases/meeting-action-items"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/summarizing-meetings",
+      "destination": "/transcription/how-to-guides/use-cases/summarizing-meetings"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/audio-chapters",
+      "destination": "/transcription/how-to-guides/use-cases/audio-chapters"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/sales-playbook",
+      "destination": "/transcription/how-to-guides/use-cases/sales-playbook"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/splitting-large-audio-files",
+      "destination": "/transcription/how-to-guides/technical/splitting-large-audio-files"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/get-transcription-quotes",
+      "destination": "/transcription/how-to-guides/use-cases/extract-quotes"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/identify-hate-speech",
+      "destination": "/transcription/how-to-guides/use-cases/identify-hate-speech"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcriptionfaq",
+      "destination": "/transcription/reference/faq"
+    },
+    {
+      "source": "/guides/transcription/sce/youtube",
+      "destination": "/container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+    },
+    {
+      "source": "/guides/llm/llm-general",
+      "destination": "/container-engine/explanation/llm-inference-overview"
     }
   ]
 }

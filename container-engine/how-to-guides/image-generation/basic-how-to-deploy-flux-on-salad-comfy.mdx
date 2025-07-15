@@ -5,7 +5,7 @@ description: 'A guide to deploying Flux1-Schnell on SaladCloud with ComfyUI'
 
 _Last Updated: March 25, 2025_
 
-![Deploy Flux on Salad, generated in flux](/guides/image-generation/images/deploy-flux-5.png)
+![Deploy Flux on Salad, generated in flux](/container-engine/images/deploy-flux-5.png)
 
 # High Level
 
@@ -119,14 +119,14 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 
     1. Drag in this image to populate the workflow.
        [Taken from the ComfyUI documentation](https://comfyanonymous.github.io/ComfyUI_examples/flux/)
-       ![Drag in the image to populate the workflow](/guides/image-generation/images/flux_schnell_checkpoint_example.png)
+       ![Drag in the image to populate the workflow](/container-engine/images/flux_schnell_checkpoint_example.png)
 
     You should see something like the following:
-    ![Populated workflow](/guides/image-generation/images/comfy-default-view-flux.png)
+    ![Populated workflow](/container-engine/images/comfy-default-view-flux.png)
     1.  Click “Queue Prompt” to generate an image. The first image should be identical to the one we used to populate
         the workflow, because they use the same seed. If you generate another image, it should be different. Here's
         mine.
-        ![A glass bottle with a galaxy and the planet earth inside, a glass containing white wine, a plate with mixed vegetables, and a plate with a piece of pie.](/guides/image-generation/images/comfy-flux-image-1.png)
+        ![A glass bottle with a galaxy and the planet earth inside, a glass containing white wine, a plate with mixed vegetables, and a plate with a piece of pie.](/container-engine/images/comfy-flux-image-1.png)
     1.  Enable Dev Mode Options via the settings menu
 
         ![Click the gear to open the settings menu](/guides/image-generation/images/comfy-settings-menu-1.png)
@@ -227,7 +227,7 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 
     5. Submit the prompt to the wrapper API on port 3000, using Postman or any http request tool of your choice.
 
-        ![Submitting the request via Postman](/guides/image-generation/images/comfy-flux-submit-prompt-1.png)
+        ![Submitting the request via Postman](/container-engine/images/comfy-flux-submit-prompt-1.png)
 
         You should submit a POST request to [`http://127.0.0.1:3000/prompt`](http://127.0.0.1:3000/prompt) with a JSON request body like this, where the value of “prompt” is that workflow json we created previously.
 
@@ -249,7 +249,7 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 
     7. Decode the base64 encoded string into your image. You can do this in a free browser tool such as https://codebeautify.org/base64-to-image-converter
 
-        ![Decoding the returned base64 image](/guides/image-generation/images/comfy-flux-decoded-image-1.png)
+        ![Decoding the returned base64 image](/container-engine/images/comfy-flux-decoded-image-1.png)
 
         or using CLI tools like `jq` and `base64`. For this method, first save your response to a file called `response.json`. Then, run the following command:
 
@@ -273,9 +273,9 @@ docker push saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 We’re going to name our container group something obvious, and fill in the configuration form. Flux is a significantly
 larger model than previous image generation models, so we're going to want pretty robust hardware.
 
-![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-1.png)
+![Untitled](/container-engine/images/deploy-comfy-flux-fp8-1.png)
 
-![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-2.png)
+![Untitled](/container-engine/images/deploy-comfy-flux-fp8-2.png)
 
 ![Untitled](/guides/image-generation/images/deploy-comfy-3.png)
 
@@ -291,18 +291,18 @@ Click Deploy, and wait for the deployment to come up.
 
 1. Wait for the deployment to be ready.
    1. First, SaladCloud pulls your container image into our own internal high-performance cache.
-      ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-5.png)
+      ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-5.png)
    1. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your
-      workload. ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-6.png) This step can take tens of
+      workload. ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-6.png) This step can take tens of
       minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes. Note
       that our progress bars are only estimates, and do not necessarily reflect real-time download status. These slow
       cold starts, and the possibility of nodes being interrupted by their host without warning, are why we always want
       to provision multiple replicas.
    1. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
 
-      ![Untitled](/guides/image-generation/images/deploy-comfy-flux-fp8-8.png)
+      ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-8.png)
 
 2. Submit your prompt to the provided Access Domain Name. You will get back a json response within a few seconds. See
    [above](#build-and-test-your-docker-image) for how to submit the request and process the response.
 
-   ![Untitled](/guides/image-generation/images/comfy-flux-submit-prompt-2.png)
+   ![Untitled](/container-engine/images/comfy-flux-submit-prompt-2.png)
