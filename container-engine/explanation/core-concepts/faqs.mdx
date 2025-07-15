@@ -59,19 +59,19 @@ per month on SaladCloud as a reward that they exchange for games, gift cards and
 
 ### What are SaladCloud Endpoints/APIs?
 
-SaladCloud has one API offering today - a full-featured [Transcription API](/transcription/explanation/overview). We will be adding
-more APIs to our suite in the coming months.
+SaladCloud has one API offering today - a full-featured [Transcription API](/transcription/explanation/overview). We
+will be adding more APIs to our suite in the coming months.
 
 ### What is the right SaladCloud product for my workload?
 
 SaladCloud has three product lines:
 
-- [Salad Container Engine (SCE)](/container-engine/tutorials/quickstart): a managed container engine built for
-  deploying GPU-intensive containers at a massive scale.
-- [Salad Gateway Service (SGS)](/gateway-service/explanation/overview): a proxy service that routes requests from VPN operators or
-  other customers who need distributed residential IP infrastructure to SaladCloud nodes.
-- [Salad Transcription API](/transcription/explanation/overview): the lowest-priced transcription service in
-  the market with unparalleled accuracy.
+- [Salad Container Engine (SCE)](/container-engine/tutorials/quickstart): a managed container engine built for deploying
+  GPU-intensive containers at a massive scale.
+- [Salad Gateway Service (SGS)](/gateway-service/explanation/overview): a proxy service that routes requests from VPN
+  operators or other customers who need distributed residential IP infrastructure to SaladCloud nodes.
+- [Salad Transcription API](/transcription/explanation/overview): the lowest-priced transcription service in the market
+  with unparalleled accuracy.
 
 ### How does the billing work?
 
@@ -155,9 +155,11 @@ All SaladCloud users have access to logs by configuring
 [external logging](/container-engine/explanation/core-concepts/external-logging). Axiom is our preferred external
 logging service provider. Your logs are seamlessly transmitted to Axiom for troubleshooting.
 
-SaladCloud users can also view their logs [directly in the portal](/container-engine/explanation/container-groups/container-logs).
+SaladCloud users can also view their logs
+[directly in the portal](/container-engine/explanation/container-groups/container-logs).
 
-SaladCloud users can [access a terminal](/container-engine/tutorials/development-tools/interactive-terminal) in a running container instance.
+SaladCloud users can [access a terminal](/container-engine/tutorials/development-tools/interactive-terminal) in a
+running container instance.
 
 ### What should I be aware of before deploying a workload to Salad?
 
@@ -166,7 +168,8 @@ SaladCloud users can [access a terminal](/container-engine/tutorials/development
 - Instances will be interrupted with no warning. Architect your application accordingly, such as retrying failed
   requests, and running multiple replicas to provide coverage during automatic fail-overs.
 
-- Network performance will [vary from node to node](/container-engine/explanation/core-concepts/overview#performance-variability), due the
+- Network performance will
+  [vary from node to node](/container-engine/explanation/core-concepts/overview#performance-variability), due the
   distributed, residential nature of the network.
 
 - For Mac developers, be sure to build your containers for amd64, not arm64.
@@ -198,9 +201,9 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
   reliability of 90%-95% (meaning, in a container group of 100 nodes, you will usually have 90+ running nodes at any
   given time), the combined reliability of the system is higher, thanks to redundancy and higher no. of nodes.
 - Similar to "spot" instances, SaladCloud using a
-  [Priority Pricing](/container-engine/explanation/billing-pricing/priority-pricing) model, where you can
-  choose the priority of your container group based on your workload requirements. Higher priority workloads may
-  interrupt lower priority workloads.
+  [Priority Pricing](/container-engine/explanation/billing-pricing/priority-pricing) model, where you can choose the
+  priority of your container group based on your workload requirements. Higher priority workloads may interrupt lower
+  priority workloads.
 - Here is a real example over 24 hours for a production AI image generation workload with 100 requested nodes. As we
   would expect, it’s fairly uncommon for all 100 to be running at the same time, but 100% of the time, we have at least
   82 live nodes. For this customer, 82 simultaneous nodes offered plenty of throughput to keep up with their own
@@ -211,7 +214,8 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
 ### How do I use SSH with Salad?
 
 Salad does not support SSH access to containers. If you need to access a running container, you can use the
-[SaladCloud Terminal](/container-engine/tutorials/development-tools/interactive-terminal) to execute commands on the container.
+[SaladCloud Terminal](/container-engine/tutorials/development-tools/interactive-terminal) to execute commands on the
+container.
 
 ### I need a unique URL for each node. How do I do that?
 

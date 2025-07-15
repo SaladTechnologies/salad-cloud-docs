@@ -45,37 +45,38 @@ should be considered.**
 
 The gateway’s Round Robin algorithm may lead to some instances being overwhelmed while others remain idle, due to the
 variability in AI inference times. In most cases,
-[the Least Number of Connections algorithm](/container-engine/explanation/gateway/load-balancer-options#algorithms) is more effective,
-as it can better manage these disparities.
+[the Least Number of Connections algorithm](/container-engine/explanation/gateway/load-balancer-options#algorithms) is
+more effective, as it can better manage these disparities.
 
 Real-time autoscaling to match GPU resources with AI system load at the minute level is not feasible. Instead, you will
 need to adjust the GPU resource pool based on historical data, and slightly overprovision resources in anticipation of
 spikes. Please check
-[this link](/container-engine/tutorials/performance/high-performance-apps#implement-auto-scaling-at-the-quarter-hour-granularity) for more
-information.
+[this link](/container-engine/tutorials/performance/high-performance-apps#implement-auto-scaling-at-the-quarter-hour-granularity)
+for more information.
 
 Some inference servers use a single thread, and when performing long-running inference tasks, they may fail to respond
 to liveness or readiness probes, leading to node reallocation or servers not receiving further requests from the
 gateway. To address this, inference servers typically require
-[a robust architecture](/container-engine/tutorials/performance/high-performance-apps#select-a-robust-inference-server) supporting multiple threads
-or asynchronous concurrency with batched inference].
+[a robust architecture](/container-engine/tutorials/performance/high-performance-apps#select-a-robust-inference-server)
+supporting multiple threads or asynchronous concurrency with batched inference].
 
 Some implementations of liveness or readiness probes in servers simply return "OK" without accurately reflecting the
 true status of the inference servers, which requires improvement to distinguish between different states, such as READY,
 BUSY and FAILED.
 
-The gateway has a [server response timeout](/container-engine/explanation/gateway/load-balancer-options#server-response-timeout) of up
-to 100 seconds for all requests. Inferences, such as video generation, may exceed this time limit and result in
-failures. Furthermore, sending more requests than the system can handle will cause them to queue up either in the
-gateway (while configured in the single-connection mode) or on the instances, eventually resulting in timeout errors.
-[To improve system robustness](/container-engine/tutorials/performance/high-performance-apps#adopt-adaptive-architectures), inference servers can
-proactively reject excessive requests as a back-pressure mechanism, while client applications can implement traffic
-control to stop accepting new requests from users during periods of congestion.
+The gateway has a
+[server response timeout](/container-engine/explanation/gateway/load-balancer-options#server-response-timeout) of up to
+100 seconds for all requests. Inferences, such as video generation, may exceed this time limit and result in failures.
+Furthermore, sending more requests than the system can handle will cause them to queue up either in the gateway (while
+configured in the single-connection mode) or on the instances, eventually resulting in timeout errors.
+[To improve system robustness](/container-engine/tutorials/performance/high-performance-apps#adopt-adaptive-architectures),
+inference servers can proactively reject excessive requests as a back-pressure mechanism, while client applications can
+implement traffic control to stop accepting new requests from users during periods of congestion.
 
 There is always **a delay of tens of seconds** between node failures and reallocation, when these nodes stop receiving
 requests from the gateway (via the Readiness Probe), and the point at which client applications start receiving errors.
 This delay may pose challenges for real-time inferences and requires optimization in the client applications.
 
 Please review these links ([LLM](/container-engine/explanation/llm/overview#recommendation-for-production),
-[image generation](/container-engine/explanation/image-generation/overview#container-gateway-or-job-queue)) thoroughly before building real-time
-applications using the Container Gateway.
+[image generation](/container-engine/explanation/image-generation/overview#container-gateway-or-job-queue)) thoroughly
+before building real-time applications using the Container Gateway.

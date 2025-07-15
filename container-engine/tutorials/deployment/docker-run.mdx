@@ -6,9 +6,9 @@ _Last Updated: November 18, 2024_
 
 This tutorial will guide you through the process of running a container locally and deploying a GPU-accelerated
 application on SaladCloud, following best practices. Before you begin, please complete
-[the quickstart guide](/general/tutorials/account-setup) to set up your account, organization and project on SaladCloud. This
-tutorial assumes you have a basic understanding of containers and images, Python, Docker commands, job queues, and load
-balancers.
+[the quickstart guide](/general/tutorials/account-setup) to set up your account, organization and project on SaladCloud.
+This tutorial assumes you have a basic understanding of containers and images, Python, Docker commands, job queues, and
+load balancers.
 
 The ideal development environment to create, build and test the image in this tutorial is a Windows PC with an NVIDIA
 GPU, WSL2, Docker Desktop and Visual Studio Code installed.
@@ -250,9 +250,9 @@ process, you would only be charged for the running time of a single replica.
 The --gpus all option in the command allocates all available GPUs on the host to the container, enabling GPU support for
 applications running inside it. SaladCloud currently supports only one GPU per container. When creating a container
 group, you can select multiple GPU types at a priority level
-[(Batch/Low/Medium/High)](/container-engine/explanation/billing-pricing/priority-pricing), along with the required
-vCPU, memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that match these selections
-to run the container group.
+[(Batch/Low/Medium/High)](/container-engine/explanation/billing-pricing/priority-pricing), along with the required vCPU,
+memory and disk space. SaladCloud will then allocate the appropriate SaladCloud nodes that match these selections to run
+the container group.
 
 <img src="/container-engine/images/docker_run7.png" />
 
@@ -275,8 +275,8 @@ however, alternative solutions are available.
 
 The -it flag allows you to interact with a container through a terminal. While SaladCloud does not offer this option
 during container group creation, you can still interact with running instances using
-[the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) after the group has been created to perform tests or
-troubleshoot issues.
+[the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) after the group has been
+created to perform tests or troubleshoot issues.
 
 The -v flag is used to mount a volume by mapping a directory from the host system to the container. SaladCloud currently
 doesn't support volume mounting using S3FS, FUSE or NFS. Instead, the recommended solution is to install and use the

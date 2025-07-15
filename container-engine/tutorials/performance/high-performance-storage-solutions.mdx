@@ -13,11 +13,11 @@ stopped or the nodes are reallocated, all images and associated runtime data are
 applications that process large datasets or produce substantial outputs, implementing a high-performance cloud-based
 storage solution is crucial to ensure efficient data handling and persistence on SaladCloud.
 
-To support [long-running tasks](/container-engine/explanation/long-running-tasks/solution-overview) such as molecular dynamics simulations,
-model fine-tuning, and hyperparameter tuning, applications on SaladCloud must regularly and efficiently save their
-running state (e.g., checkpoints or trajectories) to the cloud. In the event of a node failure, the new node can swiftly
-retrieve the previously saved state from the cloud and seamlessly resume the task, minimizing downtime and ensuring
-continuity.
+To support [long-running tasks](/container-engine/explanation/long-running-tasks/solution-overview) such as molecular
+dynamics simulations, model fine-tuning, and hyperparameter tuning, applications on SaladCloud must regularly and
+efficiently save their running state (e.g., checkpoints or trajectories) to the cloud. In the event of a node failure,
+the new node can swiftly retrieve the previously saved state from the cloud and seamlessly resume the task, minimizing
+downtime and ensuring continuity.
 
 The recommended approach is to include a cloud storage SDK or CLI tool (e.g., azcopy, aws s3, or gsutil) within the
 container image, and use it to read from and write to the cloud. Alternatively, consider using popular open-source CLI
@@ -25,23 +25,26 @@ tools like [Rclone](https://rclone.org/), which supports a wide range of cloud s
 into your applications. Note that volume mounting using S3FS, FUSE, or NFS is not supported, as SaladCloud containers do
 not operate in privileged mode.
 
-For a more integrated solution, [Salad Kelpie](/container-engine/how-to-guides/long-running-tasks/kelpie) provides a job queue service with
-optional checkpoint management. The Kelpie worker, integrated with your workloads running on Salad nodes, automatically
-retrieves jobs, executes your code, and manages data synchronization between local files and S3-compatible cloud storage
-in the background. If handling data synchronization—such as downloading or uploading checkpoints—adds complexity to your
-applications, Salad Kelpie provides a robust way to offload these tasks and simplify your workflow.
+For a more integrated solution, [Salad Kelpie](/container-engine/how-to-guides/long-running-tasks/kelpie) provides a job
+queue service with optional checkpoint management. The Kelpie worker, integrated with your workloads running on Salad
+nodes, automatically retrieves jobs, executes your code, and manages data synchronization between local files and
+S3-compatible cloud storage in the background. If handling data synchronization—such as downloading or uploading
+checkpoints—adds complexity to your applications, Salad Kelpie provides a robust way to offload these tasks and simplify
+your workflow.
 
 ## Building a High-Performance, Cost-Effective Storage Solution
 
 The following factors should be taken into account when selecting or designing a storage solution for SCE workloads:
 
 - To enhance TCP performance and throughput, consider
-  [deploying region-specific container groups](/container-engine/tutorials/performance/high-performance-apps#build-region-specific-workloads) and
-  [enabling region-specific I/O](/container-engine/tutorials/performance/high-performance-apps#enable-region-specific-i%2Fo) to reduce round-trip
-  time (**RTT**) by minimizing network distance and latency to target locations. Additionally, optimize performance by
-  [selecting nodes](/container-engine/tutorials/performance/high-performance-apps#perform-initial-checks-to-filter-nodes) with higher physical
-  bandwidth and lower RTT to a specific location and utilizing multiple connections to maximize data transfer
-  efficiency.
+  [deploying region-specific container groups](/container-engine/tutorials/performance/high-performance-apps#build-region-specific-workloads)
+  and
+  [enabling region-specific I/O](/container-engine/tutorials/performance/high-performance-apps#enable-region-specific-i%2Fo)
+  to reduce round-trip time (**RTT**) by minimizing network distance and latency to target locations. Additionally,
+  optimize performance by
+  [selecting nodes](/container-engine/tutorials/performance/high-performance-apps#perform-initial-checks-to-filter-nodes)
+  with higher physical bandwidth and lower RTT to a specific location and utilizing multiple connections to maximize
+  data transfer efficiency.
 
 - Transmission efficiency generally improves with larger data volumes. In certain scenarios, compressing a large number
   of small files into a single large file can help increase throughput.

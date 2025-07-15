@@ -293,11 +293,11 @@ Click Deploy, and wait for the deployment to come up.
    1. First, SaladCloud pulls your container image into our own internal high-performance cache.
       ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-5.png)
    1. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your
-      workload. ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-6.png) This step can take tens of
-      minutes in some cases, depending on the size of the image, and the internet speed of the individual nodes. Note
-      that our progress bars are only estimates, and do not necessarily reflect real-time download status. These slow
-      cold starts, and the possibility of nodes being interrupted by their host without warning, are why we always want
-      to provision multiple replicas.
+      workload. ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-6.png) This step can take tens of minutes in
+      some cases, depending on the size of the image, and the internet speed of the individual nodes. Note that our
+      progress bars are only estimates, and do not necessarily reflect real-time download status. These slow cold
+      starts, and the possibility of nodes being interrupted by their host without warning, are why we always want to
+      provision multiple replicas.
    1. Eventually, you will see instances listed as “running”, with a green check in the “ready” column.
 
       ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-8.png)

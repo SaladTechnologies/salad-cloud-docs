@@ -30,10 +30,11 @@ Kubernetes environment:**
 
 This widely adopted scenario decouples client applications and GPU nodes (so they don't communicate directly), offering
 enhanced scalability, flexibility, and improved resilience to traffic spikes and node failures. Most existing solutions
-and applications, including [real-time inference](/container-engine/how-to-guides/real-time-inference/build-redis-queue),
-[batch processing and long-running tasks](/container-engine/explanation/long-running-tasks/solution-overview), and various types of
-applications (streaming/non-streaming, synchronous/asynchronous), can be effectively implemented. Supported use cases
-encompass LLMs, image/video generation, transcription and molecular dynamics simulation, etc.
+and applications, including
+[real-time inference](/container-engine/how-to-guides/real-time-inference/build-redis-queue),
+[batch processing and long-running tasks](/container-engine/explanation/long-running-tasks/solution-overview), and
+various types of applications (streaming/non-streaming, synchronous/asynchronous), can be effectively implemented.
+Supported use cases encompass LLMs, image/video generation, transcription and molecular dynamics simulation, etc.
 
 There are multiple options for these external services, such as AWS SQS, GCP Pub/Sub, Salad Kelpie, AWS S3, Cloudflare
 R2, managed Redis/Kafka/RabbitMQ, and self-managed custom services, among others. Similar to provisioning GPU resources
@@ -125,4 +126,5 @@ and may shut down without prior notice. To ensure success in this scenario, addi
 - **Client-Side Traffic Control:** Applications can implement traffic management strategies to pause new user requests
   during high congestion.
 
-Please check [this link](/container-engine/how-to-guides/real-time-inference/use-container-gateway#key-considerations) for more details.
+Please check [this link](/container-engine/how-to-guides/real-time-inference/use-container-gateway#key-considerations)
+for more details.

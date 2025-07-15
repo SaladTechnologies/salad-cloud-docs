@@ -5,8 +5,9 @@ description: 'Performing Long-Running Tasks on SaladCloud'
 
 _Last Updated: January 20, 2025_
 
-There are [two primary methods](/container-engine/explanation/core-concepts/architectural-overview#provide-input-to-applications) to
-provide inputs and retrieve results from applications running on SaladCloud:
+There are
+[two primary methods](/container-engine/explanation/core-concepts/architectural-overview#provide-input-to-applications)
+to provide inputs and retrieve results from applications running on SaladCloud:
 
 - **SaladCloud’s Container Gateway:** The client application sends requests to the gateway, which forwards them to the
   container instances, waits for their responses, and then relays the responses back to the client.
@@ -26,12 +27,12 @@ storage locations for the job's input and output. In this setup, the gateway or 
 ### Container Gateway or Job Queue
 
 SaladCloud’s Container Gateway has a maximum
-[server response timeout](/container-engine/explanation/gateway/load-balancer-options#server-response-timeout) of **100 seconds**. This
-timeout specifies the maximum duration the gateway will wait for a response from an instance after forwarding a request.
-If no response is received within this timeframe, the gateway returns a timeout error to the client. For jobs that may
-run more than 100 seconds, such as video generation and long audio transcription, you will need to either use webhooks
-to receive the results asynchronously while still using the gateway, or integrate with a job queue system for better
-handling of long-running tasks.
+[server response timeout](/container-engine/explanation/gateway/load-balancer-options#server-response-timeout) of **100
+seconds**. This timeout specifies the maximum duration the gateway will wait for a response from an instance after
+forwarding a request. If no response is received within this timeframe, the gateway returns a timeout error to the
+client. For jobs that may run more than 100 seconds, such as video generation and long audio transcription, you will
+need to either use webhooks to receive the results asynchronously while still using the gateway, or integrate with a job
+queue system for better handling of long-running tasks.
 
 ### Concurrency and Throughput
 
@@ -99,12 +100,14 @@ tested and aligned:
 - Shorter saving intervals require higher upload speeds, which may lead to upload backlogs.
 
 The asymmetric bandwidth of SaladCloud is notable, as many nodes are located in residential networks. Your applications
-may perform [initial checks to filter nodes](/container-engine/tutorials/performance/high-performance-apps#perform-initial-checks-to-filter-nodes)
+may perform
+[initial checks to filter nodes](/container-engine/tutorials/performance/high-performance-apps#perform-initial-checks-to-filter-nodes)
 with specific download and upload speeds.
 
-Consider using [open-source tools like Rclone](/container-engine/tutorials/performance/high-performance-storage-solutions) to optimize performance
-and throughput. These tools support chunked, parallel uploads and downloads, enabling more efficient utilization of
-bandwidth by establishing multiple simultaneous connections.
+Consider using
+[open-source tools like Rclone](/container-engine/tutorials/performance/high-performance-storage-solutions) to optimize
+performance and throughput. These tools support chunked, parallel uploads and downloads, enabling more efficient
+utilization of bandwidth by establishing multiple simultaneous connections.
 
 Additionally, progressive or incremental uploads can reduce the overall required upload speed with shorter saving
 intervals, while also allowing you to tap into a larger pool of available nodes.

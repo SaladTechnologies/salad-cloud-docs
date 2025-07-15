@@ -257,8 +257,8 @@ docker run --rm \
 ```
 
 You should see the Kelpie worker start up, and it will wait for jobs to be submitted to the queue. You will see logs
-that it is failing to set the [deletion cost](/container-engine/explanation/imds/instance-deletion-cost), because we
-are not running on SaladCloud, but this is not an issue for our purposes.
+that it is failing to set the [deletion cost](/container-engine/explanation/imds/instance-deletion-cost), because we are
+not running on SaladCloud, but this is not an issue for our purposes.
 
 ## Submitting Jobs to the Queue
 
@@ -614,10 +614,7 @@ about [job lifecycle](https://github.com/SaladTechnologies/kelpie?tab=readme-ov-
 From the R2 console, we can see that our bucket is being filled with checkpoints and results.
 
 <Frame caption="Checkpoints and results in the R2 bucket">
-  <img
-    src="/container-engine/images/r2-bucket-has-objects.png"
-    alt="Checkpoints and results in the R2 bucket"
-  />
+  <img src="/container-engine/images/r2-bucket-has-objects.png" alt="Checkpoints and results in the R2 bucket" />
 </Frame>
 
 ## Autoscaling

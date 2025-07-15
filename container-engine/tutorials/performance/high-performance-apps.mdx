@@ -13,9 +13,9 @@ of Salad nodes.
 We assume you have some development experience with SaladCloud, including application building, troubleshooting, and
 operational management. If you're new to SaladCloud and SCE, we recommend starting with
 [the SCE Architectural Overview](/container-engine/explanation/core-concepts/architectural-overview) and
-[the Docker Run on SaladCloud](/container-engine/tutorials/deployment/docker-run) to gain hands-on experience. In this tutorial, an "application"
-refers to a container group consisting of multiple replicas (or instances/containers) running the same container image,
-with each instance deployed on a separate Salad node.
+[the Docker Run on SaladCloud](/container-engine/tutorials/deployment/docker-run) to gain hands-on experience. In this
+tutorial, an "application" refers to a container group consisting of multiple replicas (or instances/containers) running
+the same container image, with each instance deployed on a separate Salad node.
 
 ## The Distributed and Dynamic Nature, Challenges and Solutions
 
@@ -85,8 +85,8 @@ likelihood of **server response timeouts**.The multiprocessing approach also con
 requires a CUDA context and loads its own model into GPU VRAM for inference.
 
 Some inference servers always return an "OK" status on health checks, even when they encounter errors, causing
-[health probes (Startup/Liveness/Readiness)](/container-engine/explanation/health-probes/health-probes) on SaladCloud
-to malfunction.
+[health probes (Startup/Liveness/Readiness)](/container-engine/explanation/health-probes/health-probes) on SaladCloud to
+malfunction.
 
 Many open-source servers for LLM inference, such as TGI and vLLM, provide the necessary features to run efficiently on
 SaladCloud. For other use cases, please refer to
@@ -178,7 +178,8 @@ queue. This can introduce additional latency for instances located outside of th
 performance in other regions.
 
 For low-latency applications outside North America, consider using job queue products from public cloud providers or
-building a custom Redis-based real-time queue by following [this guide](/container-engine/how-to-guides/real-time-inference/build-redis-queue).
+building a custom Redis-based real-time queue by following
+[this guide](/container-engine/how-to-guides/real-time-inference/build-redis-queue).
 
 **Some Salad customers have implemented custom queues using Redis to provide real-time and streaming services for LLM
 applications without relying on a regional load balancer.**
@@ -188,9 +189,10 @@ applications without relying on a regional load balancer.**
 The most efficient way to manage performance variances across nodes is to perform initial checks while instances are
 running and filter nodes based on custom rules (such as latency and throughput to some locations), ensuring they are
 properly prepared to run your applications. If a node is deemed unsuitable,
-[call IMDS reallocate within the instance](/container-engine/how-to-guides/imds/imds-reallocate) for a more suitable one.
-This entire process only takes tens of seconds, with negligible associated costs. Please refer to the example code for
-[initial checks](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/initial_check.py) and
+[call IMDS reallocate within the instance](/container-engine/how-to-guides/imds/imds-reallocate) for a more suitable
+one. This entire process only takes tens of seconds, with negligible associated costs. Please refer to the example code
+for [initial checks](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/initial_check.py)
+and
 [IMDS reallocate](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/imds_reallocate.py).
 
 The upload speed, download speed, and latency reported by
@@ -277,11 +279,11 @@ effectively manage variations in both nodes and tasks while using
 [a job queue](/container-engine/tutorials/deployment/docker-run#scenario-1-use-a-job-queue).
 
 For the container gateway,
-[its Least Number of Connections algorithm](/container-engine/explanation/gateway/load-balancer-options#algorithms) can continuously
-monitor the load on each instance and direct new requests to those with the fewest active connections. By prioritizing
-the least-loaded instances and preventing any one from becoming overwhelmed, it balances workloads more effectively and
-optimizes system performance, resulting in greater efficiency and reliability. In most cases, this algorithm can
-effectively manage these differences and is recommended for optimal performance.
+[its Least Number of Connections algorithm](/container-engine/explanation/gateway/load-balancer-options#algorithms) can
+continuously monitor the load on each instance and direct new requests to those with the fewest active connections. By
+prioritizing the least-loaded instances and preventing any one from becoming overwhelmed, it balances workloads more
+effectively and optimizes system performance, resulting in greater efficiency and reliability. In most cases, this
+algorithm can effectively manage these differences and is recommended for optimal performance.
 
 To use the container gateway efficiently, client applications must implement **traffic control** and **retry logic** to
 enhance resilience. This includes resending requests to the load balancer for occasional errors and stopping the
@@ -381,34 +383,36 @@ To enable flexible data management, such as selectively downloading or uploading
 building a solution based on AWS SQS. This approach allows you to implement custom logic for managing data, tailored to
 the requirements of your applications.
 
-Please refer to [the reference architecture](/container-engine/explanation/core-concepts/architectural-overview#long-running-tasks),
+Please refer to
+[the reference architecture](/container-engine/explanation/core-concepts/architectural-overview#long-running-tasks),
 [demo apps and their test results](https://github.com/SaladTechnologies/mds) for long-running tasks on SaladCloud.
 
 ## Enable Shell Access
 
 External SSH access is not supported for running containers on SaladCloud. However, you can access running instances
-through [the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) in the Portal, to perform tests and troubleshoot
-issues directly.
+through [the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) in the Portal, to
+perform tests and troubleshoot issues directly.
 
 Your containers on SaladCloud must have a continuously running process (such as a web server or I/O worker) to use the
 terminal. Unlike running containers locally, you cannot use the shell with a terminal to start containers on SaladCloud.
 This is a key distinction between local and SaladCloud container usage.
 
 If this process in the containers fail to run for any reason, you can override it with "sleep infinity" in
-[the Command section](/container-engine/tutorials/deployment/docker-run#command) of the container group configuration. This ensures that the
-instances remain running in a sleep state, and then you can access them via the interactive terminal to manually execute
-tasks, perform tests, or diagnose issues.
+[the Command section](/container-engine/tutorials/deployment/docker-run#command) of the container group configuration.
+This ensures that the instances remain running in a sleep state, and then you can access them via the interactive
+terminal to manually execute tasks, perform tests, or diagnose issues.
 
 While running JupyterLab and its terminal is feasible on SaladCloud, it is not the ideal use case, as you may encounter
 cold starts and occasional interruptions. Consider running JupyterLab on SaladCloud with the following scenarios:
 
 - Use Salad nodes as a complement to
-  [your local development environment](/container-engine/explanation/llm/overview#local-deployment-to-saladcloud) when you need access to
-  specific GPUs. This allows you to monitor resource usage and test your code and dependencies in a diverse computing
-  environment.
+  [your local development environment](/container-engine/explanation/llm/overview#local-deployment-to-saladcloud) when
+  you need access to specific GPUs. This allows you to monitor resource usage and test your code and dependencies in a
+  diverse computing environment.
 
-- Perform [the single node test](/container-engine/how-to-guides/transcription/youtube-transcription-pipeline#single-node-test) before a large deployment, and
-  optimize the application settings. You will need to
+- Perform
+  [the single node test](/container-engine/how-to-guides/transcription/youtube-transcription-pipeline#single-node-test)
+  before a large deployment, and optimize the application settings. You will need to
   [add the JupyterLab support in your application image](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/blob/main/node/Dockerfile.parakeet.yt1m)
   temporarily.
 
@@ -420,4 +424,5 @@ in the container gateway is **unselected**.
 Please refer to
 [this link](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/Dockerfile.jupyterlab) for
 instructions on how to install JupyterLab in your image. For more details on how to build and run JupyterLab with
-built-in cloud storage integration, please check out [this tutorial](/container-engine/tutorials/machine-learning/jupyterlab).
+built-in cloud storage integration, please check out
+[this tutorial](/container-engine/tutorials/machine-learning/jupyterlab).

@@ -1,6 +1,7 @@
 # Storage (S4) Documentation
 
-This directory contains all documentation for SaladCloud Simple Storage Service (S4), organized using the DiATaxis methodology.
+This directory contains all documentation for SaladCloud Simple Storage Service (S4), organized using the DiATaxis
+methodology.
 
 ## Structure
 

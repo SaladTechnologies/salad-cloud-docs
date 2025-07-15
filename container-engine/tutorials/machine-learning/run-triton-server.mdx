@@ -78,7 +78,8 @@ COPY tmp/triton_repo /models
 
 #### Step 3: Enable IPv6
 
-Refer to the official SaladCloud documentation on [Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6).
+Refer to the official SaladCloud documentation on
+[Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6).
 
 Create a shell script that will run the Triton server with your model and route traffic from container port 80 to triton
 http-port 8000 using `socat`. That shell script will be an entrypoint in the image.

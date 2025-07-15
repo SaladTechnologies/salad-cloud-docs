@@ -860,10 +860,11 @@ second ide request timeout that SaladCloud's container gateway imposes.
 
 ## Step 5: Add A Job Queue
 
-To handle long-running requests like this, we can use [SaladCloud's Job Queue](/container-engine/explanation/core-concepts/job-queues).
-With the job queue, we can submit our prompt, and then either poll for the result, or receive a webhook when the job is
-complete. Additionally, the job queue will automatically handle retrying failed requests, buffer overflow requests, and
-includes some basic autoscaling functionality.
+To handle long-running requests like this, we can use
+[SaladCloud's Job Queue](/container-engine/explanation/core-concepts/job-queues). With the job queue, we can submit our
+prompt, and then either poll for the result, or receive a webhook when the job is complete. Additionally, the job queue
+will automatically handle retrying failed requests, buffer overflow requests, and includes some basic autoscaling
+functionality.
 
 To use the job queue, we simply need to add the Job Queue worker binary to our Dockerfile:
 
@@ -1382,8 +1383,8 @@ git commit -m "Video Generation API with Job Queue"
 
 Now that you have a working video generation service, and the beginnings of a client that can submit jobs to the job
 queue, you can start to integrate the video generation service into your own applications. You can also start
-experimenting with [autoscaling](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview) to handle more requests,
-and reduce costs during periods of low demand.
+experimenting with [autoscaling](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview) to handle
+more requests, and reduce costs during periods of low demand.
 
 ComfyUI API also supports sending workflow
 [progress updates](https://github.com/SaladTechnologies/comfyui-api?tab=readme-ov-file#progress) to a webhook, which can

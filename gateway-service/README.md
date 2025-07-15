@@ -1,6 +1,7 @@
 # Gateway Service Documentation
 
-This directory contains all documentation for SaladCloud Gateway Service (SGS), organized using the DiATaxis methodology.
+This directory contains all documentation for SaladCloud Gateway Service (SGS), organized using the DiATaxis
+methodology.
 
 ## Structure
 

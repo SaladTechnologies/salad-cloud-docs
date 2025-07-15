@@ -29,7 +29,8 @@ The capacity defined in the annotations should also be considered when determini
 ## Using SaladCloud APIs/SDKs
 
 Before creating Kubernetes manifests to deploy GPU resources on SaladCloud, it is recommended to first familiarize
-yourself with SaladCloud’s [key features](/container-engine/tutorials/deployment/docker-run) and [APIs](/reference/api-usage).
+yourself with SaladCloud’s [key features](/container-engine/tutorials/deployment/docker-run) and
+[APIs](/reference/api-usage).
 
 Here are code snippets demonstrating how to interact with SaladCloud using
 [its Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python). First, set up a Python virtual
@@ -215,8 +216,8 @@ result = sdk.container_groups.create_container_group(
 print(result)
 ```
 
-The above code deploys a [high-priority](/container-engine/explanation/billing-pricing/priority-pricing) container
-group with 3 replicas across Canada, the US, and Mexico. The selected resource configuration includes 4 vCPUs, 8 GiB of
+The above code deploys a [high-priority](/container-engine/explanation/billing-pricing/priority-pricing) container group
+with 3 replicas across Canada, the US, and Mexico. The selected resource configuration includes 4 vCPUs, 8 GiB of
 memory, 25 GiB of disk space, and two GPU types (RTX 3090 or 4090).
 
 **Each container group runs one image.** If the image is stored in a private repository, such as Docker Hub, the Docker
@@ -350,8 +351,8 @@ exposure to these sensitive credentials.
 
 For Networking (Container Gateway), the generated URL will be written back to the annotations of each pod upon
 deployment in a future version **(not supported in v0.2.3)**. In the meantime, alternative access methods are available
-for these virtual pods—please refer to [the service access guide](/container-engine/how-to-guides/kubernetes-integration/service-access) for
-details.
+for these virtual pods—please refer to
+[the service access guide](/container-engine/how-to-guides/kubernetes-integration/service-access) for details.
 
 If the above example does not fully cover the mappings for your use cases, you may test and adjust the deployment
 manifest, check the created resources on SaladCloud, and review
