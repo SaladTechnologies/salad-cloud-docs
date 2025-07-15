@@ -15,16 +15,11 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": [
-              "general/explanation/overview",
-              "general/explanation/account-security"
-            ]
+            "pages": ["general/explanation/overview", "general/explanation/account-security"]
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "general/tutorials/account-setup"
-            ]
+            "pages": ["general/tutorials/account-setup"]
           }
         ]
       },
@@ -54,9 +49,7 @@
               },
               {
                 "group": "Networking & Security",
-                "pages": [
-                  "container-engine/explanation/networking-security/networking"
-                ]
+                "pages": ["container-engine/explanation/networking-security/networking"]
               },
               {
                 "group": "Billing & Pricing",
@@ -68,9 +61,7 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/explanation/autoscaling/autoscaling"
-                ]
+                "pages": ["container-engine/explanation/autoscaling/autoscaling"]
               },
               {
                 "group": "Health Probes",
@@ -98,27 +89,19 @@
               },
               {
                 "group": "Computer Vision",
-                "pages": [
-                  "container-engine/explanation/computer-vision/yolov8-overview"
-                ]
+                "pages": ["container-engine/explanation/computer-vision/yolov8-overview"]
               },
               {
                 "group": "Long-Running Tasks",
-                "pages": [
-                  "container-engine/explanation/long-running-tasks/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/long-running-tasks/solution-overview"]
               },
               {
                 "group": "Kubernetes Integration",
-                "pages": [
-                  "container-engine/explanation/kubernetes-integration/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/kubernetes-integration/solution-overview"]
               },
               {
                 "group": "Tailscale Integration",
-                "pages": [
-                  "container-engine/explanation/tailscale-integration/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/tailscale-integration/solution-overview"]
               },
               {
                 "group": "System Operations",
@@ -187,9 +170,7 @@
               },
               {
                 "group": "Security",
-                "pages": [
-                  "container-engine/tutorials/security/jwt-authentication"
-                ]
+                "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
               {
                 "group": "Performance",
@@ -234,9 +215,7 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/reference/autoscaling/settings"
-                ]
+                "pages": ["container-engine/reference/autoscaling/settings"]
               },
               "container-engine/reference/quotas"
             ]
@@ -248,9 +227,7 @@
               "container-engine/how-to-guides/environment-variables",
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
-                ]
+                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
               },
               "container-engine/how-to-guides/specifying-a-command",
               {
@@ -314,9 +291,7 @@
               },
               {
                 "group": "Transcription",
-                "pages": [
-                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
-                ]
+                "pages": ["container-engine/how-to-guides/transcription/youtube-transcription-pipeline"]
               },
               {
                 "group": "LLM",
@@ -367,15 +342,11 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": [
-                  "container-engine/how-to-guides/tailscale-integration/basic"
-                ]
+                "pages": ["container-engine/how-to-guides/tailscale-integration/basic"]
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": [
-                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
-                ]
+                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
           }
@@ -397,16 +368,11 @@
           },
           {
             "group": "Reference",
-            "pages": [
-              "transcription/reference/accuracy-benchmarks",
-              "transcription/reference/faq"
-            ]
+            "pages": ["transcription/reference/accuracy-benchmarks", "transcription/reference/faq"]
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "transcription/tutorials/transcription-quick-start"
-            ]
+            "pages": ["transcription/tutorials/transcription-quick-start"]
           },
           {
             "group": "How-to Guides",
@@ -458,9 +424,7 @@
               },
               {
                 "group": "Technical",
-                "pages": [
-                  "transcription/how-to-guides/technical/splitting-large-audio-files"
-                ]
+                "pages": ["transcription/how-to-guides/technical/splitting-large-audio-files"]
               },
               {
                 "group": "Migration",
@@ -493,15 +457,11 @@
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "gateway-service/tutorials/quickstart"
-            ]
+            "pages": ["gateway-service/tutorials/quickstart"]
           },
           {
             "group": "Reference",
-            "pages": [
-              "gateway-service/reference/sgs-api"
-            ]
+            "pages": ["gateway-service/reference/sgs-api"]
           }
         ]
       },
@@ -510,9 +470,7 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": [
-              "storage/explanation/overview"
-            ]
+            "pages": ["storage/explanation/overview"]
           }
         ]
       },
@@ -572,9 +530,7 @@
                   },
                   {
                     "group": "Log Entries",
-                    "pages": [
-                      "reference/saladcloud-api/logs/query-log-entries"
-                    ]
+                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
                   },
                   {
                     "group": "Organizations",
