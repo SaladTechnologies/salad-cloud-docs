@@ -195,7 +195,7 @@ docker push saladtechnologies/sdnext:dreamshaper-8
 
     2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container-groups/create-container-group)
 
-        ![Untitled](/guides/image-generation/images/salad-create-container-group.png)
+        ![Untitled](/container-engine/images/salad-create-container-group.png)
 
         We’re going to name our container group something obvious, and fill in the configuration form.
         We’re going to use 3 replicas, to ensure coverage during node interruptions and reallocations.
@@ -206,7 +206,7 @@ docker push saladtechnologies/sdnext:dreamshaper-8
         ![Untitled](/container-engine/images/deploy-sdnext-2.png)
 
         We want to add the container gateway to our deployment, so that we will get a URL we can use to access it. Make sure to set the port to 7860, or whatever you set the PORT environment variable to in your Dockerfile.
-        ![Untitled](/guides/image-generation/images/deploy-a1111-3.png)
+        ![Untitled](/container-engine/images/deploy-a1111-3.png)
 
         We need to enable a startup probe and a liveness probe, to make sure the container gateway only routes requests to nodes that are ready for them.
         ![Untitled](/container-engine/images/deploy-sdnext-3.png)

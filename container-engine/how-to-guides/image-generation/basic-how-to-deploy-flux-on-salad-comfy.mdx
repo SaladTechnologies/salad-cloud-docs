@@ -115,7 +115,7 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
     let us access the web ui locally to make it easier to get the prompt object we need for the api.
     1. Go to [http://localhost:8188/](http://localhost:8188/) in your browser. You should see something like this:
 
-       ![Default Comfy UI Interface](/guides/image-generation/images/comfy-default-view.png)
+       ![Default Comfy UI Interface](/container-engine/images/comfy-default-view.png)
 
     1. Drag in this image to populate the workflow.
        [Taken from the ComfyUI documentation](https://comfyanonymous.github.io/ComfyUI_examples/flux/)
@@ -129,13 +129,13 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
         ![A glass bottle with a galaxy and the planet earth inside, a glass containing white wine, a plate with mixed vegetables, and a plate with a piece of pie.](/container-engine/images/comfy-flux-image-1.png)
     1.  Enable Dev Mode Options via the settings menu
 
-        ![Click the gear to open the settings menu](/guides/image-generation/images/comfy-settings-menu-1.png)
+        ![Click the gear to open the settings menu](/container-engine/images/comfy-settings-menu-1.png)
 
-        ![Check the box labeled "Enable Dev mode Options"](/guides/image-generation/images/comfy-settings-menu-2.png)
+        ![Check the box labeled "Enable Dev mode Options"](/container-engine/images/comfy-settings-menu-2.png)
 
         You should see a new option in the menu, “Save (API Format)”:
 
-        ![Notice the new button labeled "Save (API Format)"](/guides/image-generation/images/comfy-settings-menu-3.png)
+        ![Notice the new button labeled "Save (API Format)"](/container-engine/images/comfy-settings-menu-3.png)
 
     1.  Click the “Save (API Format)” button, and save it. You’ll get a file called “workflow_api.json” that contains
         everything ComfyUI needs to run that prompt again.
@@ -268,7 +268,7 @@ docker push saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 2. Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the
    [SaladCloud Public API](/reference/saladcloud-api/container-groups/create-container-group)
 
-![Untitled](/guides/image-generation/images/salad-create-container-group.png)
+![Untitled](/container-engine/images/salad-create-container-group.png)
 
 We’re going to name our container group something obvious, and fill in the configuration form. Flux is a significantly
 larger model than previous image generation models, so we're going to want pretty robust hardware.
@@ -277,13 +277,13 @@ larger model than previous image generation models, so we're going to want prett
 
 ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-2.png)
 
-![Untitled](/guides/image-generation/images/deploy-comfy-3.png)
+![Untitled](/container-engine/images/deploy-comfy-3.png)
 
 Additionally, we will want to configure our startup and readiness probes (endpoints provided by the wrapper), and enable
 the container gateway on port 3000. We’ve disabled authentication for this example, but you may want to enable it. If
 you enable authentication, requests must be submitted with your SaladCloud API Key in the `Salad-Api-Key` header.
 
-![Untitled](/guides/image-generation/images/deploy-comfy-4.png)
+![Untitled](/container-engine/images/deploy-comfy-4.png)
 
 Click Deploy, and wait for the deployment to come up.
 

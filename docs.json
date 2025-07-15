@@ -17,32 +17,6 @@
             "group": "How-to Guides",
             "pages": [
               {
-                "group": "Large Language Models",
-                "pages": [
-                  "guides/llm/llm-fine-tuning",
-                  "guides/llm/ollama-hf",
-                  "guides/llm/run-tgi-text-generation-interface-by-huggingface",
-                  "guides/llm/run-ollama"
-                ]
-              },
-              {
-                "group": "Computer Vision",
-                "pages": [
-                  "guides/computer-vision/caption-with-vlm",
-                  {
-                    "group": "YOLOv8",
-                    "pages": [
-                      "guides/computer-vision/yolov8/yolov8",
-                      "guides/computer-vision/yolov8/quickstart",
-                      "guides/computer-vision/yolov8/deployment-tutorial",
-                      "guides/computer-vision/yolov8/batch-processing",
-                      "guides/computer-vision/yolov8/model-training-guide"
-                    ]
-                  },
-                  "guides/computer-vision/deploy-blip-with-cog"
-                ]
-              },
-              {
                 "group": "Transcription",
                 "pages": [
                   {
@@ -61,13 +35,6 @@
                       }
                     ]
                   }
-                ]
-              },
-              {
-                "group": "Text To Speech",
-                "pages": [
-                  "guides/text-to-speech/metavoice-tts-api",
-                  "guides/text-to-speech/openvoice-api"
                 ]
               },
               {
@@ -318,7 +285,13 @@
                 ]
               },
               "container-engine/explanation/image-generation-overview",
-              "container-engine/explanation/llm-inference-overview"
+              "container-engine/explanation/llm-inference-overview",
+              {
+                "group": "Computer Vision",
+                "pages": [
+                  "container-engine/explanation/computer-vision/yolov8-overview"
+                ]
+              }
             ]
           },
           {
@@ -333,7 +306,8 @@
                   "container-engine/tutorials/machine-learning/run-triton-server",
                   "container-engine/tutorials/machine-learning/run-cog",
                   "container-engine/tutorials/machine-learning/jupyterlab",
-                  "container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api"
+                  "container-engine/tutorials/machine-learning/how-to-deploy-a-truss-container-to-salad-portal-and-api",
+                  "container-engine/tutorials/machine-learning/llm-fine-tuning"
                 ]
               },
               {
@@ -380,6 +354,14 @@
                 "pages": [
                   "container-engine/tutorials/getting-started/ubuntu-image",
                   "container-engine/tutorials/getting-started/example-image"
+                ]
+              },
+              {
+                "group": "Computer Vision",
+                "pages": [
+                  "container-engine/tutorials/computer-vision/yolov8-quickstart",
+                  "container-engine/tutorials/computer-vision/yolov8-deployment-tutorial",
+                  "container-engine/tutorials/computer-vision/yolov8-model-training"
                 ]
               }
             ]
@@ -484,6 +466,29 @@
                 "group": "Transcription",
                 "pages": [
                   "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+                ]
+              },
+              {
+                "group": "Llm",
+                "pages": [
+                  "container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
+                  "container-engine/how-to-guides/llm/run-ollama",
+                  "container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
+                ]
+              },
+              {
+                "group": "Computer Vision",
+                "pages": [
+                  "container-engine/how-to-guides/computer-vision/image-captioning-with-vlm",
+                  "container-engine/how-to-guides/computer-vision/deploy-blip-with-cog",
+                  "container-engine/how-to-guides/computer-vision/yolov8-batch-processing"
+                ]
+              },
+              {
+                "group": "Audio Processing",
+                "pages": [
+                  "container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
                 ]
               }
             ]
@@ -1594,6 +1599,58 @@
     {
       "source": "/guides/llm/llm-general",
       "destination": "/container-engine/explanation/llm-inference-overview"
+    },
+    {
+      "source": "/guides/llm/llm-fine-tuning",
+      "destination": "/container-engine/tutorials/machine-learning/llm-fine-tuning"
+    },
+    {
+      "source": "/guides/llm/ollama-hf",
+      "destination": "/container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama"
+    },
+    {
+      "source": "/guides/llm/run-ollama",
+      "destination": "/container-engine/how-to-guides/llm/run-ollama"
+    },
+    {
+      "source": "/guides/llm/run-tgi-text-generation-interface-by-huggingface",
+      "destination": "/container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
+    },
+    {
+      "source": "/guides/computer-vision/caption-with-vlm",
+      "destination": "/container-engine/how-to-guides/computer-vision/image-captioning-with-vlm"
+    },
+    {
+      "source": "/guides/computer-vision/deploy-blip-with-cog",
+      "destination": "/container-engine/how-to-guides/computer-vision/deploy-blip-with-cog"
+    },
+    {
+      "source": "/guides/computer-vision/yolov8/yolov8",
+      "destination": "/container-engine/explanation/computer-vision/yolov8-overview"
+    },
+    {
+      "source": "/guides/computer-vision/yolov8/quickstart",
+      "destination": "/container-engine/tutorials/computer-vision/yolov8-quickstart"
+    },
+    {
+      "source": "/guides/computer-vision/yolov8/deployment-tutorial",
+      "destination": "/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial"
+    },
+    {
+      "source": "/guides/computer-vision/yolov8/batch-processing",
+      "destination": "/container-engine/how-to-guides/computer-vision/yolov8-batch-processing"
+    },
+    {
+      "source": "/guides/computer-vision/yolov8/model-training-guide",
+      "destination": "/container-engine/tutorials/computer-vision/yolov8-model-training"
+    },
+    {
+      "source": "/guides/text-to-speech/metavoice-tts-api",
+      "destination": "/container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning"
+    },
+    {
+      "source": "/guides/text-to-speech/openvoice-api",
+      "destination": "/container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
     }
   ]
 }
