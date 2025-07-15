@@ -161,7 +161,7 @@ def move_image_file(old_path: str, new_path: str) -> bool:
 
 
 def update_image_references_in_file(file_path: str, image_mapping: Dict[str, str]) -> bool:
-    """Update image references in a file based on the mapping."""
+    """Update image and media references in a file based on the mapping."""
     if not os.path.exists(file_path):
         return False
 
@@ -171,7 +171,7 @@ def update_image_references_in_file(file_path: str, image_mapping: Dict[str, str
 
         original_content = content
 
-        # Update each image reference
+        # Update each image/media reference
         for old_ref, new_ref in image_mapping.items():
             # Update markdown image syntax
             content = re.sub(
@@ -187,11 +187,40 @@ def update_image_references_in_file(file_path: str, image_mapping: Dict[str, str
                 content
             )
 
+            # Update video tags (HTML5 video)
+            content = re.sub(
+                r'(<video[^>]+src=["\'])' + re.escape(old_ref) + r'(["\'])',
+                r'\1' + new_ref + r'\2',
+                content
+            )
+
+            # Update meta tags (og:image, twitter:image, etc.)
+            content = re.sub(
+                r"('[^']*image':\s*['\"])(" + re.escape(old_ref) + r")(['\"])",
+                r'\1' + new_ref + r'\3',
+                content
+            )
+
+            # Update Frame components with img tags inside
+            content = re.sub(
+                r'(<Frame[^>]*>\s*<img[^>]+src=["\'])' + re.escape(old_ref) + r'(["\'])',
+                r'\1' + new_ref + r'\2',
+                content
+            )
+
+        # Also handle general /guides/ path updates to /container-engine/images/
+        # This catches any remaining /guides/ image references that weren't in our mapping
+        content = re.sub(
+            r'(/guides/[^/]+/images/[^"\'\s)]+)',
+            lambda m: '/container-engine/images/' + os.path.basename(m.group(1)),
+            content
+        )
+
         # Only write if content changed
         if content != original_content:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"  📝 Updated image references in: {file_path}")
+            print(f"  📝 Updated image/media references in: {file_path}")
             return True
 
         return True

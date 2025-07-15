@@ -11,142 +11,15 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "How-to Guides",
-        "groups": [
-          {
-            "group": "How-to Guides",
-            "pages": []
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Reference",
-            "pages": [
-              "reference/api-usage",
-              {
-                "group": "SaladCloud API",
-                "pages": [
-                  {
-                    "group": "Container Groups",
-                    "pages": [
-                      "reference/saladcloud-api/container-groups/list-container-groups",
-                      "reference/saladcloud-api/container-groups/create-container-group",
-                      "reference/saladcloud-api/container-groups/get-container-group",
-                      "reference/saladcloud-api/container-groups/update-container-group",
-                      "reference/saladcloud-api/container-groups/delete-container-group",
-                      "reference/saladcloud-api/container-groups/start-container-group",
-                      "reference/saladcloud-api/container-groups/stop-container-group",
-                      "reference/saladcloud-api/container-groups/get-container-group-logs",
-                      "reference/saladcloud-api/container-groups/list-container-group-instances",
-                      "reference/saladcloud-api/container-groups/get-container-group-instance",
-                      "reference/saladcloud-api/container-groups/update-container-group-instance",
-                      "reference/saladcloud-api/container-groups/reallocate-container-group-instance",
-                      "reference/saladcloud-api/container-groups/recreate-container-group-instance",
-                      "reference/saladcloud-api/container-groups/restart-container-group-instance"
-                    ]
-                  },
-                  {
-                    "group": "Job Queues",
-                    "pages": [
-                      "reference/saladcloud-api/queues/list-queues",
-                      "reference/saladcloud-api/queues/create-queue",
-                      "reference/saladcloud-api/queues/get-queue",
-                      "reference/saladcloud-api/queues/update-queue",
-                      "reference/saladcloud-api/queues/delete-queue",
-                      "reference/saladcloud-api/queues/list-jobs",
-                      "reference/saladcloud-api/queues/create-job",
-                      "reference/saladcloud-api/queues/get-job",
-                      "reference/saladcloud-api/queues/delete-job"
-                    ]
-                  },
-                  {
-                    "group": "Inference Endpoints",
-                    "pages": [
-                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoints",
-                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint",
-                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoint-jobs",
-                      "reference/saladcloud-api/inference-endpoints/create-inference-endpoint-job",
-                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint-job",
-                      "reference/saladcloud-api/inference-endpoints/delete-inference-endpoint-job"
-                    ]
-                  },
-                  {
-                    "group": "Log Entries",
-                    "pages": [
-                      "reference/saladcloud-api/logs/query-log-entries"
-                    ]
-                  },
-                  {
-                    "group": "Organizations",
-                    "pages": [
-                      "reference/saladcloud-api/organizations/list-gpu-classes",
-                      "reference/saladcloud-api/organizations/get-quotas",
-                      "reference/saladcloud-api/organizations/get-webhook-secret-key",
-                      "reference/saladcloud-api/organizations/update-webhook-secret-key"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Instance Metadata Service",
-                "pages": [
-                  "reference/imds/get-status",
-                  "reference/imds/get-token",
-                  "reference/imds/get-deletion-cost",
-                  "reference/imds/replace-deletion-cost",
-                  "reference/imds/reallocate",
-                  "reference/imds/recreate",
-                  "reference/imds/restart"
-                ]
-              },
-              {
-                "group": "Transcription API",
-                "pages": [
-                  "reference/transcribe/inference_endpoints/create-an-inference-endpoint-job",
-                  "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
-                  "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
-                ]
-              },
-              {
-                "group": "Transcription Lite API",
-                "pages": [
-                  "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
-                  "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
-                  "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
-                ]
-              },
-              {
-                "group": "S4 - Salad Simple Storage Service",
-                "pages": [
-                  "reference/s4/upload-a-file",
-                  "reference/s4/download-a-file",
-                  "reference/s4/delete-a-file",
-                  "reference/s4/list-all-files-that-belong-to-the-organization",
-                  "reference/s4/sign-a-file-and-return-a-signed-url"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
         "tab": "General",
         "groups": [
           {
             "group": "Explanation",
-            "pages": [
-              "general/explanation/overview",
-              "general/explanation/account-security"
-            ]
+            "pages": ["general/explanation/overview", "general/explanation/account-security"]
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "general/tutorials/account-setup"
-            ]
+            "pages": ["general/tutorials/account-setup"]
           }
         ]
       },
@@ -175,9 +48,7 @@
               },
               {
                 "group": "Networking Security",
-                "pages": [
-                  "container-engine/explanation/networking-security/networking"
-                ]
+                "pages": ["container-engine/explanation/networking-security/networking"]
               },
               {
                 "group": "Billing Pricing",
@@ -189,9 +60,7 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/explanation/autoscaling/autoscaling"
-                ]
+                "pages": ["container-engine/explanation/autoscaling/autoscaling"]
               },
               "container-engine/explanation/disk-space",
               "container-engine/explanation/container-registries",
@@ -227,27 +96,19 @@
               "container-engine/explanation/llm-inference-overview",
               {
                 "group": "Computer Vision",
-                "pages": [
-                  "container-engine/explanation/computer-vision/yolov8-overview"
-                ]
+                "pages": ["container-engine/explanation/computer-vision/yolov8-overview"]
               },
               {
                 "group": "Long Running Tasks",
-                "pages": [
-                  "container-engine/explanation/long-running-tasks/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/long-running-tasks/solution-overview"]
               },
               {
                 "group": "Kubernetes Integration",
-                "pages": [
-                  "container-engine/explanation/kubernetes-integration/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/kubernetes-integration/solution-overview"]
               },
               {
                 "group": "Tailscale Integration",
-                "pages": [
-                  "container-engine/explanation/tailscale-integration/solution-overview"
-                ]
+                "pages": ["container-engine/explanation/tailscale-integration/solution-overview"]
               }
             ]
           },
@@ -294,9 +155,7 @@
               },
               {
                 "group": "Security",
-                "pages": [
-                  "container-engine/tutorials/security/jwt-authentication"
-                ]
+                "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
               {
                 "group": "Performance",
@@ -341,9 +200,7 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/reference/autoscaling/settings"
-                ]
+                "pages": ["container-engine/reference/autoscaling/settings"]
               },
               "container-engine/reference/quotas"
             ]
@@ -355,9 +212,7 @@
               "container-engine/how-to-guides/environment-variables",
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
-                ]
+                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
               },
               "container-engine/how-to-guides/specifying-a-command",
               {
@@ -421,9 +276,7 @@
               },
               {
                 "group": "Transcription",
-                "pages": [
-                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
-                ]
+                "pages": ["container-engine/how-to-guides/transcription/youtube-transcription-pipeline"]
               },
               {
                 "group": "Llm",
@@ -474,15 +327,11 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": [
-                  "container-engine/how-to-guides/tailscale-integration/basic"
-                ]
+                "pages": ["container-engine/how-to-guides/tailscale-integration/basic"]
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": [
-                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
-                ]
+                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
           }
@@ -504,16 +353,11 @@
           },
           {
             "group": "Reference",
-            "pages": [
-              "transcription/reference/accuracy-benchmarks",
-              "transcription/reference/faq"
-            ]
+            "pages": ["transcription/reference/accuracy-benchmarks", "transcription/reference/faq"]
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "transcription/tutorials/transcription-quick-start"
-            ]
+            "pages": ["transcription/tutorials/transcription-quick-start"]
           },
           {
             "group": "How-to Guides",
@@ -565,9 +409,7 @@
               },
               {
                 "group": "Technical",
-                "pages": [
-                  "transcription/how-to-guides/technical/splitting-large-audio-files"
-                ]
+                "pages": ["transcription/how-to-guides/technical/splitting-large-audio-files"]
               },
               {
                 "group": "Migration",
@@ -600,15 +442,11 @@
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "gateway-service/tutorials/quickstart"
-            ]
+            "pages": ["gateway-service/tutorials/quickstart"]
           },
           {
             "group": "Reference",
-            "pages": [
-              "gateway-service/reference/sgs-api"
-            ]
+            "pages": ["gateway-service/reference/sgs-api"]
           }
         ]
       },
@@ -617,8 +455,117 @@
         "groups": [
           {
             "group": "Explanation",
+            "pages": ["storage/explanation/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
             "pages": [
-              "storage/explanation/overview"
+              "reference/api-usage",
+              {
+                "group": "SaladCloud API",
+                "pages": [
+                  {
+                    "group": "Container Groups",
+                    "pages": [
+                      "reference/saladcloud-api/container-groups/list-container-groups",
+                      "reference/saladcloud-api/container-groups/create-container-group",
+                      "reference/saladcloud-api/container-groups/get-container-group",
+                      "reference/saladcloud-api/container-groups/update-container-group",
+                      "reference/saladcloud-api/container-groups/delete-container-group",
+                      "reference/saladcloud-api/container-groups/start-container-group",
+                      "reference/saladcloud-api/container-groups/stop-container-group",
+                      "reference/saladcloud-api/container-groups/get-container-group-logs",
+                      "reference/saladcloud-api/container-groups/list-container-group-instances",
+                      "reference/saladcloud-api/container-groups/get-container-group-instance",
+                      "reference/saladcloud-api/container-groups/update-container-group-instance",
+                      "reference/saladcloud-api/container-groups/reallocate-container-group-instance",
+                      "reference/saladcloud-api/container-groups/recreate-container-group-instance",
+                      "reference/saladcloud-api/container-groups/restart-container-group-instance"
+                    ]
+                  },
+                  {
+                    "group": "Job Queues",
+                    "pages": [
+                      "reference/saladcloud-api/queues/list-queues",
+                      "reference/saladcloud-api/queues/create-queue",
+                      "reference/saladcloud-api/queues/get-queue",
+                      "reference/saladcloud-api/queues/update-queue",
+                      "reference/saladcloud-api/queues/delete-queue",
+                      "reference/saladcloud-api/queues/list-jobs",
+                      "reference/saladcloud-api/queues/create-job",
+                      "reference/saladcloud-api/queues/get-job",
+                      "reference/saladcloud-api/queues/delete-job"
+                    ]
+                  },
+                  {
+                    "group": "Inference Endpoints",
+                    "pages": [
+                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoints",
+                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint",
+                      "reference/saladcloud-api/inference-endpoints/list-inference-endpoint-jobs",
+                      "reference/saladcloud-api/inference-endpoints/create-inference-endpoint-job",
+                      "reference/saladcloud-api/inference-endpoints/get-inference-endpoint-job",
+                      "reference/saladcloud-api/inference-endpoints/delete-inference-endpoint-job"
+                    ]
+                  },
+                  {
+                    "group": "Log Entries",
+                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
+                  },
+                  {
+                    "group": "Organizations",
+                    "pages": [
+                      "reference/saladcloud-api/organizations/list-gpu-classes",
+                      "reference/saladcloud-api/organizations/get-quotas",
+                      "reference/saladcloud-api/organizations/get-webhook-secret-key",
+                      "reference/saladcloud-api/organizations/update-webhook-secret-key"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Instance Metadata Service",
+                "pages": [
+                  "reference/imds/get-status",
+                  "reference/imds/get-token",
+                  "reference/imds/get-deletion-cost",
+                  "reference/imds/replace-deletion-cost",
+                  "reference/imds/reallocate",
+                  "reference/imds/recreate",
+                  "reference/imds/restart"
+                ]
+              },
+              {
+                "group": "Transcription API",
+                "pages": [
+                  "reference/transcribe/inference_endpoints/create-an-inference-endpoint-job",
+                  "reference/transcribe/inference_endpoints/get-an-inference-endpoint-job",
+                  "reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job"
+                ]
+              },
+              {
+                "group": "Transcription Lite API",
+                "pages": [
+                  "reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job",
+                  "reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job",
+                  "reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job"
+                ]
+              },
+              {
+                "group": "S4 - Salad Simple Storage Service",
+                "pages": [
+                  "reference/s4/upload-a-file",
+                  "reference/s4/download-a-file",
+                  "reference/s4/delete-a-file",
+                  "reference/s4/list-all-files-that-belong-to-the-organization",
+                  "reference/s4/sign-a-file-and-return-a-signed-url"
+                ]
+              }
             ]
           }
         ]
