@@ -1,0 +1,46 @@
+---
+title: 'Job Queues'
+---
+
+_Last Updated: February 14, 2025_
+
+Job Queues provide a way to process discrete jobs without worrying about node capacity, load balancing, and retries.
+With Job Queues you configure a port on your container, deploy your container group, and then send requests to a static
+endpoint. These requests are automatically queued and distributed to healthy nodes, with automatic retries to handle
+transient failures.
+
+# Limitations
+
+- Our Job Queues are designed to distribute tasks to an HTTP server, and queue operations are managed with http response
+  symantics, e.g. return 200 for a successful job, 500 for a failed job.
+- Jobs will be retried up to 3 times (meaning 4 total attempts) before being marked as failed. This limitation in
+  combination with interruptible instances means our job queues are not well suited for extremely long running tasks.
+- Instance interruptions count as job failures, and those jobs will be retried according to the above policy.
+- Jobs are not guaranteed to be processed in order, but they will be processed in a FIFO manner.
+- Jobs are not guaranteed to be processed by the same node, but they will be processed by a healthy node.
+- The response body from your http server cannot exceed 10MB.
+- Job Queues can only be managed and accessed via the [Job Queue API](/reference/saladcloud-api/queues/create-queue)
+
+# Terminology
+
+- **Job:** An individual request to be processed. An example of a job might be a token string sent to an image
+  generation service.
+- **Job Queue Worker:** A small, multi-architecture go binary program you install in your container which receives jobs
+  from the Queue, forwards them to your application running in the container, receives results and returns them to the
+  Queue.
+- **Job Queue:** Salad-managed queue service that receives requests from your systems, queues them, and distributes them
+  FIFO to nodes. Job queues distribute received jobs to one or more container groups. A container group is connected to
+  a Job Queue when the container group is first created.
+
+# Architecture
+
+<img src="/container-engine/images/job-queues-architecture.png" />
+
+# Getting Started with Job Queues
+
+1. Create a Job Queue
+2. Configure the Job Queue Worker
+3. Push your container to a registry
+4. Configure a Container Group with a Job Queue
+5. Add Jobs to the Queue
+6. Retrieve Results

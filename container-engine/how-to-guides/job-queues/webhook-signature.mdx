@@ -1,0 +1,80 @@
+---
+title: 'Validating Webhook Signatures'
+description: 'Learn how to validate webhook signatures for the Job Queue API in SaladCloud.'
+---
+
+_Last Updated: June 2, 2025_
+
+# Validating Webhook Signatures
+
+When using the Salad Job Queue API, you can set up webhooks to receive the output of your jobs. To ensure the integrity
+and authenticity of the webhook payloads, you can validate the signatures included in the webhook requests.
+
+A webhook request will include headers `webhook-signature`, `webhook-id` and `webhook-timestamp`, which contains a
+signature of the payload. This signature can be validated using your webhook secret key, available in the portal, and
+the `svix` library.
+
+![Webhook Signature Example](/container-engine/images/webhook-secret-key.png)
+
+## Validating the Signature
+
+### Node.js Example
+
+First, install `svix`:
+
+```bash
+npm install svix
+```
+
+Then, you can use the following code to validate the signature:
+
+```javascript
+const { Webhook } = require('svix')
+
+//Express.js middleware
+function validateWebhookSignature(req, res, next) {
+  const webhook = new Webhook(secret)
+  try {
+    webhook.verify(req.body, req.headers)
+    next()
+  } catch (error) {
+    console.error('Webhook verification failed:', error)
+    return res.status(401).send('Invalid signature')
+  }
+}
+```
+
+### Python Example
+
+First, install `svix`:
+
+```bash
+pip install svix
+```
+
+Then, you can use the following code to validate the signature:
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+from svix import Webhook
+from typing import Any, Dict
+
+async def validate_webhook(request: Request) -> Dict[str, Any]:
+    """
+    FastAPI Dependency to validate webhook signatures
+    """
+    try:
+        # Get the raw body
+        body = await request.body()
+
+        # Create webhook instance
+        webhook = Webhook(webhook_secret)
+
+        # Verify the webhook signature
+        payload = webhook.verify(body, dict(request.headers))
+
+        return payload
+    except Exception as e:
+        print(f"Webhook verification failed: {e}")
+        raise HTTPException(status_code=401, detail="Invalid webhook signature")
+```

@@ -19,119 +19,11 @@
           },
           {
             "group": "Container Engine",
-            "pages": [
-              "products/sce/saladcloud-secure",
-              {
-                "group": "Getting Started",
-                "pages": [
-                  "products/sce/getting-started/quickstart-api"
-                ]
-              },
-              {
-                "group": "Container Groups",
-                "pages": [
-                  "products/sce/container-groups/container-groups",
-                  "products/sce/container-groups/deployment-lifecycle",
-                  "products/sce/container-groups/managing-deployments",
-                  {
-                    "group": "Billing and Pricing",
-                    "pages": [
-                      "products/sce/container-groups/billing-and-pricing/billing",
-                      "products/sce/container-groups/billing-and-pricing/priority-pricing",
-                      "products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs"
-                    ]
-                  },
-                  "products/sce/container-groups/environment-variables",
-                  {
-                    "group": "Container Registries",
-                    "pages": [
-                      "products/sce/container-groups/registries/container-registries",
-                      "products/sce/container-groups/registries/dockerhub",
-                      "products/sce/container-groups/registries/aws-ecr",
-                      "products/sce/container-groups/registries/azure-acr",
-                      "products/sce/container-groups/registries/gcp-gar",
-                      "products/sce/container-groups/registries/quay",
-                      "products/sce/container-groups/registries/github-ghcr"
-                    ]
-                  },
-                  {
-                    "group": "External Logging",
-                    "pages": [
-                      "products/sce/container-groups/external-logging/external-logging",
-                      "products/sce/container-groups/external-logging/axiom",
-                      "products/sce/container-groups/external-logging/new-relic",
-                      "products/sce/container-groups/external-logging/splunk-logging",
-                      "products/sce/container-groups/external-logging/tcp-logging",
-                      "products/sce/container-groups/external-logging/datadog",
-                      "products/sce/container-groups/external-logging/http"
-                    ]
-                  },
-                  {
-                    "group": "Health Probes",
-                    "pages": [
-                      "products/sce/container-groups/health-probes/health-probes",
-                      "products/sce/container-groups/health-probes/startup-probes",
-                      "products/sce/container-groups/health-probes/liveness-probes",
-                      "products/sce/container-groups/health-probes/readiness-probes"
-                    ]
-                  },
-                  {
-                    "group": "Instance Metadata Service (IMDS)",
-                    "pages": [
-                      "products/sce/container-groups/imds/introduction",
-                      "products/sce/container-groups/imds/Container-status-endpoint",
-                      "products/sce/container-groups/imds/obtaining-an-imds-jwt",
-                      "products/sce/container-groups/imds/imds-reallocate",
-                      "products/sce/container-groups/imds/instance-deletion-cost"
-                    ]
-                  },
-                  "products/sce/container-groups/specifying-a-command",
-                  "products/sce/container-groups/disk-space",
-                  "products/sce/container-groups/system-events",
-                  "products/sce/container-groups/container-logs",
-                  "products/sce/container-groups/quotas"
-                ]
-              },
-              {
-                "group": "Container Gateway",
-                "pages": [
-                  "products/sce/gateway/enabling-ipv6",
-                  "products/sce/gateway/sending-requests",
-                  "products/sce/gateway/load-balancer-options",
-                  "products/sce/gateway/websockets",
-                  "products/sce/gateway/error-pages"
-                ]
-              },
-              {
-                "group": "Job Queues",
-                "pages": [
-                  "products/sce/job-queues/job-queues",
-                  "products/sce/job-queues/creating-a-job-queue",
-                  "products/sce/job-queues/queue-worker",
-                  "products/sce/job-queues/using-queues",
-                  "products/sce/job-queues/webhook-signature"
-                ]
-              },
-              {
-                "group": "Autoscaling",
-                "pages": [
-                  "products/sce/autoscaling/autoscaling",
-                  "products/sce/autoscaling/settings",
-                  "products/sce/autoscaling/enable-autoscaling"
-                ]
-              }
-            ]
+            "pages": []
           },
           {
             "group": "Transcription API",
-            "pages": [
-              "products/transcription/accuracy-benchmarks",
-              "products/transcription/speech-to-text",
-              "products/transcription/translation",
-              "products/transcription/captions",
-              "products/transcription/insights-intelligence",
-              "products/transcription/billing"
-            ]
+            "pages": []
           },
           {
             "group": "Recipes",
@@ -139,15 +31,7 @@
           },
           {
             "group": "Gateway Service",
-            "pages": [
-              "products/sgs/quickstart",
-              "products/sgs/proxy-v2",
-              "products/sgs/node-removals",
-              "products/sgs/approved-domains",
-              "products/sgs/destination-health-checks",
-              "products/sgs/sgs-api",
-              "products/sgs/faqs"
-            ]
+            "pages": []
           },
           {
             "group": "S4 - Salad Simple Storage Service",
@@ -495,17 +379,80 @@
           {
             "group": "Explanation",
             "pages": [
-              "container-engine/explanation/overview",
-              "container-engine/explanation/faqs",
-              "container-engine/explanation/recipes-overview",
-              "container-engine/explanation/networking",
-              "container-engine/explanation/architectural-overview"
+              {
+                "group": "Core Concepts",
+                "pages": [
+                  "container-engine/explanation/core-concepts/overview",
+                  "container-engine/explanation/core-concepts/architectural-overview",
+                  "container-engine/explanation/core-concepts/recipes-overview",
+                  "container-engine/explanation/core-concepts/faqs",
+                  "container-engine/explanation/core-concepts/saladcloud-secure"
+                ]
+              },
+              {
+                "group": "Container Groups",
+                "pages": [
+                  "container-engine/explanation/container-groups/container-groups",
+                  "container-engine/explanation/container-groups/deployment-lifecycle"
+                ]
+              },
+              {
+                "group": "Networking Security",
+                "pages": [
+                  "container-engine/explanation/networking-security/networking"
+                ]
+              },
+              {
+                "group": "Billing Pricing",
+                "pages": [
+                  "container-engine/explanation/billing-pricing/billing",
+                  "container-engine/explanation/billing-pricing/priority-pricing",
+                  "container-engine/explanation/billing-pricing/prepaid-billing-faqs"
+                ]
+              },
+              {
+                "group": "Autoscaling",
+                "pages": [
+                  "container-engine/explanation/autoscaling/autoscaling"
+                ]
+              },
+              "container-engine/explanation/disk-space",
+              "container-engine/explanation/container-registries",
+              "container-engine/explanation/container-logs",
+              "container-engine/explanation/system-events",
+              "container-engine/explanation/external-logging",
+              {
+                "group": "Health Probes",
+                "pages": [
+                  "container-engine/explanation/health-probes/health-probes",
+                  "container-engine/explanation/health-probes/liveness-probes",
+                  "container-engine/explanation/health-probes/readiness-probes",
+                  "container-engine/explanation/health-probes/startup-probes"
+                ]
+              },
+              {
+                "group": "Imds",
+                "pages": [
+                  "container-engine/explanation/imds/introduction",
+                  "container-engine/explanation/imds/instance-deletion-cost"
+                ]
+              },
+              "container-engine/explanation/job-queues",
+              {
+                "group": "Gateway",
+                "pages": [
+                  "container-engine/explanation/gateway/load-balancer-options",
+                  "container-engine/explanation/gateway/websockets",
+                  "container-engine/explanation/gateway/error-pages"
+                ]
+              }
             ]
           },
           {
             "group": "Tutorials",
             "pages": [
-              "container-engine/tutorials/quickstart"
+              "container-engine/tutorials/quickstart",
+              "container-engine/tutorials/quickstart-api"
             ]
           },
           {
@@ -523,6 +470,73 @@
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/yolo"
                 ]
+              },
+              {
+                "group": "Autoscaling",
+                "pages": [
+                  "container-engine/reference/autoscaling/settings"
+                ]
+              },
+              "container-engine/reference/quotas"
+            ]
+          },
+          {
+            "group": "How-to Guides",
+            "pages": [
+              "container-engine/how-to-guides/managing-deployments",
+              "container-engine/how-to-guides/environment-variables",
+              {
+                "group": "Autoscaling",
+                "pages": [
+                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
+                ]
+              },
+              "container-engine/how-to-guides/specifying-a-command",
+              {
+                "group": "Registries",
+                "pages": [
+                  "container-engine/how-to-guides/registries/dockerhub",
+                  "container-engine/how-to-guides/registries/aws-ecr",
+                  "container-engine/how-to-guides/registries/azure-acr",
+                  "container-engine/how-to-guides/registries/gcp-gar",
+                  "container-engine/how-to-guides/registries/quay",
+                  "container-engine/how-to-guides/registries/github-ghcr"
+                ]
+              },
+              {
+                "group": "Imds",
+                "pages": [
+                  "container-engine/how-to-guides/imds/obtaining-an-imds-jwt",
+                  "container-engine/how-to-guides/imds/container-status-endpoint",
+                  "container-engine/how-to-guides/imds/imds-reallocate"
+                ]
+              },
+              {
+                "group": "Job Queues",
+                "pages": [
+                  "container-engine/how-to-guides/job-queues/creating-a-job-queue",
+                  "container-engine/how-to-guides/job-queues/using-queues",
+                  "container-engine/how-to-guides/job-queues/queue-worker",
+                  "container-engine/how-to-guides/job-queues/webhook-signature"
+                ]
+              },
+              {
+                "group": "Gateway",
+                "pages": [
+                  "container-engine/how-to-guides/gateway/enabling-ipv6",
+                  "container-engine/how-to-guides/gateway/sending-requests"
+                ]
+              },
+              {
+                "group": "External Logging",
+                "pages": [
+                  "container-engine/how-to-guides/external-logging/axiom",
+                  "container-engine/how-to-guides/external-logging/datadog",
+                  "container-engine/how-to-guides/external-logging/http",
+                  "container-engine/how-to-guides/external-logging/new-relic",
+                  "container-engine/how-to-guides/external-logging/splunk-logging",
+                  "container-engine/how-to-guides/external-logging/tcp-logging"
+                ]
               }
             ]
           }
@@ -534,7 +548,18 @@
           {
             "group": "Explanation",
             "pages": [
-              "transcription/explanation/overview"
+              "transcription/explanation/overview",
+              "transcription/explanation/speech-to-text",
+              "transcription/explanation/translation",
+              "transcription/explanation/captions",
+              "transcription/explanation/insights-intelligence",
+              "transcription/explanation/billing"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "transcription/reference/accuracy-benchmarks"
             ]
           }
         ]
@@ -545,7 +570,24 @@
           {
             "group": "Explanation",
             "pages": [
-              "gateway-service/explanation/overview"
+              "gateway-service/explanation/overview",
+              "gateway-service/explanation/proxy-v2",
+              "gateway-service/explanation/node-removals",
+              "gateway-service/explanation/approved-domains",
+              "gateway-service/explanation/destination-health-checks",
+              "gateway-service/explanation/faqs"
+            ]
+          },
+          {
+            "group": "Tutorials",
+            "pages": [
+              "gateway-service/tutorials/quickstart"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "gateway-service/reference/sgs-api"
             ]
           }
         ]
@@ -1013,6 +1055,306 @@
     {
       "source": "/products/sce/getting-started/architectural-overview",
       "destination": "/container-engine/explanation/architectural-overview"
+    },
+    {
+      "source": "/products/sce/getting-started/quickstart-api",
+      "destination": "/container-engine/tutorials/quickstart-api"
+    },
+    {
+      "source": "/products/sce/saladcloud-secure",
+      "destination": "/container-engine/explanation/saladcloud-secure"
+    },
+    {
+      "source": "/products/sce/container-groups/container-groups",
+      "destination": "/container-engine/explanation/container-groups"
+    },
+    {
+      "source": "/products/sce/container-groups/deployment-lifecycle",
+      "destination": "/container-engine/explanation/deployment-lifecycle"
+    },
+    {
+      "source": "/products/sce/container-groups/managing-deployments",
+      "destination": "/container-engine/how-to-guides/managing-deployments"
+    },
+    {
+      "source": "/products/sce/container-groups/environment-variables",
+      "destination": "/container-engine/how-to-guides/environment-variables"
+    },
+    {
+      "source": "/products/sce/container-groups/billing-and-pricing/billing",
+      "destination": "/container-engine/explanation/billing"
+    },
+    {
+      "source": "/products/sce/container-groups/billing-and-pricing/priority-pricing",
+      "destination": "/container-engine/explanation/priority-pricing"
+    },
+    {
+      "source": "/products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs",
+      "destination": "/container-engine/explanation/prepaid-billing-faqs"
+    },
+    {
+      "source": "/container-engine/explanation/overview",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/container-engine/explanation/architectural-overview",
+      "destination": "/container-engine/explanation/core-concepts/architectural-overview"
+    },
+    {
+      "source": "/container-engine/explanation/recipes-overview",
+      "destination": "/container-engine/explanation/core-concepts/recipes-overview"
+    },
+    {
+      "source": "/container-engine/explanation/faqs",
+      "destination": "/container-engine/explanation/core-concepts/faqs"
+    },
+    {
+      "source": "/container-engine/explanation/container-groups",
+      "destination": "/container-engine/explanation/container-groups/container-groups"
+    },
+    {
+      "source": "/container-engine/explanation/deployment-lifecycle",
+      "destination": "/container-engine/explanation/container-groups/deployment-lifecycle"
+    },
+    {
+      "source": "/container-engine/explanation/networking",
+      "destination": "/container-engine/explanation/networking-security/networking"
+    },
+    {
+      "source": "/container-engine/explanation/saladcloud-secure",
+      "destination": "/container-engine/explanation/networking-security/saladcloud-secure"
+    },
+    {
+      "source": "/container-engine/explanation/networking-security/saladcloud-secure",
+      "destination": "/container-engine/explanation/core-concepts/saladcloud-secure"
+    },
+    {
+      "source": "/container-engine/explanation/billing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/container-engine/explanation/priority-pricing",
+      "destination": "/container-engine/explanation/billing-pricing/priority-pricing"
+    },
+    {
+      "source": "/container-engine/explanation/prepaid-billing-faqs",
+      "destination": "/container-engine/explanation/billing-pricing/prepaid-billing-faqs"
+    },
+    {
+      "source": "/products/sce/autoscaling/autoscaling",
+      "destination": "/container-engine/explanation/autoscaling/autoscaling"
+    },
+    {
+      "source": "/products/sce/autoscaling/settings",
+      "destination": "/container-engine/reference/autoscaling/settings"
+    },
+    {
+      "source": "/products/sce/autoscaling/enable-autoscaling",
+      "destination": "/container-engine/how-to-guides/autoscaling/enable-autoscaling"
+    },
+    {
+      "source": "/products/sce/container-groups/specifying-a-command",
+      "destination": "/container-engine/how-to-guides/specifying-a-command"
+    },
+    {
+      "source": "/products/sce/container-groups/quotas",
+      "destination": "/container-engine/reference/quotas"
+    },
+    {
+      "source": "/products/sce/container-groups/disk-space",
+      "destination": "/container-engine/explanation/disk-space"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/container-registries",
+      "destination": "/container-engine/explanation/container-registries"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/dockerhub",
+      "destination": "/container-engine/how-to-guides/registries/dockerhub"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/aws-ecr",
+      "destination": "/container-engine/how-to-guides/registries/aws-ecr"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/azure-acr",
+      "destination": "/container-engine/how-to-guides/registries/azure-acr"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/gcp-gar",
+      "destination": "/container-engine/how-to-guides/registries/gcp-gar"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/quay",
+      "destination": "/container-engine/how-to-guides/registries/quay"
+    },
+    {
+      "source": "/products/sce/container-groups/registries/github-ghcr",
+      "destination": "/container-engine/how-to-guides/registries/github-ghcr"
+    },
+    {
+      "source": "/products/sce/container-groups/container-logs",
+      "destination": "/container-engine/explanation/container-logs"
+    },
+    {
+      "source": "/products/sce/container-groups/system-events",
+      "destination": "/container-engine/explanation/system-events"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/external-logging",
+      "destination": "/container-engine/explanation/external-logging"
+    },
+    {
+      "source": "/products/sce/container-groups/health-probes/health-probes",
+      "destination": "/container-engine/explanation/health-probes/health-probes"
+    },
+    {
+      "source": "/products/sce/container-groups/health-probes/liveness-probes",
+      "destination": "/container-engine/explanation/health-probes/liveness-probes"
+    },
+    {
+      "source": "/products/sce/container-groups/health-probes/readiness-probes",
+      "destination": "/container-engine/explanation/health-probes/readiness-probes"
+    },
+    {
+      "source": "/products/sce/container-groups/health-probes/startup-probes",
+      "destination": "/container-engine/explanation/health-probes/startup-probes"
+    },
+    {
+      "source": "/products/sce/container-groups/imds/introduction",
+      "destination": "/container-engine/explanation/imds/introduction"
+    },
+    {
+      "source": "/products/sce/container-groups/imds/instance-deletion-cost",
+      "destination": "/container-engine/explanation/imds/instance-deletion-cost"
+    },
+    {
+      "source": "/products/sce/container-groups/imds/obtaining-an-imds-jwt",
+      "destination": "/container-engine/how-to-guides/imds/obtaining-an-imds-jwt"
+    },
+    {
+      "source": "/products/sce/container-groups/imds/Container-status-endpoint",
+      "destination": "/container-engine/how-to-guides/imds/container-status-endpoint"
+    },
+    {
+      "source": "/products/sce/container-groups/imds/imds-reallocate",
+      "destination": "/container-engine/how-to-guides/imds/imds-reallocate"
+    },
+    {
+      "source": "/products/sce/job-queues/job-queues",
+      "destination": "/container-engine/explanation/job-queues"
+    },
+    {
+      "source": "/products/sce/job-queues/creating-a-job-queue",
+      "destination": "/container-engine/how-to-guides/job-queues/creating-a-job-queue"
+    },
+    {
+      "source": "/products/sce/job-queues/using-queues",
+      "destination": "/container-engine/how-to-guides/job-queues/using-queues"
+    },
+    {
+      "source": "/products/sce/job-queues/queue-worker",
+      "destination": "/container-engine/how-to-guides/job-queues/queue-worker"
+    },
+    {
+      "source": "/products/sce/job-queues/webhook-signature",
+      "destination": "/container-engine/how-to-guides/job-queues/webhook-signature"
+    },
+    {
+      "source": "/products/sce/gateway/load-balancer-options",
+      "destination": "/container-engine/explanation/gateway/load-balancer-options"
+    },
+    {
+      "source": "/products/sce/gateway/websockets",
+      "destination": "/container-engine/explanation/gateway/websockets"
+    },
+    {
+      "source": "/products/sce/gateway/error-pages",
+      "destination": "/container-engine/explanation/gateway/error-pages"
+    },
+    {
+      "source": "/products/sce/gateway/enabling-ipv6",
+      "destination": "/container-engine/how-to-guides/gateway/enabling-ipv6"
+    },
+    {
+      "source": "/products/sce/gateway/sending-requests",
+      "destination": "/container-engine/how-to-guides/gateway/sending-requests"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/axiom",
+      "destination": "/container-engine/how-to-guides/external-logging/axiom"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/datadog",
+      "destination": "/container-engine/how-to-guides/external-logging/datadog"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/http",
+      "destination": "/container-engine/how-to-guides/external-logging/http"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/new-relic",
+      "destination": "/container-engine/how-to-guides/external-logging/new-relic"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/splunk-logging",
+      "destination": "/container-engine/how-to-guides/external-logging/splunk-logging"
+    },
+    {
+      "source": "/products/sce/container-groups/external-logging/tcp-logging",
+      "destination": "/container-engine/how-to-guides/external-logging/tcp-logging"
+    },
+    {
+      "source": "/products/sgs/quickstart",
+      "destination": "/gateway-service/tutorials/quickstart"
+    },
+    {
+      "source": "/products/sgs/proxy-v2",
+      "destination": "/gateway-service/explanation/proxy-v2"
+    },
+    {
+      "source": "/products/sgs/node-removals",
+      "destination": "/gateway-service/explanation/node-removals"
+    },
+    {
+      "source": "/products/sgs/approved-domains",
+      "destination": "/gateway-service/explanation/approved-domains"
+    },
+    {
+      "source": "/products/sgs/destination-health-checks",
+      "destination": "/gateway-service/explanation/destination-health-checks"
+    },
+    {
+      "source": "/products/sgs/faqs",
+      "destination": "/gateway-service/explanation/faqs"
+    },
+    {
+      "source": "/products/sgs/sgs-api",
+      "destination": "/gateway-service/reference/sgs-api"
+    },
+    {
+      "source": "/products/transcription/speech-to-text",
+      "destination": "/transcription/explanation/speech-to-text"
+    },
+    {
+      "source": "/products/transcription/translation",
+      "destination": "/transcription/explanation/translation"
+    },
+    {
+      "source": "/products/transcription/captions",
+      "destination": "/transcription/explanation/captions"
+    },
+    {
+      "source": "/products/transcription/insights-intelligence",
+      "destination": "/transcription/explanation/insights-intelligence"
+    },
+    {
+      "source": "/products/transcription/billing",
+      "destination": "/transcription/explanation/billing"
+    },
+    {
+      "source": "/products/transcription/accuracy-benchmarks",
+      "destination": "/transcription/reference/accuracy-benchmarks"
     }
   ]
 }

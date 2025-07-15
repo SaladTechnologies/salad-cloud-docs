@@ -1,0 +1,65 @@
+---
+title: 'Error Pages'
+---
+
+_Last Updated: October 15, 2024_
+
+When the Container Gateway is configured for a container group, it will be assigned an Access Domain Name URL. If you
+try to access that URL in your browser, and encounter an error, we provide error messaging to help you understand the
+nature of the error. Errors can occur, for example, when a container has not been fully set up yet, or has failed.
+
+## 400
+
+<img src="/container-engine/images/container-gateway-error-400.png" />
+
+## 401
+
+<img src="/container-engine/images/container-gateway-error-401.png" />
+
+## 403
+
+<img src="/container-engine/images/container-gateway-error-403.png" />
+
+## 404
+
+<img src="/container-engine/images/container-gateway-error-404.png" />
+
+## 408
+
+<img src="/container-engine/images/container-gateway-error-408.png" />
+
+## 410
+
+<img src="/container-engine/images/container-gateway-error-410.png" />
+
+## 413
+
+If you try to send large files over the URL. Currently the maximum request size is set to 1GB by the Container Gateway
+and its related services.
+
+<img src="/container-engine/images/container-gateway-error-413.png" />
+
+## 500
+
+<img src="/container-engine/images/container-gateway-error-500.png" />
+
+## 501
+
+<img src="/container-engine/images/container-gateway-error-501.png" />
+
+## 502
+
+<img src="/container-engine/images/container-gateway-error-502.png" />
+
+## 503
+
+It is possible to get this 503 error, if you have
+[health probes](/products/sce/container-groups/health-probes/health-probes) configured that are not yet passing
+
+If a 503 occurs, check that it is passing on at least 1 instance.
+
+<img src="/container-engine/images/container-gateway-error-503.png" />
+
+## 504
+
+<img src="/container-engine/images/container-gateway-error-504.png" />

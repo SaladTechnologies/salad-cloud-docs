@@ -1,0 +1,95 @@
+---
+title: 'Azure Container Registry'
+---
+
+_Last Updated: October 15, 2024_
+
+1. Obtain your Azure service account key
+
+[Link to guide](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-authentication?tabs=azure-cli)
+
+NOTE: In SaladCloud Portal, we are only going to get and make use of **Username** and **Password** from any of the
+listed three authentication method from Azure and here are the links their official documentation for each of the
+authentication methods blow including their pros and cons.
+
+> 📘 SaladCloud only makes use of **Username** and **Password**
+
+### Azure AD Service Principal
+
+[Link to guide](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal)
+
+**Pros:**
+
+1. Better security: Service principal allows for more secure authentication than using a shared user account.
+2. Granular Access Control: You can assign specific permissions to the service principal, ensuring it has only the
+   access it needs and nothing more.
+3. Automating access management: Service principal is a great way to automate authentication and authorization to access
+   Azure resources using code or scripts.
+
+**Cons:**
+
+1. Complexity: The service principal requires additional configuration steps, which can be challenging for inexperienced
+   users.
+2. Lack of visibility: Unlike a user account, it can be more difficult to track which service principal is accessing
+   which resources.
+3. Additional maintenance: Managing the lifecycle of a service principal can add to the overall management burden of the
+   application.
+
+### Admin User
+
+This authentication method refers to a user account that has been granted administrative privileges in an Azure
+subscription or resource group. Admin Users are able to perform administrative tasks such as creating and managing
+resources, setting permissions and access policies, and configuring settings that affect the entire subscription or
+resource group.
+
+[Link to guide](https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-portal)
+
+**Pros:**
+
+1. Easy to generate: Admin users can be created and granted access quickly and easily.
+2. Broad Access: Admin users have access to all resources within an account, which can be useful for managing multiple
+   resources.
+3. Flexible: Admin users can be granted temporary access as needed and then removed when no longer required.
+
+**Cons:**
+
+1. Security Risks: Admin users pose a greater security risk as they have unrestricted access to all resources within an
+   account.
+2. Lack of Granular Control: Admin users can’t be assigned granular permissions, which can lead to overprivileged
+   access( i.e Admins may have too much access because they can't be given specific permissions leading to security
+   risks)
+3. Difficult to Audit: Because admin users have access to all resources, it can be challenging to track their activity
+   and audit their actions.
+
+### Repository-Scoped Access Token
+
+To create a repository-scoped access token in Azure, you'll need to follow the steps outlined in the guide you linked
+to, which involves creating a personal access token in GitHub, then using that token to authenticate with Azure.
+
+**Pros:**
+
+1. Specific Access: Repository-scoped access tokens can be scoped to specific repositories, ensuring that only the
+   necessary resources are accessed.
+2. Enhance Security: Tokens can be revoked at any time, providing an additional layer of security in case of a breach or
+   unauthorized access.
+3. No impact on users: Repository-scoped access tokens can be used to provide access without the need for user accounts.
+
+**Cons:**
+
+1. Requires Enterprise Plan: This method requires an enterprise plan, which can be a barrier for smaller organizations
+   or individuals.
+2. Limited scope: Repository-scoped access tokens are limited to the resources they are scoped to and can’t be used to
+   access other resources.
+3. Complexity: Managing access tokens can be complex and require additional configuration and management steps.
+
+Note: The Azure AD Service Principal documentation is for Azure AD, but the same concept applies to other Azure services
+such as Azure Container Registry.
+
+2. Access the SaladCloud portal, Set up your SCE by selecting the private registry tab when setting the image source. In
+   the service dropdown option, choose "Azure Container Registry" and provide the following information:
+   - Image name (example: `https://myregistry.azurecr.io/my-repository/my-image:v1.0`)
+   - Username and Password
+
+<img src="/container-engine/images/configure-acr.png" />
+
+3. Continue to configure and deploy your container group
