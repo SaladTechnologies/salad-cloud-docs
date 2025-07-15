@@ -15,11 +15,16 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["general/explanation/overview", "general/explanation/account-security"]
+            "pages": [
+              "general/explanation/overview",
+              "general/explanation/account-security"
+            ]
           },
           {
             "group": "Tutorials",
-            "pages": ["general/tutorials/account-setup"]
+            "pages": [
+              "general/tutorials/account-setup"
+            ]
           }
         ]
       },
@@ -36,7 +41,8 @@
                   "container-engine/explanation/core-concepts/architectural-overview",
                   "container-engine/explanation/core-concepts/recipes-overview",
                   "container-engine/explanation/core-concepts/faqs",
-                  "container-engine/explanation/core-concepts/saladcloud-secure"
+                  "container-engine/explanation/core-concepts/saladcloud-secure",
+                  "container-engine/explanation/core-concepts/container-registries"
                 ]
               },
               {
@@ -47,11 +53,13 @@
                 ]
               },
               {
-                "group": "Networking Security",
-                "pages": ["container-engine/explanation/networking-security/networking"]
+                "group": "Networking & Security",
+                "pages": [
+                  "container-engine/explanation/networking-security/networking"
+                ]
               },
               {
-                "group": "Billing Pricing",
+                "group": "Billing & Pricing",
                 "pages": [
                   "container-engine/explanation/billing-pricing/billing",
                   "container-engine/explanation/billing-pricing/priority-pricing",
@@ -60,13 +68,10 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": ["container-engine/explanation/autoscaling/autoscaling"]
+                "pages": [
+                  "container-engine/explanation/autoscaling/autoscaling"
+                ]
               },
-              "container-engine/explanation/disk-space",
-              "container-engine/explanation/container-registries",
-              "container-engine/explanation/container-logs",
-              "container-engine/explanation/system-events",
-              "container-engine/explanation/external-logging",
               {
                 "group": "Health Probes",
                 "pages": [
@@ -77,13 +82,12 @@
                 ]
               },
               {
-                "group": "Imds",
+                "group": "IMDS",
                 "pages": [
                   "container-engine/explanation/imds/introduction",
                   "container-engine/explanation/imds/instance-deletion-cost"
                 ]
               },
-              "container-engine/explanation/job-queues",
               {
                 "group": "Gateway",
                 "pages": [
@@ -92,23 +96,51 @@
                   "container-engine/explanation/gateway/error-pages"
                 ]
               },
-              "container-engine/explanation/image-generation-overview",
-              "container-engine/explanation/llm-inference-overview",
               {
                 "group": "Computer Vision",
-                "pages": ["container-engine/explanation/computer-vision/yolov8-overview"]
+                "pages": [
+                  "container-engine/explanation/computer-vision/yolov8-overview"
+                ]
               },
               {
-                "group": "Long Running Tasks",
-                "pages": ["container-engine/explanation/long-running-tasks/solution-overview"]
+                "group": "Long-Running Tasks",
+                "pages": [
+                  "container-engine/explanation/long-running-tasks/solution-overview"
+                ]
               },
               {
                 "group": "Kubernetes Integration",
-                "pages": ["container-engine/explanation/kubernetes-integration/solution-overview"]
+                "pages": [
+                  "container-engine/explanation/kubernetes-integration/solution-overview"
+                ]
               },
               {
                 "group": "Tailscale Integration",
-                "pages": ["container-engine/explanation/tailscale-integration/solution-overview"]
+                "pages": [
+                  "container-engine/explanation/tailscale-integration/solution-overview"
+                ]
+              },
+              {
+                "group": "System Operations",
+                "pages": [
+                  "container-engine/explanation/system-operations/disk-space",
+                  "container-engine/explanation/system-operations/container-logs",
+                  "container-engine/explanation/system-operations/system-events"
+                ]
+              },
+              {
+                "group": "Advanced Features",
+                "pages": [
+                  "container-engine/explanation/advanced-features/external-logging",
+                  "container-engine/explanation/advanced-features/job-queues"
+                ]
+              },
+              {
+                "group": "Solution Overviews",
+                "pages": [
+                  "container-engine/explanation/solution-overviews/image-generation-overview",
+                  "container-engine/explanation/solution-overviews/llm-inference-overview"
+                ]
               }
             ]
           },
@@ -136,7 +168,7 @@
                 ]
               },
               {
-                "group": "Nodejs",
+                "group": "Node.js",
                 "pages": [
                   "container-engine/tutorials/nodejs/create-a-container",
                   "container-engine/tutorials/nodejs/how-to-deploy-a-node-app-on-salad",
@@ -155,7 +187,9 @@
               },
               {
                 "group": "Security",
-                "pages": ["container-engine/tutorials/security/jwt-authentication"]
+                "pages": [
+                  "container-engine/tutorials/security/jwt-authentication"
+                ]
               },
               {
                 "group": "Performance",
@@ -200,7 +234,9 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": ["container-engine/reference/autoscaling/settings"]
+                "pages": [
+                  "container-engine/reference/autoscaling/settings"
+                ]
               },
               "container-engine/reference/quotas"
             ]
@@ -212,7 +248,9 @@
               "container-engine/how-to-guides/environment-variables",
               {
                 "group": "Autoscaling",
-                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
+                "pages": [
+                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
+                ]
               },
               "container-engine/how-to-guides/specifying-a-command",
               {
@@ -227,7 +265,7 @@
                 ]
               },
               {
-                "group": "Imds",
+                "group": "IMDS",
                 "pages": [
                   "container-engine/how-to-guides/imds/obtaining-an-imds-jwt",
                   "container-engine/how-to-guides/imds/container-status-endpoint",
@@ -276,10 +314,12 @@
               },
               {
                 "group": "Transcription",
-                "pages": ["container-engine/how-to-guides/transcription/youtube-transcription-pipeline"]
+                "pages": [
+                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+                ]
               },
               {
-                "group": "Llm",
+                "group": "LLM",
                 "pages": [
                   "container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
                   "container-engine/how-to-guides/llm/run-ollama",
@@ -302,14 +342,14 @@
                 ]
               },
               {
-                "group": "Real Time Inference",
+                "group": "Real-Time Inference",
                 "pages": [
                   "container-engine/how-to-guides/real-time-inference/use-container-gateway",
                   "container-engine/how-to-guides/real-time-inference/build-redis-queue"
                 ]
               },
               {
-                "group": "Long Running Tasks",
+                "group": "Long-Running Tasks",
                 "pages": [
                   "container-engine/how-to-guides/long-running-tasks/kelpie",
                   "container-engine/how-to-guides/long-running-tasks/gcp-pub-sub",
@@ -327,11 +367,15 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": ["container-engine/how-to-guides/tailscale-integration/basic"]
+                "pages": [
+                  "container-engine/how-to-guides/tailscale-integration/basic"
+                ]
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
               }
             ]
           }
@@ -353,11 +397,16 @@
           },
           {
             "group": "Reference",
-            "pages": ["transcription/reference/accuracy-benchmarks", "transcription/reference/faq"]
+            "pages": [
+              "transcription/reference/accuracy-benchmarks",
+              "transcription/reference/faq"
+            ]
           },
           {
             "group": "Tutorials",
-            "pages": ["transcription/tutorials/transcription-quick-start"]
+            "pages": [
+              "transcription/tutorials/transcription-quick-start"
+            ]
           },
           {
             "group": "How-to Guides",
@@ -409,7 +458,9 @@
               },
               {
                 "group": "Technical",
-                "pages": ["transcription/how-to-guides/technical/splitting-large-audio-files"]
+                "pages": [
+                  "transcription/how-to-guides/technical/splitting-large-audio-files"
+                ]
               },
               {
                 "group": "Migration",
@@ -442,11 +493,15 @@
           },
           {
             "group": "Tutorials",
-            "pages": ["gateway-service/tutorials/quickstart"]
+            "pages": [
+              "gateway-service/tutorials/quickstart"
+            ]
           },
           {
             "group": "Reference",
-            "pages": ["gateway-service/reference/sgs-api"]
+            "pages": [
+              "gateway-service/reference/sgs-api"
+            ]
           }
         ]
       },
@@ -455,7 +510,9 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["storage/explanation/overview"]
+            "pages": [
+              "storage/explanation/overview"
+            ]
           }
         ]
       },
@@ -515,7 +572,9 @@
                   },
                   {
                     "group": "Log Entries",
-                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
+                    "pages": [
+                      "reference/saladcloud-api/logs/query-log-entries"
+                    ]
                   },
                   {
                     "group": "Organizations",
@@ -1682,6 +1741,38 @@
     {
       "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription",
       "destination": "/transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
+    },
+    {
+      "source": "/container-engine/explanation/disk-space",
+      "destination": "/container-engine/explanation/system-operations/disk-space"
+    },
+    {
+      "source": "/container-engine/explanation/container-logs",
+      "destination": "/container-engine/explanation/system-operations/container-logs"
+    },
+    {
+      "source": "/container-engine/explanation/system-events",
+      "destination": "/container-engine/explanation/system-operations/system-events"
+    },
+    {
+      "source": "/container-engine/explanation/container-registries",
+      "destination": "/container-engine/explanation/core-concepts/container-registries"
+    },
+    {
+      "source": "/container-engine/explanation/external-logging",
+      "destination": "/container-engine/explanation/advanced-features/external-logging"
+    },
+    {
+      "source": "/container-engine/explanation/job-queues",
+      "destination": "/container-engine/explanation/advanced-features/job-queues"
+    },
+    {
+      "source": "/container-engine/explanation/image-generation-overview",
+      "destination": "/container-engine/explanation/solution-overviews/image-generation-overview"
+    },
+    {
+      "source": "/container-engine/explanation/llm-inference-overview",
+      "destination": "/container-engine/explanation/solution-overviews/llm-inference-overview"
     }
   ]
 }
