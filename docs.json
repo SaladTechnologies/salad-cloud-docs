@@ -15,7 +15,7 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["general/explanation/overview", "general/explanation/account-security"]
+            "pages": ["index", "general/explanation/account-security"]
           },
           {
             "group": "Tutorials",
@@ -911,7 +911,7 @@
     },
     {
       "source": "/products/documentation",
-      "destination": "/general/explanation/overview"
+      "destination": "/"
     },
     {
       "source": "/products/account-security",
