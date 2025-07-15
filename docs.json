@@ -11,35 +11,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Products",
-        "groups": [
-          {
-            "group": "SaladCloud",
-            "pages": []
-          },
-          {
-            "group": "Container Engine",
-            "pages": []
-          },
-          {
-            "group": "Transcription API",
-            "pages": []
-          },
-          {
-            "group": "Recipes",
-            "pages": []
-          },
-          {
-            "group": "Gateway Service",
-            "pages": []
-          },
-          {
-            "group": "S4 - Salad Simple Storage Service",
-            "pages": []
-          }
-        ]
-      },
-      {
         "tab": "Tutorials",
         "groups": [
           {
