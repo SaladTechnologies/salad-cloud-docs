@@ -52,10 +52,7 @@ On the next screen, we're going to grant no permissions the the user. We will be
 grant the user access to the queue.
 
 <Frame caption="Granting no permissions to the job-submitter user">
-  <img
-    src="/container-engine/images/iam-submitter-st2.png"
-    alt="Granting no permissions to the job-submitter user"
-  />
+  <img src="/container-engine/images/iam-submitter-st2.png" alt="Granting no permissions to the job-submitter user" />
 </Frame>
 
 Finally, give the user any tags that will make it easier to find and organize later. We're going to give it a tag of
@@ -73,10 +70,7 @@ the job-worker user. Select "Create access key", and save the access keys and se
 keep track of which set of keys belongs to which user, since they have different permissions.
 
 <Frame caption="Creating an access key for the job-worker user">
-  <img
-    src="/container-engine/images/iam-worker-create-key.png"
-    alt="Creating an access key for the job-worker user"
-  />
+  <img src="/container-engine/images/iam-worker-create-key.png" alt="Creating an access key for the job-worker user" />
 </Frame>
 
 ## The Job Queue: SQS
@@ -1091,10 +1085,7 @@ Run the job submitter with `python submit-jobs.py`. It will read the csv file an
 Once that has run, we can see in the SQS console that our queue has 10000 messages.
 
 <Frame caption="The SQS Console showing 10000 messages in the queue">
-  <img
-    src="/container-engine/images/sqs-10k-messages.png"
-    alt="The SQS Console showing 10000 messages in the queue"
-  />
+  <img src="/container-engine/images/sqs-10k-messages.png" alt="The SQS Console showing 10000 messages in the queue" />
 </Frame>
 
 ## Containerize the Worker Application
@@ -1169,10 +1160,7 @@ All CPU-only jobs are prioritized as "Batch" (the lowest tier), and we don't nee
 particular application.
 
 <Frame caption="Setting the job priority and storage requirements">
-  <img
-    src="/container-engine/images/sqs-cg-create-3.png"
-    alt="Setting the job priority and storage requirements"
-  />
+  <img src="/container-engine/images/sqs-cg-create-3.png" alt="Setting the job priority and storage requirements" />
 </Frame>
 
 We do not need the container gateway, as our application pulls its work from a queue. We also do not need health probes,
@@ -1208,10 +1196,7 @@ Now that our cluster is up and running, we can go to the SQS console, and see th
 From the R2 console, we can see that our bucket is being filled with checkpoints and results.
 
 <Frame caption="Checkpoints and results in the R2 bucket">
-  <img
-    src="/container-engine/images/r2-bucket-has-objects.png"
-    alt="Checkpoints and results in the R2 bucket"
-  />
+  <img src="/container-engine/images/r2-bucket-has-objects.png" alt="Checkpoints and results in the R2 bucket" />
 </Frame>
 
 ## Autoscaling

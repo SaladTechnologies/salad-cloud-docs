@@ -203,7 +203,8 @@ def update_image_references_in_file(file_path: str, image_mapping: Dict[str, str
 
             # Update Frame components with img tags inside
             content = re.sub(
-                r'(<Frame[^>]*>\s*<img[^>]+src=["\'])' + re.escape(old_ref) + r'(["\'])',
+                r'(<Frame[^>]*>\s*<img[^>]+src=["\'])' +
+                re.escape(old_ref) + r'(["\'])',
                 r'\1' + new_ref + r'\2',
                 content
             )
@@ -212,7 +213,8 @@ def update_image_references_in_file(file_path: str, image_mapping: Dict[str, str
         # This catches any remaining /guides/ image references that weren't in our mapping
         content = re.sub(
             r'(/guides/[^/]+/images/[^"\'\s)]+)',
-            lambda m: '/container-engine/images/' + os.path.basename(m.group(1)),
+            lambda m: '/container-engine/images/' +
+            os.path.basename(m.group(1)),
             content
         )
 
