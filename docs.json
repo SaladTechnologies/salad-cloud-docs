@@ -15,19 +15,16 @@
         "groups": [
           {
             "group": "SaladCloud",
-            "pages": ["products/documentation", "products/quickstart", "products/account-security"]
+            "pages": []
           },
           {
             "group": "Container Engine",
             "pages": [
-              "products/sce/introduction",
               "products/sce/saladcloud-secure",
               {
                 "group": "Getting Started",
                 "pages": [
-                  "products/sce/getting-started/quickstart",
-                  "products/sce/getting-started/quickstart-api",
-                  "products/sce/getting-started/architectural-overview"
+                  "products/sce/getting-started/quickstart-api"
                 ]
               },
               {
@@ -98,7 +95,6 @@
               {
                 "group": "Container Gateway",
                 "pages": [
-                  "products/sce/networking",
                   "products/sce/gateway/enabling-ipv6",
                   "products/sce/gateway/sending-requests",
                   "products/sce/gateway/load-balancer-options",
@@ -123,14 +119,12 @@
                   "products/sce/autoscaling/settings",
                   "products/sce/autoscaling/enable-autoscaling"
                 ]
-              },
-              "products/sce/faqs"
+              }
             ]
           },
           {
             "group": "Transcription API",
             "pages": [
-              "products/transcription/transcription-overview",
               "products/transcription/accuracy-benchmarks",
               "products/transcription/speech-to-text",
               "products/transcription/translation",
@@ -141,21 +135,11 @@
           },
           {
             "group": "Recipes",
-            "pages": [
-              "products/recipes/overview",
-              "products/recipes/comfyui",
-              "products/recipes/kuzco",
-              "products/recipes/ollama",
-              "products/recipes/sogni-fast-worker",
-              "products/recipes/tgi",
-              "products/recipes/ubuntu",
-              "products/recipes/yolo"
-            ]
+            "pages": []
           },
           {
             "group": "Gateway Service",
             "pages": [
-              "products/sgs/introduction",
               "products/sgs/quickstart",
               "products/sgs/proxy-v2",
               "products/sgs/node-removals",
@@ -165,10 +149,9 @@
               "products/sgs/faqs"
             ]
           },
-
           {
             "group": "S4 - Salad Simple Storage Service",
-            "pages": ["products/s4/salad-simple-storage-service"]
+            "pages": []
           }
         ]
       },
@@ -319,13 +302,18 @@
                   },
                   {
                     "group": "SCE",
-                    "pages": ["guides/transcription/sce/youtube"]
+                    "pages": [
+                      "guides/transcription/sce/youtube"
+                    ]
                   }
                 ]
               },
               {
                 "group": "Text To Speech",
-                "pages": ["guides/text-to-speech/metavoice-tts-api", "guides/text-to-speech/openvoice-api"]
+                "pages": [
+                  "guides/text-to-speech/metavoice-tts-api",
+                  "guides/text-to-speech/openvoice-api"
+                ]
               },
               {
                 "group": "Real-Time Inference",
@@ -355,11 +343,16 @@
               },
               {
                 "group": "Tailscale Integration",
-                "pages": ["guides/tailscale-integration/solution-overview", "guides/tailscale-integration/basic"]
+                "pages": [
+                  "guides/tailscale-integration/solution-overview",
+                  "guides/tailscale-integration/basic"
+                ]
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": ["guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
               }
             ]
           }
@@ -421,7 +414,9 @@
                   },
                   {
                     "group": "Log Entries",
-                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
+                    "pages": [
+                      "reference/saladcloud-api/logs/query-log-entries"
+                    ]
                   },
                   {
                     "group": "Organizations",
@@ -446,8 +441,6 @@
                   "reference/imds/restart"
                 ]
               },
-
-              "reference/recipes",
               {
                 "group": "Transcription API",
                 "pages": [
@@ -474,6 +467,96 @@
                   "reference/s4/sign-a-file-and-return-a-signed-url"
                 ]
               }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "General",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": [
+              "general/explanation/overview",
+              "general/explanation/account-security"
+            ]
+          },
+          {
+            "group": "Tutorials",
+            "pages": [
+              "general/tutorials/account-setup"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Container Engine",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": [
+              "container-engine/explanation/overview",
+              "container-engine/explanation/faqs",
+              "container-engine/explanation/recipes-overview",
+              "container-engine/explanation/networking",
+              "container-engine/explanation/architectural-overview"
+            ]
+          },
+          {
+            "group": "Tutorials",
+            "pages": [
+              "container-engine/tutorials/quickstart"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              {
+                "group": "Recipes",
+                "pages": [
+                  "container-engine/reference/recipes/overview",
+                  "container-engine/reference/recipes/comfyui",
+                  "container-engine/reference/recipes/kuzco",
+                  "container-engine/reference/recipes/ollama",
+                  "container-engine/reference/recipes/sogni-fast-worker",
+                  "container-engine/reference/recipes/tgi",
+                  "container-engine/reference/recipes/ubuntu",
+                  "container-engine/reference/recipes/yolo"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Transcription",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": [
+              "transcription/explanation/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Gateway Service",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": [
+              "gateway-service/explanation/overview"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Storage",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": [
+              "storage/explanation/overview"
             ]
           }
         ]
@@ -850,6 +933,86 @@
     {
       "source": "reference/recipes/*",
       "destination": "reference/recipes"
+    },
+    {
+      "source": "/products/documentation",
+      "destination": "/general/explanation/overview"
+    },
+    {
+      "source": "/products/account-security",
+      "destination": "/general/explanation/account-security"
+    },
+    {
+      "source": "/products/quickstart",
+      "destination": "/general/tutorials/account-setup"
+    },
+    {
+      "source": "/products/sce/introduction",
+      "destination": "/container-engine/explanation/overview"
+    },
+    {
+      "source": "/products/sce/getting-started/quickstart",
+      "destination": "/container-engine/tutorials/quickstart"
+    },
+    {
+      "source": "/products/sce/faqs",
+      "destination": "/container-engine/explanation/faqs"
+    },
+    {
+      "source": "/products/recipes/overview",
+      "destination": "/container-engine/explanation/recipes-overview"
+    },
+    {
+      "source": "/products/transcription/transcription-overview",
+      "destination": "/transcription/explanation/overview"
+    },
+    {
+      "source": "/products/sgs/introduction",
+      "destination": "/gateway-service/explanation/overview"
+    },
+    {
+      "source": "/products/s4/salad-simple-storage-service",
+      "destination": "/storage/explanation/overview"
+    },
+    {
+      "source": "/reference/recipes",
+      "destination": "/container-engine/reference/recipes/overview"
+    },
+    {
+      "source": "/products/recipes/comfyui",
+      "destination": "/container-engine/reference/recipes/comfyui"
+    },
+    {
+      "source": "/products/recipes/kuzco",
+      "destination": "/container-engine/reference/recipes/kuzco"
+    },
+    {
+      "source": "/products/recipes/ollama",
+      "destination": "/container-engine/reference/recipes/ollama"
+    },
+    {
+      "source": "/products/recipes/sogni-fast-worker",
+      "destination": "/container-engine/reference/recipes/sogni-fast-worker"
+    },
+    {
+      "source": "/products/recipes/tgi",
+      "destination": "/container-engine/reference/recipes/tgi"
+    },
+    {
+      "source": "/products/recipes/ubuntu",
+      "destination": "/container-engine/reference/recipes/ubuntu"
+    },
+    {
+      "source": "/products/recipes/yolo",
+      "destination": "/container-engine/reference/recipes/yolo"
+    },
+    {
+      "source": "/products/sce/networking",
+      "destination": "/container-engine/explanation/networking"
+    },
+    {
+      "source": "/products/sce/getting-started/architectural-overview",
+      "destination": "/container-engine/explanation/architectural-overview"
     }
   ]
 }
