@@ -252,7 +252,7 @@ real-time factor of 80 or higher for long audio. If a node’s real-time factor 
 it should be immediately removed from the resource pool. Please refer to
 [the code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/blob/main/node/bench/benchmark_1m.py#L411)
 used for
-[our YouTube transcription benchmark test](/container-engine/how-to-guides/transcription/youtube-transcription-pipeline#optimization-of-performance-and-throughput).
+[our YouTube transcription benchmark test](/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline#optimization-of-performance-and-throughput).
 
 When you deploy a container group with multiple resource types varying in their processing capacity and network
 performance, you can implement an adaptive algorithm based on real-time performance monitoring to optimize resource
@@ -411,7 +411,7 @@ cold starts and occasional interruptions. Consider running JupyterLab on SaladCl
   in a diverse computing environment.
 
 - Perform
-  [the single node test](/container-engine/how-to-guides/transcription/youtube-transcription-pipeline#single-node-test)
+  [the single node test](/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline#single-node-test)
   before a large deployment, and optimize the application settings. You will need to
   [add the JupyterLab support in your application image](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/blob/main/node/Dockerfile.parakeet.yt1m)
   temporarily.

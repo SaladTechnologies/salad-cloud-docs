@@ -24,7 +24,7 @@ failed to be transcribed can be further analyzed and may be refilled to the pipe
 final output, potentially including index files containing YouTube video URLs paired with their corresponding transcript
 URLs on Cloudflare. This facilitates easy access to transcribed content for further analysis and utilization.
 
-<img src="/container-engine/images/youtube/cfef23d-1-1.jpg" />
+<img src="/container-engine/images/cfef23d-1-1.jpg" />
 
 The three steps can either constitute a single end-to-end pipeline or operate as three independent steps, depending on
 the specific business requirements.
@@ -45,20 +45,20 @@ parameters. This generator will then produce multiple channel metadata files con
 video title, URL, duration, codec, and other relevant data. Additionally, it will create an index file that maps each
 channel to its corresponding metadata file, ensuring organized and accessible storage of the collected data.
 
-<img src="/container-engine/images/youtube/f647902-2.jpg" />
+<img src="/container-engine/images/f647902-2.jpg" />
 
 The [index file](https://salad-public-transcripts.com/youtube_4m_videos_1.6m_hours_20240322.csv) comprises the following
 details for each channel: channel title, ID, URL, playlist number, total video number, total video duration (hour), and
 a link to the corresponding metadata file.
 
-<img src="/container-engine/images/youtube/5a72e29-3.jpg" />
+<img src="/container-engine/images/5a72e29-3.jpg" />
 
 A [metadata file](https://salad-public-transcripts.com/datasets/0001.csv) offers extensive details of videos within a
 channel, encompassing URL, title, duration (second), codec, and more. Extracting codec information for each video
 requires additional operations and time. Hence, we opt to randomly select a subset of videos to collect this
 information. Through our testing, we've noted that all YouTube videos encountered thus far support audio codecs.
 
-<img src="/container-engine/images/youtube/b0cbf46-4.jpg" />
+<img src="/container-engine/images/b0cbf46-4.jpg" />
 
 Downloading video metadata from a channel is time-consuming, ranging from a few minutes to several hours, depending on
 the channel's size. Additionally, there are constraints on concurrent access from a single IP address to YouTube.
@@ -114,7 +114,7 @@ accesses from a single IP address imposed by YouTube.
 
 ### The reference design for the job generator
 
-<img src="/container-engine/images/youtube/19b1ccc-5.jpg" />
+<img src="/container-engine/images/19b1ccc-5.jpg" />
 
 We use a two-tier system for managing our collection: first, we create a metadata file for each channel, containing
 comprehensive details of all videos within the channel. Then, we maintain an index file that consolidates all the
@@ -169,7 +169,7 @@ updates the corresponding record through the Channel Manager, and removes the pr
 With this solution, we can effectively harness the global distributed network provided by SaladCloud, significantly
 accelerating the job generation process by tens or even hundreds of times.
 
-<img src="/container-engine/images/youtube/991061d-6.jpg" />
+<img src="/container-engine/images/991061d-6.jpg" />
 
 # STEP 2: Data Processing on SaladCloud
 
@@ -195,7 +195,7 @@ Cloud Storage: Generated assets stored in Cloudflare R2, which is AWS S3-compati
 Job Recording System: Job results, including YouTube video URLs, audio length, processing time, Cloudflare URLs, word
 count etc., are stored in NoSQL databases like AWS DynamoDB.
 
-<img src="/container-engine/images/youtube/49a6736-7.jpg" />
+<img src="/container-engine/images/49a6736-7.jpg" />
 
 ## Job Filler
 
@@ -215,7 +215,7 @@ the queue is nearly empty, we start injecting only a few jobs and aim to keep th
 as low as possible for a period of time. This strategy allows us to prioritize completing older jobs before injecting a
 massive influx of new ones.
 
-<img src="/container-engine/images/youtube/6a9c6fc-8.jpg" />
+<img src="/container-engine/images/6a9c6fc-8.jpg" />
 
 For time-sensitive tasks, implementing autoscaling is also beneficial. By continually monitoring the job count in the
 queue, the job filler dynamically adjusts the number of SaladCloud node groups. This adaptive approach ensures that
@@ -236,11 +236,11 @@ uses AWS SendMessageBatch to transmit up to 10 jobs simultaneously.
 Through testing, the job filler has demonstrated the capability to inject up to 1 million jobs to AWS SQS within a
 single hour.
 
-<img src="/container-engine/images/youtube/eaf53ec-9.jpg" />
+<img src="/container-engine/images/eaf53ec-9.jpg" />
 
 Below are the examples of jobs sent from the job filler to the job queue:
 
-<img src="/container-engine/images/youtube/4647030-10.jpg" />
+<img src="/container-engine/images/4647030-10.jpg" />
 
 ## Job Queue System Settings
 
@@ -258,7 +258,7 @@ Within each node in the GPU resource pool in SaladCloud, we follow best practice
 Inference Process, dedicated to GPU-based transcription inference; and the Benchmark Worker Process, focused on I/O- and
 CPU-bound tasks, such as downloading/uploading, pre-processing, and post-processing.
 
-<img src="/container-engine/images/youtube/bc5a767-11.jpg" />
+<img src="/container-engine/images/bc5a767-11.jpg" />
 
 ### Inference Process
 
@@ -352,14 +352,14 @@ feed the inference server.
 
 Identify and handle various possible exceptions during application runtime, etc.
 
-<img src="/container-engine/images/youtube/78a6585-12.jpg" />
+<img src="/container-engine/images/78a6585-12.jpg" />
 
 # STEP 3: Validation, Delivery and Analysis
 
 Job results, which include video URL, audio length, processing time, Cloudflare URL, and word count for each video,
 serve multiple purposes.
 
-<img src="/container-engine/images/youtube/4fdaab6-13.jpg" />
+<img src="/container-engine/images/4fdaab6-13.jpg" />
 
 When combined with the index file and metadata files, the job results become instrumental in validating the pipeline
 output. They provide crucial information such as processing time, word count and Cloudflare URL for each video, as well
@@ -375,7 +375,7 @@ The final output comprises index files containing mappings from YouTube URLs to 
 specific channels, topics, and title keywords. These index files adhere to a predefined schema and are intended to serve
 as input for subsequent pipelines, facilitating further analysis.
 
-<img src="/container-engine/images/youtube/1316655-14-1.jpg" />
+<img src="/container-engine/images/1316655-14-1.jpg" />
 
 # [Example Code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test)
 

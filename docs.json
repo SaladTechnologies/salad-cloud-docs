@@ -239,27 +239,6 @@
                 ]
               },
               {
-                "group": "AI & Machine Learning",
-                "pages": [
-                  "container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
-                  "container-engine/how-to-guides/llm/run-ollama",
-                  "container-engine/how-to-guides/llm/run-tgi-text-generation-interface",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-                  "container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
-                  "container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy",
-                  "container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
-                  "container-engine/how-to-guides/computer-vision/image-captioning-with-vlm",
-                  "container-engine/how-to-guides/computer-vision/deploy-blip-with-cog",
-                  "container-engine/how-to-guides/computer-vision/yolov8-batch-processing",
-                  "container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
-                  "container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning",
-                  "container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
-                ]
-              },
-              {
                 "group": "Job Processing & Queues",
                 "pages": [
                   "container-engine/how-to-guides/job-queues/creating-a-job-queue",
@@ -306,6 +285,27 @@
                 "group": "Specialized Workloads",
                 "pages": [
                   "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
+              },
+              {
+                "group": "AI & Machine Learning",
+                "pages": [
+                  "container-engine/how-to-guides/ai-machine-learning/run-hugging-face-models-with-ollama",
+                  "container-engine/how-to-guides/ai-machine-learning/run-ollama",
+                  "container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models",
+                  "container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog",
+                  "container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing",
+                  "container-engine/how-to-guides/ai-machine-learning/metavoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
                 ]
               }
             ]
@@ -630,7 +630,7 @@
     },
     {
       "source": "/docs/yolov8-batch",
-      "destination": "/container-engine/how-to-guides/computer-vision/yolov8-batch-processing"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing"
     },
     {
       "source": "/docs/yolov8-model-training-guide",
@@ -642,19 +642,19 @@
     },
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface"
     },
     {
       "source": "/products/sce/guides/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface"
     },
     {
       "source": "/docs/run-ollama",
-      "destination": "/container-engine/how-to-guides/llm/run-ollama"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-ollama"
     },
     {
       "source": "/products/sce/guides/run-ollama",
-      "destination": "/container-engine/how-to-guides/llm/run-ollama"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-ollama"
     },
     {
       "source": "/docs/youtube",
@@ -690,7 +690,7 @@
     },
     {
       "source": "/container-engine/guides/deploying-blip-with-cog",
-      "destination": "/container-engine/how-to-guides/computer-vision/deploy-blip-with-cog"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog"
     },
     {
       "source": "/container-engine/health-probes/liveness-probe",
@@ -1426,31 +1426,31 @@
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
-      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
-      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111"
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
-      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy"
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
-      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus"
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
-      "destination": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext"
     },
     {
       "source": "/guides/image-generation/deploy-video-gen-on-salad-with-comfy",
-      "destination": "/container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy"
     },
     {
       "source": "/guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
-      "destination": "/container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models"
     },
     {
       "source": "/guides/image-generation/image-gen-general",
@@ -1550,7 +1550,7 @@
     },
     {
       "source": "/guides/transcription/sce/youtube",
-      "destination": "/container-engine/how-to-guides/transcription/youtube-transcription-pipeline"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
     },
     {
       "source": "/guides/llm/llm-general",
@@ -1562,23 +1562,23 @@
     },
     {
       "source": "/guides/llm/ollama-hf",
-      "destination": "/container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-hugging-face-models-with-ollama"
     },
     {
       "source": "/guides/llm/run-ollama",
-      "destination": "/container-engine/how-to-guides/llm/run-ollama"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-ollama"
     },
     {
       "source": "/guides/llm/run-tgi-text-generation-interface-by-huggingface",
-      "destination": "/container-engine/how-to-guides/llm/run-tgi-text-generation-interface"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface"
     },
     {
       "source": "/guides/computer-vision/caption-with-vlm",
-      "destination": "/container-engine/how-to-guides/computer-vision/image-captioning-with-vlm"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm"
     },
     {
       "source": "/guides/computer-vision/deploy-blip-with-cog",
-      "destination": "/container-engine/how-to-guides/computer-vision/deploy-blip-with-cog"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog"
     },
     {
       "source": "/guides/computer-vision/yolov8/yolov8",
@@ -1594,7 +1594,7 @@
     },
     {
       "source": "/guides/computer-vision/yolov8/batch-processing",
-      "destination": "/container-engine/how-to-guides/computer-vision/yolov8-batch-processing"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing"
     },
     {
       "source": "/guides/computer-vision/yolov8/model-training-guide",
@@ -1602,11 +1602,11 @@
     },
     {
       "source": "/guides/text-to-speech/metavoice-tts-api",
-      "destination": "/container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/metavoice-tts-voice-cloning"
     },
     {
       "source": "/guides/text-to-speech/openvoice-api",
-      "destination": "/container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning"
     },
     {
       "source": "/guides/real-time-inference/use-container-gateway",
@@ -1699,6 +1699,70 @@
     {
       "source": "/container-engine/explanation/computer-vision/yolov8-overview",
       "destination": "/container-engine/explanation/ai-machine-learning/computer-vision-overview"
+    },
+    {
+      "source": "/container-engine/how-to-guides/llm/run-hugging-face-models-with-ollama",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-hugging-face-models-with-ollama"
+    },
+    {
+      "source": "/container-engine/how-to-guides/llm/run-ollama",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-ollama"
+    },
+    {
+      "source": "/container-engine/how-to-guides/llm/run-tgi-text-generation-interface",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-comfy",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/deploy-video-gen-on-salad-with-comfy",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/image-generation/how-to-manage-a-large-number-of-stable-diffusion-models",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models"
+    },
+    {
+      "source": "/container-engine/how-to-guides/computer-vision/image-captioning-with-vlm",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm"
+    },
+    {
+      "source": "/container-engine/how-to-guides/computer-vision/deploy-blip-with-cog",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog"
+    },
+    {
+      "source": "/container-engine/how-to-guides/computer-vision/yolov8-batch-processing",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing"
+    },
+    {
+      "source": "/container-engine/how-to-guides/audio-processing/metavoice-tts-voice-cloning",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/metavoice-tts-voice-cloning"
+    },
+    {
+      "source": "/container-engine/how-to-guides/audio-processing/openvoice-tts-voice-cloning",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning"
+    },
+    {
+      "source": "/container-engine/how-to-guides/transcription/youtube-transcription-pipeline",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
     }
   ]
 }
