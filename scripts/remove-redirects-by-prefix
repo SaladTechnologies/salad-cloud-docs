@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""
+Remove redirects from docs.json based on source prefix.
+
+Usage: python scripts/remove-redirects-by-prefix <prefix>
+
+Example: python scripts/remove-redirects-by-prefix "/guides/transcription/"
+"""
+
+import json
+import sys
+import argparse
+from pathlib import Path
+
+def remove_redirects_by_prefix(docs_file, prefix):
+    """Remove all redirects with source starting with the given prefix."""
+    
+    # Read the docs.json file
+    with open(docs_file, 'r', encoding='utf-8') as f:
+        docs_data = json.load(f)
+    
+    # Get current redirects
+    redirects = docs_data.get('redirects', [])
+    original_count = len(redirects)
+    
+    # Filter out redirects that start with the prefix
+    filtered_redirects = [
+        redirect for redirect in redirects 
+        if not redirect.get('source', '').startswith(prefix)
+    ]
+    
+    removed_count = original_count - len(filtered_redirects)
+    
+    # Update the docs data
+    docs_data['redirects'] = filtered_redirects
+    
+    # Write back to file
+    with open(docs_file, 'w', encoding='utf-8') as f:
+        json.dump(docs_data, f, indent=2, ensure_ascii=False)
+    
+    print(f"Removed {removed_count} redirects with prefix '{prefix}'")
+    print(f"Remaining redirects: {len(filtered_redirects)}")
+    
+    # Show some examples of what was removed (up to 5)
+    if removed_count > 0:
+        removed_redirects = [
+            redirect for redirect in redirects 
+            if redirect.get('source', '').startswith(prefix)
+        ]
+        print(f"\nExamples of removed redirects:")
+        for i, redirect in enumerate(removed_redirects[:5]):
+            print(f"  {redirect['source']} -> {redirect['destination']}")
+        if len(removed_redirects) > 5:
+            print(f"  ... and {len(removed_redirects) - 5} more")
+
+def main():
+    parser = argparse.ArgumentParser(description='Remove redirects from docs.json by source prefix')
+    parser.add_argument('prefix', help='The prefix to match redirect sources against')
+    parser.add_argument('--docs-file', default='docs.json', help='Path to docs.json file (default: docs.json)')
+    
+    args = parser.parse_args()
+    
+    # Resolve the docs file path
+    docs_file = Path(args.docs_file)
+    if not docs_file.is_absolute():
+        # Assume relative to the script's parent directory (repository root)
+        script_dir = Path(__file__).parent
+        repo_root = script_dir.parent
+        docs_file = repo_root / docs_file
+    
+    if not docs_file.exists():
+        print(f"Error: docs.json file not found at {docs_file}")
+        sys.exit(1)
+    
+    print(f"Removing redirects with prefix '{args.prefix}' from {docs_file}")
+    remove_redirects_by_prefix(docs_file, args.prefix)
+
+if __name__ == '__main__':
+    main()
