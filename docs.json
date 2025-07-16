@@ -285,10 +285,10 @@
               {
                 "group": "Platform Integrations",
                 "pages": [
-                  "container-engine/how-to-guides/kubernetes-integration/installation-helm-chart",
-                  "container-engine/how-to-guides/kubernetes-integration/application-deployment",
-                  "container-engine/how-to-guides/kubernetes-integration/service-access",
-                  "container-engine/how-to-guides/tailscale-integration/basic"
+                  "container-engine/how-to-guides/platform-integrations/installation-helm-chart",
+                  "container-engine/how-to-guides/platform-integrations/application-deployment",
+                  "container-engine/how-to-guides/platform-integrations/service-access",
+                  "container-engine/how-to-guides/platform-integrations/tailscale-basic"
                 ]
               },
               {
@@ -1548,15 +1548,15 @@
     },
     {
       "source": "/guides/kubernetes-integration/installation-helm-chart",
-      "destination": "/container-engine/how-to-guides/kubernetes-integration/installation-helm-chart"
+      "destination": "/container-engine/how-to-guides/platform-integrations/installation-helm-chart"
     },
     {
       "source": "/guides/kubernetes-integration/application-deployment",
-      "destination": "/container-engine/how-to-guides/kubernetes-integration/application-deployment"
+      "destination": "/container-engine/how-to-guides/platform-integrations/application-deployment"
     },
     {
       "source": "/guides/kubernetes-integration/service-access",
-      "destination": "/container-engine/how-to-guides/kubernetes-integration/service-access"
+      "destination": "/container-engine/how-to-guides/platform-integrations/service-access"
     },
     {
       "source": "/guides/tailscale-integration/solution-overview",
@@ -1564,7 +1564,7 @@
     },
     {
       "source": "/guides/tailscale-integration/basic",
-      "destination": "/container-engine/how-to-guides/tailscale-integration/basic"
+      "destination": "/container-engine/how-to-guides/platform-integrations/tailscale-basic"
     },
     {
       "source": "/guides/molecular-dynamics-simulation/gromacs-srcg",
