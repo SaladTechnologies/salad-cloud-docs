@@ -83,8 +83,8 @@
               {
                 "group": "Job Processing",
                 "pages": [
-                  "container-engine/explanation/core-concepts/job-queues",
-                  "container-engine/explanation/long-running-tasks/solution-overview"
+                  "container-engine/explanation/job-processing/long-running-tasks",
+                  "container-engine/explanation/job-processing/job-queues"
                 ]
               },
               {
@@ -824,7 +824,7 @@
     },
     {
       "source": "/products/sce/job-queues",
-      "destination": "/container-engine/explanation/core-concepts/job-queues"
+      "destination": "/container-engine/explanation/job-processing/job-queues"
     },
     {
       "source": "/products/sce/gateway/lb-options",
@@ -1184,7 +1184,7 @@
     },
     {
       "source": "/products/sce/job-queues/job-queues",
-      "destination": "/container-engine/explanation/core-concepts/job-queues"
+      "destination": "/container-engine/explanation/job-processing/job-queues"
     },
     {
       "source": "/products/sce/job-queues/creating-a-job-queue",
@@ -1588,7 +1588,7 @@
     },
     {
       "source": "/guides/long-running-tasks/solution-overview",
-      "destination": "/container-engine/explanation/long-running-tasks/solution-overview"
+      "destination": "/container-engine/explanation/job-processing/long-running-tasks"
     },
     {
       "source": "/guides/long-running-tasks/kelpie",

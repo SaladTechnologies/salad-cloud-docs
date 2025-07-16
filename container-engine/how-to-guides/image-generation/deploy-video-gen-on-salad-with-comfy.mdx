@@ -861,7 +861,7 @@ second ide request timeout that SaladCloud's container gateway imposes.
 ## Step 5: Add A Job Queue
 
 To handle long-running requests like this, we can use
-[SaladCloud's Job Queue](/container-engine/explanation/core-concepts/job-queues). With the job queue, we can submit our
+[SaladCloud's Job Queue](/container-engine/explanation/job-processing/job-queues). With the job queue, we can submit our
 prompt, and then either poll for the result, or receive a webhook when the job is complete. Additionally, the job queue
 will automatically handle retrying failed requests, buffer overflow requests, and includes some basic autoscaling
 functionality.
