@@ -25,7 +25,7 @@ tools like [Rclone](https://rclone.org/), which supports a wide range of cloud s
 into your applications. Note that volume mounting using S3FS, FUSE, or NFS is not supported, as SaladCloud containers do
 not operate in privileged mode.
 
-For a more integrated solution, [Salad Kelpie](/container-engine/how-to-guides/long-running-tasks/kelpie) provides a job
+For a more integrated solution, [Salad Kelpie](/container-engine/how-to-guides/job-processing/kelpie) provides a job
 queue service with optional checkpoint management. The Kelpie worker, integrated with your workloads running on Salad
 nodes, automatically retrieves jobs, executes your code, and manages data synchronization between local files and
 S3-compatible cloud storage in the background. If handling data synchronization—such as downloading or uploading

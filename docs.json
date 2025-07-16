@@ -15,16 +15,11 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": [
-              "index",
-              "general/explanation/account-security"
-            ]
+            "pages": ["index", "general/explanation/account-security"]
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "general/tutorials/account-setup"
-            ]
+            "pages": ["general/tutorials/account-setup"]
           }
         ]
       },
@@ -167,9 +162,7 @@
               },
               {
                 "group": "Security",
-                "pages": [
-                  "container-engine/tutorials/security/jwt-authentication"
-                ]
+                "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
               {
                 "group": "Performance",
@@ -200,9 +193,7 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": [
-                  "container-engine/reference/autoscaling/settings"
-                ]
+                "pages": ["container-engine/reference/autoscaling/settings"]
               },
               "container-engine/reference/quotas"
             ]
@@ -227,9 +218,7 @@
               },
               {
                 "group": "Autoscaling & Resource Management",
-                "pages": [
-                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
-                ]
+                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
               },
               {
                 "group": "Gateway & Networking",
@@ -239,18 +228,39 @@
                 ]
               },
               {
+                "group": "AI & Machine Learning",
+                "pages": [
+                  "container-engine/how-to-guides/ai-machine-learning/run-hugging-face-models-with-ollama",
+                  "container-engine/how-to-guides/ai-machine-learning/run-ollama",
+                  "container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy",
+                  "container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models",
+                  "container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm",
+                  "container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog",
+                  "container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing",
+                  "container-engine/how-to-guides/ai-machine-learning/metavoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning",
+                  "container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
+                ]
+              },
+              {
                 "group": "Job Processing & Queues",
                 "pages": [
-                  "container-engine/how-to-guides/job-queues/creating-a-job-queue",
-                  "container-engine/how-to-guides/job-queues/using-queues",
-                  "container-engine/how-to-guides/job-queues/queue-worker",
-                  "container-engine/how-to-guides/job-queues/webhook-signature",
-                  "container-engine/how-to-guides/real-time-inference/use-container-gateway",
-                  "container-engine/how-to-guides/real-time-inference/build-redis-queue",
-                  "container-engine/how-to-guides/long-running-tasks/kelpie",
-                  "container-engine/how-to-guides/long-running-tasks/gcp-pub-sub",
-                  "container-engine/how-to-guides/long-running-tasks/rabbitmq",
-                  "container-engine/how-to-guides/long-running-tasks/sqs"
+                  "container-engine/how-to-guides/job-processing/creating-a-job-queue",
+                  "container-engine/how-to-guides/job-processing/using-queues",
+                  "container-engine/how-to-guides/job-processing/queue-worker",
+                  "container-engine/how-to-guides/job-processing/webhook-signature",
+                  "container-engine/how-to-guides/job-processing/use-container-gateway",
+                  "container-engine/how-to-guides/job-processing/build-redis-queue",
+                  "container-engine/how-to-guides/job-processing/kelpie",
+                  "container-engine/how-to-guides/job-processing/gcp-pub-sub",
+                  "container-engine/how-to-guides/job-processing/rabbitmq",
+                  "container-engine/how-to-guides/job-processing/sqs"
                 ]
               },
               {
@@ -283,30 +293,7 @@
               },
               {
                 "group": "Specialized Workloads",
-                "pages": [
-                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
-                ]
-              },
-              {
-                "group": "AI & Machine Learning",
-                "pages": [
-                  "container-engine/how-to-guides/ai-machine-learning/run-hugging-face-models-with-ollama",
-                  "container-engine/how-to-guides/ai-machine-learning/run-ollama",
-                  "container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy",
-                  "container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models",
-                  "container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog",
-                  "container-engine/how-to-guides/ai-machine-learning/yolov8-batch-processing",
-                  "container-engine/how-to-guides/ai-machine-learning/metavoice-tts-voice-cloning",
-                  "container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning",
-                  "container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
-                ]
+                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
           }
@@ -336,9 +323,7 @@
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "transcription/tutorials/transcription-quick-start"
-            ]
+            "pages": ["transcription/tutorials/transcription-quick-start"]
           },
           {
             "group": "How-to Guides",
@@ -390,9 +375,7 @@
               },
               {
                 "group": "Technical",
-                "pages": [
-                  "transcription/how-to-guides/technical/splitting-large-audio-files"
-                ]
+                "pages": ["transcription/how-to-guides/technical/splitting-large-audio-files"]
               },
               {
                 "group": "Migration",
@@ -425,15 +408,11 @@
           },
           {
             "group": "Tutorials",
-            "pages": [
-              "gateway-service/tutorials/quickstart"
-            ]
+            "pages": ["gateway-service/tutorials/quickstart"]
           },
           {
             "group": "Reference",
-            "pages": [
-              "gateway-service/reference/sgs-api"
-            ]
+            "pages": ["gateway-service/reference/sgs-api"]
           }
         ]
       },
@@ -442,15 +421,11 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": [
-              "storage/explanation/overview"
-            ]
+            "pages": ["storage/explanation/overview"]
           },
           {
             "group": "Reference",
-            "pages": [
-              "storage/reference/api"
-            ]
+            "pages": ["storage/reference/api"]
           }
         ]
       },
@@ -519,9 +494,7 @@
                   },
                   {
                     "group": "Log Entries",
-                    "pages": [
-                      "reference/saladcloud-api/logs/query-log-entries"
-                    ]
+                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
                   }
                 ]
               },
@@ -572,10 +545,7 @@
         "groups": [
           {
             "group": "Support",
-            "pages": [
-              "support",
-              "support/contact"
-            ]
+            "pages": ["support", "support/contact"]
           }
         ]
       }
@@ -1162,19 +1132,19 @@
     },
     {
       "source": "/products/sce/job-queues/creating-a-job-queue",
-      "destination": "/container-engine/how-to-guides/job-queues/creating-a-job-queue"
+      "destination": "/container-engine/how-to-guides/job-processing/creating-a-job-queue"
     },
     {
       "source": "/products/sce/job-queues/using-queues",
-      "destination": "/container-engine/how-to-guides/job-queues/using-queues"
+      "destination": "/container-engine/how-to-guides/job-processing/using-queues"
     },
     {
       "source": "/products/sce/job-queues/queue-worker",
-      "destination": "/container-engine/how-to-guides/job-queues/queue-worker"
+      "destination": "/container-engine/how-to-guides/job-processing/queue-worker"
     },
     {
       "source": "/products/sce/job-queues/webhook-signature",
-      "destination": "/container-engine/how-to-guides/job-queues/webhook-signature"
+      "destination": "/container-engine/how-to-guides/job-processing/webhook-signature"
     },
     {
       "source": "/products/sce/gateway/load-balancer-options",
@@ -1546,11 +1516,11 @@
     },
     {
       "source": "/guides/real-time-inference/use-container-gateway",
-      "destination": "/container-engine/how-to-guides/real-time-inference/use-container-gateway"
+      "destination": "/container-engine/how-to-guides/job-processing/use-container-gateway"
     },
     {
       "source": "/guides/real-time-inference/build-redis-queue",
-      "destination": "/container-engine/how-to-guides/real-time-inference/build-redis-queue"
+      "destination": "/container-engine/how-to-guides/job-processing/build-redis-queue"
     },
     {
       "source": "/guides/long-running-tasks/solution-overview",
@@ -1558,19 +1528,19 @@
     },
     {
       "source": "/guides/long-running-tasks/kelpie",
-      "destination": "/container-engine/how-to-guides/long-running-tasks/kelpie"
+      "destination": "/container-engine/how-to-guides/job-processing/kelpie"
     },
     {
       "source": "/guides/long-running-tasks/gcp-pub-sub",
-      "destination": "/container-engine/how-to-guides/long-running-tasks/gcp-pub-sub"
+      "destination": "/container-engine/how-to-guides/job-processing/gcp-pub-sub"
     },
     {
       "source": "/guides/long-running-tasks/rabbitmq",
-      "destination": "/container-engine/how-to-guides/long-running-tasks/rabbitmq"
+      "destination": "/container-engine/how-to-guides/job-processing/rabbitmq"
     },
     {
       "source": "/guides/long-running-tasks/sqs",
-      "destination": "/container-engine/how-to-guides/long-running-tasks/sqs"
+      "destination": "/container-engine/how-to-guides/job-processing/sqs"
     },
     {
       "source": "/guides/kubernetes-integration/solution-overview",

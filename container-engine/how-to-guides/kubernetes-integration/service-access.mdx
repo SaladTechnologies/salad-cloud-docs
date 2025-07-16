@@ -30,8 +30,7 @@ Kubernetes environment:**
 
 This widely adopted scenario decouples client applications and GPU nodes (so they don't communicate directly), offering
 enhanced scalability, flexibility, and improved resilience to traffic spikes and node failures. Most existing solutions
-and applications, including
-[real-time inference](/container-engine/how-to-guides/real-time-inference/build-redis-queue),
+and applications, including [real-time inference](/container-engine/how-to-guides/job-processing/build-redis-queue),
 [batch processing and long-running tasks](/container-engine/explanation/job-processing/long-running-tasks), and various
 types of applications (streaming/non-streaming, synchronous/asynchronous), can be effectively implemented. Supported use
 cases encompass LLMs, image/video generation, transcription and molecular dynamics simulation, etc.
@@ -126,5 +125,5 @@ and may shut down without prior notice. To ensure success in this scenario, addi
 - **Client-Side Traffic Control:** Applications can implement traffic management strategies to pause new user requests
   during high congestion.
 
-Please check [this link](/container-engine/how-to-guides/real-time-inference/use-container-gateway#key-considerations)
-for more details.
+Please check [this link](/container-engine/how-to-guides/job-processing/use-container-gateway#key-considerations) for
+more details.
