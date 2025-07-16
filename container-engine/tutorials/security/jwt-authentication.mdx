@@ -74,10 +74,10 @@ Each Salad node can be issued a JWT that contains essential metadata, including 
 salad_organization_name, and other relevant information. **The JWT expires after 5 minutes, with a new one automatically
 issued before expiration.**
 
-The [SaladCloud Instance Metadata Service](/container-engine/explanation/infrastructure-platform/imds) (IMDS) enables applications
-running on Salad nodes to securely query essential information and manage configurations. The IMDS is available at the
-non-routable IPv4 address 169.254.169.254 on port 80 of each Salad node, and applications running locally can call the
-service to check health status, trigger node reallocation, and retrieve the JWT.
+The [SaladCloud Instance Metadata Service](/container-engine/explanation/infrastructure-platform/imds) (IMDS) enables
+applications running on Salad nodes to securely query essential information and manage configurations. The IMDS is
+available at the non-routable IPv4 address 169.254.169.254 on port 80 of each Salad node, and applications running
+locally can call the service to check health status, trigger node reallocation, and retrieve the JWT.
 
 **Note: Applications must bypass any proxies (such as SOCK5 and HTTP) when making requests to the IMDS.**
 
