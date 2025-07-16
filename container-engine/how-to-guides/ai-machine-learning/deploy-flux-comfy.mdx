@@ -114,6 +114,7 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 
     Using it here locally, we’re going to expose port 3000, which is required for the wrapper, and port 8188 that will
     let us access the web ui locally to make it easier to get the prompt object we need for the api.
+
     1. Go to [http://localhost:8188/](http://localhost:8188/) in your browser. You should see something like this:
 
        ![Default Comfy UI Interface](/container-engine/images/comfy-default-view.png)
@@ -124,6 +125,7 @@ docker build -t saladtechnologies/comfyui:comfy0.3.27-api1.8.2-flux1-schnell-fp8
 
     You should see something like the following:
     ![Populated workflow](/container-engine/images/comfy-default-view-flux.png)
+
     1.  Click “Queue Prompt” to generate an image. The first image should be identical to the one we used to populate
         the workflow, because they use the same seed. If you generate another image, it should be different. Here's
         mine.
@@ -291,6 +293,7 @@ Click Deploy, and wait for the deployment to come up.
 ## Interact with Your Deployment
 
 1. Wait for the deployment to be ready.
+
    1. First, SaladCloud pulls your container image into our own internal high-performance cache.
       ![Untitled](/container-engine/images/deploy-comfy-flux-fp8-5.png)
    1. Next, SaladCloud begins downloading the cached container image to the nodes that have been assigned to your
