@@ -23,6 +23,14 @@ paths:
       operationId: get_deletion_cost
       summary: Get Container Instance Deletion Cost
       description: Gets the deletion cost of the current container instance
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       responses:
         "200":
           $ref: "#/components/responses/GetDeletionCost"
@@ -38,6 +46,14 @@ paths:
       operationId: replace_deletion_cost
       summary: Replace Container Instance Deletion Cost
       description: Replaces the deletion cost of the current container instance
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       requestBody:
         $ref: "#/components/requestBodies/ReplaceDeletionCost"
       responses:
@@ -61,6 +77,14 @@ paths:
       operationId: reallocate
       summary: Reallocate Container Instance
       description: Reallocates the current container instance to another SaladCloud node
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       requestBody:
         $ref: "#/components/requestBodies/Reallocate"
       responses:
@@ -183,6 +207,14 @@ paths:
       operationId: recreate
       summary: Recreate Container Instance
       description: Recreates the current container instance on the same SaladCloud node
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       responses:
         "204":
           $ref: "#/components/responses/204"
@@ -278,6 +310,14 @@ paths:
       operationId: restart
       summary: Restart Container Instance
       description: Restarts the current container instance on the same SaladCloud node
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       responses:
         "204":
           $ref: "#/components/responses/204"
@@ -372,6 +412,14 @@ paths:
       operationId: get_status
       summary: Get Container Instance Status
       description: Gets the health statuses of the current container instance
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       responses:
         "200":
           $ref: "#/components/responses/GetStatus"
@@ -469,6 +517,14 @@ paths:
       operationId: get_token
       summary: Get Container Instance Token
       description: Gets the identity token of the current container instance
+      parameters:
+        - name: Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+            enum: ["true"]
+          description: Required header to indicate metadata request
       responses:
         "200":
           $ref: "#/components/responses/GetToken"
