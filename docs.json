@@ -175,30 +175,6 @@
             ]
           },
           {
-            "group": "Reference",
-            "pages": [
-              "container-engine/reference/api",
-              {
-                "group": "Recipes",
-                "pages": [
-                  "container-engine/reference/recipes/overview",
-                  "container-engine/reference/recipes/comfyui",
-                  "container-engine/reference/recipes/kuzco",
-                  "container-engine/reference/recipes/ollama",
-                  "container-engine/reference/recipes/sogni-fast-worker",
-                  "container-engine/reference/recipes/tgi",
-                  "container-engine/reference/recipes/ubuntu",
-                  "container-engine/reference/recipes/yolo"
-                ]
-              },
-              {
-                "group": "Autoscaling",
-                "pages": ["container-engine/reference/autoscaling/settings"]
-              },
-              "container-engine/reference/quotas"
-            ]
-          },
-          {
             "group": "How-to Guides",
             "pages": [
               "container-engine/how-to-guides/managing-deployments",
@@ -296,6 +272,30 @@
                 "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
               }
             ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "container-engine/reference/api",
+              {
+                "group": "Recipes",
+                "pages": [
+                  "container-engine/reference/recipes/overview",
+                  "container-engine/reference/recipes/comfyui",
+                  "container-engine/reference/recipes/kuzco",
+                  "container-engine/reference/recipes/ollama",
+                  "container-engine/reference/recipes/sogni-fast-worker",
+                  "container-engine/reference/recipes/tgi",
+                  "container-engine/reference/recipes/ubuntu",
+                  "container-engine/reference/recipes/yolo"
+                ]
+              },
+              {
+                "group": "Autoscaling",
+                "pages": ["container-engine/reference/autoscaling/settings"]
+              },
+              "container-engine/reference/quotas"
+            ]
           }
         ]
       },
@@ -311,14 +311,6 @@
               "transcription/explanation/captions",
               "transcription/explanation/insights-intelligence",
               "transcription/explanation/billing"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "transcription/reference/api",
-              "transcription/reference/accuracy-benchmarks",
-              "transcription/reference/faq"
             ]
           },
           {
@@ -388,6 +380,14 @@
                   "transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "transcription/reference/api",
+              "transcription/reference/accuracy-benchmarks",
+              "transcription/reference/faq"
             ]
           }
         ]
