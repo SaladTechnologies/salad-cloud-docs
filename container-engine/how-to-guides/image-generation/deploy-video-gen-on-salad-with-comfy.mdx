@@ -914,7 +914,7 @@ the portal.
 - We're going to connect the container group to the job queue we made in the previous step. Configure the job queue for
   port 3000 (where our API is running), and set the path to `/workflow/video-clip`, which is the endpoint we created.
   For this tutorial, we won't enable autoscaling, but you can
-  [learn more about it here](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview).
+  [learn more about it here](/container-engine/explanation/infrastructure-platform/autoscaling#autoscaling-overview).
 - Finally, we will configure the readiness probe to check the `/ready` endpoint
 - Finally, ensure `autostart_policy` is set to `true` so that the container group starts automatically once the image is
   pulled into our internal cache.
@@ -1383,7 +1383,7 @@ git commit -m "Video Generation API with Job Queue"
 
 Now that you have a working video generation service, and the beginnings of a client that can submit jobs to the job
 queue, you can start to integrate the video generation service into your own applications. You can also start
-experimenting with [autoscaling](/container-engine/explanation/autoscaling/autoscaling#autoscaling-overview) to handle
+experimenting with [autoscaling](/container-engine/explanation/infrastructure-platform/autoscaling#autoscaling-overview) to handle
 more requests, and reduce costs during periods of low demand.
 
 ComfyUI API also supports sending workflow

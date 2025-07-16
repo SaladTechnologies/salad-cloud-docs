@@ -6,7 +6,7 @@ _Last Updated: October 15, 2024_
 
 # Overview
 
-Readiness probes are only available if [Container Gateway](/container-engine/explanation/networking-security/networking)
+Readiness probes are only available if [Container Gateway](/container-engine/explanation/infrastructure-platform/networking)
 or [Job Queues](/container-engine/explanation/core-concepts/job-queues) are turned on. They run after the startup probe
 has completed successfully. They are typically used to evaluate whether the application running in your container is
 ready to accept traffic. If configured, no traffic will be sent from the load balancer until the readiness probe has

@@ -85,7 +85,7 @@ likelihood of **server response timeouts**.The multiprocessing approach also con
 requires a CUDA context and loads its own model into GPU VRAM for inference.
 
 Some inference servers always return an "OK" status on health checks, even when they encounter errors, causing
-[health probes (Startup/Liveness/Readiness)](/container-engine/explanation/health-probes/health-probes) on SaladCloud to
+[health probes (Startup/Liveness/Readiness)](/container-engine/explanation/infrastructure-platform/health-probes) on SaladCloud to
 malfunction.
 
 Many open-source servers for LLM inference, such as TGI and vLLM, provide the necessary features to run efficiently on

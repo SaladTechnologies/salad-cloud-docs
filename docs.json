@@ -33,10 +33,10 @@
                 "group": "Core Concepts",
                 "pages": [
                   "container-engine/explanation/core-concepts/overview",
+                  "container-engine/explanation/core-concepts/saladcloud-secure",
                   "container-engine/explanation/core-concepts/architectural-overview",
                   "container-engine/explanation/core-concepts/recipes-overview",
-                  "container-engine/explanation/core-concepts/faqs",
-                  "container-engine/explanation/core-concepts/saladcloud-secure"
+                  "container-engine/explanation/core-concepts/faqs"
                 ]
               },
               {
@@ -52,21 +52,21 @@
               {
                 "group": "Infrastructure & Platform",
                 "pages": [
-                  "container-engine/explanation/core-concepts/container-registries",
-                  "container-engine/explanation/core-concepts/external-logging",
-                  "container-engine/explanation/networking-security/networking",
-                  "container-engine/explanation/health-probes/health-probes",
-                  "container-engine/explanation/health-probes/startup-probes",
-                  "container-engine/explanation/health-probes/readiness-probes",
-                  "container-engine/explanation/health-probes/liveness-probes",
-                  "container-engine/explanation/imds/introduction",
-                  "container-engine/explanation/imds/instance-deletion-cost"
+                  "container-engine/explanation/infrastructure-platform/container-registries",
+                  "container-engine/explanation/infrastructure-platform/external-logging",
+                  "container-engine/explanation/infrastructure-platform/networking",
+                  "container-engine/explanation/infrastructure-platform/health-probes",
+                  "container-engine/explanation/infrastructure-platform/startup-probes",
+                  "container-engine/explanation/infrastructure-platform/readiness-probes",
+                  "container-engine/explanation/infrastructure-platform/liveness-probes",
+                  "container-engine/explanation/infrastructure-platform/imds",
+                  "container-engine/explanation/infrastructure-platform/instance-deletion-cost",
+                  "container-engine/explanation/infrastructure-platform/autoscaling"
                 ]
               },
               {
-                "group": "Scaling & Resource Management",
+                "group": "Billing & Pricing",
                 "pages": [
-                  "container-engine/explanation/autoscaling/autoscaling",
                   "container-engine/explanation/billing-pricing/billing",
                   "container-engine/explanation/billing-pricing/priority-pricing",
                   "container-engine/explanation/billing-pricing/prepaid-billing-faqs"
@@ -98,8 +98,8 @@
               {
                 "group": "Platform Integrations",
                 "pages": [
-                  "container-engine/explanation/kubernetes-integration/solution-overview",
-                  "container-engine/explanation/tailscale-integration/solution-overview"
+                  "container-engine/explanation/platform-integrations/kubernetes-integration",
+                  "container-engine/explanation/platform-integrations/tailscale-integration"
                 ]
               }
             ]
@@ -664,7 +664,7 @@
     },
     {
       "source": "/container-engine/health-probes/liveness-probe",
-      "destination": "/container-engine/explanation/health-probes/liveness-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/liveness-probes"
     },
     {
       "source": "/products/api-usage",
@@ -732,7 +732,7 @@
     },
     {
       "source": "/products/sce/container-registries",
-      "destination": "/container-engine/explanation/core-concepts/container-registries"
+      "destination": "/container-engine/explanation/infrastructure-platform/container-registries"
     },
     {
       "source": "/products/sce/external-logging/axiom",
@@ -760,7 +760,7 @@
     },
     {
       "source": "/products/sce/external-logging",
-      "destination": "/container-engine/explanation/core-concepts/external-logging"
+      "destination": "/container-engine/explanation/infrastructure-platform/external-logging"
     },
     {
       "source": "/products/sce/health-probes/health-probe-examples",
@@ -768,19 +768,19 @@
     },
     {
       "source": "/products/sce/health-probes/liveness-probes",
-      "destination": "/container-engine/explanation/health-probes/liveness-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/liveness-probes"
     },
     {
       "source": "/products/sce/health-probes/readiness-probes",
-      "destination": "/container-engine/explanation/health-probes/readiness-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/readiness-probes"
     },
     {
       "source": "/products/sce/health-probes/startup-probes",
-      "destination": "/container-engine/explanation/health-probes/startup-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/startup-probes"
     },
     {
       "source": "/products/sce/health-probes",
-      "destination": "/container-engine/explanation/health-probes/health-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/health-probes"
     },
     {
       "source": "/products/sce/imds/Container-status-endpoint",
@@ -792,7 +792,7 @@
     },
     {
       "source": "/products/sce/imds/introduction",
-      "destination": "/container-engine/explanation/imds/introduction"
+      "destination": "/container-engine/explanation/infrastructure-platform/imds"
     },
     {
       "source": "/products/sce/imds/obtaining-an-imds-jwt",
@@ -992,7 +992,7 @@
     },
     {
       "source": "/products/sce/networking",
-      "destination": "/container-engine/explanation/networking-security/networking"
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
     },
     {
       "source": "/products/sce/getting-started/architectural-overview",
@@ -1060,7 +1060,7 @@
     },
     {
       "source": "/container-engine/explanation/networking",
-      "destination": "/container-engine/explanation/networking-security/networking"
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
     },
     {
       "source": "/container-engine/explanation/saladcloud-secure",
@@ -1084,7 +1084,7 @@
     },
     {
       "source": "/products/sce/autoscaling/autoscaling",
-      "destination": "/container-engine/explanation/autoscaling/autoscaling"
+      "destination": "/container-engine/explanation/infrastructure-platform/autoscaling"
     },
     {
       "source": "/products/sce/autoscaling/settings",
@@ -1108,7 +1108,7 @@
     },
     {
       "source": "/products/sce/container-groups/registries/container-registries",
-      "destination": "/container-engine/explanation/core-concepts/container-registries"
+      "destination": "/container-engine/explanation/infrastructure-platform/container-registries"
     },
     {
       "source": "/products/sce/container-groups/registries/dockerhub",
@@ -1144,31 +1144,31 @@
     },
     {
       "source": "/products/sce/container-groups/external-logging/external-logging",
-      "destination": "/container-engine/explanation/core-concepts/external-logging"
+      "destination": "/container-engine/explanation/infrastructure-platform/external-logging"
     },
     {
       "source": "/products/sce/container-groups/health-probes/health-probes",
-      "destination": "/container-engine/explanation/health-probes/health-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/health-probes"
     },
     {
       "source": "/products/sce/container-groups/health-probes/liveness-probes",
-      "destination": "/container-engine/explanation/health-probes/liveness-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/liveness-probes"
     },
     {
       "source": "/products/sce/container-groups/health-probes/readiness-probes",
-      "destination": "/container-engine/explanation/health-probes/readiness-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/readiness-probes"
     },
     {
       "source": "/products/sce/container-groups/health-probes/startup-probes",
-      "destination": "/container-engine/explanation/health-probes/startup-probes"
+      "destination": "/container-engine/explanation/infrastructure-platform/startup-probes"
     },
     {
       "source": "/products/sce/container-groups/imds/introduction",
-      "destination": "/container-engine/explanation/imds/introduction"
+      "destination": "/container-engine/explanation/infrastructure-platform/imds"
     },
     {
       "source": "/products/sce/container-groups/imds/instance-deletion-cost",
-      "destination": "/container-engine/explanation/imds/instance-deletion-cost"
+      "destination": "/container-engine/explanation/infrastructure-platform/instance-deletion-cost"
     },
     {
       "source": "/products/sce/container-groups/imds/obtaining-an-imds-jwt",
@@ -1608,7 +1608,7 @@
     },
     {
       "source": "/guides/kubernetes-integration/solution-overview",
-      "destination": "/container-engine/explanation/kubernetes-integration/solution-overview"
+      "destination": "/container-engine/explanation/platform-integrations/kubernetes-integration"
     },
     {
       "source": "/guides/kubernetes-integration/installation-helm-chart",
@@ -1624,7 +1624,7 @@
     },
     {
       "source": "/guides/tailscale-integration/solution-overview",
-      "destination": "/container-engine/explanation/tailscale-integration/solution-overview"
+      "destination": "/container-engine/explanation/platform-integrations/tailscale-integration"
     },
     {
       "source": "/guides/tailscale-integration/basic",

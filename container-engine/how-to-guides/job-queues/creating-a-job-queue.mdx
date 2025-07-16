@@ -17,7 +17,7 @@ order to attach a job queue to it.
 > A Job Queue can be connected to multiple container groups at once. but a container group can only be connected to at
 > most a single Job Queue.
 
-**We recommend adding a [readiness probe](/container-engine/explanation/health-probes/readiness-probes) to your
+**We recommend adding a [readiness probe](/container-engine/explanation/infrastructure-platform/readiness-probes) to your
 container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
 receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run
 after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to

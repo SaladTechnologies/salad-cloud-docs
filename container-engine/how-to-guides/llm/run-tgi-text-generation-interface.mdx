@@ -45,7 +45,7 @@ Gateway feature. This is done by simply setting `HOSTNAME` to `::`
 
 ## Recommended - Health Probes
 
-[Health Probes](/container-engine/explanation/health-probes/health-probes) help ensure that your container only serves
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) help ensure that your container only serves
 traffic it is ready and ensures that the container continues to run as expected. When the TGI container starts up, it
 begins to download the specific model before it can start serving requests. While the model is downloading, the API is
 unavailable. The simplest health probe is to check the `/health` endpoint. If the endpoint is running, then the model is

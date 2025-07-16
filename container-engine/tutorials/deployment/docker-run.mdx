@@ -200,7 +200,7 @@ storage or job queues or APIs, for your containers running on SaladCloud.
 One container group can run only one container image at this moment.
 
 Ensure the repository, image name and tag are all correct in
-[the Image Source](/container-engine/explanation/core-concepts/container-registries). If the container image is from a
+[the Image Source](/container-engine/explanation/infrastructure-platform/container-registries). If the container image is from a
 private repository, you will need to provide both the username and access token. These credentials will be used by
 SaladCloud to pull the image.
 
@@ -420,12 +420,12 @@ contain only the status and metadata.
 
 ### Health Probes
 
-[Health probes](/container-engine/explanation/health-probes/health-probes) offer an automated mechanism to initiate
+[Health probes](/container-engine/explanation/infrastructure-platform/health-probes) offer an automated mechanism to initiate
 specific actions based on the status of containers within a container group. **You can think of a probe as a piece of
 code running alongside the inference server within the same container, allowing it to access the service locally or the
 shared file system**.
 
-[Readiness probes](/container-engine/explanation/health-probes/readiness-probes) are essential when deploying a
+[Readiness probes](/container-engine/explanation/infrastructure-platform/readiness-probes) are essential when deploying a
 container gateway, as they ensure that requests are only forwarded to an instance when it is fully prepared—for example,
 when the model has been loaded and warmed up.
 
@@ -455,7 +455,7 @@ Failure Threshold: 3
 
 <img src="/container-engine/images/docker_run19.png" />
 
-You can also use the [exec protocol](/container-engine/explanation/health-probes/health-probes#exec-protocol) to create
+You can also use the [exec protocol](/container-engine/explanation/infrastructure-platform/health-probes#exec-protocol) to create
 a custom script for the readiness probe.
 
 Let’s look at another example: This exec probe runs a Python script inside the instance and checks the exit code. If the
