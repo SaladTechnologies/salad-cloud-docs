@@ -15,11 +15,16 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["index", "general/explanation/account-security"]
+            "pages": [
+              "index",
+              "general/explanation/account-security"
+            ]
           },
           {
             "group": "Tutorials",
-            "pages": ["general/tutorials/account-setup"]
+            "pages": [
+              "general/tutorials/account-setup"
+            ]
           }
         ]
       },
@@ -88,18 +93,18 @@
                 ]
               },
               {
-                "group": "AI & Machine Learning",
-                "pages": [
-                  "container-engine/explanation/llm/overview",
-                  "container-engine/explanation/image-generation/overview",
-                  "container-engine/explanation/computer-vision/yolov8-overview"
-                ]
-              },
-              {
                 "group": "Platform Integrations",
                 "pages": [
                   "container-engine/explanation/platform-integrations/kubernetes-integration",
                   "container-engine/explanation/platform-integrations/tailscale-integration"
+                ]
+              },
+              {
+                "group": "AI & Machine Learning",
+                "pages": [
+                  "container-engine/explanation/ai-machine-learning/llm-overview",
+                  "container-engine/explanation/ai-machine-learning/image-generation-overview",
+                  "container-engine/explanation/ai-machine-learning/computer-vision-overview"
                 ]
               }
             ]
@@ -162,7 +167,9 @@
               },
               {
                 "group": "Security",
-                "pages": ["container-engine/tutorials/security/jwt-authentication"]
+                "pages": [
+                  "container-engine/tutorials/security/jwt-authentication"
+                ]
               },
               {
                 "group": "Performance",
@@ -193,7 +200,9 @@
               },
               {
                 "group": "Autoscaling",
-                "pages": ["container-engine/reference/autoscaling/settings"]
+                "pages": [
+                  "container-engine/reference/autoscaling/settings"
+                ]
               },
               "container-engine/reference/quotas"
             ]
@@ -218,7 +227,9 @@
               },
               {
                 "group": "Autoscaling & Resource Management",
-                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
+                "pages": [
+                  "container-engine/how-to-guides/autoscaling/enable-autoscaling"
+                ]
               },
               {
                 "group": "Gateway & Networking",
@@ -293,7 +304,9 @@
               },
               {
                 "group": "Specialized Workloads",
-                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"
+                ]
               }
             ]
           }
@@ -323,7 +336,9 @@
           },
           {
             "group": "Tutorials",
-            "pages": ["transcription/tutorials/transcription-quick-start"]
+            "pages": [
+              "transcription/tutorials/transcription-quick-start"
+            ]
           },
           {
             "group": "How-to Guides",
@@ -375,7 +390,9 @@
               },
               {
                 "group": "Technical",
-                "pages": ["transcription/how-to-guides/technical/splitting-large-audio-files"]
+                "pages": [
+                  "transcription/how-to-guides/technical/splitting-large-audio-files"
+                ]
               },
               {
                 "group": "Migration",
@@ -408,11 +425,15 @@
           },
           {
             "group": "Tutorials",
-            "pages": ["gateway-service/tutorials/quickstart"]
+            "pages": [
+              "gateway-service/tutorials/quickstart"
+            ]
           },
           {
             "group": "Reference",
-            "pages": ["gateway-service/reference/sgs-api"]
+            "pages": [
+              "gateway-service/reference/sgs-api"
+            ]
           }
         ]
       },
@@ -421,11 +442,15 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["storage/explanation/overview"]
+            "pages": [
+              "storage/explanation/overview"
+            ]
           },
           {
             "group": "Reference",
-            "pages": ["storage/reference/api"]
+            "pages": [
+              "storage/reference/api"
+            ]
           }
         ]
       },
@@ -494,7 +519,9 @@
                   },
                   {
                     "group": "Log Entries",
-                    "pages": ["reference/saladcloud-api/logs/query-log-entries"]
+                    "pages": [
+                      "reference/saladcloud-api/logs/query-log-entries"
+                    ]
                   }
                 ]
               },
@@ -545,7 +572,10 @@
         "groups": [
           {
             "group": "Support",
-            "pages": ["support", "support/contact"]
+            "pages": [
+              "support",
+              "support/contact"
+            ]
           }
         ]
       }
@@ -1424,7 +1454,7 @@
     },
     {
       "source": "/guides/image-generation/image-gen-general",
-      "destination": "/container-engine/explanation/image-generation/overview"
+      "destination": "/container-engine/explanation/ai-machine-learning/image-generation-overview"
     },
     {
       "source": "/guides/transcription/salad-transcription-api/transcription-quick-start",
@@ -1524,7 +1554,7 @@
     },
     {
       "source": "/guides/llm/llm-general",
-      "destination": "/container-engine/explanation/llm/overview"
+      "destination": "/container-engine/explanation/ai-machine-learning/llm-overview"
     },
     {
       "source": "/guides/llm/llm-fine-tuning",
@@ -1552,7 +1582,7 @@
     },
     {
       "source": "/guides/computer-vision/yolov8/yolov8",
-      "destination": "/container-engine/explanation/computer-vision/yolov8-overview"
+      "destination": "/container-engine/explanation/ai-machine-learning/computer-vision-overview"
     },
     {
       "source": "/guides/computer-vision/yolov8/quickstart",
@@ -1657,6 +1687,18 @@
     {
       "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription",
       "destination": "/transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
+    },
+    {
+      "source": "/container-engine/explanation/llm/overview",
+      "destination": "/container-engine/explanation/ai-machine-learning/llm-overview"
+    },
+    {
+      "source": "/container-engine/explanation/image-generation/overview",
+      "destination": "/container-engine/explanation/ai-machine-learning/image-generation-overview"
+    },
+    {
+      "source": "/container-engine/explanation/computer-vision/yolov8-overview",
+      "destination": "/container-engine/explanation/ai-machine-learning/computer-vision-overview"
     }
   ]
 }
