@@ -1,0 +1,269 @@
+---
+title: 'Run OpenMM on SaladCloud'
+description: 'How to execute molecular dynamics simulations on interruptible infrastructure'
+---
+
+_Last Updated: July 17, 2025_
+
+## Introduction
+
+For performance and cost benchmarks of running [OpenMM](https://openmm.org/) on SaladCloud, please refer to
+[this blog post](https://blog.salad.com/openmm-gpu-benchmark/). You can also check
+[the GitHub repository](https://github.com/SaladTechnologies/mds/tree/main/openmm-benchmark) for the benchmarking
+Dockerfile and detailed test methodology.
+
+Molecular dynamics simulations with OpenMM can run from several hours to multiple days, depending on factors such as
+CPU/GPU performance, system size (number of atoms or molecules), simulation length (number of steps), and the level of
+physical detail modeled. Large-scale simulations often produce substantial output—ranging up to tens of
+gigabytes—including trajectories and logs.
+
+SaladCloud operates on a distributed network of interruptible nodes, meaning any node running your tasks may shut down
+unexpectedly and all runtime data are removed (data persistence must be managed via external cloud storage). Despite
+this, most Salad nodes remain stable for over 10 hours at a time.
+
+To run OpenMM effectively on SaladCloud, it's recommended to divide large simulation tasks into manageable chunks—such
+as 30-minute runs—and execute them sequentially. This chunked approach is natively supported by OpenMM and can be
+implemented with just a few lines of code. With this adapted workflow, each chunk generates its own small output files
+and a corresponding checkpoint file, all of which can be uploaded to cloud storage immediately. When resuming after node
+reallocation, only the input file and the checkpoint file need to be downloaded from the cloud—**eliminating the need to
+upload or download large files at any point.**
+
+Salad nodes are globally distributed, leading to variations in network latency, geographic distance, and throughput to
+specific cloud storage endpoints. Many nodes also have asymmetric bandwidth, with upload speeds typically lower than
+download speeds. Nevertheless, more than 90% of nodes can upload over 10 GB of data per hour—more than sufficient for
+OpenMM workloads. For detailed performance metrics, refer to
+[the cloud storage benchmarks on SaladCloud](/tutorials/high-performance-storage-solutions#cloud-storage-benchmarking-on-saladcloud).
+
+## Single-Replica Container Group vs. Job Queue System
+
+As a starting point, we recommend creating a dedicated Single-Replica Container Group (**SRCG**) for each simulation
+task on SaladCloud. This setup is easy to launch and works well for larger simulations—spanning tens of hours or
+multiple days. Task-specific configurations, such as the number of steps, chunking intervals, and input/output paths in
+cloud storage—can be passed to the instance via environment variables.
+
+While tasks are briefly paused during node reallocation after interruptions, our testing across a large number of
+samples shows that total downtime remains under 4% of the overall runtime.
+
+On the other hand, if you’re running a large number of simulation tasks—a job queue becomes essential to ensure
+efficiency and scalability. Systems like GCP Pub/Sub, AWS SQS, Salad Kelpie, or custom solutions using Redis or Kafka
+can be used to distribute jobs (task-specific configurations) across a pool of Salad nodes. If a node fails during job
+execution, the job queue ensures the job is retried immediately on another available node.
+
+You can further implement autoscaling by monitoring the number of available jobs in the queue and dynamically adjusting
+the number of Salad nodes. This approach ensures that your target number of tasks is completed within a defined
+timeframe, while also allowing cost control during periods of lower demand.
+
+This guide focuses on the SRCG-based approach. A separate guide will cover job queue integration.
+
+## Job Chunking Methodology
+
+To demonstrate how to divide a large OpenMM simulation into manageable chunks, consider the following example. It runs a
+chunk of 10,000 steps as part of a million-step simulation, downloading two files at the start to resume the state and
+uploading three files upon completion to back up the state and save the output files.
+
+```python
+# Download 2 files from cloud storage.
+# PDB_LOCAL, the PDB input file
+# CPT_LOCAL, the checkpoint file
+
+# Load the PDB input file.
+pdb = PDBFile(PDB_LOCAL)
+
+# Load force fields and create the system.
+forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
+system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME, nonbondedCutoff=1*nanometer, constraints=HBonds)
+integrator = LangevinMiddleIntegrator(300*kelvin, 1/picosecond, 0.004*picoseconds)
+simulation = Simulation(pdb.topology, system, integrator)
+
+if cpt_exists: # Load the simulation state and get the current step number if the checkpoint exists.
+    with open(CPT_LOCAL, 'rb') as f:
+       simulation.context.loadCheckpoint(f.read())
+    steps_done = simulation.context.getState().getStepCount() # The accumulated total number of steps done.
+else:          # Start from scratch if no checkpoint.
+    simulation.context.setPositions(pdb.positions)
+    simulation.minimizeEnergy()
+    steps_done = 0
+
+# Will run 10,000 steps in this chunk.
+chunk_steps = 10000
+
+# Define the chunk ID to represent the total number of steps completed after this chunk.
+# Assuming steps_done is 10000, chunk_id will be 20000 after this chunk.
+chunk_id = steps_done + chunk_steps
+
+# Define the output file names based on the chunk ID for this chunk
+OUTPUT_DCD_FILE_LOCAL = f'output_{chunk_id}.dcd' # output_20000.dcd to keep trajectory data
+LOG_FILE_LOCAL = f'log_{chunk_id}.txt'           # log_20000.txt to record progress and performance
+
+# Define the output frequency during the chunk simulation.
+# Every 1000 steps, new data is appended to the end of the dcd and log files.
+# These two files will continue to grow over time and can become very large for long-running simulations.
+report_freq = 1000
+simulation.reporters.append(DCDReporter(OUTPUT_DCD_FILE_LOCAL, report_freq))
+simulation.reporters.append(StateDataReporter(LOG_FILE_LOCAL, report_freq, step=True, potentialEnergy=True, temperature=True))
+
+# Run the chunk simulation of 10,000 steps
+simulation.step(chunk_steps)
+
+# The output files are ready.
+# output_20000.dcd
+# log_20000.txt
+
+# Save the checkpoint file.
+with open(CPT_LOCAL, 'wb') as f:
+    f.write(simulation.context.createCheckpoint())
+# CPT_LOCAL
+
+# Upload 3 files to cloud storage
+# output_20000.dcd
+# log_20000.txt
+# CPT_LOCAL
+```
+
+## Dynamic Benchmarking and Adaptive Algorithms
+
+OpenMM can only run a chunk for a specified number of steps; it does not support running a chunk based on wall-clock
+time, such as running each chunk for 30 minutes.
+
+A long-running job may be executed sequentially on multiple Salad nodes with different performance characteristics. As a
+result, running the same number of steps will take varying amounts of time on each node, and if a chunk takes too long,
+it can lead to greater compute time loss in the event of an interruption.
+
+To address this, perform a dynamic benchmark before executing the simulation on a Salad node. For example, running a
+short test to measure the node’s performance allows us to determine the appropriate number of steps to fit within a
+30-minute chunk.
+
+Please refer to [the example code](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/main_basic.py) that
+implements the workflow described above. It is intended to run on your local machine, without any optimizations for
+SaladCloud, and supports dynamic benchmarking, simulation interruption and resumption. To use it, you’ll need access to
+a Cloudflare R2 or other S3-compatible cloud storage bucket and must specify the path of input and output files.
+
+## Running OpenMM on SaladCloud
+
+### Code Optimizations
+
+To run OpenMM efficiently on SaladCloud, several additional code optimizations are recommended:
+
+- Use chunked and parallel data transfers to maximize throughput when uploading or downloading large files between Salad
+  nodes and cloud storage.
+
+- Introduce a dedicated uploader thread with task queue to offload upload operations from the main thread, ensuring that
+  simulation execution remains unblocked.
+
+- Add error handling, monitoring, and logging to improve reliability, enhance visibility, and simplify troubleshooting.
+
+Please refer to [the example code](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/main_salad.py) for
+more implementation details.
+
+The code also generates [a task log file](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/history.txt)
+upon simulation completion, alongside the standard output files. This log contains detailed runtime statistics, which
+can be analyzed using
+[salad_analysis.py](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/salad_analysis.py) to produce a
+summary report.
+
+<img src="/guides/molecular-dynamics-simulation/images/om_workflow.png" />
+
+### Dockerfile Configuration
+
+[The provided Dockerfile](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/Dockerfile) creates a
+containerized environment by using the miniconda official image, then installing essential utilities (VS Code Server
+CLI), OpenMM 8.3.0 and required dependencies. It copies the required Python code into the image and sets the default
+command.
+
+```Dockerfile
+# Select a base image: https://hub.docker.com/r/continuumio/miniconda3 (Python 3.12)
+FROM continuumio/miniconda3:25.1.1-0
+
+RUN apt-get update && apt-get install -y curl net-tools iputils-ping python3-pip nginx
+
+# Optional: Install VS Code Server for remote debugging
+# https://docs.salad.com/tutorials/vscode-remote-development#interactive-mode
+RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o vscode_cli.tar.gz && \
+    tar -xf vscode_cli.tar.gz && \
+    mv code /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
+
+# To connect using VS Code:
+# Log in the instance using the terminal, and then run the following commands:
+# code tunnel user login --provider github
+# nohup code tunnel --accept-server-license-terms --name XXX &> output.log &
+
+# http://docs.openmm.org/latest/userguide/application/01_getting_started.html#installing-openmm
+RUN conda install -c conda-forge openmm=8.3.0 cuda-version=12.6 -y
+
+RUN pip install python-dotenv boto3 salad-cloud-sdk
+
+WORKDIR /app
+
+COPY main_basic.py helper.py main_salad.py salad_monitor.py /app/
+
+CMD ["python", "main_salad.py"]
+
+# The pre-built image:
+# docker.io/saladtechnologies/mds:001-openmm-srcg
+```
+
+### Environment Variables
+
+Ensure all required environment variables are set before running a simulation. These variables will be passed to the
+SRCG at creation time. For easy configuration and reuse, you can define them in a .env file located in the project
+directory.
+
+```bash .env
+# Access to the Cloudflare R2:
+CLOUDFLARE_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+CLOUDFLARE_ID=******
+CLOUDFLARE_KEY=******
+
+# Task parameters: input, checkpoint and output files are stored in the BUCKET/PREFIX/FOLDER.
+BUCKET=<BUCKET_NAME>
+PREFIX=<PREFIX_NAME> # Optional
+FOLDER=<FOLDER_NAME>
+PDB_FILE=<***.pdb>
+
+MAX_STEPS=200000000
+BENCHMARK_STEPS=10000
+REPORT_FREQ=1000
+SAVING_INTERVAL_SECONDS=600 # 10 minutes
+
+# If the main thread is unresponsive for the specified duration, the uploader thread triggers reallocation.
+MAX_NO_RESPONSE_TIME=3600 # 1 hour
+
+# This is optional and allows the SRCG to call the SaladCloud API internally to shut itself down once the simulation is complete.
+# If these settings are not provided, the SRCG will continue running (sleep infinity) after completion, and you can log into the instance to perform additional tasks using VS Code or the terminal available through the SaladCloud Portal.
+# SaladCloud will introduce a new mechanism that allows the SRCG to shut itself down internally, eliminating the need for the SaladCloud Python SDK and API access.
+SALAD_API_KEY=salad_cloud_user_******
+ORGANIZATION_NAME=******
+PROJECT_NAME=******
+CONTAINER_GROUP_NAME=******
+
+# Optional, telling the SRCG when it was created
+# TASK_CREATION_TIME=2025-07-17 10:10:10
+```
+
+### Local Run
+
+If you have access to a local GPU environment, you can perform a test of the image before running it on SaladCloud. Use
+`docker compose` to start the container defined in
+[docker-compose.yaml](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/docker-compose.yaml). The command
+automatically loads environment variables from the .env file in the same directory.
+
+```bash
+docker compose up
+```
+
+The input .tpr file should be uploaded to the cloud before starting the test.
+
+### Deployment on SaladCloud
+
+Run [salad_quotas.py](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/salad_quotas.py) to view detailed
+information about your current quotas and available GPU types, and refer to
+[salad_deploy.py](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/salad_deploy.py) for a deployment
+example of an SRCG with the SaladCloud Python SDK to run a simulation task.
+
+The [salad_monitor.py](https://github.com/SaladTechnologies/mds/blob/main/openmm-srcg/salad_monitor.py) script monitors
+the simulation progress by checking the files uploaded to cloud storage. It can also reset the test environment by
+clearing the cloud folder while preserving the .tpr input file.
+
+To debug and perform manual tasks, follow [this guide](/tutorials/vscode-remote-development#interactive-mode) to connect
+to the SRCG using VS Code.

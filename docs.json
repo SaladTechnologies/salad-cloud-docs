@@ -359,7 +359,10 @@
               },
               {
                 "group": "Molecular Dynamics Simulation",
-                "pages": ["guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "guides/molecular-dynamics-simulation/gromacs-srcg",
+                  "guides/molecular-dynamics-simulation/openmm-srcg"
+                ]
               }
             ]
           }
