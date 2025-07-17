@@ -174,7 +174,7 @@ command.
 # Select a base image: https://hub.docker.com/r/continuumio/miniconda3 (Python 3.12)
 FROM continuumio/miniconda3:25.1.1-0
 
-RUN apt-get update && apt-get install -y curl net-tools iputils-ping python3-pip nginx
+RUN apt-get update && apt-get install -y curl net-tools iputils-ping python3-pip
 
 # Optional: Install VS Code Server for remote debugging
 # https://docs.salad.com/tutorials/vscode-remote-development#interactive-mode
