@@ -259,6 +259,10 @@
                 ]
               },
               {
+                "group": "Migration",
+                "pages": ["container-engine/how-to-guides/migration/migrate-from-vast"]
+              },
+              {
                 "group": "Platform Integrations",
                 "pages": [
                   "container-engine/how-to-guides/platform-integrations/installation-helm-chart",
