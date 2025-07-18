@@ -1,0 +1,85 @@
+---
+title: 'Container Groups'
+sidebarTitle: 'Overview'
+slug: 'containers'
+---
+
+_Last Updated: October 15, 2024_
+
+Container Groups are fundamental to the deployment process within the SaladCloud Environment (SCE). They consist of a
+container image, hardware requirements, and a replica count, playing a crucial role in deploying your application on the
+SaladCloud network. As the owner of the Container Group, you have the responsibility to manage it, while SCE takes care
+of running the group and maintaining the desired replica count.
+
+## Container Group Components
+
+- **[Container Registry and Image](/container-engine/explanation/infrastructure-platform/container-registries)**:
+  Specify the container image you want to run in the Container Group. Use public or private images from most container
+  registries.
+- **Resource Requirements**:
+  - **Replica Count**: Replicas are the desired number of instances for your container group deployment. We recommend
+    that you deploy with 3+ replicas during testing, and 5+ replicas in production to ensure the uptime of your
+    deployment.
+    - **Why multiple replicas?**: For enhanced reliability and smoother operation, we strongly recommend deploying with
+      a minimum of 3 replicas. This ensures your applications remain resilient and maintain performance, even when a
+      node becomes temporarily unavailable. Scaling beyond a single node not only increases fault tolerance but also
+      optimizes resource allocation and load balancing across our distributed cloud infrastructure. Start with 3 or more
+      replicas to unlock the full potential of our platform and experience seamless scaling and improved uptime for your
+      containers.
+  - **Number of vCPUs (1-16)**: \*Define the desired number of virtual CPUs for your container.
+  - **Memory (RAM) (1-60GB)**: Specify the amount of RAM required for your container.
+  - **GPU Class**: Define the type of GPU to be used. Each container instance will have 1 GPU attached. If you select
+    multiple GPU classes, the system will assign the first available GPU class to new container instances.
+
+<img src="/container-engine/images/portal-select-hardware.png" />
+
+## Additional Configuration
+
+- **[Environment Variables](/container-engine/how-to-guides/environment-variables)**: Define environment variables to
+  customize your container's environment. You can do this via the key-value editor, or via the bulk editor.
+  ![](/container-engine/images/portal-environment-variables-key-value-edit.png)
+  ![](/container-engine/images/portal-environment-variables-bulk-edit.png)
+- **[Command](/container-engine/how-to-guides/specifying-a-command)**: Specify the command to run when the container
+  starts. This command will override the default command and entrypoint specified in the container image.
+
+## Monitoring and Observability
+
+- **[Startup Probe](/container-engine/explanation/infrastructure-platform/startup-probes)**: Set up a startup probe to
+  check if the container has started as expected. Recommended for all applications using the Container Gateway.
+- **[Liveness Probe](/container-engine/explanation/infrastructure-platform/liveness-probes)**: Configure a liveness
+  probe to check if the container is healthy. Recommended for all applications using the Container Gateway.
+- **[Readiness Probe](/container-engine/explanation/infrastructure-platform/readiness-probes)**: Set up a readiness
+  probe to check if the container is ready to accept traffic. Recommended for all applications using the Container
+  Gateway.
+- **[Container Gateway](/container-engine/explanation/infrastructure-platform/networking)**: Choose between
+  authentication or no authentication for external requests and port number for enabling networking inside of container.
+- **[External Logging Service](/container-engine/explanation/infrastructure-platform/external-logging)**: Optionally
+  configure an external logging service for container logs. Recommended for production deployments.
+
+<img src="/container-engine/images/portal-monitoring-config.png" />
+
+## Auto-Start Feature
+
+The container deployment screen offers an auto-start feature. By default, this feature is enabled, and it automatically
+starts the container group when the image is pulled. If you disable this feature, you will need to manually start the
+container group after it is done pulling the image.
+
+## Container Group Actions
+
+Container Group actions allow you to create, manage, and modify your container deployments effectively. To access the
+container group actions you first need to deploy a container.
+
+- **Create** : Create a new Container Group. When created, it is not yet running on nodes.
+- **Start** : Initiate a deployment of the Container Group on the SaladCloud network.
+- **Stop**: Stop the current deployment, terminating all active Container Instances. Stopped Container Groups can be
+  started again, but the deployment will be of new container group instances, not the same ones that were stopped.
+- **Refresh**: Refresh allows you to update the status and information of a Container Group without making significant
+  changes to the group itself. The details automatically refresh every few seconds, so there should not be many
+  situations where the refresh option is needed.
+- **Duplicate**: Create a copy of an existing Container Group, allowing for easy replication of settings and
+  configurations.
+- **Edit**: Update the display name, replica count, image source, resource requirements, and other configuration
+  settings of a Container Group once it has been created.
+- **Delete**: Delete a Container Group and all associated information. This action is irreversible.
+
+<img src="/container-engine/images/portal-container-group-actions.png" />

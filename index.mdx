@@ -1,0 +1,112 @@
+---
+title: 'SaladCloud Documentation'
+description: 'Information, Tutorials, How-To Guides and API Reference for SaladCloud Products'
+sidebarTitle: 'Documentation'
+---
+
+_Last Updated: March 20, 2025_
+
+## Introduction
+
+SaladCloud is the world's largest fully distributed cloud, suitable for a wide range of compute-intensive applications,
+from generative AI inference to molecular simulations.
+
+Applications on SaladCloud are deployed as docker containers, scaled out horizontally to idle compute resources from
+SaladCloud's network of millions of devices. This allows SaladCloud to offer the most
+[competitive pricing](https://salad.com/pricing) in the industry, while providing the flexibility to scale up or down as
+needed.
+
+SaladCloud is comprised of millions of privately owned devices, primarily gaming PCs, running the SaladCloud agent. When
+these devices are not in use by their owners, SaladCloud assigns containers to run on them, paying the device owner for
+their compute time. You can think of it like AirBnB for compute.
+[Learn more about how SaladCloud works](/container-engine/explanation/core-concepts/overview), and how we ensure
+[security](https://salad.com/security) and privacy for both device owners and container operators.
+
+## Migrating From Other Providers
+
+### Transcription APIs
+
+Check out our step-by-by guides to migrate your transcription workloads from other providers to
+[Salad Transcription APIs](/transcription/explanation/overview).
+
+<CardGroup>
+  <Card
+    title="Azure Batch Transcription"
+    href="/transcription/how-to-guides/migration/migrate-from-azure-batch"
+    horizontal
+  >
+    Migrate from Azure Batch Transcription to Salad Transcription API
+  </Card>
+  <Card
+    title="Google Cloud Speech-to-Text"
+    href="/transcription/how-to-guides/migration/migrate-from-gcp-transcription"
+    horizontal
+  >
+    Migrate from Google Cloud Speech-to-Text to Salad Transcription API
+  </Card>
+  <Card
+    title="Rev Transcription"
+    href="/transcription/how-to-guides/migration/migrate-from-rev-transcription"
+    horizontal
+  >
+    Migrate from Rev Transcription to Salad Transcription API
+  </Card>
+  <Card
+    title="AssemblyAI Transcription"
+    href="/transcription/how-to-guides/migration/migrate-from-assembly-transcription"
+    horizontal
+  >
+    Migrate from AssemblyAI Transcription to Salad Transcription API
+  </Card>
+  <Card
+    title="Amazon Transcribe"
+    href="/transcription/how-to-guides/migration/migrate-from-aws-transcription"
+    horizontal
+  >
+    Migrate from Amazon Transcribe to Salad Transcription API
+  </Card>
+  <Card title="Deepgram" href="/transcription/how-to-guides/migration/migrate-from-deepgram-transcription" horizontal>
+    Migrate from Deepgram to Salad Transcription API
+  </Card>
+</CardGroup>
+
+## Browse by Product
+
+SaladCloud offers a variety of products to meet your needs. Select a product below to get started.
+
+<CardGroup cols={1}>
+  <Card title="Salad Container Engine (SCE)" icon="docker" href="/container-engine/explanation/core-concepts/overview">
+    Deploy your own custom application on SaladCloud's managed container service. Bring your own docker image, choose
+    your hardware, and scale horizontally as needed. We assign your workload to eligible devices in the SaladCloud
+    network, and handle reallocations automatically as devices come on- and offline from the network. It is
+    [billed](/container-engine/explanation/billing-pricing/billing) by the amount of time any workload replica is
+    running.
+  </Card>
+  <Card title="Recipes" icon="rocket" href="/container-engine/reference/recipes/overview">
+    The fastest way to get started with [SCE](/container-engine/explanation/core-concepts/overview). Recipes are
+    deployment templates for the Container Engine that can be deployed as-is, or easily customized to meet your needs.
+    They are the best way to get up and running quickly with SaladCloud.
+  </Card>
+  <Card title="Transcription API" icon="code" href="/transcription/explanation/overview">
+    The lowest cost, highest quality transcription service on the market. This is a fully managed service, with no
+    servers to maintain or infrastructure to manage. It is billed by the audio-minute.
+  </Card>
+  <Card title="Salad Simple Storage Service (S4)" icon="database" href="/storage/explanation/overview">
+    Temporarily upload assets for use on SaladCloud. Files are stored for 30 days, and may be up to 100mb. This service
+    is free to use for SaladCloud customers. This can be useful for uploading audio files prior to transcription, or
+    user images for AI image-to-image workflows.
+  </Card>
+  <Card title="Salad Gateway Service (SGS)" icon="house-signal" href="/gateway-service/explanation/overview">
+    Safe and secure residential IPs dedicated to streaming media.
+  </Card>
+</CardGroup>
+
+## Additional Resources
+
+<CardGroup cols={2}>
+  <Card title="Security" icon="shield" href="https://salad.com/security" />
+  <Card title="Trust Center" icon="building-shield" href="https://trust.salad.com/" />
+  <Card title="Terms of Service" icon="scroll" href="https://salad.com/terms/saladcloud" />
+  <Card title="Privacy Policy" icon="user-secret" href="https://salad.com/privacy" />
+  <Card title="Support" icon="life-ring" href="/support" />
+</CardGroup>

@@ -1,0 +1,286 @@
+---
+title: 'Migrating from Rev Transcription'
+sidebarTitle: 'From Rev'
+---
+
+_Last Updated: February 12, 2025_
+
+Migrating from Rev Transcription to Salad Transcription API will require only a simple API call modification. Depending
+on which features you are using, you may also be able to reduce the number of API calls required, as Salad Transcription
+API is able to handle multiple steps in one.
+
+| Features                   | SaladCloud Transcription | Rev Transcription       |
+| -------------------------- | ------------------------ | ----------------------- |
+| Translation                | ✅                       | Requires additional API |
+| Audio Transcription        | ✅                       | ✅                      |
+| Video Transcription        | ✅                       | ✅                      |
+| Multilingual Transcription | ✅                       | ✅                      |
+| Summarization              | ✅                       | Requires additional API |
+| Speaker Identification     | ✅                       | ✅                      |
+| SRT Output                 | ✅                       | ❌                      |
+| Transcribe Multiple Files  | ❌                       | ❌                      |
+| Max Length                 | 2.5 Hours                | 17 Hours                |
+| Text Sentiment Analysis    | ✅                       | Requires Additional API |
+| Text Classification        | ✅                       | Required Additional API |
+| Custom LLM Prompt          | ✅                       | ❌                      |
+| Custom Vocabulary          | ✅                       | Requires Additional API |
+
+## 1. Get your Salad API Key.
+
+    - Open up https://portal.salad.com and sign up/log into your account.
+    - Navigate to your profile at the top right, and select API Access. Here you can find your API Key.
+
+## 2. Updating job creation API calls.
+
+If you’re just using the basic Speech To Text features from Rev Transcription, moving to Salad Transcription API is as
+simple as updating your API call.
+
+### Rev Transcription
+
+Your existing API calls using Rev Transcription should look something like this:
+
+```
+curl -X POST "https://api.rev.ai/speechtotext/v1/jobs" \
+     -H "Authorization: Bearer <REVAI_ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{"source_config": {"url": "https://www.rev.ai/FTC_Sample_1.mp3"},"metadata":"This is a test"}'
+```
+
+### Salad Transcription API Equivalent
+
+When using Salad Transcription API, you’ll update that job creation call to instead look like this:
+
+```
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
+   -d '{
+  	"input": {
+     	"url": "https://example.com/path/to/file.mp3",
+     	"language_code": "en",
+     	"return_as_file": true,
+     	"word_level_timestamps": true
+  	},
+  	}'
+```
+
+- If you’re copy/pasting this call, you’ll update the URL to include your Salad Organization Name.
+- You’ll also need to include your SaladCloud API Key in the header.
+- Next, you’ll add the URL to the file to transcribe into the URL object. Make sure the file length is less than 2.5
+  hours, and less than 3GB. Make sure the URL provided is to a direct download of the file. Header based security is not
+  compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
+  [Salad Simple Storage Service](/storage/explanation/overview#upload-a-file)
+
+A breakdown of all our input parameters are available
+[here](/transcription/tutorials/transcription-quick-start#step-2-set-input-parameters).
+
+You will receive this JSON body from the POST response. You’ll need to cache the ID you receive, as this is how you’ll
+pull your job results.
+
+```
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "inference_endpoint_name": "transcribe",
+  "input": {
+	"property1": "value1",
+	"property2": "value2"
+  },
+  "metadata": null,
+  "organization_name": "example-corp",
+  "status": "pending",
+  "events": [],
+  "create_time": "2025-01-016T19:00:00Z",
+  "update_time": "2025-01-016T19:00:00Z"
+}
+```
+
+## 3. More advanced jobs
+
+If you are utilizing additional features offered by Rev to run analysis, or summarize intent, you can integrate these
+features into the same API call with Salad Transcription API.
+
+### Intent/summarization:
+
+If you’re using Rev services to obtain the intent or summarization of transcribed text, you can also integrate this
+easily with Salad Transcription API with the same API call. For this, you’ll add the `summarize` input parameter, with
+the word limit for the summarization.
+
+```
+curl -X POST https://api.salad.com/api/public/organizations/{my-organization}/inference-endpoints/transcribe/jobs \
+   -H "Salad-Api-Key: {your-api-key}" \
+   -H "Content-Type: application/json" \
+   -d '{
+  	"input": {
+     	"url": "https://example.com/path/to/file.mp3",
+  	"llm_translation": "italian, french",
+	"summarize: 50,
+     	"language_code": "en",
+     	"return_as_file": true,
+     	"word_level_timestamps": true
+  	},
+  	}
+   }'
+```
+
+## 4. Updating your job retrieval:
+
+You’ll also need to update the code you’re using to retrieve your job results. Currently, your process with Rev
+Transcription is likely made up of two steps, checking the status of the job, and then another step to obtain the
+transcription once complete. With Salad Transcription API, this is compacted into a single API call which contains the
+job status, as well as the completed results once the job succeeds.
+
+### Rev Transcription
+
+Your flow with Rev Transcription should look something like this:
+
+- Check the status of the job
+
+```
+curl -X GET https://api.rev.ai/speechtotext/v1/jobs/<ID> \
+     -H "Authorization: Bearer <REVAI_ACCESS_TOKEN>"
+```
+
+- Obtain the results from the completed job
+
+```
+curl -X GET "https://api.rev.ai/speechtotext/v1/jobs/<ID>/transcript" \
+     -H "Authorization: Bearer <REVAI_ACCESS_TOKEN>" \
+     -H "Accept: application/vnd.rev.transcript.v1.0+json"
+```
+
+### Salad Transcription API Equivalent
+
+Instead, you'll update your API call to this:
+
+```
+curl --request GET \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id} \
+  --header 'Salad-Api-Key: <api-key>'
+```
+
+This method will return this JSON body:
+
+```
+{
+   "id":"7c425fc0-dd3d-4c6c-8b6a-a010187492dd",
+   "input":{
+      "url":"https://example.com/path/to/file.mp3",
+      "language_code":"en",
+      "return_as_file":true,
+      "word_level_timestamps":true
+   },
+   "inference_endpoint_name":"transcribe",
+   "status":"succeeded",
+   "events":[
+      {
+         "action":"created",
+         "time":"2025-01-22T15:57:26.0815348+00:00"
+      },
+      {
+         "action":"started",
+         "time":"2025-01-22T15:57:26.2061428+00:00"
+      },
+      {
+         "action":"succeeded",
+         "time":"2025-01-22T15:58:13.9323189+00:00"
+      }
+   ],
+   "organization_name":"salad",
+   "output":{
+      "url":"https://storage-api.salad.com/organizations/salad/files/transcription/73b2ee75-664e-4332-a853-9210dde5c5fd?token=ac34664a-088d-4c72-b53c-c99cfbf538",
+      "duration_in_seconds":320.4135,
+      "duration":0.09,
+      "processing_time":46.076966285705566
+   },
+   "create_time":"2025-01-22T15:57:26.0815348+00:00",
+   "update_time":"2025-01-22T15:58:13.9323189+00:00"
+}
+```
+
+Once the job is completed, the response will automatically update to include the URL for the file containing your job
+results.
+
+## 5. SDK Equivalent
+
+If you're using the Rev SDK to handle your transcription, you'll need to update your code accordingly. Whilst we do not
+offer an SDK, we do have example functions that will mimic them.
+
+### Rev Transcription
+
+Your existing Python code with Rev Transcription should look something like this:
+
+```Python
+from rev_ai import apiclient
+
+token = "<REVAI_ACCESS_TOKEN>"
+filePath = "<FILEPATH>"
+
+# create your client
+client = apiclient.RevAiAPIClient(token)
+
+# send a local file
+job = client.submit_job_local_file(filePath)
+
+# check job status
+job_details = client.get_job_details(job.id)
+
+# retrieve transcript as text
+transcript_text = client.get_transcript_text(job.id)
+
+# retrieve transcript as JSON
+transcript_json = client.get_transcript_json(job.id)
+
+# retrieve transcript as a Python object
+transcript_object = client.get_transcript_object(job.id)
+```
+
+### Salad Transcription API Equivalent
+
+When converting to Salad Transcription API, the following code will mimic the actions of Rev Transcription.
+
+```Python
+import requests
+import json
+
+def salad_transcribe(file, Salad-Api-Key):
+
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+    payload = {
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": true,
+       	    "word_level_timestamps": true
+        }
+    }
+    headers = {
+        "Salad-Api-Key": Salad-Api-Key,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)
+    return response
+
+def get_result(job_id, Salad-Api-Key):
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/" + job_id
+
+    headers = {"Salad-Api-Key": Salad-Api-Key}
+
+    response = requests.request("GET", url, headers=headers)
+
+    return response
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+file = "https://example.com/path/to/file.mp3"
+
+job = salad_transcribe(file)
+print(job.text)
+
+data = json.loads(job)
+job_id = data['id']
+
+result = get_result(job_id, Salad-Api-Key)
+print(result.text)
+```

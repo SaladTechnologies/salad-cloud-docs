@@ -1,0 +1,33 @@
+---
+title: 'External Logging'
+---
+
+_Last Updated: October 15, 2024_
+
+You may wish to stream event logs from your container group deployment to an external service for easier parsing,
+retention, and monitoring. To configure external logging, click 'edit' on the External Logging Services section on the
+Container Group Deployment page.
+
+<img src="/container-engine/images/portal-edit-external-logging.png" />
+
+In the sidebar that appears, select the logging service you wish to use.
+
+> ❓ Logging service not supported?
+>
+> We're working to expand the logging services supported on SaladCloud. If you're using an external logging service not
+> listed here, please [get in touch](mailto:cloud@salad.com)!
+>
+> Under the hood, SaladCloud uses [Fluent Bit](https://docs.fluentbit.io/manual/pipeline/outputs) to collect and send
+> container logs. Check the Fluent Bit documentation here to see if your preferred logging service is supported out of
+> the box. If so, we can easily add support for it - just let us know.
+
+<img src="/container-engine/images/portal-select-logging-service.png" />
+
+Finally, fill out the form fields and press Configure.
+
+<img src="/container-engine/images/portal-configure-logging-service.png" />
+
+> 📘 Don't have an external logging provider?
+>
+> Check out the [Container Logs](/container-engine/explanation/container-groups/container-logs) feature in the
+> SaladCloud Portal.

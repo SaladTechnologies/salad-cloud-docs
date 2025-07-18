@@ -1,0 +1,272 @@
+---
+title: 'Migrating from Amazon Transcribe'
+sidebarTitle: 'From Amazon Transcribe'
+---
+
+_Last Updated: February 28, 2025_
+
+Migrating from Amazon Transcribe to Salad Transcription API will require you to replace your Amazon Transcribe Python
+functions with Salad compatible ones. Whilst we do not offer an SDK, we do have example Python functions that you can
+use in replacement.
+
+| Features                   | SaladCloud Transcription | Amazon Transcribe       |
+| -------------------------- | ------------------------ | ----------------------- |
+| Translation                | ✅                       | Requires additional API |
+| Audio Transcription        | ✅                       | ✅                      |
+| Video Transcription        | ✅                       | ✅                      |
+| Multilingual Transcription | ✅                       | ✅                      |
+| Summarization              | ✅                       | ❌                      |
+| Speaker Identification     | ✅                       | ✅                      |
+| SRT Output                 | ✅                       | ✅                      |
+| Transcribe Multiple Files  | ❌                       | ❌                      |
+| Max Length                 | 2.5 Hours                | 2GB                     |
+| Text Sentiment Analysis    | ✅                       | ❌                      |
+| Text Classification        | ✅                       | ❌                      |
+| Custom LLM Prompt          | ✅                       | ❌                      |
+| Custom Vocabulary          | ✅                       | ✅                      |
+
+## 1. Get your Salad API Key.
+
+    - Open up https://portal.salad.com and sign up/log into your account.
+    - Navigate to your profile at the top right, and select API Access. Here you can find your API Key.
+
+## 2. Updating job creation API calls.
+
+The Salad Transcription API uses a Job Queue system for processing transcription requests, rather than a Python function
+that returns the data like Amazon Transcribe. With Salad Transcription API, you'll use two steps. Submit the job, and
+then request the results.
+
+### Amazon Transcribe
+
+Your existing Python code for Amazon Transcribe should look something like this:
+
+```Python
+import time
+import boto3
+
+def transcribe_file(job_name, file_uri, transcribe_client):
+    transcribe_client.start_transcription_job(
+        TranscriptionJobName = job_name,
+        Media = {
+            'MediaFileUri': file_uri
+        },
+        MediaFormat = 'flac',
+        LanguageCode = 'en-US'
+    )
+
+    max_tries = 60
+    while max_tries > 0:
+        max_tries -= 1
+        job = transcribe_client.get_transcription_job(TranscriptionJobName = job_name)
+        job_status = job['TranscriptionJob']['TranscriptionJobStatus']
+        if job_status in ['COMPLETED', 'FAILED']:
+            print(f"Job {job_name} is {job_status}.")
+            if job_status == 'COMPLETED':
+                print(
+                    f"Download the transcript from\n"
+                    f"\t{job['TranscriptionJob']['Transcript']['TranscriptFileUri']}.")
+            break
+        else:
+            print(f"Waiting for {job_name}. Current status is {job_status}.")
+        time.sleep(10)
+
+
+def main():
+    transcribe_client = boto3.client('transcribe', region_name = 'us-west-2')
+    file_uri = 's3://amzn-s3-demo-bucket/my-input-files/my-media-file.flac'
+    transcribe_file('Example-job', file_uri, transcribe_client)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+### Salad Transcription API Equivalent
+
+When using Salad Transcription API, you’ll update that job creation function to instead look like this:
+
+```Python
+import requests
+
+def salad_transcribe(file, Salad-Api-Key):
+
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+    payload = {
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True
+        }
+    }
+    headers = {
+        "Salad-Api-Key": Salad-Api-Key,
+        "Content-Type": "application/json"
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)
+    return response
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+file = "https://example.com/path/to/file.mp3"
+
+job = salad_transcribe(file, Salad-Api-Key)
+print(job.text)
+```
+
+- For this code snippet, you'll need to insert your Salad Organization name into the API url field.
+- You will also need to insert your Salad API Key we obtained earlier lower down in the code snippet.
+- Put the URL to the file to be transcribed into the file string. Please note that Salad Transcription API can only
+  process files up to 2.5 hours. Make sure the URL provided is to a direct download of the file. Header based security
+  is not compatible with Salad Transcription API, so you'll need to use a signed URL like that offered by
+  [Salad Simple Storage Service.](/storage/explanation/overview#upload-a-file)
+
+The response will look like this:
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "inference_endpoint_name": "transcribe",
+  "input": {
+    "property1": "value1",
+    "property2": "value2"
+  },
+  "metadata": null,
+  "organization_name": "example-corp",
+  "status": "pending",
+  "events": [],
+  "create_time": "2025-01-016T19:00:00Z",
+  "update_time": "2025-01-016T19:00:00Z"
+}
+```
+
+## 3. More advanced jobs
+
+If you are utilizing additional features offered by AWS to translate the text to another language, or get SRT subtitles,
+you can integrate these features into the same call with Salad Transcription API.
+
+### Translation to English:
+
+To activate translation on the same API call as above, just add the `translate` input parameter. This parameter is only
+to convert from other languages to English. If you need to translate to another language, you’ll need to use our LLM
+translation features, also available in the same API call.
+
+```Python
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
+            "translate": "to_eng"
+        }
+```
+
+### Translation to other languages:
+
+Utilizing our LLM translation services is similar to the direct to English translation, but uses a different input
+parameter. Instead, you’ll use `llm_translation`. Eight languages are currently supported for LLM translation:
+`English, French, German, Italian, Portuguese, Hindi, Spanish, and Thai`. You can translate to multiple languages at
+once, and you’ll receive back the original transcription, along with translations in all the languages requested.
+
+```Python
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
+            "llm_translation": "italian, french"
+        }
+```
+
+### Get SRT subtitles:
+
+If you’re also using AWS services to get SRT subtitles for your audio, you can do so by simply adding the `srt` input
+parameter. It will include the srt file for download when you fetch your job results.
+
+```Python
+        "input": {
+       	    "url": file,
+       	    "language_code": "en",
+       	    "return_as_file": True,
+       	    "word_level_timestamps": True,
+            "llm_translation": "italian, french",
+            "srt": True
+        }
+```
+
+## 4. Obtaining job results
+
+In the response from submitting your job with the above step, you'll receive the Job ID which is required to obtain the
+results of your transcription. The Job status and transcription results are combined into a single API call. With this
+Python function, you'll check the status, and once the job is completed it will also retrieve the transcription results.
+
+```Python
+import json
+
+def get_result(job_id, Salad-Api-Key):
+    url = "https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/" + job_id
+
+    headers = {"Salad-Api-Key": Salad-Api-Key}
+
+    response = requests.request("GET", url, headers=headers)
+
+    return response
+
+Salad-Api-Key = "{Salad-Api-Key}"
+
+file = "https://example.com/path/to/file.mp3"
+
+job = salad_transcribe(file, Salad-Api-Key)
+print(job.text)
+
+data = job.json()
+job_id = data['id']
+
+result = get_result(job_id, Salad-Api-Key)
+print(result.text)
+```
+
+- Make sure to again update the organization name above to your organization name.
+- And again make sure to include your Salad API Key.
+
+Once the status of your job has reached `succeeded`, the `output` object will include the URL to the completed
+transcription via a directly downloadable URL.
+
+```json
+{
+  "id": "7c425fc0-dd3d-4c6c-8b6a-a010187492dd",
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "return_as_file": True,
+    "word_level_timestamps": True
+  },
+  "inference_endpoint_name": "transcribe",
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2025-01-22T15:57:26.0815348+00:00"
+    },
+    {
+      "action": "started",
+      "time": "2025-01-22T15:57:26.2061428+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2025-01-22T15:58:13.9323189+00:00"
+    }
+  ],
+  "organization_name": "salad",
+  "output": {
+    "url": "https://storage-api.salad.com/organizations/salad/files/transcription/73b2ee75-664e-4332-a853-9210dde5c5fd?token=ac34664a-088d-4c72-b53c-c99cfbf538",
+    "duration_in_seconds": 320.4135,
+    "duration": 0.09,
+    "processing_time": 46.076966285705566
+  },
+  "create_time": "2025-01-22T15:57:26.0815348+00:00",
+  "update_time": "2025-01-22T15:58:13.9323189+00:00"
+}
+```

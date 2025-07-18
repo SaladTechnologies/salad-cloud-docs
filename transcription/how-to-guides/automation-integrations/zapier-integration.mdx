@@ -1,0 +1,135 @@
+---
+title: 'Zapier Transcription Guide'
+sidebarTitle: 'Zapier'
+---
+
+_Last Updated: October 10, 2024_
+
+This guide will show you how to use Zapier to automate transcription with Salad, streamlining the request and response
+process for efficient audio file handling. This workflow will consist of two Zaps:
+
+1. **Request Zap**: This Zap will trigger when a Google Form (or any other app of your choice) is submitted, sending a
+   transcription request to the SaladCloud service.
+2. **Response Zap**: This Zap will catch the response from the SaladCloud service and send the transcription result via
+   email (use any app you like).
+
+# **Step 1 Create the response Zap**
+
+1. **Login to Zapier**: Go to [Zapier.com](https://zapier.com) and log in to your account.
+2. **Create a New Zap**: On the home page, click the "Create" button and select "Zaps".
+   <img src="/transcription/images/zapier1.png" />
+
+# **Step 2 Set Up the Catch Hook Trigger**
+
+We will start with the response Zap to create a catch webhook URL.
+
+1. **Choose Webhooks by Zapier**: Click on the trigger and find "Webhooks by Zapier.
+   1. Note that Webhooks are only available to Zapier Pro customers.
+2. **Select Event**: Choose "Catch Hook"
+
+3. **Copy Webhook URL**: Zapier will generate a unique webhook URL. Copy this URL for use in the Request Zap.
+
+# **Step 3 Create the Response Zap**
+
+Create a New Zap for API Call Automation
+
+1. **Return to Home Page**: Go back to the Zapier home page.
+2. **Create a New Zap**: Click on the "Create" button and select "Zaps".
+3. **Name Your Zap**: For clarity, name this Zap something like "Request".
+4. **Set Up the Trigger**
+   1. Before setting up the Zaps, we created a Google Form with a single field. This field will collect the URL of the
+      audio file to be transcribed.
+5. **Choose Google Forms**: Click on the trigger and find "Google Forms".
+6. **Select Trigger Event**: Choose "New Form Response".
+7. **Connect Your Account**: Link your Google account and select the form you created with the "File link" field.
+8. **Test Trigger**: Test the trigger to ensure Zapier can retrieve form responses.
+9. **Set Up the Webhook Action**.
+10. **Choose Webhooks by Zapier**: Search for and select "Webhooks by Zapier".
+11. **Select Action Event**: Choose "Custom Request".
+12. **Configure the Action:**
+    1. Fill in the required fields:
+       1. **Method**: Select "POST" from the dropdown.
+       2. **URL**: Enter your SaladCloud API endpoint URL. For example:
+          https://api.salad.com/api/public/organizations/{your_organization_name}/inference-endpoints/transcribe/jobs.
+          Replace {your_organization_name} with the name of your organization in Salad.
+       3. **Data**: In the "Data" field, configure it as follows:
+          1. **Copy and paste the following json:**
+
+```
+{
+  "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "word_level_timestamps": true,
+    "diarization": true,
+    "srt": true
+  },
+  "webhook": "{your_webhook_url}",
+  "metadata": {
+    "my-job-id": 1234
+  }
+}
+
+```
+
+- _For "url": Click inside the quotation marks and select "File link" from the dropdown to insert the data from the
+  Google Form._
+- _For "webhook": Paste the webhook URL you copied from the Response Zap._
+
+1. **Headers:**
+   1. Under “Headers" enter the following key-value pairs:
+
+      **Key**: Salad-Api-Key, Value: (your SaladCloud API key)
+
+      **Key**: Content-Type, Value: application/json
+
+2. Here is the full JSON :
+
+```
+{
+ "input": {
+    "url": "https://example.com/path/to/file.mp3",
+    "language_code": "en",
+    "word_level_timestamps": false,
+    "diarization": false,
+    "srt": false
+    },
+    "metadata": {
+        "my-job-id": 1234
+    }
+}
+
+```
+
+13. **Test and save this zap.**
+
+# **Step 4 Create an Action Step in Your "Response" Zap**
+
+1. **Create an Action Step**: In your "Response" Zap, click on "Action" to add a new action step.
+2. **Choose an App**: Select any app you want to use for the action. In our case, we will choose "Email by Zapier".
+3. **Configure the Email**:
+   1. **To**: Enter the recipient's email address where you want to send the transcription result.
+   2. **Subject**: Enter a subject for the email, such as "Transcription Result".
+   3. **Body**: You will need to trigger your request by submitting your Google Form. The Catch Hook needs at least one
+      request to know the structure of your data. After submitting the form, go back to the email setup and pick fields
+      from “Insert Data“ that you want to see in the body of your email.
+      1. Click on "Insert Data" and choose the fields you want to include in your email body. In our case, we chose
+         "Data Output Text" from the webhook trigger data.
+4. **Test Action**: Send a test email to ensure everything is set up correctly
+
+# **Final Step Complete the Setup**
+
+You're all set! Each time you submit your Google Form, the transcription will start and an email with the result will be
+sent upon completion.
+
+_Here's a summary of the final Step_
+
+1. **Submit the Google Form**: When you submit the form with the audio file link, it triggers the Request Zap, which
+   sends the transcription request to the SaladCloud service.
+2. **Transcription Process**: The SaladCloud service processes the transcription request.
+3. **Receive Transcription Result**: The Response Zap catches the result from the SaladCloud service.
+4. **Send Email with Result**: The Response Zap then sends an email with the transcription result to the specified
+   recipient.
+
+Congratulations! You have successfully created an automated audio transcription workflow using Google Forms, Zapier, and
+SaladCloud. Note that transcripts will be available for up to 24.

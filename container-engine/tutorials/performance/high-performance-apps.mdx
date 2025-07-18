@@ -1,0 +1,429 @@
+---
+title: 'Build High-Performance Applications'
+sidebarTitle: 'High-Performance Apps'
+description: 'The world’s largest distributed GPU cloud at the most competitive prices'
+---
+
+_Last Updated: June 13, 2025_
+
+This tutorial introduces the distributed and dynamic nature of SaladCloud, highlights common challenges when migrating
+workloads from hyperscalers to SaladCloud, and shares best practices along with proven insights from customers who have
+successfully built large-scale AI inference applications and run molecular dynamics simulations, using tens to thousands
+of Salad nodes.
+
+We assume you have some development experience with SaladCloud, including application building, troubleshooting, and
+operational management. If you're new to SaladCloud and SCE, we recommend starting with
+[the SCE Architectural Overview](/container-engine/explanation/core-concepts/architectural-overview) and
+[the Docker Run on SaladCloud](/container-engine/tutorials/deployment/docker-run) to gain hands-on experience. In this
+tutorial, an "application" refers to a container group consisting of multiple replicas (or instances/containers) running
+the same container image, with each instance deployed on a separate Salad node.
+
+## The Distributed and Dynamic Nature, Challenges and Solutions
+
+SaladCloud comprises tens of thousands of Salad nodes distributed globally, primarily high-performance desktop computers
+and workstations running the SaladCloud agent. Each node is equipped with a consumer-grade GPU and has varying CPU and
+memory configurations. When these devices are not in use by their owners, SaladCloud assigns SCE workloads (docker
+containers) to run on them, paying the device owners for their compute time.
+
+While SaladCloud provides exceptional flexibility to scale GPU-powered applications up or down at the most competitive
+prices in the industry, applications must be optimized to address the following challenges for successful deployment:
+
+| No  | Challenges                                                                                                                                                                                                                                                                                                                                            | Recommended Solutions and Best Practices                                                                                                                                                                                                                                                                                                        |
+| :-- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Salad nodes are globally distributed, resulting in varying distances, latencies, and network throughput to specific endpoints.                                                                                                                                                                                                                        | Use the SaladCloud APIs to create region-specific workloads and choose a cloud storage provider within the same regions to optimize performance. Deploy regional job queues from public cloud providers or using open-source tools, to manage workload input and output locally.                                                                |
+| 2   | The nodes differ in CPU, RAM, GPU and network capabilities. This leads to variations in processing capacity and network performance, which may also fluctuate over time due to the shared nature of the resources. Many nodes are located in residential networks with asymmetric bandwidth, where the upload speed is lower than the download speed. | Configure the machine hardware specifications of a container group. Once the instances are running, applications can further perform initial checks and continuously monitor performance to filter nodes based on specific criteria.                                                                                                            |
+| 3   | AI inference processing times also vary widely, ranging from a few seconds for tasks like image generation to several minutes or longer for tasks such as LLM processing or transcription. Some extensive tasks, like molecular dynamics simulations, can run for up to a week.                                                                       | Implement adaptive architectures to effectively manage variations in both nodes and tasks.                                                                                                                                                                                                                                                      |
+| 4   | When a container group is started, the image is dynamically downloaded to the allocated nodes, leading to variable startup times, potentially ranging from a few minutes to longer.                                                                                                                                                                   | Build a custom auto-scaling solution to align GPU resources with system load at the quarter-hour granularity.                                                                                                                                                                                                                                   |
+| 5   | When a container group is stopped, the image and any associated runtime data are removed from the allocated nodes that are then released.                                                                                                                                                                                                             | Data persistence must be ensured using external cloud storage.                                                                                                                                                                                                                                                                                  |
+| 6   | Nodes may experience unexpected downtime without prior notice; however, the majority can operate continuously for over 10 hours.                                                                                                                                                                                                                      | Increasing the replica count for a container group can significantly enhance the reliability and throughput of applications on SaladCloud. Long-running tasks on SaladCloud must meet additional requirements, such as regularly saving task states to cloud storage and being able to resume from the previous state in case of interruptions. |
+| 7   | SCE provides a GPU-enabled container environment (PaaS) for running containerized applications, rather than a virtual machine (IaaS).                                                                                                                                                                                                                 | You can access running instances through the interactive terminal in the Portal. Running JupyterLab on SaladCloud is also feasible, allowing you to perform comprehensive tests and troubleshoot issues directly.                                                                                                                               |
+
+## Use Cases and Scenarios
+
+SaladCloud is a powerful, highly scalable and cost-effective platform for requirements that involve tens to thousands of
+GPUs for a large-scale and on-demand AI inference application (such as image generation or LLM) utilizing a load
+balancer, or a batch-processing system with a job queue to handle millions of jobs (model fine-tuning, transcription,
+molecular simulation) within a specified timeframe.
+
+However, SaladCloud is not well-suited for single-instance workloads, UI-based applications, or traditional databases.
+It’s also not ideal if your use case requires a GPU-enabled virtual machine with attached volumes—although similar
+functionality can be achieved using cloud storage. Additionally, running docker run commands inside SCE instances (i.e.,
+Docker-in-Docker) is not supported.
+
+If your applications require uploading large amounts of data in a short time, only a subset of Salad nodes can meet this
+requirement.
+
+Real-time auto-scaling of a container group at the minute level is not feasible on SaladCloud. Consider other cloud
+providers or an API product, where you can pay only for actual usage, without the need to manage the underlying
+infrastructure.
+
+For internal testing, since some nodes start earlier than others and there are no charges when instances are not
+running, you can initially launch a container group with a few replicas to reduce waiting time and enhance the developer
+experience. Once one replica is running, you can adjust the replica count to one, ensuring you are only charged for the
+running time of a single instance.
+
+## Select a Robust Inference Server
+
+Whether you use the container gateway or a job queue to provide input to your applications, and regardless of the use
+case—from image generation to LLM and transcription—a robust inference server is crucial for successful deployment and
+optimal performance.
+
+For inference servers, it’s ideal to design them to handle multiple simultaneous requests efficiently. Key features
+should include a local queue to buffer incoming requests, the ability to accept new requests and respond to health
+checks during GPU inference, and a back-pressure mechanism to reject requests when the queue is full. Additionally, the
+server should support batched inference dynamically grouping incoming requests to optimize processing, and provide
+accurate status updates to health probes, such as READY, BUSY, FAILED, or others.
+
+Some customers use FastAPI to build their inference servers, which supports asynchronous operations. However, GPU
+inference—typically performed with frameworks like TensorFlow or PyTorch—may not be fully compatible with async
+execution, as it often involves blocking GPU operations that can freeze FastAPI's main thread. This can lead to failed
+health checks (**triggering node reallocation or stopping receiving traffic from the container gateway**) and impede the
+ability to handle new requests (**causing connection timeouts**) during long-running inference tasks.
+
+Using multiprocessing or multithreading for concurrent inference on a single GPU can negatively impact performance, as
+it may reduce optimal GPU cache utilization (each inference running at its own layer or stage) and increase the
+likelihood of **server response timeouts**.The multiprocessing approach also consumes more VRAM as every process
+requires a CUDA context and loads its own model into GPU VRAM for inference.
+
+Some inference servers always return an "OK" status on health checks, even when they encounter errors, causing
+[health probes (Startup/Liveness/Readiness)](/container-engine/explanation/infrastructure-platform/health-probes) on
+SaladCloud to malfunction.
+
+Many open-source servers for LLM inference, such as TGI and vLLM, provide the necessary features to run efficiently on
+SaladCloud. For other use cases, please refer to
+[the reference implementation of the inference server](https://github.com/SaladTechnologies/mds/tree/main/inference-server)
+using Python (Flask/FastAPI) and TypeScript (Express) for detailed guidance.
+
+## Use Cloud Storage for Data Persistence
+
+SCE provides a GPU-enabled container environment for running containerized applications, rather than a virtual machine
+with attached volumes. When nodes are reallocated or a container group is stopped, the image and any associated runtime
+data are removed from the previously allocated nodes. These nodes are then released and may be reassigned to other
+customers.
+
+Data persistence must be ensured through external cloud storage. When launching a container group, you can use
+environment variables to pass access credentials for the selected cloud storage to its instances.
+
+However, volume mounting using S3FS, FUSE or NFS is not supported in the instances, as these containers do not run in
+privileged mode. The recommended solution is to install and use a cloud storage SDK or CLI (e.g., azcopy, aws s3 or
+gsutil) within the container image to read and write data to the cloud.
+
+Consider using popular open-source CLI tools like [Rclone](https://rclone.org/), which supports a wide range of cloud
+storage providers and can be easily integrated into your applications. Rclone enables chunked, parallel downloads and
+uploads, allowing for more efficient utilization of physical bandwidth by leveraging multiple connections.
+
+For detailed instructions on building a high-performance storage solution on SaladCloud, please refer to
+[the guide](/container-engine/tutorials/performance/high-performance-storage-solutions)
+
+## Build Region-Specific Workloads
+
+Assuming unlimited end-to-end bandwidth, TCP throughput is primarily determined by the congestion window size and
+Round-Trip Time (**RTT**), with the relationship expressed as Throughput ≈ Window Size / RTT. Lower RTT enables faster
+acknowledgment, allowing more data to be transmitted and increasing throughput. In contrast, higher RTT slows
+acknowledgment, reducing throughput. For more information, please refer to
+[this link](https://blog.cloudflare.com/optimizing-tcp-for-high-throughput-and-low-latency/).
+
+Using multiple connections can also increase throughput by enabling parallel data transfer, better utilizing available
+bandwidth, and reducing the impact of network limitations on a single connection.
+
+So, minimizing RTT by optimizing network latency and leveraging multiple connections are key strategies for enhancing
+TCP performance, especially in applications requiring high data transfer rates.
+
+The following test results were collected from over 100 Salad nodes located in North America, using storage buckets from
+multiple S3-compatible providers in both the US East and EU Central regions. The data highlights how physical distance
+can significantly affect both RTT and throughput.
+
+| No  | Salad Nodes   | Buckets | Average RTT | Average Upload Throughput | Average Download Throughput |
+| :-- | :------------ | :------ | ----------- | ------------------------- | --------------------------- |
+| 1   | North America | Europe  | 123.30 ms   | 146.50 Mbps               | 299.12 Mbps                 |
+| 2   | North America | US East | 40.35 ms    | 285.79 Mbps               | 463.04 Mbps                 |
+
+If your applications consume large amounts of data from the cloud or generate significant data that needs to be stored
+in the cloud, ensure you select the appropriate nodes based on latency and throughput. To further optimize performance,
+consider deploying region-specific container groups to maximize throughput.
+
+You can create a container group in specific countries either by using
+[the SaladCloud API](/reference/saladcloud-api/container-groups/create-container-group) (not supported by the Portal) or
+by leveraging [the SaladCloud Python SDK](https://github.com/SaladTechnologies/salad-cloud-sdk-python) to streamline the
+process.
+
+Before deployment, several parameters need to be considered and decided. The simplest approach is to manually deploy a
+container group via the Portal,
+[retrieve the relevant parameters using the SDK](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/get_container_group.py),
+and then apply and modify these parameters for subsequent deployments through the SDK.
+
+Please refer to
+[this example](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/create_regional_container_group.py)
+for creating a container group with 3 replicas, deployed across Canada, the US, and Mexico. The selected resource
+configuration includes 4 vCPUs, 4GB of memory, and 3 GPU types (each with 16GB of VRAM).
+
+Restricting nodes to specific countries may impact node availability. Please perform some tests before a large
+deployment.
+
+## Enable Region-Specific I/O
+
+There are generally
+[two methods for providing inputs and retrieving results](/container-engine/explanation/core-concepts/architectural-overview#provide-input-to-applications)
+from applications on SaladCloud: the Salad container gateway (load balancer) and a job queue from any provider
+(including Salad Kelpie and Salad Job Queue).
+
+Task input and output data can be directly embedded in the request and response for smaller datasets. For larger
+datasets, it is recommended to handle data exchange directly between applications and cloud storage. In this case, the
+container gateway or job queue should only carry a reference to the data, rather than the data itself, to optimize
+efficiency and minimize overhead. **This process requires uploading task inputs to cloud storage initially and
+downloading the processed results from cloud storage once the tasks are completed.**
+
+Currently, both the container gateway, Salad Kelpie, and Job Queue are available only in the US. As a result, all
+container instances, regardless of their geographical location, route data through the US-based container gateway or job
+queue. This can introduce additional latency for instances located outside of the US, potentially impacting application
+performance in other regions.
+
+For low-latency applications outside North America, consider using job queue products from public cloud providers or
+building a custom Redis-based real-time queue by following
+[this guide](/container-engine/how-to-guides/job-processing/build-redis-queue).
+
+**Some Salad customers have implemented custom queues using Redis to provide real-time and streaming services for LLM
+applications without relying on a regional load balancer.**
+
+## Perform Initial Checks to Filter Nodes
+
+The most efficient way to manage performance variances across nodes is to perform initial checks while instances are
+running and filter nodes based on custom rules (such as latency and throughput to some locations), ensuring they are
+properly prepared to run your applications. If a node is deemed unsuitable,
+[call IMDS reallocate within the instance](/container-engine/how-to-guides/imds/imds-reallocate) for a more suitable
+one. This entire process only takes tens of seconds, with negligible associated costs. Please refer to the example code
+for [initial checks](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/initial_check.py)
+and
+[IMDS reallocate](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/imds_reallocate.py).
+
+The upload speed, download speed, and latency reported by
+[Python's speedtest module](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_network.py#L6)
+are measured using Speedtest.net servers, which may not always accurately reflect real-world network performance. In our
+experiments, throughput measured via the speedtest module was consistently lower than the results obtained from actual
+cloud storage transfers. Additionally, around 20% of nodes failed to run the speedtest, likely due to traffic being
+blocked by certain ISPs.
+
+To get a more precise measurement, you can assess latency and throughput from the node to your cloud bucket's location
+using tools like
+[the pythonping module](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_network.py#L23)
+(note that the first ping is often lost or inaccurate) and the cloud-specific SDK/CLI.
+
+You can also obtain detailed GPU information, including **the supported CUDA Toolkit version and VRAM usage**, by
+running the nvidia-smi command through Python’s subprocess module.
+
+The NVIDIA driver maintains backward compatibility to continue support of applications built on older CUDA Toolkits.
+Most of Salad nodes (around 97%) have been updated with the latest GPU drivers; however, some nodes may still be running
+older verisons. SaladCloud currently guarantees support for **CUDA Toolkit version 12.0 and later** when allocating
+nodes.
+
+Given the lag between the release of a new CUDA version and its support in AI frameworks such as TensorFlow and
+PyTorch—due to the time needed for integration, testing, and validation—container images built upon the most recent AI
+frameworks can generally run on SaladCloud without any problems. We suggest building your images using recent and stable
+CUDA Toolkit versions instead of its latest version. If your applications require the latest CUDA Toolkit version, you
+should perform
+[the necessary checks](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_gpu.py#L5).
+
+Typically, consumer-grade GPUs have video outputs, which can use a few hundred MB of VRAM depending on factors such as
+the number of connected displays, their resolutions, and any open applications that output to the screens. If your
+applications are VRAM-intensive, it's important to
+[check initial VRAM usage](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/check_gpu.py#L18)
+and ensure that the available VRAM is sufficient to run your applications.
+
+Finally, the code should download and load the models, followed by warming it up by running a few inference tasks (the
+first one is typically slow and should be excluded from performance measures) and compare the actual performance with
+the predefined threshold. If the node meets the requirements, the server can report its health status and begin
+listening and processing requests. If the node is not ideal, the code can invoke the IMDS reallocate at any point in the
+process to make SaladCloud allocate a new node.
+
+Pre-building AI models into container images can help reduce costs, as instances are billed based on running time.
+However, larger image sizes may lead to longer startup times, which should be considered during deployment.
+
+## Implement Real-Time Performance Monitoring
+
+Node and network performance may fluctuate over time due to the shared nature of the resources. When node owners begin
+using their devices, they are likely to disable the SaladCloud agent, triggering node reallocation for the container
+groups utilizing those devices. If the agent remains active while other applications are running, the performance of SCE
+workloads could be impacted.
+
+The code can continuously monitor application performance within a defined time window. If performance metrics, such as
+the real-time factor for transcription (calculated as audio length divided by processing time, an effective measure of
+transcription performance), fall below a predefined threshold, the code should invoke IMDS reallocate. This ensures that
+nodes stay in an optimal state for application execution. For instance, most nodes of given resource types can achieve a
+real-time factor of 80 or higher for long audio. If a node’s real-time factor drops below 20 during a monitoring period,
+it should be immediately removed from the resource pool. Please refer to
+[the code](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/blob/main/node/bench/benchmark_1m.py#L411)
+used for
+[our YouTube transcription benchmark test](/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline#optimization-of-performance-and-throughput).
+
+When you deploy a container group with multiple resource types varying in their processing capacity and network
+performance, you can implement an adaptive algorithm based on real-time performance monitoring to optimize resource
+utilization and system throughput.
+
+For example, in a batch-processing system using a job queue where each node processes multiple jobs concurrently,
+high-performance nodes can handle larger local queues and process more requests in parallel to maximize throughput. On
+the other hand, low-performance nodes should work with smaller local queues for fewer requests to prevent delays and
+ensure overall progress.
+
+Please refer to
+[the example code](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/realtime_performance_monitor.py)
+for more information.
+
+## Adopt Adaptive Architectures
+
+Processing time for AI inference can vary significantly based on factors like image size, context length, and audio
+duration. Additionally, deploying a container group with multiple GPU types having different VRAM size and processing
+capabilities can further complicate this variability.
+
+In addition to using the aforementioned adaptive algorithms on each node, we must also adopt adaptive designs to
+effectively manage variations in both nodes and tasks while using
+[the container gateway](/container-engine/tutorials/deployment/docker-run#scenario-2-with-container-gateway) or
+[a job queue](/container-engine/tutorials/deployment/docker-run#scenario-1-use-a-job-queue).
+
+For the container gateway,
+[its Least Number of Connections algorithm](/container-engine/explanation/gateway/load-balancer-options#algorithms) can
+continuously monitor the load on each instance and direct new requests to those with the fewest active connections. By
+prioritizing the least-loaded instances and preventing any one from becoming overwhelmed, it balances workloads more
+effectively and optimizes system performance, resulting in greater efficiency and reliability. In most cases, this
+algorithm can effectively manage these differences and is recommended for optimal performance.
+
+To use the container gateway efficiently, client applications must implement **traffic control** and **retry logic** to
+enhance resilience. This includes resending requests to the load balancer for occasional errors and stopping the
+acceptance of new requests from users early during congestion, rather than allowing them to be dropped within the system
+due to the server response timeouts.
+
+A job queue can simplify system management and effectively handle variances in both nodes and tasks. It acts as a
+buffer, absorbing spikes in traffic and allowing each node to process jobs according to its available capacity. If an
+instance fails to complete a job, the job is automatically made available for other instances to pick up via the job
+queue, ensuring continuity and efficient resource utilization. This reduces the need for real-time load balancing and
+helps manage resource fluctuations without disrupting task processing.
+
+An asynchronous application architecture is required to effectively use a job queue. In this setup, after submitting a
+job to the queue, you need to query the job result asynchronously or provide a callback function to handle the outcome
+once the job is completed.
+
+Please refer to
+[this link for a detailed comparison](/container-engine/explanation/core-concepts/architectural-overview#provide-input-to-applications)
+between the container gateway and the job queue.
+
+## Implement Auto Scaling at the Quarter-Hour Granularity
+
+When a container group is started, the image is dynamically downloaded to the allocated nodes, leading to variable
+startup times, potentially ranging from a few minutes to longer, depending on the image size and the network conditions
+of nodes. Some nodes may download the image faster than others, leading to earlier startup times.
+
+During [our previous test](https://blog.salad.com/parakeet-tdt-1-1b/) with the Parakeet-TDT model (compressed image
+size: 8.36 GB) and 100 Salad nodes from all regions, the system reached 70~80% capacity within 30 minutes of launching
+the container group and achieved maximum capacity in about 1 hour, with over 90% of nodes actively running at any given
+time.
+
+The time to reach full capacity may vary depending on the image size and your selection on regions. However, this
+process has improved as we’ve implemented multiple image repositories to optimize image downloading recently.
+
+Due to the variable startup times, the real-time auto-scaling to match GPU resources with system load at the minute
+level is not feasible on SaladCloud, but we may still be able to implement auto-scaling at the quarter-hour level.
+
+Implementing auto scaling with a job queue is straightforward: you just need to monitor the number of available jobs in
+the queue regularly and then call
+[the SaladCloud API](/reference/saladcloud-api/container-groups/update-container-group) to adjust the replica count of
+the running container group. Both Salad Kelpie and Salad Job Queue already offer this feature, saving you the effort of
+implementing it yourself.
+
+Implementing auto-scaling with the container gateway can be complex due to its synchronous and real-time nature.
+
+We recommend provisioning slightly more resources than required to establish a baseline. From there, you can forecast
+load based on historical data and adjust resources proactively in anticipation of traffic spikes.
+
+To prevent being overwhelmed by bursts of requests, inference servers should reject new requests when they exceed
+processing capacity. Client applications should implement traffic control to stop accepting new user requests early
+during congestion.
+
+These applications can track metrics such as **the number of requests rejected, processed, and returned with errors**
+and **the average response waiting time** within a specified time frame, providing valuable data for system capacity
+planning and auto-scaling.
+
+For example, if the number of rejected requests or the average response waiting time starts to increase, the client
+application can use the SaladCloud API to scale up the replica count of the container group. Conversely, if the request
+volume is significantly lower relative to the number of running instances, the client application can scale down the
+replica count to optimize resource usage and minimize costs.
+
+## Support Long-Running Tasks
+
+Since Salad nodes may experience unexpected downtime without prior notice, running long tasks on SaladCloud must meet
+additional requirements. These include regularly saving task states to cloud storage and being able to resume processing
+from the last saved state in case of interruptions.
+
+When filtering nodes for long-running tasks, it is crucial to prioritize Salad nodes with higher upload speeds, as many
+are located in residential networks where upload speeds are typically lower than download speeds.
+
+Key application settings, such as the saving interval, checkpoint upload size, and required upload speed, should be
+carefully tested and aligned:
+
+- Longer saving intervals reduce the required upload speed but may result in greater GPU processing losses if nodes go
+  down.
+
+- Shorter saving intervals require higher upload speeds, which may limit the number of suitable nodes available.
+
+Certain large molecular dynamics simulation jobs can run for several days or even a week, generating tens to hundreds of
+gigabytes of data (e.g., trajectory files at various time points) that must be uploaded to cloud storage. This is fully
+achievable on SaladCloud, as validated by customer use cases. With an upload speed requirement of approximately 10 Mbps,
+the majority of Salad nodes can readily support such tasks.
+
+AI model fine-tuning using LoRA, such as with SDXL, is also a demonstrated use case on SaladCloud, as each checkpoint
+upload size is relatively small, typically only a few hundred megabytes.
+
+**Using the container gateway, all the requests need to be processed and returned within 100 seconds.** So, you will
+need a job queue for long-running tasks. Any queue products in the markets can be leveraged.
+
+If you don’t want to deal with data synchronization (such as downloading task input and state, uploading task state and
+output), Salad Kelpie can be a good choice. It provides a job queue service where you can submit a job using its APIs.
+The Kelpie worker, integrated with your applications running on Salad nodes, can retrieve a job, execute your code, and
+handle all data synchronization in the background between local folders/files in the instances and S3-compatible Cloud
+Storage.
+
+To enable flexible data management, such as selectively downloading or uploading specific parts of job data, consider
+building a solution based on AWS SQS. This approach allows you to implement custom logic for managing data, tailored to
+the requirements of your applications.
+
+Please refer to
+[the reference architecture](/container-engine/explanation/core-concepts/architectural-overview#long-running-tasks),
+[demo apps and their test results](https://github.com/SaladTechnologies/mds) for long-running tasks on SaladCloud.
+
+## Enable Shell Access
+
+External SSH access is not supported for running containers on SaladCloud. However, you can access running instances
+through [the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) in the Portal, to
+perform tests and troubleshoot issues directly.
+
+Your containers on SaladCloud must have a continuously running process (such as a web server or I/O worker) to use the
+terminal. Unlike running containers locally, you cannot use the shell with a terminal to start containers on SaladCloud.
+This is a key distinction between local and SaladCloud container usage.
+
+If this process in the containers fail to run for any reason, you can override it with "sleep infinity" in
+[the Command section](/container-engine/tutorials/deployment/docker-run#command) of the container group configuration.
+This ensures that the instances remain running in a sleep state, and then you can access them via the interactive
+terminal to manually execute tasks, perform tests, or diagnose issues.
+
+While running JupyterLab and its terminal is feasible on SaladCloud, it is not the ideal use case, as you may encounter
+cold starts and occasional interruptions. Consider running JupyterLab on SaladCloud with the following scenarios:
+
+- Use Salad nodes as a complement to
+  [your local development environment](/container-engine/explanation/ai-machine-learning/llm-overview#local-deployment-to-saladcloud)
+  when you need access to specific GPUs. This allows you to monitor resource usage and test your code and dependencies
+  in a diverse computing environment.
+
+- Perform
+  [the single node test](/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline#single-node-test)
+  before a large deployment, and optimize the application settings. You will need to
+  [add the JupyterLab support in your application image](https://github.com/SaladTechnologies/yt-1m-hours-transcription-test/blob/main/node/Dockerfile.parakeet.yt1m)
+  temporarily.
+
+To run JupyterLab properly on SaladCloud, ensure the following deployment setup: create a container group with a single
+replica and ensure
+[the "Limit each server to a single, active connection" option](/container-engine/explanation/gateway/load-balancer-options#concurrency)
+in the container gateway is **unselected**.
+
+Please refer to
+[this link](https://github.com/SaladTechnologies/mds/blob/main/high-performance-applications/Dockerfile.jupyterlab) for
+instructions on how to install JupyterLab in your image. For more details on how to build and run JupyterLab with
+built-in cloud storage integration, please check out
+[this tutorial](/container-engine/tutorials/machine-learning/jupyterlab).

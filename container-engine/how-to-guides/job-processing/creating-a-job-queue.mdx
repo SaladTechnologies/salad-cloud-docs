@@ -1,0 +1,45 @@
+---
+title: 'Creating a Job Queue'
+---
+
+_Last Updated: March 24, 2025_
+
+# Using the Public API
+
+Job Queues are not available through the portal, but you can create a Job Queue with the
+[Job Queue API](/reference/saladcloud-api/queues/create-queue). You will also need to
+[create your container group](/reference/saladcloud-api/container-groups/create-container-group) via the public API in
+order to attach a job queue to it.
+[Ensure your container image includes the job queue worker](/container-engine/how-to-guides/job-processing/queue-worker)
+
+> 📘 Job Queue Connections
+>
+> A Job Queue can be connected to multiple container groups at once. but a container group can only be connected to at
+> most a single Job Queue.
+
+**We recommend adding a [readiness probe](/container-engine/explanation/infrastructure-platform/readiness-probes) to
+your container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
+receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run
+after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to
+look for jobs, even if your application inside is not yet ready to receive jobs. If this happens, the job will fail and
+you’ll need to submit it again.
+
+How the readiness probe is configured will depend on your container image, and how it’s configured inside. Many prebuilt
+containers or http-apps found in open-source libraries will have a liveness API URL you can check, that will respond
+with a 200 code when it’s ready to receive work. Other times, any pre-requisite work may be done before the server
+starts, and the server starts up as the last step, so any health-check endpoint would work. In a Whisper Large v3
+example below, this is what we have. If your container does not contain a way to check health statuses, you may need to
+add one of your own. You can usually find any references to this in the readme or documentation for the container image
+you are using. Readiness probes can flip between passing and failing, and will continue to check until it’s ready to go.
+
+```yml
+Protocol: HTTP/1.X
+Path: /hc
+Port: 8000
+Headers: None Configured
+Initial Delay Seconds: 60
+Period Seconds: 10
+Timeout Seconds: 1
+Success Threshold: 1
+Failure Threshold: 3
+```

@@ -1,0 +1,75 @@
+---
+title: 'How to Split Large Audio Files for Salad Transcription API'
+sidebarTitle: 'Split Large Audio Files'
+---
+
+_Last Updated: February 28, 2025_
+
+## Introduction
+
+When using Salad Transcription API, audio files have a maximum length limit of 2.5 hours each. If you have audio files
+longer than this to transcribe, you will need to split these into shorter segments first.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+1. **Python Installed**: Ensure you have Python 3.8 or higher.
+2. **Libraries Installed**: Use the following command to install the required libraries:
+   ```bash
+   pip install pydub
+   ```
+3. **FFmpeg Installed**: FFmpeg is needed by pydub for processing audio:
+   - **Linux**: `sudo apt install ffmpeg`
+   - **MacOS**: `brew install ffmpeg`
+   - **Windows**: [Download FFmpeg](https://ffmpeg.org/download.html) and add it to your system PATH.
+
+---
+
+_Last Updated: February 28, 2025_
+
+## Splitting the audio files
+
+### 1. Create the script:
+
+Create a Python script named `split_audio.py` to split the audio file:
+
+```Python
+from pydub import AudioSegment
+import os
+
+def split_audio(file_path, output_dir, segment_length=int(2.5*60*60*1000)): ## Adjust this value if you want even shorter segments.
+  audio = AudioSegment.from_file(file_path)
+  total_length = len(audio)
+  os.makedirs(output_dir, exist_ok=True)
+
+  for i in range(0, total_length, segment_length):
+    segment = audio[i:i+segment_length]
+    file_constant = os.path.splitext(os.path.basename(file_path))[0]
+    segment.export(os.path.join(output_dir, f"{file_constant}_segment_{i//segment_length + 1}.
+
+if __name__ == "__main__":
+  input_file = "path/to/file.mp3" ## Set this to the location of the file you want to split. MP3 and MP4 files are compatible, but will always convert to MP3.
+  output_directory = "output/directory" ## Set this to the output directory you want to use.
+  split_audio(input_file, output_directory)
+```
+
+This script will split your large audio file into smaller segments of 2.5 hours maximum each and save them in the
+specified output directory. You can input either audio or video files, and they will convert to MP3 when splitting. Make
+sure to set the input, and output, directories for your files.
+
+### 2. Run the script:
+
+```bash
+python split_audio.py
+```
+
+After running the script, your output directory should now contain your original audio clip split into compatible
+segments to transcribe with Salad Transcription API. It should look something like this:
+
+<img src="/transcription/images/audio-split.png" />
+
+You can now use these audio files to transcribe with using
+[Salad Transcription API.](/transcription/tutorials/transcription-quick-start)

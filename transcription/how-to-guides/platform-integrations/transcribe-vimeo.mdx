@@ -1,0 +1,684 @@
+---
+title: 'How to Transcribe Vimeo Videos with Salad Transcription API'
+sidebarTitle: 'Vimeo'
+---
+
+_Last Updated: March 12, 2025_
+
+Vimeo URLs are not natively downloadable, which can be a challenge when working with the Salad Transcription API, which
+requires downloadable audio links. However, you can extract audio from Vimeo videos, upload it to
+[Salad Simple Storage Service](/storage/explanation/overview) free of charge, and use the resulting link with the API.
+
+This guide will walk you through the process to batch transcribe multiple Vimeo URLs and save the outputs.
+
+---
+
+## **Prerequisites**
+
+Before you begin, make sure you have:
+
+1. **Python Installed**: Ensure you have Python 3.8 or higher.
+2. **Libraries Installed**: Use the following command to install the required libraries:
+   ```bash
+   pip install yt-dlp requests
+   ```
+3. **FFmpeg Installed**: FFmpeg is needed by yt-dlp for processing audio:
+   - **Linux**: `sudo apt install ffmpeg`
+   - **MacOS**: `brew install ffmpeg`
+   - **Windows**: [Download FFmpeg](https://ffmpeg.org/download.html) and add it to your system PATH.
+4. **Salad API Key**: Ensure you have a valid [Salad API key](/reference/api-usage#get-your-saladcloud-api-key).
+
+---
+
+## **Step 1: Import Libraries**
+
+To start, import the required Python libraries:
+
+```python
+# For extracting audio from Vimeo
+import yt_dlp
+
+# For handling HTTP requests and file paths
+import requests
+from pathlib import Path
+import time
+
+# For working with JSON files (batch processing).
+import json
+```
+
+## **Step 2: Define Functions**
+
+**1. Download Audio from Vimeo**
+
+This function downloads the best-quality audio from a YouTube video:
+
+```python
+def download_audio_from_vimeo(video_url, output_format="mp3"):
+    """
+    Downloads audio from a Vimeo video in the specified format.
+
+    Args:
+        video_url (str): The URL of the Vimeo video.
+        output_format (str): Desired audio format (default: "mp3").
+
+    Returns:
+        str: The filename of the downloaded audio file.
+    """
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': output_format,
+                'preferredquality': '128',
+            }],
+            'outtmpl': '%(id)s.%(ext)s',
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            return f"{info['id']}.{output_format}"
+    except Exception as e:
+        print(f"Error downloading audio: {e}")
+        return None
+```
+
+**2. Upload Audio to Salad Storage**
+
+This function uploads the audio file to Salad Storage and generates a presigned URL:
+
+```python
+def upload_to_salad_storage(audio_file_path, salad_api_key, organization_name, mime_type="audio/mpeg"):
+    """
+    Uploads an audio file to Salad Storage and generates a signed access URL.
+
+    Args:
+        audio_file_path (str): Path to the audio file.
+        salad_api_key (str): Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+        mime_type (str): MIME type of the file (default: "audio/mpeg").
+
+    Returns:
+        str: The signed URL for the uploaded file.
+    """
+    try:
+      # Generate the upload URL
+      file_name = f"audio/{Path(audio_file_path).name}"
+      upload_url = f"https://storage-api.salad.com/organizations/{organization_name}/files/{file_name}"
+
+      # Prepare headers for authentication
+      headers = {"Salad-Api-Key": salad_api_key}
+
+      # Prepare data for the upload
+      data = {
+          "mimeType": mime_type,
+          "sign": "true",  # Request a signed URL
+          "signatureExp": 3 * 24 * 60 * 60  # 3 days in seconds
+      }
+
+      # Prepare the file to be uploaded
+      with open(audio_file_path, "rb") as f:
+          files = {"file": (Path(audio_file_path).name, f)}
+          response = requests.put(upload_url, headers=headers, data=data, files=files)
+          response.raise_for_status()
+
+      # Extract and return the signed URL
+      signed_url = response.json().get("url")
+      if not signed_url:
+          raise ValueError("Signed URL not returned by the API.")
+      return signed_url
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error uploading to Salad storage: {e}")
+    except ValueError as ve:
+        print(f"API response error: {ve}")
+    return None
+```
+
+## **Step 3: Define Variables**
+
+Set the variables required for the process:
+
+```python
+# Salad Storage credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# List of Vimeo URLs
+VIMEO_URLS = [
+    "https://vimeo.com/872908388",
+    "https://vimeo.com/771258052",
+    "https://vimeo.com/586011850"
+]
+```
+
+- Adjust the `SALAD_API_KEY` and `ORGANIZATION_NAME` variables to your Salad API key and organization name.
+- Add all of your Vimeo URLs to the `VIMEO_URLS` list.
+
+## **Step 4: Batch Process Multiple URLs**
+
+To process multiple Vimeo URLs, use the following script:
+
+```python
+# Dictionary to store mappings of Vimeo URLs to Salad Storage links
+url_mappings = {}
+
+for url in VIMEO_URLS:
+    try:
+        print(f"Processing: {url}")
+        audio_path = download_audio_from_vimeo(url)  # Step 1: Download audio
+        print(f"Downloaded audio successfully, uploading to Salad Storage...")
+        storage_url = upload_to_salad_storage(audio_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Step 2: Upload audio
+        url_mappings[url] = storage_url
+        Path(audio_path).unlink()  # Clean up local file
+        print(f"Processed successfully: {url}")
+    except Exception as e:
+        print(f"Failed to process {url}: {e}")
+
+# Save mappings to a JSON file
+with open("url_mappings.json", "w") as f:
+    json.dump(url_mappings, f, indent=4)
+
+print("Batch processing complete. URL mappings saved to url_mappings.json.")
+
+```
+
+### **Expected Output:** A url_mappings.json file is generated with the mappings:
+
+```json
+{
+  "https://vimeo.com/872908388": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token=TOKEN",
+  "https://vimeo.com/771258052": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token=TOKEN",
+  "https://vimeo.com/586011850": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token=TOKEN"
+}
+```
+
+- Salad Storage supports a max file size of 100MB. If the Vimeo video is too long, you may need to
+  [split the audio](/transcription/how-to-guides/technical/splitting-large-audio-files) or use a different storage
+  solution.
+
+## **Step 5: Send Prepared URLs to the Salad Transcription API**
+
+Once the audio files are uploaded to Salad Storage and you have the corresponding signed URLs, the final step is to send
+these URLs to the Salad Transcription API for processing.
+
+You can find detailed instructions on how to send requests a to the Salad Transcription API in the official
+documentation:
+
+[Salad Transcription API Documentation](/transcription/tutorials/transcription-quick-start)
+
+Below, we provide a function to send a transcription request to the API and retrieve the `job_id`.
+
+### **Function to Send a Transcription Request**
+
+This function sends a transcription request to the Salad Transcription API for a single URL:
+
+```python
+def send_transcription_request(audio_url, organization_name, salad_key, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        api_endpoint (str): The Salad Transcription API endpoint.
+        salad_key (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+# Define dynamic input parameters. Discover more about available parameters in the official documentation.
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+jobs = {}
+
+# Send the transcription request
+for uploaded_url in url_mappings.values():
+    try:
+        response = send_transcription_request(
+            audio_url=uploaded_url,
+            organization_name=ORGANIZATION_NAME,
+            salad_key=SALAD_API_KEY,
+            language_code="en",  # Specify the language code if needed
+            input_params=input_parameters
+        )
+        print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+
+        jobs[uploaded_url] = response["id"]
+    except Exception as e:
+        print(f"Error sending transcription request: {e}")
+
+# Save jobs to a JSON file
+with open("jobs.json", "w") as f:
+    json.dump(jobs, f, indent=4)
+    print(f"Job IDs mapped to Salad Storage URLs saved to jobs.json")
+```
+
+### **Expected Output**
+
+If the request is successful, the API will return a job_id and our function will print it out:
+
+```text
+Transcription request submitted successfully. Job ID: 6ea78b03-6ca4-4aeb-9136-4442fe8f49b2
+```
+
+You should also have a `jobs.json` file with the mappings:
+
+```json
+{
+  "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token": "1ea78b03-6ca4-4aeb-9136-4442fe8f49b1",
+  "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token": "2ea78b03-6ca4-4aeb-9136-4442fe8f49b2",
+  "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token": "3ea78b03-6ca4-4aeb-9136-4442fe8f49b3"
+}
+```
+
+The `job_id` is a unique identifier for the transcription job. You can use it later to check the job status or retrieve
+the final result.
+
+## **Step 6: Retrieve the Transcription Result**
+
+If you did not specify a webhook to receive the result, you can manually retrieve the transcription result using the
+`job_id` returned in Step 5.
+
+### **Function to Retrieve Transcription Results**
+
+This function retrieves the result of a transcription job from the Salad Transcription API:
+
+```python
+def get_transcription_result(job_id, salad_key, organization_name):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        salad_key (str): The Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+for job_ids in jobs.values():
+    # Retrieve the transcription result
+    while True:
+        # Retrieve the transcription result
+        time.sleep(5) # Adjust this value if needed, depending on whether your transcription is long or short.
+        try:
+            result = get_transcription_result(
+                job_id=job_ids,
+                salad_key=SALAD_API_KEY,
+                organization_name=ORGANIZATION_NAME
+            )
+            job_id=job_ids
+            if result["status"] in ["created", "started", "running", "failed"]:
+                print(f'Job ID: {job_id} status is {result["status"]}')
+            elif result["output"]:
+                with open(f"{job_id}.txt", "w") as f:
+                    text = str(result["output"]["text"])
+                    f.write(text)
+                print(f'Job ID: {job_id} status is {result["status"]}')
+                with open(f'output_{job_id}.json', 'w', encoding='utf-8') as f:
+                    json.dump(result, f, ensure_ascii=False, indent=4)
+                break
+            else:
+                print(f'Current job status is {result["status"]}')
+        except Exception as e:
+            print(f'Error retrieving transcription result: {e}')
+            break
+```
+
+### **Expected Output**
+
+If the job is still processing:
+
+```text
+Job ID: 1ea78b03-6ca4-4aeb-9136-4442fe8f49b1 status is running
+```
+
+If the job is completed:
+
+```text
+Job ID: 1ea78b03-6ca4-4aeb-9136-4442fe8f49b1 status is succeeded
+```
+
+The completed transcriptions will be saved in a text file with the `job_id` as the filename:
+
+```text
+ That's one small step for man, one giant leap for mankind. It's hard to imagine that nearly every consumer in America walks around with the total computational power of the Apollo 11 mission in their pocket. The technological advances of the last 50 years now afford us incredible processing power, an evolution in gaming, and nearly ubiquitous online connectivity. With the introduction of blockchain technologies, our youngest generations are also seeing the value in digital assets and the integration of the real and digital worlds. I watched the transition happen in real time. Back in the day, gaming was really single player. Even if you had people over, we were on the couch playing games on consoles together. That's where we left it. When we went home, the game didn't follow. But now there's not a moment where I couldn't pick up my computer or pick up a console and get someone on there with me. And even outside of that game lobby, if I've played a match of Starcraft 2 or Counter-Strike GO, it doesn't end there. We go and talk about it on Discord afterwards. The concept of digital ownership is very nebulous for certainly the baby boomer generation. myself as a millennial, it's hard to really comprehend and understand what does digital ownership mean. When you look at Gen Z who are true digital natives, they were brought up interacting with the internet, they spend their day to day socializing with their friends on the internet. When you bring along a new technology, the younger generation just gets it more quickly. They understand what blockchain technology is unlocking, which is the ability to assign value or property rights without relying on a centralized middleman or a centralized platform to arbitrate who owns what online. The entire identity of online personalities has changed. It started with a simple avatar on Facebook or Twitter to convey who you were. And now there's live streamers that are fully running motion capture suits and changing their physical identity, their voice, everything about them. And that is how they convey themselves to the world. I started developing mobile games when the App Store first launched. It's been more than a decade now. And seeing that transformation from small indie studios where it was one or two developers could make a game that became a worldwide phenomenon. It started off as a niche product. And today we see that companies are investing hundreds of millions of dollars into developing single titles. So that's been a change that I've witnessed in a relatively short amount of time. That trend is continuing today. The gaming space is now blending into what we would call the physical or reality space, where everything we touch has some sort of gamification feature to it. From making sure that you're sleeping the right amount of hours every night, to exercising on your Apple Watch. Gamification has perforated every part of our lives. A lot of times we get the question of why salad? It's a universal food. Every culture in the world has a salad. And it's only a salad when you mix the ingredients. And the individuality of the world right now allows people to keep their personal identity while contributing to a larger whole that's more meaningful. With the emergence of AI, there are so many exciting problems that we'll be taking on as a species. but the largest constraint is going to be compute resources. As AI comes online, its demand for compute is doubling every three and a half months. So to overcome this limiting factor, we're looking into every household around America and the globe to tap into the idle compute resources to really support this growing AI revolution. With Salad, we look at the growth in AI machine learning. It's exponential, and when we look at where can those needs be met, that's in the consumers' homes, on their desks. It's sitting there right now. That is the solution for the impending AI crisis that we have. Allowing users to participate in that, to monetize that resource that they have, is very important and the key part of why Salad exists. The more people who adopt into this system, not only will they be exposed to information and education about the systems you're interacting with, whether that's blockchain on the one hand, or if it's just gaming monetization models on the other hand. You learn more through interacting with the thing. Most people, especially for myself, I'm not exactly hands-on, but I need to be involved with something to start understanding it. It's kind of hard to just read what other people are saying, watch YouTube videos over and over again, and really get the idea. You need to get involved and get in it. As computers become more and more powerful, the data centers of the future will sit in everyone's home. Together, collectively, we'll build an infrastructure layer that powers different P2P networks, ecosystems, and economies. Together, we will build an infrastructure layer that will power our digital lives, maintain the integrity of the digital P2P networks, and Salad is here to empower that future. To learn more about how to make your computer work for you, visit salad.com. Salad. Share. Compute. For epic loot.
+```
+
+A full JSON response is also saved in a JSON file named `output_JOB_ID.json` for your further processing.
+
+```json
+{
+  "id": "ea78b03-6ca4-4aeb-9136-4442fe8f49b1",
+  "input": {
+    "sentence_level_timestamps": false,
+    "diarization": false,
+    "url": "https://storage-api.salad.com/organizations/YOUR_ORGANIZATION_NAME/files/audio/....mp3?token",
+    "language_code": "en"
+  },
+  "inference_endpoint_name": "transcribe",
+  "status": "succeeded",
+  "events": [
+    {
+      "action": "created",
+      "time": "2025-03-12T16:29:01.2808121+00:00"
+    },
+    {
+      "action": "started",
+      "time": "2025-03-12T16:29:01.4068381+00:00"
+    },
+    {
+      "action": "succeeded",
+      "time": "2025-03-12T16:29:37.9204505+00:00"
+    }
+  ],
+  "organization_name": "salad",
+  "output": {
+    "text": " That's one small step for man, one giant leap for mankind. It's hard to imagine that nearly every consumer in America walks around with the total computational power of the Apollo 11 mission in their pocket. The technological advances of the last 50 years now afford us incredible processing power, an evolution in gaming, and nearly ubiquitous online connectivity. With the introduction of blockchain technologies, our youngest generations are also seeing the value in digital assets and the integration of the real and digital worlds. I watched the transition happen in real time. Back in the day, gaming was really single player. Even if you had people over, we were on the couch playing games on consoles together. That's where we left it. When we went home, the game didn't follow. But now there's not a moment where I couldn't pick up my computer or pick up a console and get someone on there with me. And even outside of that game lobby, if I've played a match of Starcraft 2 or Counter-Strike GO, it doesn't end there. We go and talk about it on Discord afterwards. The concept of digital ownership is very nebulous for certainly the baby boomer generation. myself as a millennial, it's hard to really comprehend and understand what does digital ownership mean. When you look at Gen Z who are true digital natives, they were brought up interacting with the internet, they spend their day to day socializing with their friends on the internet. When you bring along a new technology, the younger generation just gets it more quickly. They understand what blockchain technology is unlocking, which is the ability to assign value or property rights without relying on a centralized middleman or a centralized platform to arbitrate who owns what online. The entire identity of online personalities has changed. It started with a simple avatar on Facebook or Twitter to convey who you were. And now there's live streamers that are fully running motion capture suits and changing their physical identity, their voice, everything about them. And that is how they convey themselves to the world. I started developing mobile games when the App Store first launched. It's been more than a decade now. And seeing that transformation from small indie studios where it was one or two developers could make a game that became a worldwide phenomenon. It started off as a niche product. And today we see that companies are investing hundreds of millions of dollars into developing single titles. So that's been a change that I've witnessed in a relatively short amount of time. That trend is continuing today. The gaming space is now blending into what we would call the physical or reality space, where everything we touch has some sort of gamification feature to it. From making sure that you're sleeping the right amount of hours every night, to exercising on your Apple Watch. Gamification has perforated every part of our lives. A lot of times we get the question of why salad? It's a universal food. Every culture in the world has a salad. And it's only a salad when you mix the ingredients. And the individuality of the world right now allows people to keep their personal identity while contributing to a larger whole that's more meaningful. With the emergence of AI, there are so many exciting problems that we'll be taking on as a species. but the largest constraint is going to be compute resources. As AI comes online, its demand for compute is doubling every three and a half months. So to overcome this limiting factor, we're looking into every household around America and the globe to tap into the idle compute resources to really support this growing AI revolution. With Salad, we look at the growth in AI machine learning. It's exponential, and when we look at where can those needs be met, that's in the consumers' homes, on their desks. It's sitting there right now. That is the solution for the impending AI crisis that we have. Allowing users to participate in that, to monetize that resource that they have, is very important and the key part of why Salad exists. The more people who adopt into this system, not only will they be exposed to information and education about the systems you're interacting with, whether that's blockchain on the one hand, or if it's just gaming monetization models on the other hand. You learn more through interacting with the thing. Most people, especially for myself, I'm not exactly hands-on, but I need to be involved with something to start understanding it. It's kind of hard to just read what other people are saying, watch YouTube videos over and over again, and really get the idea. You need to get involved and get in it. As computers become more and more powerful, the data centers of the future will sit in everyone's home. Together, collectively, we'll build an infrastructure layer that powers different P2P networks, ecosystems, and economies. Together, we will build an infrastructure layer that will power our digital lives, maintain the integrity of the digital P2P networks, and Salad is here to empower that future. To learn more about how to make your computer work for you, visit salad.com. Salad. Share. Compute. For epic loot.",
+    "duration_in_seconds": 325.488,
+    "duration": 0.09,
+    "processing_time": 35.118329763412476
+  },
+  "create_time": "2025-03-12T16:29:01.2808121+00:00",
+  "update_time": "2025-03-12T16:29:37.9204505+00:00"
+}
+```
+
+## Full Script
+
+Here is the full script combining all the steps:
+
+```python
+# For extracting audio from Vimeo
+import yt_dlp
+
+# For handling HTTP requests and file paths
+import requests
+from pathlib import Path
+import time
+
+# For working with JSON files (batch processing).
+import json
+
+def download_audio_from_vimeo(video_url, output_format="mp3"):
+    """
+    Downloads audio from a Vimeo video in the specified format.
+
+    Args:
+        video_url (str): The URL of the Vimeo video.
+        output_format (str): Desired audio format (default: "mp3").
+
+    Returns:
+        str: The filename of the downloaded audio file.
+    """
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': output_format,
+                'preferredquality': '128',
+            }],
+            'outtmpl': '%(id)s.%(ext)s',
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=True)
+            return f"{info['id']}.{output_format}"
+    except Exception as e:
+        print(f"Error downloading audio: {e}")
+        return None
+
+
+def upload_to_salad_storage(audio_file_path, salad_api_key, organization_name, mime_type="audio/mpeg"):
+    """
+    Uploads an audio file to Salad Storage and generates a signed access URL.
+
+    Args:
+        audio_file_path (str): Path to the audio file.
+        salad_api_key (str): Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+        mime_type (str): MIME type of the file (default: "audio/mpeg").
+
+    Returns:
+        str: The signed URL for the uploaded file.
+    """
+    try:
+      # Generate the upload URL
+      file_name = f"audio/{Path(audio_file_path).name}"
+      upload_url = f"https://storage-api.salad.com/organizations/{organization_name}/files/{file_name}"
+
+      # Prepare headers for authentication
+      headers = {"Salad-Api-Key": salad_api_key}
+
+      # Prepare data for the upload
+      data = {
+          "mimeType": mime_type,
+          "sign": "true",  # Request a signed URL
+          "signatureExp": 3 * 24 * 60 * 60  # 3 days in seconds
+      }
+
+      # Prepare the file to be uploaded
+      with open(audio_file_path, "rb") as f:
+          files = {"file": (Path(audio_file_path).name, f)}
+          response = requests.put(upload_url, headers=headers, data=data, files=files)
+          response.raise_for_status()
+
+      # Extract and return the signed URL
+      signed_url = response.json().get("url")
+      if not signed_url:
+          raise ValueError("Signed URL not returned by the API.")
+      return signed_url
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error uploading to Salad storage: {e}")
+    except ValueError as ve:
+        print(f"API response error: {ve}")
+    return None
+
+
+# Salad Storage credentials
+SALAD_API_KEY = "YOUR_SALAD_API_KEY"  # Replace with your Salad API key
+ORGANIZATION_NAME = "YOUR_ORGANIZATION_NAME"  # Replace with your organization name
+
+# List of Vimeo URLs
+VIMEO_URLS = [
+    "https://vimeo.com/872908388",
+    "https://vimeo.com/771258052",
+    "https://vimeo.com/586011850"
+]
+
+# Dictionary to store mappings of Vimeo URLs to Salad Storage links
+url_mappings = {}
+
+for url in VIMEO_URLS:
+    try:
+        print(f"Processing: {url}")
+        audio_path = download_audio_from_vimeo(url)  # Step 1: Download audio
+        print(f"Downloaded audio successfully, uploading to Salad Storage...")
+        storage_url = upload_to_salad_storage(audio_path, SALAD_API_KEY, ORGANIZATION_NAME)  # Step 2: Upload audio
+        url_mappings[url] = storage_url
+        Path(audio_path).unlink()  # Clean up local file
+        print(f"Processed successfully: {url}")
+    except Exception as e:
+        print(f"Failed to process {url}: {e}")
+
+# Save mappings to a JSON file
+with open("url_mappings.json", "w") as f:
+    json.dump(url_mappings, f, indent=4)
+
+print("Batch processing complete. URL mappings saved to url_mappings.json.")
+
+def send_transcription_request(audio_url, organization_name, salad_key, language_code="en", input_params=None):
+    """
+    Sends a transcription request to the Salad Transcription API with dynamic input parameters.
+
+    Args:
+        audio_url (str): The signed Salad Storage URL for the audio file.
+        api_endpoint (str): The Salad Transcription API endpoint.
+        salad_key (str): The Salad API key for authentication.
+        language_code (str): The language of the audio file (default: "en").
+        input_params (dict): Additional input parameters to include in the request.
+
+    Returns:
+        dict: The response from the API, including the job ID.
+    """
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+    # Prepare the input dictionary, appending the audio URL and language code
+    input_data = input_params.copy() if input_params else {}
+    input_data["url"] = audio_url
+    input_data["language_code"] = language_code
+
+    # Request body
+    data = {
+        "input": input_data
+    }
+
+    # Send the request
+    response = requests.post(api_endpoint, headers=headers, json=data)
+    response.raise_for_status()  # Raise an error for bad responses
+
+    # Extract and return the response
+    return response.json()
+
+
+def get_transcription_result(job_id, salad_key, organization_name):
+    """
+    Retrieves the transcription result from the Salad Transcription API for a given job ID.
+
+    Args:
+        job_id (str): The unique identifier of the transcription job.
+        salad_key (str): The Salad API key for authentication.
+        organization_name (str): Name of the Salad organization.
+
+    Returns:
+        dict: The response from the API containing the job status and transcription result.
+    """
+    # Construct the Salad API endpoint for retrieving job results
+    api_endpoint = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}"
+
+    # Set headers
+    headers = {
+        "Salad-Api-Key": salad_key,
+        "Content-Type": "application/json",
+        "accept": "application/json",
+    }
+
+    # Send the request
+    response = requests.get(api_endpoint, headers=headers)
+    response.raise_for_status()
+
+    # Extract and return the response
+    return response.json()
+
+
+# Define dynamic input parameters. Discover more about available parameters in the official documentation.
+# Example:
+input_parameters = {
+    "sentence_level_timestamps": False,
+    "diarization": False,
+}
+
+jobs = {}
+
+# Send the transcription request
+for uploaded_url in url_mappings.values():
+    try:
+        response = send_transcription_request(
+            audio_url=uploaded_url,
+            organization_name=ORGANIZATION_NAME,
+            salad_key=SALAD_API_KEY,
+            language_code="en",  # Specify the language code if needed
+            input_params=input_parameters
+        )
+        print(f"Transcription request submitted successfully. Job ID: {response['id']}")
+
+        jobs[uploaded_url] = response["id"]
+    except Exception as e:
+        print(f"Error sending transcription request: {e}")
+
+# Save jobs to a JSON file
+with open("jobs.json", "w") as f:
+    json.dump(jobs, f, indent=4)
+    print(f"Job IDs mapped to Salad Storage URLs saved to jobs.json")
+
+for job_ids in jobs.values():
+    # Retrieve the transcription result
+    while True:
+        # Retrieve the transcription result
+        time.sleep(5) # Adjust this value if needed, depending on whether your transcription is long or short.
+        try:
+            result = get_transcription_result(
+                job_id=job_ids,
+                salad_key=SALAD_API_KEY,
+                organization_name=ORGANIZATION_NAME
+            )
+            job_id=job_ids
+            if result["status"] in ["created", "started", "running", "failed"]:
+                print(f'Job ID: {job_id} status is {result["status"]}')
+            elif result["output"]:
+                with open(f"{job_id}.txt", "w") as f:
+                    text = str(result["output"]["text"])
+                    f.write(text)
+                print(f'Job ID: {job_id} status is {result["status"]}')
+                with open(f'output_{job_id}.json', 'w', encoding='utf-8') as f:
+                    json.dump(result, f, ensure_ascii=False, indent=4)
+                break
+            else:
+                print(f'Current job status is {result["status"]}')
+        except Exception as e:
+            print(f'Error retrieving transcription result: {e}')
+            break
+```

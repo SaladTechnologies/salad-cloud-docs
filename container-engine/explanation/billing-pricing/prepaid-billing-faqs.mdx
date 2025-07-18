@@ -1,0 +1,73 @@
+---
+title: 'Prepaid Billing FAQs'
+sidebarTitle: 'Prepaid Billing FAQs'
+---
+
+_Last Updated: February 05, 2025_
+
+This document addresses common questions asked to the SaladCloud support team about our migration to prepaid billing. If
+you have additional questions, please reach out to support at [cloud@salad.com](mailto:cloud@salad.com).
+
+## How does SaladCloud's prepaid system work?
+
+Prepaid credits are used to run workloads on SaladCloud, offering two recharge options: automatic and manual. With
+automatic recharges, you can set a predefined credit amount to automatically top up your balance when it falls below a
+minimum threshold. Manual recharges allow for one-time credit purchases of up to $10,000. Regardless of the chosen
+method, it is the customer’s responsibility to maintain a positive credit balance. Failure to do so may result in
+restricted workloads and API usage if the organization’s credits are fully depleted. For more information, view the
+prepaid billing workflows [here](/container-engine/explanation/billing-pricing/billing#prepaid-billing).
+
+## What’s the difference between Auto and Manual Recharge?
+
+Auto Recharge enables you to automatically top up your balance with a predefined credit amount whenever it falls below a
+set threshold. In contrast, manual recharging does not include an automatic threshold; you must manually purchase
+additional credits each time your balance reaches $0.
+
+## How do I know if Auto or Manual Recharge is better for me?
+
+For production workloads, SaladCloud strongly recommends enabling Auto Recharge to maintain a positive credit balance
+and ensure uninterrupted service. For testing or non-production workloads, such as long-running batch jobs, either
+manual or Auto Recharge options may be suitable. Auto Recharge includes a built-in grace period to address potential
+payment method issues, allowing time to resolve errors before a shutdown occurs. However, if your organization is not
+enrolled in Auto Recharge, you risk an immediate shutdown if your credits are fully depleted.
+
+## What should I set my automatic recharge threshold to?
+
+We recommend setting your recharge threshold to 10% of your recharge amount (e.g., a $1,000 top-up should have a $100
+recharge threshold). As your credit usage increases, we suggest adjusting your threshold proportionally to ensure
+seamless account management. Higher thresholds and less frequent recharges help minimize the risk of credit card errors
+that could disrupt performance.
+
+## Can I set my automatic recharge to $0?
+
+Yes, you can, but it is not recommended. The processing and application of new credits are not instantaneous, meaning
+that even if the billing process is executed immediately, your instances could be paused until the new credits are fully
+applied.
+
+## What happens if my credit balance reaches $0 before I manually recharge?
+
+Your active instances will automatically be paused until another manual recharge occurs, resulting in a positive credit
+balance.
+
+## How do I make sure I don’t experience any service disruption?
+
+To ensure you don’t experience a services disruption, you should keep a valid payment method on file and ensure you have
+a positive credit balance. The best way to ensure you keep your credit balance positive is to enable Auto Recharge on
+your account. If we detect an error with an Auto or Manual Recharge event, we will immediately send you an email
+notification with directions for how to resolve the issue.
+
+## What happens if I have remaining credits after a test or a batch job on SaladCloud?
+
+All credits purchases are final and expire 12 months from purchase date.
+
+## What should I do if I've previously purchased an AppSumo lifetime deal?
+
+If you've previously purchased a lifetime deal from AppSumo, no action is required on your account. Each month, your
+account will automatically receive the transcription audio hours included in your purchase. If you use all your credits
+before the next monthly renewal, SaladCloud will restrict your access until the new credits are available. To prevent
+any interruption in service, you can add Auto Recharge or make a one-time Manual Recharge to purchase additional credits
+for your organization; however, this is optional.
+
+## Who do I reach out to with other questions?
+
+Please reach out to support via [cloud@salad.com](mailto:cloud@salad.com).

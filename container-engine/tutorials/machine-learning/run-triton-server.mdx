@@ -1,0 +1,195 @@
+---
+title: 'Run NVIDIA Triton Server on SaladCloud'
+sidebarTitle: 'NVIDIA Triton Server'
+---
+
+_Last Updated: October 15, 2024_
+
+## Introduction
+
+Triton Inference Server is an open-source, high-performance inference serving software that facilitates the deployment
+of machine learning models in production environments. Developed by NVIDIA, Triton provides a flexible and scalable
+solution for serving deep learning models.
+
+Triton Inference Server supports a wide range of deep learning and machine learning frameworks, including **TensorFlow,
+PyTorch, Python, ONNX, NVIDIA® TensorRT™, RAPIDS™ cuML, XGBoost, scikit-learn RandomForest, OpenVINO, custom C++**,
+and more. Its primary use cases are:
+
+- Serving multiple models from a single server instance.
+- Dynamic model loading and unloading without server restart.
+- Ensemble inference, allowing multiple models to be used together to achieve results.
+- Model versioning for A/B testing and rolling updates.
+
+**Resources:**
+
+- [Official website](https://developer.nvidia.com/triton-inference-server)
+- [Documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/)
+- [Tutorials](https://www.youtube.com/watch?v=NQDtfSi5QF4)
+- [GitHub](https://github.com/triton-inference-server/server)
+
+## Prerequisites
+
+1. **Pick the Official NVIDIA Triton Server Docker Image:**
+
+- [Release Notes and Docker Image](https://docs.nvidia.com/deeplearning/triton-inference-server/release-notes/rel-23-09.html)
+
+2. **Create a Model Repository.** The
+   [model repository](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html)
+   is the directory where you place the models that you want Triton to serve. Ensure your models are organized in the
+   following folder structure:
+   ```java
+   model-name/
+   ├── 1
+   │ └── model_file
+   └── config.pbtxt
+   ```
+
+- **model-name** It can be anything, but keep in mind you need this name to send requests to the correct model. Example:
+  yolo
+- **1/**: This subdirectory suggests different model versions might be stored here, with "1" representing the first
+  version.
+- **config.pbtxt**: This file stores the model configuration in a text-based format, specifying details like
+  input/output tensors, metadata, and backend used.
+- **model_file**: The model itself.
+
+You can upload multiple models and versions
+
+### Deploy on SaladCloud
+
+To deploy a Triton Server on SaladCloud, create a Docker image using the official Triton Server image as a base. Include
+your models in the image and route IPv6 requests to the Triton Server HTTP port.
+
+#### Step 1: Create a Dockerfile and add a Base Image
+
+Create a new file called `Dockerfile` and open it in your preferred text editor. Add the base image to your Dockerfile.
+Example:
+
+```dockerfile
+FROM nvcr.io/nvidia/tritonserver:23.09-py3
+```
+
+#### Step 2: Copy Your Models to the Image
+
+Make sure the folder containing your model is structured as mentioned in the prerequisites, then copy it to your image
+by updating Dockerfile. Example:
+
+```dockerfile
+COPY tmp/triton_repo /models
+```
+
+#### Step 3: Enable IPv6
+
+Refer to the official SaladCloud documentation on
+[Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6).
+
+Create a shell script that will run the Triton server with your model and route traffic from container port 80 to triton
+http-port 8000 using `socat`. That shell script will be an entrypoint in the image.
+
+**start_services.sh**
+
+```shell
+#!/bin/bash
+
+# Start tritonserver
+tritonserver --model-repository=/models --http-port=8000 &
+
+# Start socat
+socat TCP6-LISTEN:80,fork TCP4:127.0.0.1:8000 &
+
+# Keep the container running
+wait
+```
+
+#### Step 4: Complete the Dockerfile
+
+Add the script to the Docker image and configure it to run on container startup. Here is the full Dockerfile example:
+
+```dockerfile
+# Use the Triton server image as the base
+FROM nvcr.io/nvidia/tritonserver:23.09-py3
+
+RUN apt-get update && apt-get install -y socat
+
+# Copy the local tmp/triton_repo directory to /models in the image
+COPY tmp/triton_repo /models
+
+# Copy the start_services script into the image
+COPY start_services.sh /start_services.sh
+
+# Make the script executable
+RUN chmod +x /start_services.sh
+
+EXPOSE 80
+
+CMD ["/start_services.sh"]
+```
+
+#### Step 5: Build your image and push it to docker hub (or the container registry of your choice.)
+
+#### Step 6: Deploy your image on Salad, using either the [Portal](https://portal.salad.com) or the [SaladCloud Public API](/reference/saladcloud-api/container-groups/create-container-group)
+
+Follow this easy steps to deploy your container on salad:
+[Quickstart - SaladCloud](/container-engine/tutorials/quickstart)
+
+## Usage Example
+
+**Accessing the Application:** Copy the Access Domain Name from the Container Group created above. Detailed instructions
+on how to find it can be found here:
+[Setup Container Gateway](https://cloud-support.salad.com/article/421-setup-container-gateway#:~:text=Enable%20the%20Container%20Gateway%20%28Load%20Balancer%29%20on%20the,Domain%20Name%20is%20located%20in%20the%20Container%20Group.)
+
+To test the solution, we deployed a Triton server running a YOLO model. To send requests to it, run the following Python
+script:
+
+```python
+import numpy as np
+import gevent.ssl
+import tritonclient.http as httpclient
+from PIL import Image
+
+# Define a callable that returns an SSLContext with custom settings
+def custom_ssl_context_factory():
+    context = gevent.ssl.create_default_context()
+    return context
+
+# Load and preprocess the image
+image_path = "test_pic.jpg"
+image = Image.open(image_path).resize((640, 640))
+image = np.array(image).astype(np.float32)
+image = np.transpose(image, (2, 0, 1))  # Convert to CHW format
+image = np.expand_dims(image, axis=0)  # Add batch dimension
+
+# Create Triton client
+url = "romaine-fennel.salad.cloud"
+model_name = "yolo"
+
+client = httpclient.InferenceServerClient(
+    url=url,
+    ssl=True,
+    ssl_context_factory=custom_ssl_context_factory
+)
+# Prepare inputs and outputs
+inputs = [httpclient.InferInput("images", image.shape, "FP32")]
+inputs[0].set_data_from_numpy(image)
+
+outputs = [httpclient.InferRequestedOutput("output0")]
+
+# Perform inference
+response = client.infer(model_name, inputs, outputs=outputs)
+
+# Get the output
+output_data = response.as_numpy("output0")
+print("Inference result:", output_data)
+```
+
+**Explanation:**
+
+1. **Image Preprocessing**: The image is loaded, resized to 640x640, and converted to the required format (CHW).
+2. **Triton Client Setup**: A Triton client is created to communicate with the server.
+3. **Inputs and Outputs**: The input tensor is prepared and set with the image data. The output tensor is specified to
+   retrieve the inference results.
+4. **Inference**: The infer method is called to perform inference, and the results are printed.
+
+Replace `romaine-fennel.salad.cloud` with your Access Domain Name, and `yolo` with the name of your model.
+
+By following these steps, you can successfully deploy, manage, and test the NVIDIA Triton Inference Server on
+SaladCloud, enabling high-performance serving of your machine learning models.

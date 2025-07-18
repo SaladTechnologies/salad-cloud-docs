@@ -1,0 +1,61 @@
+---
+title: 'Autoscaling Settings'
+---
+
+_Last Updated: October 25, 2024_
+
+To fine-tune how autoscaling works in SaladCloud, you can adjust the following settings:
+
+### **Desired Queue Length**
+
+- **Description**: The target queue length that triggers the autoscaler to adjust the number of container instances.
+- **Range**: Must be between 1 and 100.
+- **Example**: If you set this to 20, the system will aim to maintain a queue length of 20 messages before scaling up or
+  down.
+
+### **Minimum Replicas**
+
+- **Description**: The minimum number of container instances that the system will scale down to.
+- **Range**: Must be between 0 and 100.
+- **Example**: If you set this to 3, the system will never scale below 3 running instances, even during low demand
+  periods. If set to 0, the system will scale down to zero instances when there are no jobs in the queue, which means
+  you do not pay for any resources when the queue is empty. However, this will result in cold starts when new jobs are
+  added to the queue. A cold start happens when the system needs to start new containers, potentially causing delays as
+  the instances are brought online.
+
+### **Maximum Replicas**
+
+- **Description**: The maximum number of container instances that the system will scale up to.
+- **Range**: Must be between 1 and 200, or the maximum instance quota assigned to the project, whichever is lower.
+- **Note**: The maximum allowed value depends on the project instance quota. Ensure that your quota supports the desired
+  number of replicas.
+- **Example**: If set to 100, the system will never spin up more than 100 instances, even if the queue continues to
+  grow.
+
+### **Period (Seconds)**
+
+- **Description**: The time interval in seconds during which the autoscaler checks the queue length and applies the
+  scaling formula.
+- **Range**: Must be between 15 and 1800 seconds.
+- **Example**: If set to 30, the queue is checked every 30 seconds, and scaling decisions are made at that frequency.
+
+### **Maximum Upscale Per Minute (Optional)**
+
+- **Description**: The maximum number of instances that can be added per minute to handle increasing demand.
+- **Range**: Must be between 1 and 100.
+- **Example**: Setting this to 20 means that the autoscaler can spin up a maximum of 20 new instances each minute to
+  accommodate increasing load.
+
+### **Maximum Downscale Per Minute (Optional)**
+
+- **Description**: The maximum number of instances that can be removed per minute when demand decreases.
+- **Range**: Must be between 1 and 100.
+- **Example**: If set to 10, no more than 10 instances will be removed per minute during downscaling, ensuring a smooth
+  reduction in resources.
+- **Note**: When scaling down, the system might remove nodes that are still processing jobs. To prevent this, ensure
+  that your application can handle graceful shutdowns and that jobs are not lost during the process.
+
+---
+
+Refer back to the [Autoscaling Overview](/container-engine/explanation/infrastructure-platform/autoscaling) or proceed
+to [Set Up Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling).

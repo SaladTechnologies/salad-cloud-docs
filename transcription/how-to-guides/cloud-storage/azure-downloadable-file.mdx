@@ -1,0 +1,103 @@
+---
+title: 'How to Create a Downloadable File from Azure'
+sidebarTitle: 'Azure Blob Storage'
+---
+
+_Last Updated: October 09, 2024_
+
+Azure Blob Storage allows you to generate a Shared Access Signature (SAS) token, which provides secure, time-limited
+access to your blobs (files) without sharing your account key. This guide will walk you through the steps to create a
+downloadable link using a SAS token.
+
+**Using Portal:**
+
+### **Step 1: Log in to the Azure Portal**
+
+1. Go to the [Azure Portal](https://portal.azure.com/).
+2. Log in with your Azure account credentials.
+
+---
+
+### **Step 2: Navigate to Your Storage Account**
+
+1. In the Azure Portal, search for **"Storage accounts"** in the search bar at the top.
+2. Click on **"Storage accounts"** in the search results.
+3. Select the storage account that contains the blob (file) you want to share.
+
+---
+
+_Last Updated: October 09, 2024_
+
+### **Step 3: Access the Blob Service**
+
+1. In the storage account overview, scroll down to the **"Blob service"** section in the left-hand menu.
+2. Click on **"Containers"** to view the list of containers in your storage account.
+3. Select the container that holds the blob you want to create a link for.
+
+---
+
+### **Step 4: Generate the SAS Token**
+
+1. Inside the container, find and click on the blob (file) you want to share.
+2. At the top of the blob's properties window, click on **"Generate SAS"** (sometimes labeled as **"Shared Access
+   Signature"**).
+3. In the SAS token generation window, configure the following options:
+   - **Permissions**: Select the permissions you want to grant. For a downloadable link, you typically need **Read**
+     permissions.
+   - **Start and Expiry Date/Time**: Set the start time and expiry time for the token. This defines how long the link
+     will be valid.
+4. After configuring the settings, click **"Generate SAS token and URL"**.
+
+---
+
+_Last Updated: October 09, 2024_
+
+### **Step 5: Copy the SAS URL**
+
+1. Once the SAS token and URL are generated, you'll see a URL in the **"Blob SAS URL"** field.
+2. Copy the entire URL. This is your downloadable link.
+
+### **Using Azure SDK for Python**
+
+You can use the `azure-storage-blob` library to generate a SAS token programmatically with python:
+
+### **Installation**
+
+First, install the Azure Blob Storage SDK for Python:
+
+```bash
+pip install azure-storage-blob
+```
+
+### **Python Code Example**
+
+```python
+from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
+from datetime import datetime, timedelta
+
+# Set your connection string and container details
+connection_string = "your_connection_string"
+container_name = "your_container_name"
+blob_name = "your_blob_name.txt"
+
+# Create a BlobServiceClient object
+blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+
+# Generate a SAS token for the blob
+sas_token = generate_blob_sas(
+    account_name=blob_service_client.account_name,
+    container_name=container_name,
+    blob_name=blob_name,
+    account_key=blob_service_client.credential.account_key,
+    permission=BlobSasPermissions(read=True),
+    expiry=datetime.utcnow() + timedelta(hours=1)  # SAS token valid for 1 hour
+)
+
+# Construct the full URL with the SAS token
+blob_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{container_name}/{blob_name}?{sas_token}"
+
+print(f"SAS URL: {blob_url}")
+
+```
+
+---

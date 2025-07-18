@@ -1,0 +1,115 @@
+---
+title: 'How to Automatically Generate Meeting Action Items with Salad Transcription API'
+sidebarTitle: 'Meeting Action Items'
+---
+
+_Last Updated: March 18, 2025_
+
+By using our integrated custom LLM prompts, you can generate an action items list from your transcribed meetings. To use
+this, you just need to add the `custom_prompt` input parameter to your transcription request.
+
+## Custom input parameters
+
+In this example, we'll use a Python script to transcribe an audio file and tell it to use the `custom_prompt` input
+parameter to generate the action items. We'll use the following input parameters:
+
+```python
+payload = {"input": {
+        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
+        "url": audio_file_url,
+        "diarization": True,
+        "language_code": "en",
+        "return_as_file": False
+    }}
+```
+
+## Python script
+
+We're going to create a file and name it `action-items.py`. We're then going to use the above parameters in the
+following Python script:
+
+```python
+import requests
+import time
+
+audio_file_url = "url/to/audio/file.mp3" # replace with your audio file URL
+
+salad_api_key = "YOUR_SALAD_API_KEY" # replace with your Salad API key
+organization_name = "YOUR_ORGANIZATION_NAME" # replace with your organization name
+
+payload = {"input": {
+        "custom_prompt": "The following is a meeting transcription. Summarize internally, and then generate a list of action items from the meeting. Only use real actions that make sense to do, ignore anything unimportant. Rewrite each task to be more clear and concise. Format it in a markdown compatible list to make it easy to read.",
+        "url": audio_file_url,
+        "diarization": True,
+        "language_code": "en",
+        "return_as_file": False
+    }}
+headers = {
+    "Salad-Api-Key": salad_api_key,
+    "Content-Type": "application/json"
+}
+
+
+url = f"https://api.salad.com/api/public/organizations/{organization_name}/inference-endpoints/transcribe/jobs"
+
+response = requests.post(url, json=payload, headers=headers)
+
+response = response.json()
+job_id=response["id"]
+print (f'Job ID: {job_id}')
+
+while True:
+  time.sleep(5)
+  try:
+      result = requests.get(f"{url}/{job_id}", headers=headers)
+      result = result.json()
+      if result["status"] == "created" or result["status"] == "pending" or result["status"] == "started" or result["status"] == "running":
+          print(f'Current job status is {result["status"]}')
+      elif result["status"] == "failed":
+          print(f'Job failed')
+          break
+      elif result["output"]:
+          print(result["output"]["llm_result"])
+          break
+      else:
+          print(f'Current job status is {result["status"]}')
+  except Exception as e:
+        print(f'Error retrieving transcription result: {e}')
+        break
+```
+
+- Make sure to replace `url/to/audio/file.mp3` with the URL of your audio file.
+- Replace `YOUR_SALAD_API_KEY` with
+  [your Salad API key](/container-engine/tutorials/quickstart-api#step-1-obtain-your-api-key).
+- Replace `YOUR_ORGANIZATION_NAME` with your organization name.
+- Run the script using with `python action-items.py`.
+
+In this script, we're telling the LLM to read through the transcription, and generate a list of important action items.
+We're also asking it to format it to be easily readable in markdown format. It will be returned in the `llm_result`
+field of the response. We're then printing the result of this field to the console. Your console will look something
+like this once it finishes:
+
+### Output
+
+```text
+Job ID: abcdef6c-1234-41e8-b81b-ecc1109033ed
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+Current job status is running
+The meeting discusses migrating to Salad Transcription API from our existing provider.
+
+**Action Items:**
+
+* Schedule a follow-up meeting to discuss transcription migration with the team
+* Assign tasks to team members for the new project
+* Test out the Salad Transcription API for the next meeting
+* Set up billing for Salad
+* Onboard Aardvark to the project
+* Configure the new server
+```

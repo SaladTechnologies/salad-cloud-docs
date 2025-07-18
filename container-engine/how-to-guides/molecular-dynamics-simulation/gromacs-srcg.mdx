@@ -1,0 +1,375 @@
+---
+title: 'Run GROMACS on SaladCloud'
+sidebarTitle: 'GROMACS'
+description: 'How to execute molecular dynamics simulations on interruptible infrastructure'
+---
+
+_Last Updated: June 20, 2025_
+
+## Introduction
+
+For performance and cost benchmarks of running [GROMACS](https://www.gromacs.org/) on SaladCloud, please refer to
+[this blog post](https://blog.salad.com/gromacs-benchmark). You can also check
+[the GitHub repository](https://github.com/SaladTechnologies/mds/tree/main/gromacs-benchmark) for the benchmarking
+Dockerfile and detailed test methodology.
+
+Molecular dynamics simulations with GROMACS can run from several hours to multiple days, depending on factors such as
+CPU/GPU performance, system size (number of atoms or molecules), simulation length (number of steps), and the level of
+physical detail modeled. Large-scale simulations often produce substantial output—ranging up to tens of
+gigabytes—including trajectories, energy profiles, and other results.
+
+SaladCloud operates on a distributed network of interruptible nodes, meaning any node running your tasks may shut down
+unexpectedly and all runtime data are removed (data persistence must be managed via external cloud storage). Despite
+this, most Salad nodes remain stable for over 10 hours at a time.
+
+To run GROMACS effectively on SaladCloud, it's recommended to divide large simulation tasks into manageable chunks—such
+as 30-minute runs—and execute them sequentially. This chunked approach is natively supported by GROMACS and can be
+implemented with just a few lines of code. With this adapted workflow, each chunk generates its own small output files
+along with the updated checkpoint, all of which can be uploaded to cloud storage immediately. When resuming after node
+reallocation, only the input file and the checkpoint file need to be downloaded from the cloud—**eliminating the need to
+upload or download large files at any point.**
+
+Salad nodes are globally distributed, leading to variations in network latency, geographic distance, and throughput to
+specific cloud storage endpoints. Many nodes also have asymmetric bandwidth, with upload speeds typically lower than
+download speeds. Nevertheless, more than 90% of nodes can upload over 10 GB of data per hour—more than sufficient for
+GROMACS workloads. For detailed performance metrics, refer to
+[the cloud storage benchmarks on SaladCloud](/container-engine/tutorials/performance/high-performance-storage-solutions#cloud-storage-benchmarking-on-saladcloud).
+
+## Single-Replica Container Group vs. Job Queue System
+
+As a starting point, we recommend creating a dedicated Single-Replica Container Group (**SRCG**) for each simulation
+task on SaladCloud. This setup is easy to launch and works well for larger simulations—spanning tens of hours or
+multiple days. Task-specific configurations, such as the number of steps, chunking intervals, and input/output paths in
+cloud storage—can be passed to the instance via environment variables.
+
+While tasks are briefly paused during node reallocation after interruptions, our testing across a large number of
+samples shows that total downtime remains under 4% of the overall runtime.
+
+On the other hand, if you’re running a large number of simulation tasks—a job queue becomes essential to ensure
+efficiency and scalability. Systems like GCP Pub/Sub, AWS SQS, Salad Kelpie, or custom solutions using Redis or Kafka
+can be used to distribute jobs (task-specific configurations) across a pool of Salad nodes. If a node fails during job
+execution, the job queue ensures the job is retried immediately on another available node.
+
+You can further implement autoscaling by monitoring the number of available jobs in the queue and dynamically adjusting
+the number of Salad nodes. This approach ensures that your target number of tasks is completed within a defined
+timeframe, while also allowing cost control during periods of lower demand.
+
+This guide focuses on the SRCG-based approach. A separate guide will cover job queue integration.
+
+## Chunking Large Simulations
+
+To demonstrate how to split a GROMACS simulation into chunks, consider the following example.
+
+```bash
+gmx mdrun \                        # Run GROMACS
+  -nb gpu \                        # Use GPU for non-bonded force calculations
+  -pme gpu \                       # Use GPU for Particle-Mesh Ewald (PME) calculations
+  -bonded gpu \                    # Use GPU for bonded interactions
+  -update gpu \                    # Use GPU to update particle positions and velocities
+  -ntmpi 1 \                       # Number of MPI ranks (parallel processes)
+  -ntomp 8 \                       # Number of OpenMP threads per rank
+  -pin on \                        # Enable thread pinning (better performance on some systems)
+  -pinstride 1 \                   # Set pinning stride (1 = consecutive cores)
+  -s j1.tpr \                      # Input run file (TPR format)
+  -deffnm j1 \                     # Base name for output files (e.g., j1.log, j1.trr, j1.edr, etc.)
+  -nsteps 200000                   # Total number of steps to run
+```
+
+This command runs a 200,000-step GPU-accelerated simulation using the system defined in the `j1.tpr` file. It uses a
+single MPI rank and 8 OpenMP threads, with `j1` as the default filename prefix for all output files. All major
+components of the simulation—non-bonded interactions, PME, bonded interactions, and integration—are offloaded to the
+GPU. CPU threads are pinned to specific cores to ensure consistent performance.
+
+Let’s take a closer look at the input, checkpoint and output files generated by the simulation.
+
+<img src="/container-engine/images/gs_normal.png" />
+
+- **.tpr** – The portable binary run input file. It contains everything required to run the simulation: topology,
+  parameters, coordinates, velocities, and simulation settings.
+- **.cpt** – The checkpoint file, updated at configurable intervals (every 15 minutes by default) during the simulation.
+  **It allows the simulation to resume from the last saved state after an interruption.** While its contents change, the
+  file size remains constant for a given input. A **\_prev.cpt** file may be created to store the previous checkpoint
+  when a new checkpoint is written.
+- **.edr, .log, .trr, .xtc** – **These output files** are continuously and rapidly updated during the simulation, with
+  new data appended at regular step intervals. Over long runs, they can grow significantly in size—possibly reaching
+  tens of gigabytes, especially the .trr file.
+  - .edr stores energy terms such as temperature, pressure, and kinetic/potential energy.
+  - .log records detailed information about the run, including settings, performance metrics, and diagnostic messages.
+  - .trr is a full-precision trajectory file containing coordinates, velocities, and forces at each saved step.
+  - .xtc is a compressed trajectory file that stores only atomic coordinates; it may be generated in some simulations to
+    save storage space.
+- **.gro** – A coordinate file generated upon simulation completion. It represents the final state of the system and can
+  serve as input for a continuation or new simulation.
+
+**Directly backing up the checkpoint and output files while they are actively being written—especially at different
+frequencies—can lead to data inconsistencies or corruption, leaving these files out of sync.**
+
+A better approach is to split the simulation into smaller chunks, each running for a short duration. After each chunk
+finishes, the output files and their corresponding, properly aligned checkpoint file can be safely generated and
+uploaded to cloud storage.
+
+To resume the simulation, extract the number of completed steps from the checkpoint file, then continue the run using
+the original input file, the updated number of remaining steps, and the checkpoint. In case of node reallocation, the
+new node only needs to download the input file and the checkpoint file to continue the simulation.
+
+Below are the commands to implement the adapted workflow:
+
+```bash
+# Download the input file (j1.tpr).
+
+# Run the simulation for 200,000 steps with the input file, stopping gracefully after 1 minute.
+# The -noappend option ensures that output files are created with incremented suffixes automatically, rather than appending to existing files.
+gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 200000 -maxh 0.016
+
+# Files generated after the first chunk and uploaded to cloud storage:
+# j1.cpt
+# j1_prev.cpt
+# j1.part0001.edr
+# j1.part0001.log
+# j1.part0001.trr
+
+# After node reallocation, the new node only needs to download the input file (j1.tpr) and the checkpoint file (j1.cpt) from cloud storage
+
+# Extract the number of completed steps (47,200 in this example) from the checkpoint file.
+gmx dump -cp j1.cpt | grep step
+
+# Continue the simulation using the input file, the number of remaining steps (200,000 - 47,200 = 152,800) and the checkpoint.
+gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 152800 -maxh 0.016 -cpi j1.cpt
+
+# Files generated after the second chunk (with j1.cpt and j1_prev.cpt updated) and uploaded to cloud storage:
+# j1.cpt
+# j1_prev.cpt
+# j1.part0002.edr
+# j1.part0002.log
+# j1.part0002.trr
+
+# The same logic applies to next chunks until all 200,000 steps are completed.
+gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps 105600 -maxh 0.016 -cpi j1.cpt
+gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps  58700 -maxh 0.016 -cpi j1.cpt
+gmx mdrun -nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on -pinstride 1 -noappend -s j1.tpr -deffnm j1 -nsteps  11800 -maxh 0.016 -cpi j1.cpt
+```
+
+Here are the input, checkpoint and output files generated by the adapted workflow:
+
+<img src="/container-engine/images/gs_chunks.png" />
+
+Please refer to [the example code](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/main_basic.py) that
+implements the workflow described above. It is intended to run on your local machine, without any optimizations for
+SaladCloud, and supports simulation interruption and resumption. To use it, you’ll need access to a Cloudflare R2 or
+other S3-compatible cloud storage bucket and must specify the path of input and output files.
+
+## Running GROMACS on SaladCloud
+
+### Code Optimizations
+
+To run GROMACS efficiently on SaladCloud, several additional code optimizations are recommended:
+
+- Use chunked and parallel data transfers to maximize throughput when uploading or downloading large files between Salad
+  nodes and cloud storage.
+
+- Introduce a dedicated uploader thread with task queue to offload upload operations from the main thread, ensuring that
+  simulation execution remains unblocked.
+
+- Add error handling, monitoring, and logging to improve reliability, enhance visibility, and simplify troubleshooting.
+
+Please refer to [the example code](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/main_salad.py) for
+more implementation details.
+
+The code also generates [a task log file](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/history.txt)
+upon simulation completion, alongside the standard output files. This log contains detailed runtime statistics, which
+can be analyzed using
+[salad_analysis.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/salad_analysis.py) to produce a
+summary report.
+
+<img src="/container-engine/images/gs_workflow.png" />
+
+### Dockerfile Configuration
+
+[The provided Dockerfile](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/Dockerfile) creates a
+containerized environment by using the miniconda official image, then installing essential utilities (VS Code Server
+CLI), GROMACS 2024.5 and required dependencies. It copies the required Python code into the image and sets the default
+command.
+
+```Dockerfile
+# Select a base image: https://hub.docker.com/r/continuumio/miniconda3
+FROM continuumio/miniconda3:25.1.1-0
+
+RUN apt-get update && apt-get install -y curl net-tools iputils-ping
+
+# Optional: Install VS Code Server for remote debugging
+RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o vscode_cli.tar.gz && \
+    tar -xf vscode_cli.tar.gz && \
+    mv code /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
+
+# Install GROMACS 2024.5，with CUDA and without MPI
+# https://anaconda.org/conda-forge/gromacs
+# No GPU when building the image, so we use CONDA_OVERRIDE_CUDA to simulate CUDA during build
+RUN CONDA_OVERRIDE_CUDA="11.8" conda install -c conda-forge gromacs=2024.5=nompi_cuda_h5cb645a_0 -y
+
+RUN pip install --upgrade pip
+RUN pip install python-dotenv boto3 salad-cloud-sdk
+
+WORKDIR /app
+COPY main_basic.py helper.py main_salad.py salad_monitor.py /app/
+
+CMD ["python", "main_salad.py"]
+
+# The pre-built image:
+# docker.io/saladtechnologies/mds:001-gromacs-srcg
+```
+
+### Environment Variables
+
+Ensure all required environment variables are set before running a simulation. These variables will be passed to the
+SRCG at creation time. For easy configuration and reuse, you can define them in a .env file located in the project
+directory.
+
+```bash .env
+# Access to the Cloudflare R2:
+CLOUDFLARE_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+CLOUDFLARE_ID=******
+CLOUDFLARE_KEY=******
+
+# Task parameters: input, checkpoint and output files are stored in the BUCKET/PREFIX/FOLDER.
+BUCKET=<BUCKET_NAME>
+PREFIX=<PREFIX_NAME> # Optional
+FOLDER=<FOLDER_NAME>
+TPR_FILE=<***.tpr>
+MAX_STEPS=10000000
+SAVING_INTERVAL_HOURS=0.5 # 30 minutes
+
+# If the main thread is unresponsive for the specified duration, the uploader thread triggers reallocation.
+MAX_NO_RESPONSE_TIME=3600 # 1 hour
+
+# This is optional and allows the SRCG to call the SaladCloud API internally to shut itself down once the simulation is complete.
+# If these settings are not provided, the SRCG will continue running (sleep infinity) after completion, and you can log into the instance to perform additional tasks using VS Code or the terminal available through the SaladCloud Portal.
+# SaladCloud will introduce a new mechanism that allows the SRCG to shut itself down internally, eliminating the need for the SaladCloud Python SDK and API access.
+SALAD_API_KEY=salad_cloud_user_******
+ORGANIZATION_NAME=******
+PROJECT_NAME=******
+CONTAINER_GROUP_NAME=******
+
+# Optional, telling the SRCG when it was created
+# TASK_CREATION_TIME=2025-06-18 10:10:10
+```
+
+### Local Run
+
+If you have access to a local GPU environment, you can perform a test of the image before running it on SaladCloud. Use
+`docker compose` to start the container defined in
+[docker-compose.yaml](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/docker-compose.yaml). The command
+automatically loads environment variables from the .env file in the same directory.
+
+```bash
+docker compose up
+```
+
+The input .tpr file should be uploaded to the cloud before starting the test.
+
+### Deployment on SaladCloud
+
+Run [salad_quotas.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/salad_quotas.py) to view detailed
+information about your current quotas and available GPU types, and refer to
+[salad_deploy.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/salad_deploy.py) for a deployment
+example of an SRCG with the SaladCloud Python SDK to run a simulation task.
+
+The [salad_monitor.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/salad_monitor.py) script monitors
+the simulation progress by checking the files uploaded to cloud storage. It can also reset the test environment by
+clearing the cloud folder while preserving the .tpr input file.
+
+To debug and perform manual tasks, follow
+[this guide](/container-engine/tutorials/development-tools/vscode-remote-development#interactive-mode) to connect to the
+SRCG using VS Code.
+
+## Test Results and Benchmarks
+
+### Single-Day Simulation Results
+
+The input model for the test is [a huge virus protein](https://zenodo.org/records/3893789) with 1,066,628 atoms. The
+test run 10,000,000 steps with a chunking interval of 30 minutes.
+
+Here is the summary of
+[the test run results](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/history.txt) on SaladCloud:
+
+```txt
+SRCG Resource Type: 16 vCPUs, 24 GB RAM, RTX 4000-series GPUs
+Task Creation Time: 2025-06-18 10:38:10
+First Node Online: 2025-06-18 10:45:09 (7 minutes after task creation)
+Total Task Duration: 1 day, 0:11:45
+Efficient Runtime: 22:57:01
+Non-Running time: 1:14:44
+Runtime-to-Duration Ratio: 95%
+Interruptions: 2 (the last one was shut down by the test code)
+```
+
+**The 75 minutes of non-running time includes:**
+
+- 2 Interruptions: With a 30 minutes chunking interval, the interruptions may result in 30 minutes of lost compute time
+  (estimated as N x Chunking Interval / 2). This lost time is not included in the efficient runtime, and can be reduced
+  by using smaller chunking intervals.
+- 3 Node allocation/reallocations. This includes image pulling and environment setup, which are not charged by
+  SaladCloud.
+
+Here are the detailed statistics of each node run:
+
+| Machine ID                           | GPU                        | Start               | End                 | Duration | Chunks | Steps     | Steps/Second     |
+| ------------------------------------ | -------------------------- | ------------------- | ------------------- | -------- | ------ | --------- | ---------------- |
+| c599288a-9974-3858-b1eb-1e8b2e8aa9ab | NVIDIA GeForce RTX 4060 Ti | 2025-06-18 10:45:09 | 2025-06-19 00:11:28 | 13:26:19 | 27     | 3,717,000 | 76.83 steps/sec  |
+| e138daef-c41c-e050-ba2d-889b7b9a08fc | NVIDIA GeForce RTX 4090    | 2025-06-19 00:46:07 | 2025-06-19 01:16:05 | 0:29:58  | 1      | 385,400   | 214.35 steps/sec |
+| e3b930f7-637d-6e57-a67b-3bb9563a2796 | NVIDIA GeForce RTX 4090    | 2025-06-19 01:49:11 | 2025-06-19 10:49:55 | 9:00:44  | 19     | 5,897,600 | 181.78 steps/sec |
+
+### Multi-Day Simulation Results
+
+The test uses the same input model as described above, but runs for 30,000,000 steps, with the simulation chunked into
+10-minute intervals. Here is the summary of
+[the test run results](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/history_2.txt) on SaladCloud:
+
+```txt
+SRCG Resource Type: 16 vCPUs, 24 GB RAM, RTX 4000-series GPUs
+Task Creation Time: 2025-06-19 16:16:59
+First Node Online: 2025-06-19 16:25:00 (8 minutes after task creation)
+Total Task Duration: 4 days, 12:19:12
+Efficient Runtime: 4 days, 11:48:04
+Non-Running time: 0:31:08
+Runtime-to-Duration Ratio: 99.5%
+Interruptions: 1 (the last one was shut down by the test code)
+```
+
+**The 31 minutes of non-running time includes:**
+
+- 1 Interruption: With a 10 minutes chunking interval, the interruption may result in 5 minutes of lost compute time
+  (estimated as N x Chunking Interval / 2). This lost time is not included in the efficient runtime, and can be reduced
+  by using smaller chunking intervals.
+- 2 Node allocation/reallocations. This includes image pulling and environment setup, which are not charged by
+  SaladCloud.
+
+Here are the detailed statistics of each node run:
+
+| Machine ID                           | GPU                              | Start               | End                 | Duration         | Chunks | Steps      | Steps/Second     |
+| ------------------------------------ | -------------------------------- | ------------------- | ------------------- | ---------------- | ------ | ---------- | ---------------- |
+| 602e45b0-1fd8-4352-bddc-f96270e1f048 | NVIDIA GeForce RTX 4060 Ti       | 2025-06-19 16:25:00 | 2025-06-23 12:39:15 | 3 days, 20:14:15 | 544    | 22,254,600 | 67.02 steps/sec  |
+| 3d18a605-08d6-1958-8795-e500065b2377 | NVIDIA GeForce RTX 4070 Ti SUPER | 2025-06-23 13:02:22 | 2025-06-24 04:36:11 | 15:33:49         | 94     | 7,745,400  | 138.24 steps/sec |
+
+### Summary and Conclusions
+
+The SRCG approach is easy to set up and works especially well for long-running simulations—where the longer the runtime,
+the more negligible the non-runtime overhead becomes. However, when running a large number of simulation
+tasks—particularly short ones—a job queue is essential to maintain efficiency and scalability.
+
+A shorter chunking interval helps minimize compute loss during unexpected interruptions, but it can slightly impact
+overall performance. This is because the simulation must pause more frequently to generate output and checkpoint files
+for each chunk. The upload process, however, has no effect on performance, as it is handled asynchronously.
+
+In the above tests using the same node type (RTX 4060 Ti), the configuration with 10-minute chunking intervals
+demonstrated approximately 10% lower performance compared to the 30-minute interval configuration.
+
+Salad nodes equipped with the same GPU type may differ in CPU, RAM, and other hardware characteristics, including vendor
+and model. These differences could introduce variations in processing capacity, which may also fluctuate over time due
+to the shared nature.
+
+To mitigate the impact of underperforming nodes, applications can perform initial checks and
+[continuously monitor performance](/container-engine/tutorials/performance/performance-monitoring) to filter nodes based
+on specific criteria. Please refer to
+[this guide](/container-engine/tutorials/performance/high-performance-apps#implement-real-time-performance-monitoring)
+for more details.
