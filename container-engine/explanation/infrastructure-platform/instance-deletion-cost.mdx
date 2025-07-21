@@ -9,13 +9,13 @@ _Last Updated: June 3, 2025_
 
 Setting the instance deletion cost is a powerful and flexible way to manage scale-in behavior for container groups.
 Note, however, that this deletion cost only applies when intentional scaling events occur, such as setting replica
-count, or via autoscaling policies. It does not apply to instances that are terminated due to other reasons, such as
-host interruptions or failed instances.
+count, or via [Job Queue autoscaling policies](/container-engine/explanation/infrastructure-platform/autoscaling). It
+does not apply to instances that are terminated due to other reasons, such as host interruptions or failed instances.
 
-When a salad container group is scaled in via adjusting its replica count or an autoscaling policy, the instance
-deletion cost determines how the system selects which instances to terminate. The instance deletion cost is an integer
-value with a default of `0` that you can assign to each instance in the container group. Instances with a lower deletion
-cost are prioritized for termination when scaling down.
+When a salad container group is scaled in via adjusting its replica count or a Job Queue autoscaling policy, the
+instance deletion cost determines how the system selects which instances to terminate. The instance deletion cost is an
+integer value with a default of `0` that you can assign to each instance in the container group. Instances with a lower
+deletion cost are prioritized for termination when scaling down.
 
 Assigning this value can be done from within the application through the instance metadata service, using the
 [Replace Deletion Cost Endpoint](/reference/imds/replace-deletion-cost). It can also be done externally via the
@@ -66,3 +66,12 @@ internal queues. You can set the deletion cost of the instance to the depth of t
 when scaling down. For example, if an instance has a queue depth of 5, you can set its deletion cost to 5. This way, if
 the system needs to scale down, it will prioritize terminating instances with a lower deletion cost, thus preserving
 instances that are actively processing jobs in their queues.
+
+## Related Topics
+
+- **[Job Queue Autoscaling Overview](/container-engine/explanation/infrastructure-platform/autoscaling)**: Learn how
+  SaladCloud's built-in autoscaling works with job queues
+- **[Set Up Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling)**: Configure
+  autoscaling for your container groups
+- **[Job Queue Autoscaling Settings](/container-engine/reference/autoscaling/settings)**: Reference for autoscaling
+  configuration parameters
