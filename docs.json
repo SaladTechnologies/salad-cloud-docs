@@ -259,6 +259,14 @@
                 ]
               },
               {
+                "group": "Migration",
+                "pages": [
+                  "container-engine/how-to-guides/migration/migrate-from-vast",
+                  "container-engine/how-to-guides/migration/migrate-from-runpod"
+                ]
+              },
+
+              {
                 "group": "Platform Integrations",
                 "pages": [
                   "container-engine/how-to-guides/platform-integrations/installation-helm-chart",
