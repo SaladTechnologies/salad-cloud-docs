@@ -1,0 +1,792 @@
+---
+title: 'Vast.ai to SaladCloud Migration Guide'
+sidebarTitle: 'From Vast.ai'
+description:
+  'Complete guide to migrating your GPU workloads from Vast.ai to SaladCloud with containerization, cost savings up to
+  90%, and automated orchestration'
+---
+
+_Last Updated: July 18, 2025_
+
+# Overview
+
+Migrating from Vast.ai to SaladCloud is a straightforward process that preserves your existing development workflow
+while automating the operational complexity you're used to managing manually. If you're currently SSH-ing into
+instances, installing dependencies, and running scripts on Vast.ai, you'll find that SaladCloud maintains the same
+familiar patterns—your Python code, ML frameworks, and data processing logic remain identical.
+
+**What Stays Exactly the Same:**
+
+- Your application code and algorithms work unchanged
+- Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
+- Identical API patterns, data processing workflows, and model training approaches
+- Same debugging mindset—just with better tools than SSH
+- Your development environment and local testing process
+
+**What Gets Automated for You:** Instead of manually managing GPU instances, SaladCloud handles instance provisioning,
+CUDA driver installation, framework setup, automatic failover, and global load balancing through our
+[Salad Container Engine (SCE)](/container-engine/explanation/core-concepts/overview). The "migration" is really about
+packaging your existing workflow into a container that runs your familiar code automatically across 11,000+ GPUs while
+saving up to 90% on costs.
+
+> 💡 **New to containerization?** Check out our comprehensive
+> [getting started guide](/container-engine/tutorials/quickstart) for a step-by-step introduction to deploying on
+> SaladCloud, or explore our
+> [architectural overview](/container-engine/explanation/core-concepts/architectural-overview) to understand how
+> SaladCloud's distributed GPU network works.
+
+Think of containerization as creating a "recipe" for the manual setup you already do on Vast.ai—instead of SSH-ing in
+and running `pip install` commands each time, you write those same commands once in a Dockerfile, Docker builds an
+immutable image with everything pre-installed, and that same image runs consistently across all instances. Most
+developers find this eliminates their biggest frustrations with manual instance management while keeping everything else
+familiar.
+
+## Why Containerization Has Become the Industry Standard
+
+Containerization has emerged as the de facto deployment standard across the technology industry for compelling reasons
+that directly benefit developers and organizations. Containers provide **consistency across environments** by packaging
+applications with all their dependencies, eliminating the "it works on my machine" problem that has plagued software
+deployment for decades. This consistency extends from development laptops to production clusters, ensuring predictable
+behavior regardless of the underlying infrastructure.
+
+The **portability** offered by containers is transformative—applications become truly platform-agnostic, running
+identically on any system that supports container runtimes. This portability reduces vendor lock-in and enables
+organizations to migrate workloads between cloud providers, on-premises infrastructure, or hybrid environments without
+code changes. Additionally, containers enable **efficient resource utilization** through consistent packaging and
+deployment, while SaladCloud's architecture ensures each container gets dedicated access to full GPU resources on
+individual nodes.
+
+Perhaps most importantly, containers have revolutionized **deployment velocity and reliability**. Teams can package,
+test, and deploy applications in minutes rather than hours, while container orchestration platforms provide automatic
+scaling, health monitoring, and self-healing capabilities. This operational efficiency has made containerization
+essential for modern DevOps practices and continuous delivery pipelines.
+
+On SaladCloud, each container runs on a dedicated GPU node, ensuring your application has exclusive access to the full
+GPU resources without sharing with other workloads. This dedicated approach maximizes performance while maintaining the
+portability and consistency benefits of containerization.
+
+## Key Platform Differences
+
+### Vast.ai Architecture
+
+- Individual GPU instances with SSH access
+- VM-like environment with direct file system access
+- Instance-based pricing and management
+
+### SaladCloud Architecture
+
+- Containerized applications with automatic orchestration
+- Distributed network with built-in redundancy
+- Container-based deployment with health monitoring
+
+## Migration Requirements
+
+### What You're Already Doing (Made Easier)
+
+The "requirements" below are actually improvements to processes you're already handling manually on Vast.ai. Rather than
+learning entirely new concepts, you're automating existing workflows with better consistency and reliability.
+
+- **Containerization** replaces manual dependency installation on each instance. Instead of SSH-ing in and running the
+  same `pip install` commands repeatedly, you write them once in a Dockerfile, Docker builds the dependencies into an
+  immutable image, and that image runs consistently across all instances.
+
+- **Storage Strategy** shifts from local file management to cloud-based storage patterns. While cloud APIs provide more
+  reliable data persistence than manually copying files between instances, this transition requires rethinking data
+  workflows. You'll need to consider upload/download costs, latency impacts, and potential network reliability issues
+  that weren't factors with local storage on Vast.ai.
+
+- **Network Architecture** replaces managing multiple ports and SSH tunneling. You get a single port with automatic load
+  balancing instead of manually configuring port forwarding and access rules.
+
+- **AMD64 Architecture** is what you're already using on most Vast.ai instances, so this requires no change to your
+  existing applications.
+
+### Technical Implementation (Familiar Concepts)
+
+These constraints map directly to what you're already working with, just more consistently managed:
+
+- **Container Images**: 35GB limit (larger than most Vast.ai instance setups)
+- **Storage**: Cloud-based (eliminates instance storage limitations) - see our
+  [storage integration guide](/storage/explanation/overview) for persistent data patterns
+- **Networking**: [IPv6 support](/container-engine/how-to-guides/gateway/enabling-ipv6) (replace `0.0.0.0` with `::` in
+  your bind address)
+- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal) and
+  [portal logs](/container-engine/explanation/container-groups/container-logs) (more convenient than SSH key management)
+
+> 📘 **Container Registry Options:** SaladCloud supports all major container registries. See our guides for
+> [Docker Hub](/container-engine/how-to-guides/registries/dockerhub),
+> [AWS ECR](/container-engine/how-to-guides/registries/aws-ecr),
+> [Azure ACR](/container-engine/how-to-guides/registries/azure-acr), and
+> [Google Artifact Registry](/container-engine/how-to-guides/registries/gcp-gar).
+
+## Migration Process
+
+All deployment and management tasks described in this guide can be accomplished through the intuitive SaladCloud web
+portal at [portal.salad.com](https://portal.salad.com) or programmatically via our REST API and SDKs (Python and
+TypeScript). The portal provides a visual interface perfect for getting started and one-off deployments, while the API
+and SDKs enable automation, CI/CD integration, and infrastructure-as-code workflows. You can seamlessly switch between
+approaches—deploy through the portal initially, then automate with the API as your needs grow.
+
+### Phase 1: Assessment and Containerization
+
+**Assessment and Planning**
+
+- Catalog your current Vast.ai workloads
+- Identify containerization candidates
+- Set up SaladCloud account and API access
+
+**Container Development**
+
+- Create Dockerfiles for your applications
+- Build and test containers locally
+- Push images to container registry
+
+> 🔧 **Containerization Resources:** If you're new to Docker, check out our
+> [Docker deployment tutorial](/container-engine/tutorials/deployment/docker-run) for practical examples, or see
+> [specifying container commands](/container-engine/how-to-guides/specifying-a-command) for advanced startup
+> configuration.
+
+### Phase 2: Deployment and Optimization
+
+**Initial Deployment**
+
+- Deploy containers to SaladCloud (via portal or API)
+- Configure Container Gateway and health probes
+- Set up monitoring and logging
+
+> 📊 **Monitoring & Logging:** For production workloads, consider setting up
+> [external logging](/container-engine/explanation/infrastructure-platform/external-logging) with providers like
+> [Axiom](/container-engine/how-to-guides/external-logging/axiom) (recommended),
+> [Datadog](/container-engine/how-to-guides/external-logging/datadog), or
+> [New Relic](/container-engine/how-to-guides/external-logging/new-relic) for advanced log analysis and retention.
+
+**Testing and Optimization**
+
+- Validate performance and functionality
+- Optimize resource allocation (containers have CPU/memory limits, not direct hardware allocation like VMs)
+- Complete migration of remaining workloads
+
+**Understanding Container vs VM Resource Models**
+
+Unlike Vast.ai VMs where you get dedicated hardware specs (e.g., "8 vCPUs, 32GB RAM"), SaladCloud containers specify
+resource limits. Your container can use up to the specified CPU and memory limits, but the underlying node architecture
+may vary. This means:
+
+- **CPU Limits**: Your container gets guaranteed access up to the specified vCPU count, but performance characteristics
+  may differ across node types
+- **Memory Limits**: Hard limits enforced by the container runtime - exceeding these will terminate your container
+- **GPU Access**: Each container gets exclusive access to the full GPU on its assigned node
+- **Storage**: Container filesystem is ephemeral - data doesn't persist between container restarts unless using external
+  storage
+
+## Step-by-Step Migration Process
+
+### Step 1: Prepare Your SaladCloud Environment
+
+**Account Setup**
+
+1. Create account at [portal.salad.com](https://portal.salad.com)
+2. Set up organization and project
+3. Add billing information and initial credits
+4. Generate API key for programmatic access
+
+**Environment Configuration**
+
+```bash
+# Use SaladCloud API directly or Python SDK
+curl -X GET "https://api.salad.com/api/public/organizations/your-org/projects/your-project/containers" \
+  -H "Salad-Api-Key: YOUR_API_KEY"
+```
+
+**Python SDK Installation**
+
+```bash
+pip install salad-cloud-sdk
+```
+
+**Python SDK Usage**
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+# Initialize SDK
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+# List container groups
+result = sdk.container_groups.list_container_groups(
+    organization_name="your-org",
+    project_name="your-project"
+)
+```
+
+For complete API documentation, see the [SaladCloud API Reference](/reference/saladcloud-api).
+
+### Step 2: Containerize Your Applications
+
+**Understanding Containerization for Vast.ai Users** If you're coming from Vast.ai without container experience, think
+of containerization as creating a "blueprint" for your application environment. Instead of manually installing
+dependencies on each GPU instance, you define everything your application needs in a simple text file called a
+Dockerfile. The key difference is that containers provide environment consistency - when your container image is
+deployed across multiple SaladCloud nodes, each instance runs in an identical environment that was defined at build
+time.
+
+**No More Manual Environment Setup** One of the biggest advantages of containerization is that complex environments like
+PyTorch with CUDA are available as pre-built, officially maintained images. Remember the frustration of manually
+configuring CUDA drivers, PyTorch versions, and dependency conflicts on Vast.ai? That's completely eliminated with
+containers.
+
+Instead of spending time on environment setup, you can start with battle-tested base images:
+
+```dockerfile
+# Pre-built PyTorch with latest CUDA support - no manual setup required
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+# Or NVIDIA's optimized PyTorch container with CUDA 12.6
+FROM nvcr.io/nvidia/pytorch:25.01-py3
+
+# Or a general CUDA base for custom ML stacks
+FROM nvidia/cuda:12.6-cudnn9-runtime-ubuntu22.04
+```
+
+These images come with:
+
+- ✅ CUDA drivers pre-installed and configured
+- ✅ cuDNN libraries properly linked
+- ✅ Framework-specific optimizations
+- ✅ Compatible Python environments
+- ✅ All dependencies tested together
+
+> ⚡ **GPU Compatibility:** SaladCloud guarantees support for CUDA Toolkit 12.0 and later. For the latest RTX 5090/5080
+> GPUs, see our [PyTorch RTX 5090 guide](/container-engine/tutorials/machine-learning/pytorch-rtx5090) for CUDA 12.8
+> requirements. Check our
+> [high-performance applications guide](/container-engine/tutorials/performance/high-performance-apps) for GPU
+> optimization tips.
+
+**Basic Containerization Pattern** The Dockerfile below shows how straightforward containerization can be. Notice how it
+mirrors the same steps you'd typically perform on a Vast.ai instance:
+
+```dockerfile
+# Start with a pre-built PyTorch+CUDA image (no manual CUDA setup!)
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+WORKDIR /app
+
+# Install additional dependencies (same as pip install on Vast.ai)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code (same as uploading your files)
+COPY . .
+
+# Start application with IPv6 support (same as running python app.py)
+CMD ["uvicorn", "app:app", "--host", "::", "--port", "8000"]
+```
+
+**What's Familiar:**
+
+- **Dependencies**: The `pip install` line works exactly like on Vast.ai
+- **File Structure**: Your code organization remains the same
+- **Startup Command**: The CMD line replaces what you'd type in your Vast.ai terminal
+- **Environment Variables**: Still work the same way in containers
+
+**What's Better:**
+
+- **No CUDA Setup**: Skip the tedious CUDA/PyTorch installation process entirely
+- **Consistent Environments**: Your exact environment runs identically across all nodes
+- **Version Control**: Pin specific framework versions without compatibility issues
+- **IPv6 Ready**: Use `::` instead of `0.0.0.0` for Container Gateway compatibility
+
+**Building Your Container**
+
+```bash
+# Build your container (replaces manual setup)
+docker build -t your-ml-app:latest .
+
+# Push to registry (replaces copying files to instances)
+docker push your-registry/your-ml-app:latest
+```
+
+The beauty of this approach is that you're essentially automating the same setup process you'd do manually on Vast.ai,
+but with better consistency and portability—plus you never have to deal with CUDA installation headaches again.
+
+For detailed containerization guidance, see [Getting Started with SCE](/container-engine/tutorials/quickstart).
+
+> 🤖 **ML-Specific Examples:** For machine learning workloads, explore our specialized deployment guides:
+>
+> - [BLIP image captioning with Cog](/container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog)
+> - [YOLOv8 object detection](/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial)
+> - [LLM deployment patterns](/container-engine/explanation/ai-machine-learning/llm-overview)
+> - [JupyterLab with cloud storage](/container-engine/tutorials/machine-learning/jupyterlab)
+
+**Storage Integration Example**
+
+```python
+# Replace local file operations with cloud storage
+import boto3
+import requests
+import tempfile
+import os
+
+# For persistent data: Use external cloud storage (S3)
+s3_client = boto3.client('s3')
+
+def store_data_s3(data, bucket, key):
+    """Store data in S3 for persistent storage"""
+    s3_client.put_object(Bucket=bucket, Key=key, Body=data)
+    return f"s3://{bucket}/{key}"
+
+def load_data_s3(bucket, key):
+    """Load data from S3"""
+    response = s3_client.get_object(Bucket=bucket, Key=key)
+    return response['Body'].read()
+
+# For processing: Use in-memory or temporary local storage
+def process_data(input_data):
+    """Process data using temporary storage"""
+    with tempfile.NamedTemporaryFile() as tmp_file:
+        tmp_file.write(input_data)
+        tmp_file.flush()
+        # Process the temporary file
+        # File is automatically cleaned up when context exits
+        return processed_data
+
+# Example usage in application
+def main():
+    # Load persistent data from S3
+    model_data = load_data_s3('my-models', 'trained_model.safetensors')
+
+    # Use temporary local storage for processing
+    with tempfile.NamedTemporaryFile() as tmp:
+        tmp.write(model_data)
+        result = process_model(tmp.name)
+
+    # Store final results back to S3
+    store_data_s3(result, 'my-results', 'final_output.json')
+```
+
+**Important Storage Considerations**
+
+While cloud storage offers better reliability than local files, the transition requires careful planning:
+
+- **Latency Impact**: Network calls to cloud storage are slower than local file access. Consider caching frequently
+  accessed data locally during processing.
+- **Bandwidth Costs**: Large model downloads/uploads can be expensive. Evaluate if you need to transfer full datasets or
+  can work with smaller chunks.
+- **Error Handling**: Network operations can fail. Implement retry logic and graceful degradation for storage
+  operations.
+- **Concurrent Access**: Multiple container instances may access the same data. Consider read/write patterns and
+  potential conflicts.
+
+**What Changes:**
+
+- `open('/path/to/file.txt', 'r')` becomes `load_data_s3('bucket', 'file.txt')`
+- `with open('/path/to/file.txt', 'w')` becomes `store_data_s3(data, 'bucket', 'file.txt')`
+- File paths become bucket keys (still organized hierarchically)
+
+**What Stays the Same:**
+
+- Your data processing logic is identical
+- Error handling patterns remain familiar
+- File formats and serialization work exactly as before
+- Temporary processing still uses local files when needed
+
+**Benefits You Gain:**
+
+- **Reliability**: No more lost data when containers restart—your models and results persist
+- **Scalability**: Access the same data from multiple containers simultaneously
+- **Collaboration**: Share datasets and models across your team instantly
+- **Backup**: Built-in redundancy and versioning (with S3) eliminates data loss concerns
+- **Performance**: Often faster than local disk I/O, especially for large files
+- **Cost Efficiency**: Pay only for storage you use, not for reserved disk space
+
+This approach actually simplifies deployment because you eliminate the complexity of managing persistent volumes, file
+permissions, and disk space—challenges that often plague traditional GPU instance setups.
+
+> 💾 **Storage Best Practices:** For comprehensive storage strategies, see our
+> [Simple Storage Service documentation](/storage/explanation/overview) for file storage patterns, or explore
+> [environment variables management](/container-engine/how-to-guides/environment-variables) for configuration data.
+
+### Step 3: Deploy Container Groups
+
+**Portal Deployment (Recommended for first deployment)**
+
+1. Navigate to your SaladCloud project
+2. Click "Create Container Group"
+3. Configure container settings:
+   - Image: Your container registry URL
+   - Replicas: Start with 2-3 for reliability
+   - Resources: CPU, RAM, and GPU requirements
+   - Container Gateway: Enable for external access
+
+For a complete deployment walkthrough, see the [Quickstart Tutorial](/container-engine/tutorials/quickstart).
+
+**API Deployment Example**
+
+```bash
+curl -X POST "https://api.salad.com/api/public/organizations/$ORG/projects/$PROJECT/containers" \
+  -H "Salad-Api-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-workload",
+    "container": {
+      "image": "myregistry/myapp:latest",
+      "resources": {
+        "cpu": 2,
+        "memory": 4096,
+        "gpu_classes": ["rtx4090", "rtx3090"]
+      }
+    },
+    "networking": {
+      "protocol": "http",
+      "port": 8000,
+      "auth": false
+    },
+    "replicas": 3,
+    "restart_policy": "always"
+  }'
+```
+
+### Step 4: Configure Health Monitoring
+
+**Health Probe Implementation**
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
+
+@app.get("/ready")
+async def readiness_check():
+    # Check if app is ready to receive traffic
+    return {"status": "ready"}
+
+@app.get("/started")
+async def startup_check():
+    # Check if app has started successfully
+    return {"status": "started"}
+```
+
+**Configure Health Probes in SaladCloud** Health probes are configured through the SaladCloud portal or API, not through
+Dockerfile directives:
+
+- **Startup Probe**: Configure HTTP probe pointing to `/started` endpoint
+- **Liveness Probe**: Configure HTTP probe pointing to `/health` endpoint
+- **Readiness Probe**: Configure HTTP probe pointing to `/ready` endpoint
+
+For detailed information on health probes, see the
+[Health Probes documentation](/container-engine/explanation/infrastructure-platform/health-probes).
+
+> 🏥 **Health Monitoring Deep Dive:** Explore specific probe types:
+>
+> - [Startup probes](/container-engine/explanation/infrastructure-platform/startup-probes) - verify container
+>   initialization
+> - [Readiness probes](/container-engine/explanation/infrastructure-platform/readiness-probes) - control traffic routing
+> - [Liveness probes](/container-engine/explanation/infrastructure-platform/liveness-probes) - detect and restart
+>   unhealthy containers
+> - [Health probe in general](/container-engine/explanation/infrastructure-platform/health-probes) - practical
+>   implementation patterns
+
+**Health Probe Configuration**
+
+```python
+# Example: SDK configuration for health probes
+from salad_cloud_sdk.models import ContainerGroupCreationRequest
+
+request = ContainerGroupCreationRequest(
+    # ... other configuration
+    startup_probe={
+        "http": {
+            "path": "/started",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 10,
+        "period_seconds": 5,
+        "timeout_seconds": 3,
+        "failure_threshold": 3
+    },
+    liveness_probe={
+        "http": {
+            "path": "/health",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 30,
+        "period_seconds": 10,
+        "timeout_seconds": 5,
+        "failure_threshold": 3
+    },
+    readiness_probe={
+        "http": {
+            "path": "/ready",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 5,
+        "period_seconds": 5,
+        "timeout_seconds": 3,
+        "failure_threshold": 3
+    }
+)
+```
+
+### Step 5: Set Up Monitoring and Logging
+
+**Application Logging**
+
+```python
+import logging
+import sys
+import json
+
+# Configure JSON logging for better parsing
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        return json.dumps({
+            "timestamp": record.created,
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "module": record.module
+        })
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[logging.StreamHandler(sys.stdout)],
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+```
+
+**External Logging (Optional)** Configure external logging providers like Axiom through the SaladCloud portal for
+advanced log analysis and retention beyond the 3-month portal limit.
+
+> 📋 **Logging Solutions:** Choose from multiple external logging providers:
+>
+> - [Axiom](/container-engine/how-to-guides/external-logging/axiom) (SaladCloud's preferred provider)
+> - [Datadog](/container-engine/how-to-guides/external-logging/datadog) for comprehensive monitoring
+> - [Splunk](/container-engine/how-to-guides/external-logging/splunk-logging) for enterprise environments
+> - [HTTP endpoints](/container-engine/how-to-guides/external-logging/http) for custom solutions
+> - [TCP logging](/container-engine/how-to-guides/external-logging/tcp-logging) with secure transport
+
+## Migration Scenarios
+
+### Scenario 1: Simple API Service
+
+**Before (Vast.ai)**: SSH into instance, run Python script
+
+**After (SaladCloud)**: Containerized FastAPI with health checks
+
+**Key changes**: Add Dockerfile, configure IPv6, implement health endpoints
+
+### Scenario 2: ML Training Pipeline
+
+**Before (Vast.ai)**: Upload data to instance, run training script
+
+**After (SaladCloud)**: Containerized training with S3 data loading
+
+**Key changes**: Implement cloud storage data loading, containerize training code
+
+### Scenario 3: Multi-Service Application
+
+**Before (Vast.ai)**: Multiple services on different ports
+
+**After (SaladCloud)**: Single container with internal routing
+
+**Key changes**: Implement API gateway pattern, consolidate services
+
+## Quick Solutions for Common Challenges
+
+### Challenge: File Storage Dependencies
+
+**Quick Fix**: Use cloud storage APIs for persistent data
+
+```python
+# Cloud storage for persistent data
+def store_persistent_data(data):
+    return s3_client.put_object(Bucket='my-bucket', Key='data.json', Body=data)
+
+# Local temporary storage for processing
+def process_with_temp_storage(data):
+    with tempfile.NamedTemporaryFile() as tmp:
+        tmp.write(data)
+        tmp.flush()
+        return process_file(tmp.name)
+```
+
+### Challenge: Multiple Port Applications
+
+**Quick Fix**: Use path-based routing
+
+```python
+app = FastAPI()
+
+@app.get("/service1/{path:path}")
+async def service1_handler(path: str):
+    return handle_service1(path)
+
+@app.get("/service2/{path:path}")
+async def service2_handler(path: str):
+    return handle_service2(path)
+```
+
+### Challenge: Debugging Without SSH
+
+**Quick Fix**: Use SaladCloud web terminal and comprehensive logging
+
+- Access web terminal through portal for interactive debugging
+- Implement detailed logging for troubleshooting
+- Use health probes to monitor application state
+
+> 🛠️ **Advanced Debugging:** Explore additional troubleshooting resources:
+>
+> - [Troubleshooting guide](/container-engine/how-to-guides/troubleshooting) for common issues
+> - [Performance monitoring](/container-engine/tutorials/performance/performance-monitoring) for optimization
+> - [Interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) for live debugging
+
+## Performance Optimization Tips
+
+### Resource Allocation
+
+- Start with 2-3 replicas for reliability
+- Monitor resource usage and adjust CPU/memory as needed
+- Use appropriate GPU classes for your workload
+
+### Network Performance
+
+- Enable Container Gateway for load balancing
+- Implement proper health checks for automatic failover
+- Use HTTPS for all external communications
+
+> 🌐 **Advanced Networking:** For complex networking needs, explore:
+>
+> - [Container Gateway load balancing](/container-engine/explanation/gateway/load-balancer-options) for traffic
+>   distribution
+> - [Tailscale integration](/container-engine/how-to-guides/platform-integrations/tailscale-basic) for private networks
+> - [Real-time inference patterns](/container-engine/how-to-guides/job-processing/build-redis-queue) for high-throughput
+>   applications
+
+### Cost Optimization
+
+- Use priority pricing tiers based on availability needs
+- Monitor usage through SaladCloud portal
+- Scale replicas based on actual demand
+
+> 💰 **Scaling Strategies:** Optimize costs and performance with:
+>
+> - [Autoscaling configuration](/container-engine/how-to-guides/autoscaling/enable-autoscaling) for dynamic replica
+>   management
+> - [Job processing patterns](/container-engine/how-to-guides/job-processing/sqs) for batch workloads
+> - [Long-running task optimization](/container-engine/explanation/job-processing/long-running-tasks) for efficient
+>   resource usage
+
+## Testing Your Migration
+
+### Local Testing
+
+```bash
+# Test container locally
+docker run -p 8000:8000 myapp:latest
+
+# Test IPv6 compatibility
+docker run -p 8000:8000 myapp:latest
+curl -6 http://localhost:8000/health
+```
+
+### SaladCloud Testing
+
+1. Deploy with 1-2 replicas initially
+2. Test Container Gateway connectivity
+3. Validate health probes are working
+4. Monitor logs for any issues
+5. Scale up once validated
+
+## Migration Checklist
+
+### Pre-Migration
+
+- [ ] Applications containerized and tested locally
+- [ ] Storage dependencies identified and addressed
+- [ ] IPv6 compatibility verified
+- [ ] Health endpoints implemented
+- [ ] Container images pushed to registry
+
+### During Migration
+
+- [ ] Container groups deployed successfully
+- [ ] Container Gateway configured and tested
+- [ ] Health probes responding correctly
+- [ ] Logs flowing to portal/external service
+- [ ] Performance validated
+
+### Post-Migration
+
+- [ ] Monitoring and alerting configured
+- [ ] Cost optimization reviewed
+- [ ] Team trained on new deployment process
+- [ ] Documentation updated
+
+## Getting Help
+
+### SaladCloud Resources
+
+- **Documentation**: [docs.salad.com](https://docs.salad.com)
+- **Portal**: [portal.salad.com](https://portal.salad.com)
+- **API Reference**: [SaladCloud API Documentation](/reference/saladcloud-api)
+- **Support**: Contact [cloud@salad.com](mailto:cloud@salad.com)
+
+### Migration Support
+
+- Use [SaladCloud's web terminal](/container-engine/tutorials/development-tools/interactive-terminal) for debugging
+- Leverage [portal logs](/container-engine/explanation/container-groups/container-logs) for troubleshooting
+- Configure [external logging](/container-engine/explanation/infrastructure-platform/external-logging) for advanced
+  analysis
+- Review [health probes documentation](/container-engine/explanation/infrastructure-platform/health-probes) for
+  container lifecycle management
+
+## What You'll Gain
+
+Migrating to SaladCloud provides immediate benefits:
+
+- **Cost Savings**: Up to 90% reduction in compute costs
+- **Global Scale**: Access to 11,000+ active GPUs across 190+ countries
+- **Reliability**: Automatic failover and load balancing
+- **Simplicity**: Managed container orchestration
+- **Flexibility**: Per-second billing with no long-term commitments
+
+The containerization process, while requiring initial effort, results in more portable, scalable, and maintainable
+applications. Most teams find their deployment workflow is significantly improved after migration, with better
+monitoring, automatic scaling, and simplified operations.
+
+For more information on SaladCloud's architecture and benefits, see our
+[Core Concepts documentation](/container-engine/explanation/core-concepts/overview).
+
+Ready to get started? Create your SaladCloud account and begin your migration today!
+
+## Related Resources
+
+### Migration and Integration
+
+- [Other migration guides](/transcription/how-to-guides/migration/migrate-from-azure-batch) - Learn from migration
+  patterns for transcription APIs
+- [Kubernetes integration](/container-engine/explanation/platform-integrations/kubernetes-integration) - For
+  orchestration-aware workloads
+- [Platform integrations](/container-engine/how-to-guides/platform-integrations/service-access) - Connect with external
+  services
+
+### Specialized Deployment Guides
+
+- [Image generation with Stable Diffusion](/container-engine/explanation/ai-machine-learning/image-generation-overview)
+- [Triton Inference Server](/container-engine/tutorials/machine-learning/run-triton-server) for multi-model serving
+- [Computer vision workloads](/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial)
+- [High-performance applications](/container-engine/tutorials/performance/high-performance-apps) optimization guide
+
+### Development and Operations
+
+- [Interactive development tools](/container-engine/tutorials/development-tools/interactive-terminal)
+- [Performance monitoring and optimization](/container-engine/tutorials/performance/performance-monitoring)
+- [Advanced logging and monitoring](/container-engine/explanation/infrastructure-platform/external-logging)
