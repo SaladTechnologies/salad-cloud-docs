@@ -265,7 +265,6 @@
                   "container-engine/how-to-guides/migration/migrate-from-runpod"
                 ]
               },
-
               {
                 "group": "Platform Integrations",
                 "pages": [
@@ -277,7 +276,10 @@
               },
               {
                 "group": "Specialized Workloads",
-                "pages": ["container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg"]
+                "pages": [
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg",
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/openmm-srcg"
+                ]
               }
             ]
           },

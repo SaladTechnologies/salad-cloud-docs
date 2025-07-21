@@ -113,6 +113,7 @@ mdrun
 metavoiceio
 mintlify
 mlabonne
+myregistry
 Nemotron
 neofetch
 nflx
@@ -238,3 +239,4 @@ yolob8m-custom
 yolov8
 zapier
 zset
+openmm
