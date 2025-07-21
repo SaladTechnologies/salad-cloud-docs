@@ -458,6 +458,21 @@ When creating your container group, ensure the `queue_connection` matches your a
 3. **Test Application Endpoint**: Manually test your app's HTTP endpoint for job processing
 4. **Review Process Management**: Ensure both worker and application processes are running
 
+## Alternative Autoscaling Approaches
+
+While SaladCloud's built-in Job Queue autoscaling provides the most integrated experience, you can also implement custom
+autoscaling solutions with external queue systems:
+
+- **[AWS SQS Autoscaling](/container-engine/how-to-guides/job-processing/sqs#autoscaling)**: Build custom autoscaling
+  with AWS SQS using Lambda functions to monitor queue depth and scale container groups
+- **[RabbitMQ Autoscaling](/container-engine/how-to-guides/job-processing/rabbitmq#autoscaling)**: Implement autoscaling
+  with RabbitMQ using Cloudflare Workers to monitor queue length and adjust replicas
+- **[Kelpie Autoscaling Service](/container-engine/how-to-guides/job-processing/kelpie#autoscaling)**: Use Kelpie's
+  external autoscaling service that automatically scales SaladCloud container groups based on RabbitMQ queue depth
+
+These approaches require additional setup and external infrastructure but offer more flexibility for complex workflows,
+integration with existing systems, or when you need to integrate with existing queue infrastructure.
+
 ## Next Steps
 
 - 📖 Learn more about [Autoscaling Settings](/container-engine/reference/autoscaling/settings)
