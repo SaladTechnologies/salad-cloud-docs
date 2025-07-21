@@ -1,26 +1,481 @@
 ---
-title: 'Set Up Autoscaling'
+title: 'Set Up Container Group Autoscaling with Job Queues'
+sidebarTitle: 'Enable Job Queue Autoscaling'
+description:
+  'Learn how to configure queue-based autoscaling for your SaladCloud container groups to automatically scale based on
+  workload demand.'
 ---
 
-_Last Updated: February 26, 2025_
+_Last Updated: July 21, 2025_
 
-You can enable the autoscaling feature in SaladCloud via the API. Here's how:
+This guide walks you through setting up autoscaling for SaladCloud container groups using job queues. With autoscaling
+enabled, your container groups will automatically scale up when jobs are queued and scale down when demand decreases,
+optimizing both performance and cost.
 
-1. **Create a Container Group**: Use the SaladCloud API to create a container group. Ensure that the Job Queue is
-   enabled in the configuration.
+## Prerequisites
 
-2. **Set Autoscaling Parameters**: Set the following parameters in the API request body to enable autoscaling. Example:
+Before you begin, ensure you have:
 
-   ```json
-   "queue_autoscaler": {
-      "min_replicas": 3,
-      "max_replicas": 20,
-      "desired_queue_length": 5,
-      "polling_period": 15,
-      "max_upscale_per_minute": 20,
-      "max_downscale_per_minute": 10
+- ✅ **SaladCloud API Key**: You'll need a valid API key to make requests
+- ✅ **Organization and Project**: An active organization and project in SaladCloud
+- ✅ **Container Image with Job Queue Worker**: A containerized application that includes the
+  [SaladCloud Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker) and exposes an HTTP
+  endpoint for job processing
+- ✅ **Job Queue Understanding**: Familiarity with
+  [SaladCloud Job Queues](/container-engine/explanation/job-processing/job-queues)
+
+<Tip>
+  **Important**: Your container must include both your application AND the SaladCloud Job Queue Worker binary. The
+  worker handles communication with the queue service and forwards jobs to your application via HTTP requests. See the
+  [Job Queue Worker guide](/container-engine/how-to-guides/job-processing/queue-worker) for setup instructions.
+</Tip>
+
+## Overview
+
+Queue-based autoscaling works by monitoring the number of pending jobs in your queue and automatically adjusting the
+number of container instances accordingly. The system uses a simple formula:
+
+```
+Required Replicas = ceil(Queue Length / Desired Queue Length per Instance)
+```
+
+This ensures that your workload is distributed efficiently across the available instances.
+
+## Step 1: Plan Your Autoscaling Configuration
+
+Before implementing autoscaling, decide on these key parameters:
+
+### **Scaling Boundaries**
+
+- **Minimum Replicas**: The lowest number of instances (0 for cost optimization, or higher for faster response times)
+- **Maximum Replicas**: The upper limit based on your workload capacity and budget
+
+### **Queue Management**
+
+- **Desired Queue Length**: How many jobs each instance should handle (typically 1-10 depending on job complexity)
+- **Polling Period**: How often to check the queue (15-300 seconds, shorter for more responsive scaling)
+
+### **Rate Limiting**
+
+- **Max Upscale/Downscale per Minute**: Prevents rapid scaling fluctuations
+
+## Step 2: Create a Job Queue
+
+First, create a job queue for your project:
+
+```bash
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/queues \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
+  --data '{
+    "name": "my-processing-queue",
+    "display_name": "My Processing Queue",
+    "description": "Queue for batch processing jobs"
+  }'
+```
+
+## Step 3: Create Container Group with Autoscaling
+
+Now create a container group with autoscaling enabled. Your container image must include both your application and the
+Job Queue Worker. Here's a complete example:
+
+```bash
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
+  --data '{
+    "name": "autoscaling-workers",
+    "display_name": "Autoscaling Worker Group",
+    "container": {
+      "image": "your-registry/worker-image:latest",
+      "resources": {
+        "cpu": 4,
+        "memory": 8192,
+        "gpu_classes": ["gtx1660_super", "rtx3060", "rtx4060"]
+      },
+      "environment_variables": {
+        "SALAD_QUEUE_WORKER_LOG_LEVEL": "info"
+      }
+    },
+    "replicas": 0,
+    "country_codes": ["US", "CA"],
+    "networking": {
+      "protocol": "http",
+      "port": 8080,
+      "auth": false
+    },
+    "readiness_probe": {
+      "http": {
+        "path": "/ready",
+        "port": 8080
+      },
+      "initial_delay_seconds": 10,
+      "period_seconds": 10
+    },
+    "queue_connection": {
+      "path": "/process",
+      "port": 8080,
+      "queue_name": "my-processing-queue"
+    },
+    "queue_autoscaler": {
+      "min_replicas": 0,
+      "max_replicas": 50,
+      "desired_queue_length": 3,
+      "polling_period": 30,
+      "max_upscale_per_minute": 10,
+      "max_downscale_per_minute": 5
     }
-   ```
+  }'
+```
 
-   For the full api call example, refer to the
-   [API documentation](/reference/saladcloud-api/container-groups/create-container-group).
+**Key Configuration Points:**
+
+- **`queue_connection.path`**: HTTP endpoint where your app receives jobs (e.g., `/process`)
+- **`queue_connection.port`**: Port your application listens on (must match networking.port)
+- **`readiness_probe`**: Ensures your app is ready before the worker starts sending jobs
+- **`SALAD_QUEUE_WORKER_LOG_LEVEL`**: Controls worker logging (error, warn, info, debug)
+
+## Step 4: Configure Autoscaling Parameters
+
+Let's break down each autoscaling parameter:
+
+### **Core Settings**
+
+```json
+"queue_autoscaler": {
+  "min_replicas": 0,           // Scale to zero for cost savings
+  "max_replicas": 50,          // Maximum instances (check your quota)
+  "desired_queue_length": 3,   // Target jobs per instance
+  "polling_period": 30         // Check every 30 seconds
+}
+```
+
+### **Rate Limiting (Optional)**
+
+```json
+"max_upscale_per_minute": 10,   // Add max 10 instances per minute
+"max_downscale_per_minute": 5   // Remove max 5 instances per minute
+```
+
+Rate limiting prevents aggressive scaling that could cause instability or unnecessary costs.
+
+## Step 5: Verify Your Setup
+
+After creating your container group, verify the configuration:
+
+```bash
+curl --request GET \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name} \
+  --header 'Salad-Api-Key: YOUR_API_KEY'
+```
+
+Check that:
+
+- ✅ `queue_autoscaler` section is present with your configured values
+- ✅ `queue_connection` is properly configured
+- ✅ Container group is in `running` state
+
+## Step 6: Test Autoscaling Behavior
+
+### **Test Scale Up**
+
+Add jobs to your queue and observe scaling:
+
+```bash
+# Add multiple jobs to trigger scaling
+for i in {1..15}; do
+  curl --request POST \
+    --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/queues/my-processing-queue/jobs \
+    --header 'Content-Type: application/json' \
+    --header 'Salad-Api-Key: YOUR_API_KEY' \
+    --data '{
+      "input": {"task_id": "'$i'", "data": "sample_data_'$i'"},
+      "metadata": {"batch": "test_batch_1"}
+    }'
+done
+```
+
+Monitor the scaling behavior:
+
+```bash
+# Check current replica count
+curl --request GET \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name} \
+  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '.current_state.instance_count'
+
+# Check queue length
+curl --request GET \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/queues/my-processing-queue \
+  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '.size'
+```
+
+### **Test Scale Down**
+
+Once jobs are processed, the system should automatically scale down based on your configuration.
+
+## Common Configuration Patterns
+
+### **Cost-Optimized (Scale to Zero)**
+
+```json
+"queue_autoscaler": {
+  "min_replicas": 0,
+  "max_replicas": 20,
+  "desired_queue_length": 5,
+  "polling_period": 60
+}
+```
+
+- **Use case**: Batch processing where response time isn't critical
+- **Benefits**: Zero cost when idle
+- **Trade-off**: Cold start delays when new jobs arrive
+
+### **Performance-Optimized (Always Ready)**
+
+```json
+"queue_autoscaler": {
+  "min_replicas": 3,
+  "max_replicas": 100,
+  "desired_queue_length": 1,
+  "polling_period": 15,
+  "max_upscale_per_minute": 20
+}
+```
+
+- **Use case**: Real-time processing requiring low latency
+- **Benefits**: Immediate job processing
+- **Trade-off**: Higher baseline costs
+
+### **Balanced Approach**
+
+```json
+"queue_autoscaler": {
+  "min_replicas": 1,
+  "max_replicas": 50,
+  "desired_queue_length": 3,
+  "polling_period": 30,
+  "max_upscale_per_minute": 10,
+  "max_downscale_per_minute": 5
+}
+```
+
+- **Use case**: Steady workload with occasional spikes
+- **Benefits**: Good balance of cost and performance
+
+## Best Practices
+
+### **Container Application Design**
+
+Your container must include both your application and the **SaladCloud Job Queue Worker**. The worker handles queue
+communication while your application processes jobs via HTTP requests.
+
+#### **Key Architecture Requirements:**
+
+1. **Job Queue Worker**: Include the precompiled Go binary in your container
+2. **HTTP Server**: Your application must expose an HTTP endpoint to receive jobs
+3. **Process Management**: Use s6-overlay or shell scripts to run both processes
+4. **Health Checks**: Implement readiness probes to ensure your app is ready before receiving jobs
+
+#### **Example Container Setup**
+
+**Application Code (FastAPI example):**
+
+```python
+# main.py - Your HTTP application that processes jobs
+from fastapi import FastAPI, HTTPException
+import signal
+import sys
+
+def signal_handler(signum, frame):
+    print("Received shutdown signal, finishing current requests...")
+    sys.exit(0)
+
+# Register signal handler
+signal.signal(signal.SIGTERM, signal_handler)
+
+app = FastAPI()
+
+@app.get("/ready")
+async def readiness_check():
+    """Readiness endpoint for container health probes"""
+    return {"status": "ready"}
+
+@app.post("/process")
+async def process_job(job_data: dict):
+    """
+    Main job processing endpoint - this is where the Job Queue Worker
+    sends jobs for your application to process
+    """
+    try:
+        # Your job processing logic here
+        task_id = job_data.get("task_id")
+        data = job_data.get("data")
+
+        # Simulate processing work
+        result = f"Processed task {task_id} with data: {data}"
+
+        # Return success response (HTTP 200)
+        return {"result": result, "status": "completed"}
+
+    except Exception as e:
+        # Return error response (HTTP 500) to trigger job retry
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+**Dockerfile with Job Queue Worker:**
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install your application dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy your application code
+COPY main.py .
+
+# Download and install the SaladCloud Job Queue Worker
+RUN apt-get update && apt-get install -y curl && \
+    curl -L -o /usr/local/bin/salad-job-queue-worker \
+    https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-job-queue-worker-linux-amd64 && \
+    chmod +x /usr/local/bin/salad-job-queue-worker
+
+# Copy startup script
+COPY start.sh .
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]
+```
+
+**Startup Script (start.sh):**
+
+```bash
+#!/bin/bash
+
+# Start the SaladCloud Job Queue Worker in background
+/usr/local/bin/salad-job-queue-worker &
+
+# Start your application (only needs to listen on localhost)
+uvicorn main:app --host 127.0.0.1 --port 8080 &
+
+# Wait for any process to exit
+wait -n
+
+# Exit with status of process that exited first
+exit $?
+```
+
+#### **Container Group Configuration**
+
+When creating your container group, ensure the `queue_connection` matches your application:
+
+```json
+"queue_connection": {
+  "path": "/process",        // Your app's job processing endpoint
+  "port": 8080,             // Port your app listens on
+  "queue_name": "my-processing-queue"
+}
+```
+
+#### **How It Works:**
+
+1. **Job Queue Worker** connects to SaladCloud queue service
+2. **Worker** receives jobs and forwards them as HTTP POST requests to your app
+3. **Your Application** processes the job and returns HTTP response
+4. **Worker** interprets HTTP status codes:
+   - `200`: Job successful
+   - `500`: Job failed (will retry up to 3 times, meaning 4 total attempts)
+
+#### **Best Practices:**
+
+- **Use Readiness Probes**: Ensure your app is ready before the worker starts sending jobs
+- **Handle Graceful Shutdown**: Complete current HTTP requests before termination
+- **Return Proper HTTP Status Codes**: Use `200` for successful jobs, `500` for failed jobs that should retry
+- **Set Appropriate Timeouts**: Configure request timeouts based on job complexity
+- **Implement Health Checks**: Provide `/ready` endpoint for container monitoring
+
+### **Monitoring and Optimization**
+
+1. **Monitor Key Metrics**:
+   - Queue length over time
+   - Instance count fluctuations
+   - Job processing rate
+   - Cost per job processed
+
+2. **Tune Parameters Based on Workload**:
+   - Increase `desired_queue_length` for longer-running jobs
+   - Decrease `polling_period` for more responsive scaling
+   - Adjust rate limits based on scaling patterns
+
+### **Cost Management**
+
+1. **Set Appropriate Quotas**: Configure `max_replicas` based on your budget
+2. **Use Instance Deletion Cost**: Set
+   [deletion costs](/container-engine/explanation/infrastructure-platform/instance-deletion-cost) to prioritize which
+   instances to terminate
+3. **Monitor Scaling Events**: Track when and why scaling occurs to optimize settings
+
+## Troubleshooting
+
+### **Autoscaling Not Working**
+
+1. **Check Queue Connection**: Ensure `queue_connection` path and port match your application's HTTP endpoint
+2. **Verify Job Queue Worker**: Confirm the worker binary is included and running in your container
+3. **Review Container Logs**: Check if the worker is connecting to the queue and your app is receiving requests
+4. **Test Readiness Probe**: Ensure your app responds to health checks before jobs are sent
+
+### **Jobs Failing or Timing Out**
+
+1. **Check HTTP Response Codes**: Ensure your app returns `200` for successful jobs, `500` for failed jobs that should
+   retry
+2. **Verify Endpoint Path**: Confirm `queue_connection.path` matches your application's job processing endpoint
+3. **Review Application Logs**: Check for errors in job processing logic
+4. **Adjust Timeouts**: Optimize job processing time or configure appropriate timeouts
+
+### **Excessive Scaling**
+
+1. **Increase Polling Period**: Reduce frequency of scaling decisions
+2. **Set Rate Limits**: Use `max_upscale_per_minute` and `max_downscale_per_minute`
+3. **Adjust Desired Queue Length**: Increase to reduce sensitivity to queue fluctuations
+4. **Monitor Job Processing Rate**: Ensure jobs are completing successfully to clear the queue
+
+### **Slow Response to Load**
+
+1. **Decrease Polling Period**: Check queue more frequently
+2. **Increase Rate Limits**: Allow faster scaling when needed
+3. **Optimize Container Startup**: Reduce image size and startup time
+4. **Use Readiness Probes**: Prevent jobs from being sent to containers that aren't ready
+
+### **Worker Connection Issues**
+
+1. **Check Worker Logs**: Set `SALAD_QUEUE_WORKER_LOG_LEVEL=debug` for detailed logging
+2. **Verify Port Configuration**: Ensure networking.port matches queue_connection.port
+3. **Test Application Endpoint**: Manually test your app's HTTP endpoint for job processing
+4. **Review Process Management**: Ensure both worker and application processes are running
+
+## Alternative Autoscaling Approaches
+
+While SaladCloud's built-in Job Queue autoscaling provides the most integrated experience, you can also implement custom
+autoscaling solutions with external queue systems:
+
+- **[AWS SQS Autoscaling](/container-engine/how-to-guides/job-processing/sqs#autoscaling)**: Build custom autoscaling
+  with AWS SQS using Lambda functions to monitor queue depth and scale container groups
+- **[RabbitMQ Autoscaling](/container-engine/how-to-guides/job-processing/rabbitmq#autoscaling)**: Implement autoscaling
+  with RabbitMQ using Cloudflare Workers to monitor queue length and adjust replicas
+- **[Kelpie Autoscaling Service](/container-engine/how-to-guides/job-processing/kelpie#autoscaling)**: Use Kelpie's
+  external autoscaling service that automatically scales SaladCloud container groups based on RabbitMQ queue depth
+
+These approaches require additional setup and external infrastructure but offer more flexibility for complex workflows,
+integration with existing systems, or when you need to integrate with existing queue infrastructure.
+
+## Next Steps
+
+- 📖 Learn more about [Autoscaling Settings](/container-engine/reference/autoscaling/settings)
+- 🔧 Explore [Job Queue Management](/container-engine/how-to-guides/job-processing/using-queues)
+- 📊 Set up [Instance Deletion Cost](/container-engine/explanation/infrastructure-platform/instance-deletion-cost) for
+  smarter scaling
+- 🔗 Review the complete [SaladCloud API Reference](/reference/saladcloud-api/container-groups/create-container-group)

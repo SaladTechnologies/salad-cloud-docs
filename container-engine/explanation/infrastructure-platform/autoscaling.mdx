@@ -1,35 +1,38 @@
 ---
-title: 'Autoscaling Overview'
-sidebarTitle: 'Autoscaling'
+title: 'Job Queue Autoscaling Overview'
+sidebarTitle: 'Job Queue Autoscaling'
+description:
+  'Learn how SaladCloud Job Queue autoscaling automatically adjusts container instances based on queue depth to optimize
+  performance and cost for batch processing workloads.'
 ---
 
-_Last Updated: October 25, 2024_
+_Last Updated: July 21, 2025_
 
-The new **Autoscaling** feature in SaladCloud dynamically adjusts the number of container instances based on the number
-of messages in a queue. This ensures that your infrastructure scales up when demand increases and scales down during low
-usage periods, optimizing both performance and cost efficiency.
+**Job Queue Autoscaling** in SaladCloud dynamically adjusts the number of container instances based on the number of
+jobs in your SaladCloud job queues. This ensures that your infrastructure scales up when job volume increases and scales
+down during low usage periods, optimizing both performance and cost efficiency.
 
-To use the autoscaling feature, you need to integrate the Job Queue into your container groups. The system will monitor
-the queue length and adjust the number of container replicas accordingly.
+Job Queue autoscaling integrates directly with SaladCloud's managed queue service and the Job Queue Worker to provide
+seamless scaling for batch processing and job-based workloads.
 
 ## Prerequisites
 
-Before you can enable autoscaling, you must configure the Job Queue:
+Before you can enable Job Queue autoscaling, you must configure the Job Queue:
 
-1. Ensure that the [**Job Queue**](/container-engine/explanation/job-processing/job-queues) is enabled for your
+1. Ensure that [**SaladCloud Job Queues**](/container-engine/explanation/job-processing/job-queues) are enabled for your
    container group.
 2. Verify that your application can handle scaling with multiple container instances.
-3. Review the [Autoscaling Settings](/container-engine/reference/autoscaling/settings) to understand how to fine-tune
-   autoscaling for your workloads.
+3. Review the [Job Queue Autoscaling Settings](/container-engine/reference/autoscaling/settings) to understand how to
+   fine-tune autoscaling for your workloads.
 
 ## Example Use Case
 
-Let's say you run a batch job, but the number of jobs you receive is inconsistent. Sometimes, there are no jobs at all,
-and you want to scale down to zero instances to avoid paying for unused compute resources. By setting the **Minimum
-Replicas** to 0, the system will automatically scale down to zero when the queue is empty, which means you don't pay for
-any resources when there is no workload. However, this will result in cold starts when new jobs arrive. Cold starts
-occur when the system needs to initialize new instances, which can introduce a delay while containers are started from
-an inactive state.
+Let's say you run a batch processing workload, but the number of jobs you receive is inconsistent. Sometimes, there are
+no jobs at all, and you want to scale down to zero instances to avoid paying for unused compute resources. By setting
+the **Minimum Replicas** to 0, the Job Queue autoscaler will automatically scale down to zero when the queue is empty,
+which means you don't pay for any resources when there is no workload. However, this will result in cold starts when new
+jobs arrive. Cold starts occur when the system needs to initialize new instances, which can introduce a delay while
+containers are started from an inactive state.
 
 At other times, you might experience a spike where thousands of jobs need to be processed quickly. By setting the
 **Maximum Replicas** to 100, you can scale up and process all the jobs much faster. Even though you're using more
@@ -38,6 +41,6 @@ are completed 100 times faster, reducing overall processing time.
 
 ---
 
-Ready to configure autoscaling? Learn more about the available
+Ready to configure Job Queue autoscaling? Learn more about the available
 [Settings](/container-engine/reference/autoscaling/settings) or
-[Set Up Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) in SaladCloud.
+[Set Up Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) in SaladCloud.
