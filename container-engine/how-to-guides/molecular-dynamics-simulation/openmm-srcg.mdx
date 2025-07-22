@@ -33,7 +33,7 @@ Salad nodes are globally distributed, leading to variations in network latency, 
 specific cloud storage endpoints. Many nodes also have asymmetric bandwidth, with upload speeds typically lower than
 download speeds. Nevertheless, more than 90% of nodes can upload over 10 GB of data per hour—more than sufficient for
 OpenMM workloads. For detailed performance metrics, refer to
-[the cloud storage benchmarks on SaladCloud](/tutorials/high-performance-storage-solutions#cloud-storage-benchmarking-on-saladcloud).
+[the cloud storage benchmarks on SaladCloud](/container-engine/tutorials/performance/high-performance-storage-solutions#cloud-storage-benchmarking-on-saladcloud).
 
 ## Single-Replica Container Group vs. Job Queue System
 
@@ -266,5 +266,6 @@ The [salad_monitor.py](https://github.com/SaladTechnologies/mds/blob/main/openmm
 the simulation progress by checking the files uploaded to cloud storage. It can also reset the test environment by
 clearing the cloud folder while preserving the .tpr input file.
 
-To debug and perform manual tasks, follow [this guide](/tutorials/vscode-remote-development#interactive-mode) to connect
-to the SRCG using VS Code.
+To debug and perform manual tasks, follow
+[this guide](/container-engine/tutorials/development-tools/vscode-remote-development#interactive-mode) to connect to the
+SRCG using VS Code.

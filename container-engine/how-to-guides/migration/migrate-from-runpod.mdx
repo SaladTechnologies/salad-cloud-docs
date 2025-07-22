@@ -1,0 +1,1390 @@
+---
+title: 'RunPod to SaladCloud Migration Guide'
+sidebarTitle: 'From RunPod'
+description:
+  'Complete guide to migrating your GPU workloads from RunPod to SaladCloud, preserving your workflow while automating
+  scaling, orchestration, and infrastructure management.'
+---
+
+_Last Updated: July 22, 2025_
+
+# Overview
+
+Migrating from **RunPod** to **SaladCloud** is a straightforward process that preserves your existing development
+workflow while removing much of the manual infrastructure management you're used to handling yourself. If you're
+currently spinning up pods, SSH-ing into instances, manually installing dependencies and running your code on RunPod,
+you'll find that SaladCloud supports the same familiar patterns — your Python code, ML frameworks, and data processing
+pipelines all run unchanged.
+
+**What Stays Exactly the Same:**
+
+- Your application code, models, and algorithms remain unchanged
+- Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
+- Identical API endpoints, inference workflows, and model training patterns
+- Same debugging approach — but now with browser-based tools instead of SSH
+- Your local development and testing process
+
+**What Gets Automated for You:** Instead of manually provisioning pods, setting up CUDA drivers, configuring
+environments, SaladCloud takes care of it automatically. Through the
+[Salad Container Engine (SCE)](/container-engine/explanation/core-concepts/overview), your workloads run as containers
+on a global network of GPUs with:
+
+- Automated provisioning and scaling
+- Built-in CUDA and framework setup
+- Global load balancing and automatic failover
+- Savings of up to 90% compared to traditional GPU cloud providers
+
+The migration itself is mostly about **containerizing your existing RunPod workflow** so it can run automatically across
+SaladCloud's distributed network of GPUs.
+
+> 💡 **New to containerization?** Check out our comprehensive
+> [getting started guide](/container-engine/tutorials/quickstart) for a step-by-step introduction to deploying on
+> SaladCloud, or explore our
+> [architectural overview](/container-engine/explanation/core-concepts/architectural-overview) to understand how
+> SaladCloud's distributed GPU network works.
+
+Think of containerization as creating a "recipe" for the manual setup you already do on RunPod—instead of SSH-ing in and
+running `pip install` commands each time, you write those same commands once in a Dockerfile, Docker builds an immutable
+image with everything pre-installed, and that same image runs consistently across all instances. Most developers find
+this eliminates their biggest frustrations with manual instance management while keeping everything else familiar.
+
+## Why Containerization Has Become the Industry Standard
+
+Containerization has emerged as the de facto deployment standard across the technology industry for compelling reasons
+that directly benefit developers and organizations. Containers provide **consistency across environments** by packaging
+applications with all their dependencies, eliminating the "it works on my machine" problem that has plagued software
+deployment for decades. This consistency extends from development laptops to production clusters, ensuring predictable
+behavior regardless of the underlying infrastructure.
+
+The **portability** offered by containers is transformative—applications become truly platform-agnostic, running
+identically on any system that supports container runtimes. This portability reduces vendor lock-in and enables
+organizations to migrate workloads between cloud providers, on-premises infrastructure, or hybrid environments without
+code changes. Additionally, containers enable **efficient resource utilization** through consistent packaging and
+deployment, while SaladCloud's architecture ensures each container gets dedicated access to full GPU resources on
+individual nodes.
+
+Perhaps most importantly, containers have revolutionized **deployment velocity and reliability**. Teams can package,
+test, and deploy applications in minutes rather than hours, while container orchestration platforms provide automatic
+scaling, health monitoring, and self-healing capabilities. This operational efficiency has made containerization
+essential for modern DevOps practices and continuous delivery pipelines.
+
+On SaladCloud, each container runs on a dedicated GPU node, ensuring your application has exclusive access to the full
+GPU resources without sharing with other workloads. This dedicated approach maximizes performance while maintaining the
+portability and consistency benefits of containerization.
+
+# Product Comparison: RunPod vs. SaladCloud
+
+RunPod offers four primary products. Each has a clear equivalent or migration strategy on SaladCloud:
+
+| RunPod Products      | SaladCloud Alternative        | Key Specs                                         |
+| -------------------- | ----------------------------- | ------------------------------------------------- |
+| **Cloud GPUs**       | **Container GPU Deployments** | Container-first model, distributed consumer GPUs  |
+| **Instant Clusters** | **SaladCloud Secure (soon)**  | Datacenter GPUs (A100/L40), multi-GPU nodes       |
+| **Serverless**       | **Containers + SDK/API**      | Container lifecycle managed via SDK/API/Job Queue |
+| **Hub**              | **SaladCloud Recipes**        | Salad native, one-click deploy solutions          |
+
+### 1. RunPod Cloud GPUs → SaladCloud GPU Containers
+
+**RunPod Cloud GPUs:**
+
+- Single-node GPU pods
+- Manual environment setup (via SSH or scripts)
+- Consumer grade and datacenter GPUs
+
+**SaladCloud GPU Containers:**
+
+- Containerized apps running on distributed GPUs
+- No SSH to start — prebuilt containers with automated orchestration. Terminal available post deployment.
+- Consumer grade and datacenter GPUs [coming now](/container-engine/explanation/core-concepts/saladcloud-secure)
+- Integrated failover, and monitoring
+- Significant Cost savings
+
+**Quick Migration Tips:**
+
+- Build a full Docker image with dependencies baked in
+- Bind apps to `::` for IPv6 compatibility
+- Use `sleep infinity` or `tail -f /dev/null` for development/testing of containers
+
+### 2. RunPod Serverless → SaladCloud Endpoints with Container Gateway (or Job Queues)
+
+**RunPod Serverless:**
+
+- Serverless compute with fast cold start times (typically around 1 second)
+- Scales from zero of workers automatically based on demand
+- Workers spin up and down automatically
+- Endpoint URL triggers workers
+
+**SaladCloud Equivalent:**
+
+- Use **Container Gateway** to expose your container as an
+  [HTTP API endpoint](/container-engine/explanation/gateway/load-balancer-options)
+- Scale replicas dynamically via [Salad API](/reference/saladcloud-api/container-groups/update-container-group), portal,
+  or [sdk](/container-engine/explanation/infrastructure-platform/imds#imds-sdks)
+- Containers don't automatically scale to zero, but can be scaled up/down or stopped
+- Can also be combined with **job queues** (Salad Job Queue, Redis, or SQS).
+- Autoscaling can be setup if using Salad Job Queue to automatically
+  [scale based on queue length](/container-engine/explanation/infrastructure-platform/autoscaling).
+
+> ⚠️ **Cold Start Trade-off:** SaladCloud containers have significantly slower cold start times than RunPod Serverless
+> (typically several minutes, but can take up to tens of minutes depending on image size and individual node network
+> conditions). This is the trade-off for SaladCloud's cost savings and distributed architecture. Consider keeping
+> minimum replicas running for latency-sensitive applications or using job queues for batch workloads where cold start
+> time is less critical.
+
+**Migration Tips:**
+
+- Convert your handler-based function into a **web API** (e.g., FastAPI or Flask) exposed via Container Gateway
+- Bind to `::` (IPv6) instead of `0.0.0.0` for external access
+- Use the **Salad SDK** or **API** to dynamically adjust replicas based on request volume
+- For batch-heavy use cases, add a **queue** for job buffering and scale consumers separately.
+- Enable Autoscaling for SaladJob Queue to automatically scale based on queue length.
+
+### 3. RunPod Hub → SaladCloud Recipes
+
+**RunPod Hub:**
+
+- Pre-built templates with one-click deployments
+
+[**SaladCloud Recipes:**](/container-engine/explanation/core-concepts/recipes-overview#what-are-recipes)
+
+- Pre-built templates with one-click deployments
+- Open-source, GitHub-based templates
+- Easy for teams to fork, modify, and deploy
+- Community-driven sharing and collaboration
+
+### 4. RunPod Instant Clusters → SaladCloud Secure
+
+**RunPod Instant Clusters:**
+
+- Multi-node GPU clusters
+- Fast interconnect for distributed workloads
+
+[**SaladCloud Secure:**](/container-engine/explanation/core-concepts/saladcloud-secure)
+
+- Datacenter-class nodes with 8 GPUs each
+- Secure networking and high-bandwidth interconnects
+- Ideal for distributed training and multi-GPU inference
+
+## Key Platform Differences
+
+### RunPod Architecture
+
+- Individual GPU pods/instances with SSH access (Cloud GPUs)
+- Function-based handlers (Serverless)
+- Template-based deployments (Hub)
+- Multi-node clusters with high-speed interconnects (Instant Clusters)
+
+### SaladCloud Architecture
+
+- Containerized applications with automatic orchestration
+- Distributed network of consumer GPUs with built-in redundancy
+- Container-based deployment with health monitoring and automatic failover
+- Global load balancing across 11,000+ active GPUs
+
+## Migration Requirements
+
+### What You're Already Doing (Made Easier)
+
+The "requirements" below are actually improvements to processes you're already handling manually on RunPod. Rather than
+learning entirely new concepts, you're automating existing workflows with better consistency and reliability.
+
+- **Containerization** replaces manual dependency installation on each instance. Instead of SSH-ing in and running the
+  same `pip install` commands repeatedly, you write them once in a Dockerfile, Docker builds the dependencies into an
+  immutable image, and that image runs consistently across all instances.
+
+- **Storage Strategy** shifts from local file management to cloud-based storage patterns. While cloud APIs provide more
+  reliable data persistence than manually copying files between instances, this transition requires rethinking data
+  workflows. You'll need to consider upload/download costs, latency impacts, and potential network reliability issues
+  that weren't factors with local storage on RunPod.
+
+- **Network Architecture** replaces managing multiple ports and SSH tunneling. You get a single port with automatic load
+  balancing instead of manually configuring port forwarding and access rules.
+
+- **AMD64 Architecture** is what you're already using on most RunPod instances, so this requires no change to your
+  existing applications.
+
+### Technical Implementation (Familiar Concepts)
+
+These constraints map directly to what you're already working with, just more consistently managed:
+
+- **Container Images**: 35GB limit (larger than most RunPod instance setups)
+- **Storage**: Cloud-based (eliminates instance storage limitations) - see our
+  [storage options documentation](/storage/explanation/overview) for temporary file storage, or use S3-compatible
+  services for persistent data
+- **Networking**: [IPv6 support](/container-engine/how-to-guides/gateway/enabling-ipv6) (replace `0.0.0.0` with `::` in
+  your bind address)
+- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal) and
+  [portal logs](/container-engine/explanation/container-groups/container-logs) (more convenient than SSH key management)
+
+> 📘 **Container Registry Options:** SaladCloud supports all major container registries. See our guides for
+> [Docker Hub](/container-engine/how-to-guides/registries/dockerhub),
+> [AWS ECR](/container-engine/how-to-guides/registries/aws-ecr),
+> [Azure ACR](/container-engine/how-to-guides/registries/azure-acr), and
+> [Google Artifact Registry](/container-engine/how-to-guides/registries/gcp-gar).
+
+## Cold Start Considerations: Setting Realistic Expectations
+
+**Understanding Cold Start Trade-offs**
+
+One of the most important differences between RunPod and SaladCloud involves cold start behavior. We want to be
+transparent about this trade-off:
+
+**RunPod Serverless Cold Starts:**
+
+- Typically around 1 second
+- Optimized for rapid scaling from zero
+- Much higher per-minute costs when running
+
+**SaladCloud Container Cold Starts:**
+
+- Typically several minutes, but can take up to tens of minutes in worst-case scenarios
+- Depends heavily on container image size, node availability, and network conditions on individual nodes
+- Significantly lower per-minute costs (up to 90% savings)
+
+**Why SaladCloud Cold Starts Are Slower:**
+
+- **Network Variability**: Individual consumer nodes may have varying network speeds, which can significantly impact
+  image pull times for large containers
+- **Container Size Impact**: Large container images (multi-GB) can take tens of minutes to download on slower consumer
+  network connections
+
+**Strategies for Managing Cold Starts:**
+
+1. **Keep Minimum Replicas Running**: For latency-sensitive applications, maintain 1-2 replicas to ensure immediate
+   availability
+2. **Use Job Queues**: For batch processing, cold start time is often acceptable since jobs are queued and processed
+   asynchronously
+3. **Optimize Container Images**: Smaller images start faster - use multi-stage builds and minimal base images. This is
+   critical on SaladCloud since large images can take tens of minutes to download on slower consumer connections
+4. **Pre-warm for Events**: Scale up replicas before expected traffic spikes
+5. **Consider Hybrid Patterns**: Use RunPod Serverless for ultra-low latency needs and SaladCloud for cost-effective
+   sustained workloads
+
+**When SaladCloud's Cold Start Trade-off Makes Sense:**
+
+- Batch processing workloads where delays of several minutes to tens of minutes are acceptable
+- Long-running inference tasks that amortize startup time over hours or days of execution
+- Development and testing environments where cost savings outweigh speed
+- Applications with predictable traffic patterns where you can pre-scale
+- Background data processing jobs where immediate response isn't required
+
+**When SaladCloud May Not Be Ideal:**
+
+- Real-time APIs requiring sub-second response times with unpredictable traffic
+- Systems where startup delays could impact user experience
+
+> 💡 **Cost vs. Speed Decision:** The choice between RunPod Serverless and SaladCloud often comes down to whether you
+> prioritize startup speed (RunPod) or cost efficiency (SaladCloud).
+
+## Before You Begin: Key Differences & Tips for Migrating from RunPod
+
+Migrating from RunPod to SaladCloud is straightforward, but there are **fundamental platform differences** you should
+understand first. These tips apply to _all_ workloads (Pods or Serverless) you're migrating.
+
+### What is a Container? (And Why You Need It)
+
+On RunPod, you might:
+
+- Spin up a Pod
+- SSH into the node
+- Install dependencies manually
+- Run your Python script directly
+
+On SaladCloud, all of that is **pre-packaged into a Docker container**:
+
+- A container is like a "recipe" for your application environment.
+- It includes your OS base, dependencies, frameworks (PyTorch, CUDA), and your app.
+- Once built, it runs identically across thousands of Salad nodes without manual setup.
+
+**Understanding Containerization for RunPod Users** If you're coming from RunPod without container experience, think of
+containerization as creating a "blueprint" for your application environment. Instead of manually installing dependencies
+on each GPU instance, you define everything your application needs in a simple text file called a Dockerfile. The key
+difference is that containers provide environment consistency - when your container image is deployed across multiple
+SaladCloud nodes, each instance runs in an identical environment that was defined at build time.
+
+**No More Manual Environment Setup** One of the biggest advantages of containerization is that complex environments like
+PyTorch with CUDA are available as pre-built, officially maintained images. Remember the frustration of manually
+configuring CUDA drivers, PyTorch versions, and dependency conflicts on RunPod? That's completely eliminated with
+containers.
+
+Instead of spending time on environment setup, you can start with battle-tested base images:
+
+```dockerfile
+# Pre-built PyTorch with latest CUDA support - no manual setup required
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+# Or NVIDIA's optimized PyTorch container with CUDA 12.6
+FROM nvcr.io/nvidia/pytorch:25.01-py3
+
+# Or a general CUDA base for custom ML stacks
+FROM nvidia/cuda:12.6-cudnn9-runtime-ubuntu22.04
+```
+
+These images come with:
+
+- ✅ CUDA drivers pre-installed and configured
+- ✅ cuDNN libraries properly linked
+- ✅ Framework-specific optimizations
+- ✅ Compatible Python environments
+- ✅ All dependencies tested together
+
+> ⚡ **GPU Compatibility:** SaladCloud guarantees support for CUDA Toolkit 12.0 and later. For the latest RTX 5090/5080
+> GPUs, see our [PyTorch RTX 5090 guide](/container-engine/tutorials/machine-learning/pytorch-rtx5090) for CUDA 12.8
+> requirements. Check our
+> [high-performance applications guide](/container-engine/tutorials/performance/high-performance-apps) for GPU
+> optimization tips.
+
+If you've never built one, check our [Quickstart Container Guide](/container-engine/tutorials/quickstart).
+
+### IPv6-Only Networking on SaladCloud
+
+Unlike RunPod (IPv4), SaladCloud requires your application to bind to IPv6 addresses internally. However, **users access
+your application through normal HTTPS URLs** that SaladCloud provides via Container Gateway.
+
+To ensure your app works:
+
+- **Your application must bind to `::` (IPv6)** when starting your server internally
+- **Users access your app via regular HTTPS URLs** like `https://your-app-xyz.salad.cloud`
+- SaladCloud's Container Gateway automatically maps the HTTPS URL to your configured port
+
+Example (FastAPI):
+
+```bash
+# Your app binds to IPv6 internally
+uvicorn app:app --host :: --port 8000
+```
+
+- Test locally with IPv6:
+
+  ```bash
+  curl -6 http://[::1]:8000
+  ```
+
+- In production, your container will be reachable at a normal HTTPS URL (e.g., `https://your-app-xyz.salad.cloud`) that
+  Container Gateway maps to your configured port.
+
+### No Mountable Persistent Storage (Use External Cloud Storage)
+
+RunPod allows mounting volumes directly into Pods. **SaladCloud does not support local volume mounts** — all container
+filesystems are ephemeral.
+
+Instead, use:
+
+- [Salad S4](/storage/explanation/overview) (temporary storage for files up to 100MB, auto-deleted after 30 days)
+- Any S3-compatible storage (AWS S3, Cloudflare R2, Azure Storage, etc.)
+
+**Storage Integration Example**
+
+```python
+# Replace local file operations with cloud storage
+import boto3
+import requests
+import tempfile
+import os
+
+# For persistent data: Use external cloud storage (S3)
+s3_client = boto3.client('s3')
+
+def store_data_s3(data, bucket, key):
+    """Store data in S3 for persistent storage"""
+    s3_client.put_object(Bucket=bucket, Key=key, Body=data)
+    return f"s3://{bucket}/{key}"
+
+def load_data_s3(bucket, key):
+    """Load data from S3"""
+    response = s3_client.get_object(Bucket=bucket, Key=key)
+    return response['Body'].read()
+
+# For processing: Use in-memory or temporary local storage
+def process_data(input_data):
+    """Process data using temporary storage"""
+    with tempfile.NamedTemporaryFile() as tmp_file:
+        tmp_file.write(input_data)
+        tmp_file.flush()
+        # Process the temporary file
+        # File is automatically cleaned up when context exits
+        return processed_data
+
+# Example usage in application
+def main():
+    # Load persistent data from S3
+    model_data = load_data_s3('my-models', 'trained_model.safetensors')
+
+    # Use temporary local storage for processing
+    with tempfile.NamedTemporaryFile() as tmp:
+        tmp.write(model_data)
+        result = process_model(tmp.name)
+
+    # Store final results back to S3
+    store_data_s3(result, 'my-results', 'final_output.json')
+```
+
+**Important Storage Considerations**
+
+While cloud storage offers better reliability than local files, the transition requires careful planning:
+
+- **Latency Impact**: Network calls to cloud storage are slower than local file access. Consider caching frequently
+  accessed data locally during processing.
+- **Bandwidth Costs**: Large model downloads/uploads can be expensive. Evaluate if you need to transfer full datasets or
+  can work with smaller chunks.
+- **Error Handling**: Network operations can fail. Implement retry logic and graceful degradation for storage
+  operations.
+- **Concurrent Access**: Multiple container instances may access the same data. Consider read/write patterns and
+  potential conflicts.
+
+> 💾 **Storage Best Practices:** For temporary file storage up to 100MB, see our
+> [Simple Storage Service documentation](/storage/explanation/overview). For production storage strategies, explore
+> [High Performance Storage Solutions](/container-engine/tutorials/performance/high-performance-storage-solutions) to
+> understand how to optimize data access patterns and minimize costs.
+
+### Containers Must Stay Alive
+
+On RunPod, you can start empty Pods and run commands interactively. On **SaladCloud**, containers:
+
+- Start and immediately run the defined `CMD` or `ENTRYPOINT`.
+- Automatically **exit when that process ends**, unless kept alive.
+
+For testing or manual interactive sessions, you can keep the container running by adding one of the following to your
+Dockerfile:
+
+```dockerfile
+CMD ["sh", "-c", "sleep infinity"]
+```
+
+or
+
+```dockerfile
+CMD ["tail", "-f", "/dev/null"]
+```
+
+For production deployments, ensure your application (server or worker) runs persistently so the container stays alive
+without manual intervention.
+
+You can also override the ENTRYPOINT and CMD of a container image through SaladCloud portal or API by following this
+[instructions](/container-engine/how-to-guides/specifying-a-command).
+
+## Migration Process
+
+All deployment and management tasks described in this guide can be accomplished through the intuitive SaladCloud web
+portal at [portal.salad.com](https://portal.salad.com) or programmatically via our REST API and SDKs (Python and
+TypeScript). The portal provides a visual interface perfect for getting started and one-off deployments, while the API
+and SDKs enable automation, CI/CD integration, and infrastructure-as-code workflows. You can seamlessly switch between
+approaches—deploy through the portal initially, then automate with the API as your needs grow.
+
+### Phase 1: Assessment and Planning
+
+**Assessment and Planning**
+
+- Catalog your current RunPod workloads by product type (Cloud GPUs, Serverless, Hub, Instant Clusters)
+- Identify containerization requirements for each workload
+- Set up SaladCloud account and API access
+
+**Container Development**
+
+- Create Dockerfiles for your applications
+- Build and test containers locally
+- Push images to container registry
+
+> 🔧 **Containerization Resources:** If you're new to Docker, check out our
+> [Docker deployment tutorial](/container-engine/tutorials/deployment/docker-run) for practical examples, or see
+> [specifying container commands](/container-engine/how-to-guides/specifying-a-command) for advanced startup
+> configuration.
+
+### Phase 2: Deployment and Optimization
+
+**Initial Deployment**
+
+- Deploy containers to SaladCloud (via portal or API)
+- Configure Container Gateway and health probes
+- Set up monitoring and logging
+
+> 📊 **Monitoring & Logging:** For production workloads, consider setting up
+> [external logging](/container-engine/explanation/infrastructure-platform/external-logging) with providers like
+> [Axiom](/container-engine/how-to-guides/external-logging/axiom) (recommended),
+> [Datadog](/container-engine/how-to-guides/external-logging/datadog), or
+> [New Relic](/container-engine/how-to-guides/external-logging/new-relic) for advanced log analysis and retention.
+
+**Testing and Optimization**
+
+- Validate performance and functionality
+- Optimize resource allocation (containers have CPU/memory limits, not direct hardware allocation like VMs)
+- Complete migration of remaining workloads
+
+# Step-by-Step Migration Process
+
+## Step 1: Prepare Your SaladCloud Environment
+
+**Account Setup**
+
+1. Create account at [portal.salad.com](https://portal.salad.com)
+2. Set up organization and project
+3. Add billing information and initial credits
+4. Generate API key for programmatic access
+
+**Environment Configuration**
+
+```bash
+# Use SaladCloud API directly or Python SDK
+curl -X GET "https://api.salad.com/api/public/organizations/your-org/projects/your-project/containers" \
+  -H "Salad-Api-Key: YOUR_API_KEY"
+```
+
+**Python SDK Installation**
+
+```bash
+pip install salad-cloud-sdk
+```
+
+**Python SDK Usage**
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+# Initialize SDK
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+# List container groups
+result = sdk.container_groups.list_container_groups(
+    organization_name="your-org",
+    project_name="your-project"
+)
+```
+
+For complete API documentation, see the [SaladCloud API Reference](/reference/saladcloud-api).
+
+## Step 2: Containerize Your Applications
+
+**Basic Containerization Pattern** The Dockerfile below shows how straightforward containerization can be. Notice how it
+mirrors the same steps you'd typically perform on a RunPod instance:
+
+```dockerfile
+# Start with a pre-built PyTorch+CUDA image (no manual CUDA setup!)
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+WORKDIR /app
+
+# Install additional dependencies (same as pip install on RunPod)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code (same as uploading your files)
+COPY . .
+
+# Start application with IPv6 support (same as running python app.py)
+CMD ["uvicorn", "app:app", "--host", "::", "--port", "8000"]
+```
+
+**What's Familiar:**
+
+- **Dependencies**: The `pip install` line works exactly like on RunPod
+- **File Structure**: Your code organization remains the same
+- **Startup Command**: The CMD line replaces what you'd type in your RunPod terminal
+- **Environment Variables**: Still work the same way in containers
+
+**What's Better:**
+
+- **No CUDA Setup**: Skip the tedious CUDA/PyTorch installation process entirely
+- **Consistent Environments**: Your exact environment runs identically across all nodes
+- **Version Control**: Pin specific framework versions without compatibility issues
+- **IPv6 Ready**: Use `::` instead of `0.0.0.0` for Container Gateway compatibility
+
+**Building Your Container**
+
+```bash
+# Build your container (replaces manual setup)
+docker build -t your-ml-app:latest .
+
+# Push to registry (replaces copying files to instances)
+docker push your-registry/your-ml-app:latest
+```
+
+The beauty of this approach is that you're essentially automating the same setup process you'd do manually on RunPod,
+but with better consistency and portability—plus you never have to deal with CUDA installation headaches again.
+
+For detailed containerization guidance, see [Getting Started with SCE](/container-engine/tutorials/quickstart).
+
+> 🤖 **ML-Specific Examples:** For machine learning workloads, explore our specialized deployment guides:
+>
+> - [BLIP image captioning with Cog](/container-engine/how-to-guides/ai-machine-learning/deploy-blip-cog)
+> - [YOLOv8 object detection](/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial)
+> - [LLM deployment patterns](/container-engine/explanation/ai-machine-learning/llm-overview)
+> - [JupyterLab with cloud storage](/container-engine/tutorials/machine-learning/jupyterlab)
+
+## Step 3: Deploy Container Groups
+
+**Portal Deployment (Recommended for first deployment)**
+
+1. Navigate to your SaladCloud project
+2. Click "Create Container Group"
+3. Configure container settings:
+   - Image: Your container registry URL
+   - Replicas: Start with 2-3 for reliability
+   - Resources: CPU, RAM, and GPU requirements
+   - Container Gateway: Enable for external access
+
+For a complete deployment walkthrough, see the [Quickstart Tutorial](/container-engine/tutorials/quickstart).
+
+**API Deployment Example**
+
+```bash
+curl -X POST "https://api.salad.com/api/public/organizations/$ORG/projects/$PROJECT/containers" \
+  -H "Salad-Api-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-workload",
+    "container": {
+      "image": "myregistry/myapp:latest",
+      "resources": {
+        "cpu": 2,
+        "memory": 4096,
+        "gpu_classes": ["8a955716-6ca4-493c-bb72-fca79bb12329", "7b6d5302-4b8e-4d1a-9cb4-7c8f5e6d9a2b"]
+      }
+    },
+    "networking": {
+      "protocol": "http",
+      "port": 8000,
+      "auth": false
+    },
+    "replicas": 3,
+    "restart_policy": "always"
+  }'
+```
+
+**Python SDK Deployment Example**
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+# Create container group - refer to API documentation for complete model structure
+result = sdk.container_groups.create_container_group(
+    organization_name="your-org",
+    project_name="your-project",
+    request_body={
+        "name": "my-runpod-migration",
+        "container": {
+            "image": "your-registry/your-app:latest",
+            "resources": {
+                "cpu": 2,
+                "memory": 4096,
+                "gpu_classes": ["8a955716-6ca4-493c-bb72-fca79bb12329", "7b6d5302-4b8e-4d1a-9cb4-7c8f5e6d9a2b"]
+            }
+        },
+        "networking": {
+            "protocol": "http",
+            "port": 8000,
+            "auth": False
+        },
+        "replicas": 3
+    }
+)
+```
+
+## Step 4: Configure Health Monitoring
+
+**Health Probe Implementation**
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
+
+@app.get("/ready")
+async def readiness_check():
+    # Check if app is ready to receive traffic
+    return {"status": "ready"}
+
+@app.get("/started")
+async def startup_check():
+    # Check if app has started successfully
+    return {"status": "started"}
+```
+
+**Configure Health Probes in SaladCloud** Health probes are configured through the SaladCloud portal or API, not through
+Dockerfile directives:
+
+- **Startup Probe**: Configure HTTP probe pointing to `/started` endpoint
+- **Liveness Probe**: Configure HTTP probe pointing to `/health` endpoint
+- **Readiness Probe**: Configure HTTP probe pointing to `/ready` endpoint
+
+For detailed information on health probes, see the
+[Health Probes documentation](/container-engine/explanation/infrastructure-platform/health-probes).
+
+> 🏥 **Health Monitoring Deep Dive:** Explore specific probe types:
+>
+> - [Startup probes](/container-engine/explanation/infrastructure-platform/startup-probes) - verify container
+>   initialization
+> - [Readiness probes](/container-engine/explanation/infrastructure-platform/readiness-probes) - control traffic routing
+> - [Liveness probes](/container-engine/explanation/infrastructure-platform/liveness-probes) - detect and restart
+>   unhealthy containers
+> - [Health probe in general](/container-engine/explanation/infrastructure-platform/health-probes) - practical
+>   implementation patterns
+
+**Health Probe Configuration**
+
+Health probes are configured through the SaladCloud API. Refer to the
+[SaladCloud API documentation](/reference/saladcloud-api/container-groups/create-container-group) for the complete
+request structure including health probe configuration:
+
+```python
+# Health probes are configured as part of the container group creation request
+# Example structure (refer to API docs for complete schema):
+container_group_request = {
+    # ... other configuration
+    "startup_probe": {
+        "http": {
+            "path": "/started",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 10,
+        "period_seconds": 5,
+        "timeout_seconds": 3,
+        "failure_threshold": 3
+    },
+    "liveness_probe": {
+        "http": {
+            "path": "/health",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 30,
+        "period_seconds": 10,
+        "timeout_seconds": 5,
+        "failure_threshold": 3
+    },
+    "readiness_probe": {
+        "http": {
+            "path": "/ready",
+            "port": 8000,
+            "scheme": "http"
+        },
+        "initial_delay_seconds": 5,
+        "period_seconds": 5,
+        "timeout_seconds": 3,
+        "failure_threshold": 3
+    }
+}
+```
+
+## Step 5: Set Up Monitoring and Logging
+
+**Application Logging**
+
+```python
+import logging
+import sys
+import json
+
+# Configure JSON logging for better parsing
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        return json.dumps({
+            "timestamp": record.created,
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "module": record.module
+        })
+
+# Set up handler with JSON formatter
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(JSONFormatter())
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[handler]
+)
+
+logger = logging.getLogger(__name__)
+```
+
+**External Logging (Recommended)** Configure external logging providers like Axiom through the SaladCloud portal for
+advanced log analysis and retention beyond the 3-month portal limit.
+
+> 📋 **Logging Solutions:** Choose from multiple external logging providers:
+>
+> - [Axiom](/container-engine/how-to-guides/external-logging/axiom) (SaladCloud's preferred provider)
+> - [Datadog](/container-engine/how-to-guides/external-logging/datadog) for comprehensive monitoring
+> - [Splunk](/container-engine/how-to-guides/external-logging/splunk-logging) for enterprise environments
+> - [HTTP endpoints](/container-engine/how-to-guides/external-logging/http) for custom solutions
+> - [TCP logging](/container-engine/how-to-guides/external-logging/tcp-logging) with secure transport
+
+## Migration Scenarios by RunPod Product
+
+### Scenario 1: RunPod Cloud GPU → SaladCloud Container
+
+**Before (RunPod Cloud GPU)**: SSH into pod, install dependencies, run Python script
+
+**After (SaladCloud)**: Containerized application with health checks and automatic scaling
+
+**Migration Steps:**
+
+1. **Containerize your setup process**:
+
+   ```dockerfile
+   FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+   WORKDIR /app
+   COPY requirements.txt .
+   RUN pip install --no-cache-dir -r requirements.txt
+   COPY . .
+   CMD ["python", "app.py", "--host", "::", "--port", "8000"]
+   ```
+
+2. **Add health endpoints**:
+
+   ```python
+   from fastapi import FastAPI
+   app = FastAPI()
+
+   @app.get("/health")
+   async def health_check():
+       return {"status": "healthy"}
+   ```
+
+3. **Deploy with Container Gateway** for external access
+
+**Key changes**: Add Dockerfile, configure IPv6, implement health endpoints
+
+### Scenario 2: RunPod Serverless → SaladCloud Container Gateway + Job Queue
+
+**Before (RunPod Serverless)**: Handler function with automatic scaling and fast cold starts
+
+**After (SaladCloud)**: Containerized web API with job queue for batch processing and slower but cost-effective scaling
+
+**Migration Steps:**
+
+1. **Convert handler to web API**:
+
+   ```python
+   # RunPod handler pattern
+   def handler(event):
+       input_data = event["input"]
+       result = process_data(input_data)
+       return {"output": result}
+
+   # SaladCloud web API pattern
+   from fastapi import FastAPI
+   app = FastAPI()
+
+   @app.post("/process")
+   async def process_endpoint(request: ProcessRequest):
+       result = process_data(request.input)
+       return {"output": result}
+   ```
+
+2. **Configure job queue for batch processing**:
+
+   ```python
+   # Add job queue worker to your container
+   # See: /container-engine/how-to-guides/job-processing/queue-worker
+   ```
+
+3. **Set up autoscaling** based on queue depth
+
+**Key changes**: Convert handler to HTTP API, add job queue, implement autoscaling
+
+**Important Considerations for Serverless Migration:**
+
+- **Cold Start Impact**: SaladCloud containers take several minutes to tens of minutes to start vs. RunPod's ~1 second
+  serverless scaling
+- **Cost vs. Speed Trade-off**: Significantly lower per-minute costs but dramatically slower scaling response
+- **Mitigation Strategies**: Keep minimum replicas running for latency-sensitive workloads, or use job queues where cold
+  start delays are acceptable
+
+### Scenario 3: RunPod Hub Template → SaladCloud Recipe
+
+**Before (RunPod Hub)**: Use pre-built template, click deploy
+
+**After (SaladCloud)**: Use SaladCloud Recipe or create custom deployment
+
+**Migration Steps:**
+
+1. **Find equivalent SaladCloud Recipe**:
+   - Browse [SaladCloud Recipes](/container-engine/reference/recipes/overview)
+   - Look for similar ML frameworks or applications
+
+2. **Customize if needed**:
+
+   ```dockerfile
+   # Fork the recipe and modify for your needs
+   # Recipes are open-source and GitHub-based
+   ```
+
+3. **Deploy through portal** with one-click deployment
+
+**Key changes**: Switch to SaladCloud recipes, customize as needed
+
+### Scenario 4: RunPod Instant Cluster → SaladCloud Secure (Coming Soon)
+
+**Before (RunPod Instant Cluster)**: Multi-node GPU clusters with fast interconnects
+
+**After (SaladCloud Secure)**: Datacenter-grade nodes with enterprise security
+
+**Migration Strategy:**
+
+- **Current**: Use multiple single-GPU containers for distributed workloads
+- **Future**: Migrate to SaladCloud Secure when available for true multi-GPU nodes
+- **Pattern**: Design applications to work across both architectures
+
+## Advanced Migration Patterns
+
+### Job Queue Integration for Former Serverless Users
+
+If you're migrating from RunPod Serverless, implementing job queues provides the closest equivalent experience:
+
+**SaladCloud Job Queue Architecture:**
+
+```python
+# Container application with job queue worker
+from fastapi import FastAPI
+import asyncio
+import json
+
+app = FastAPI()
+
+@app.post("/process")
+async def process_job(job_data: dict):
+    # Your processing logic here
+    result = await process_data(job_data)
+    return {"status": "completed", "result": result}
+
+# Job queue worker handles the queue integration
+# This gets configured separately in your container
+```
+
+**Benefits of Job Queue Pattern:**
+
+- Automatic retry on failures
+- Load balancing across instances
+- Queue-based autoscaling
+- Asynchronous processing like serverless
+
+> 📋 **Job Queue Resources:**
+>
+> - [Job Queue Overview](/container-engine/explanation/job-processing/job-queues)
+> - [Creating a Job Queue](/container-engine/how-to-guides/job-processing/creating-a-job-queue)
+> - [Queue Worker Setup](/container-engine/how-to-guides/job-processing/queue-worker)
+
+### Multi-Service Application Migration
+
+**Before (RunPod)**: Multiple services on different ports
+
+**After (SaladCloud)**: Single container with internal routing or multiple container groups
+
+**Option 1: Internal Routing**
+
+```python
+# Single container with path-based routing
+app = FastAPI()
+
+@app.get("/service1/{path:path}")
+async def service1_handler(path: str):
+    return handle_service1(path)
+
+@app.get("/service2/{path:path}")
+async def service2_handler(path: str):
+    return handle_service2(path)
+```
+
+**Option 2: Multiple Container Groups**
+
+- Deploy each service as a separate container group
+- Use Container Gateway for load balancing
+- Services communicate via HTTP APIs
+
+### Storage Migration Strategies
+
+**Local Storage → Cloud Storage**
+
+```python
+# Before: Local file operations
+def save_model(model, path):
+    torch.save(model.state_dict(), path)
+
+def load_model(path):
+    return torch.load(path)
+
+# After: S3-compatible storage
+import boto3
+s3 = boto3.client('s3')
+
+def save_model_s3(model, bucket, key):
+    import tempfile
+    with tempfile.NamedTemporaryFile() as tmp:
+        torch.save(model.state_dict(), tmp.name)
+        s3.upload_file(tmp.name, bucket, key)
+
+def load_model_s3(bucket, key):
+    import tempfile
+    with tempfile.NamedTemporaryFile() as tmp:
+        s3.download_file(bucket, key, tmp.name)
+        return torch.load(tmp.name)
+```
+
+**Salad S4 Storage Integration:**
+
+```python
+import requests
+
+# Upload to Salad S4 (files up to 100MB, auto-deleted after 30 days)
+def upload_to_s4(file_path, org_name, filename):
+    url = f"https://storage-api.salad.com/organizations/{org_name}/files/{filename}"
+    headers = {"Salad-Api-Key": "YOUR_API_KEY"}
+
+    with open(file_path, 'rb') as f:
+        files = {
+            'file': f,
+            'mimeType': 'application/octet-stream'  # Required field
+        }
+        response = requests.put(url, headers=headers, files=files)
+
+    return response.json()["url"]
+
+# Download from Salad S4
+def download_from_s4(org_name, filename):
+    url = f"https://storage-api.salad.com/organizations/{org_name}/files/{filename}"
+    headers = {"Salad-Api-Key": "YOUR_API_KEY"}
+
+    response = requests.get(url, headers=headers)
+    return response.content
+```
+
+## Quick Solutions for Common Migration Challenges
+
+### Challenge: RunPod Templates → SaladCloud Containers
+
+**Quick Fix**: Convert template configuration to Dockerfile
+
+```dockerfile
+# RunPod template with PyTorch
+# Becomes:
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+# Add your template's environment variables as ENV commands
+ENV MODEL_NAME="stable-diffusion"
+ENV BATCH_SIZE="1"
+
+# Install template's dependencies
+RUN pip install transformers diffusers accelerate
+
+# Add your application code
+COPY . /app
+WORKDIR /app
+
+# Start your application
+CMD ["python", "app.py"]
+```
+
+### Challenge: RunPod SSH Access → SaladCloud Debugging
+
+**Quick Fix**: Use SaladCloud web terminal and comprehensive logging
+
+```python
+# Add debugging endpoints to your application
+@app.get("/debug/status")
+async def debug_status():
+    import psutil
+    import torch
+    return {
+        "cpu_percent": psutil.cpu_percent(),
+        "memory_percent": psutil.virtual_memory().percent,
+        "gpu_memory": torch.cuda.memory_allocated() if torch.cuda.is_available() else None,
+        "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+    }
+
+@app.get("/debug/logs")
+async def get_recent_logs():
+    # Return recent application logs
+    return {"logs": recent_log_entries}
+```
+
+- Access web terminal through portal for interactive debugging
+- Implement detailed logging for troubleshooting
+- Use health probes to monitor application state
+
+> 🛠️ **Advanced Debugging:** Explore additional troubleshooting resources:
+>
+> - [Troubleshooting guide](/container-engine/how-to-guides/troubleshooting) for common issues
+> - [Performance monitoring](/container-engine/tutorials/performance/performance-monitoring) for optimization
+> - [Interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) for live debugging
+
+### Challenge: RunPod Volume Mounts → SaladCloud Storage
+
+**Quick Fix**: Use cloud storage APIs for persistent data
+
+```python
+# RunPod volume pattern
+def save_checkpoint(model, epoch):
+    torch.save(model.state_dict(), f"/workspace/checkpoint_epoch_{epoch}.pth")
+
+# SaladCloud cloud storage pattern
+def save_checkpoint_s3(model, epoch, bucket, key_prefix):
+    import tempfile
+    import boto3
+
+    s3 = boto3.client('s3')
+    with tempfile.NamedTemporaryFile() as tmp:
+        torch.save(model.state_dict(), tmp.name)
+        key = f"{key_prefix}/checkpoint_epoch_{epoch}.pth"
+        s3.upload_file(tmp.name, bucket, key)
+        return f"s3://{bucket}/{key}"
+```
+
+### Challenge: RunPod Serverless Scaling → SaladCloud Autoscaling
+
+**Quick Fix**: Implement job queue with autoscaling
+
+```python
+# Configure autoscaling based on queue depth
+from salad_cloud_sdk.models import QueueAutoscaler
+
+autoscaler = QueueAutoscaler(
+    min_replicas=0,  # Scale to zero when no jobs
+    max_replicas=50,  # Scale up to 50 instances
+    desired_queue_length=2,  # Target 2 jobs per instance
+    polling_period=30  # Check every 30 seconds
+)
+```
+
+## Performance Optimization Tips
+
+### Resource Allocation
+
+- Start with 2-3 replicas for reliability
+- Monitor resource usage and adjust CPU/memory as needed
+- Use appropriate GPU classes for your workload
+
+**Understanding Container vs VM Resource Models**
+
+Unlike RunPod pods where you get dedicated hardware specs (e.g., "8 vCPUs, 32GB RAM"), SaladCloud containers specify
+resource limits. Your container can use up to the specified CPU and memory limits, but the underlying node architecture
+may vary. This means:
+
+- **CPU Limits**: Your container gets guaranteed access up to the specified vCPU count, but performance characteristics
+  may differ across node types
+- **Memory Limits**: Hard limits enforced by the container runtime - exceeding these will terminate your container
+- **GPU Access**: Each container gets exclusive access to the full GPU on its assigned node
+- **Storage**: Container filesystem is ephemeral - data doesn't persist between container restarts unless using external
+  storage
+
+### Network Performance
+
+- Enable Container Gateway for load balancing
+- Implement proper health checks for automatic failover
+- Use HTTPS for all external communications
+
+> 🌐 **Advanced Networking:** For complex networking needs, explore:
+>
+> - [Container Gateway load balancing](/container-engine/explanation/gateway/load-balancer-options) for traffic
+>   distribution
+> - [Tailscale integration](/container-engine/how-to-guides/platform-integrations/tailscale-basic) for private networks
+> - [Real-time inference patterns](/container-engine/how-to-guides/job-processing/build-redis-queue) for high-throughput
+>   applications
+
+### Cost Optimization
+
+- Use priority pricing tiers based on availability needs
+- Monitor usage through SaladCloud portal
+- Scale replicas based on actual demand
+- Consider scaling to zero for batch workloads with job queues
+
+> 💰 **Scaling Strategies:** Optimize costs and performance with:
+>
+> - [Autoscaling configuration](/container-engine/how-to-guides/autoscaling/enable-autoscaling) for dynamic replica
+>   management
+> - [Job processing patterns](/container-engine/how-to-guides/job-processing/sqs) for batch workloads
+> - [Long-running task optimization](/container-engine/explanation/job-processing/long-running-tasks) for efficient
+>   resource usage
+
+## Testing Your Migration
+
+### Local Testing
+
+```bash
+# Test container locally
+docker run -p 8000:8000 myapp:latest
+
+# Test IPv6 compatibility
+docker run -p 8000:8000 myapp:latest
+curl -6 http://localhost:8000/health
+```
+
+### SaladCloud Testing
+
+1. Deploy with 1-2 replicas initially
+2. Test Container Gateway connectivity
+3. Validate health probes are working
+4. Monitor logs for any issues
+5. Scale up once validated
+
+**Testing Different RunPod Migration Patterns:**
+
+```bash
+# Test Container Gateway (for former RunPod Cloud GPU users)
+curl https://your-container-gateway-url.salad.cloud/health
+
+# Test Job Queue (for former RunPod Serverless users)
+curl -X POST https://api.salad.com/api/public/organizations/org/projects/project/queues/queue-name/jobs \
+  -H "Salad-Api-Key: YOUR_API_KEY" \
+  -d '{"input": {"test": "data"}}'
+```
+
+## Migration Checklist
+
+### Pre-Migration
+
+#### For All RunPod Users
+
+- [ ] Applications containerized and tested locally
+- [ ] IPv6 compatibility verified (bind to `::`)
+- [ ] Health endpoints implemented
+- [ ] Container images pushed to registry
+- [ ] Storage dependencies identified and addressed
+
+#### For RunPod Cloud GPU Users
+
+- [ ] SSH-based setup converted to Dockerfile
+- [ ] Manual dependency installation automated
+- [ ] Local file operations converted to cloud storage
+
+#### For RunPod Serverless Users
+
+- [ ] Handler functions converted to web APIs
+- [ ] Job queue pattern implemented (if needed)
+- [ ] Autoscaling configuration planned
+
+#### For RunPod Hub Users
+
+- [ ] Equivalent SaladCloud Recipe identified or custom solution planned
+- [ ] Template customizations documented
+
+### During Migration
+
+- [ ] Container groups deployed successfully
+- [ ] Container Gateway configured and tested (for web APIs)
+- [ ] Job queues configured and tested (for batch processing)
+- [ ] Health probes responding correctly
+- [ ] Logs flowing to portal/external service
+- [ ] Performance validated against RunPod baseline
+
+### Post-Migration
+
+- [ ] Monitoring and alerting configured
+- [ ] Cost optimization reviewed
+- [ ] Autoscaling tested and tuned
+- [ ] Team trained on new deployment process
+- [ ] Documentation updated
+- [ ] Rollback plan documented
+
+## Getting Help
+
+### SaladCloud Resources
+
+- **Documentation**: [docs.salad.com](https://docs.salad.com)
+- **Portal**: [portal.salad.com](https://portal.salad.com)
+- **API Reference**: [SaladCloud API Documentation](/reference/saladcloud-api)
+- **Support**: Contact [cloud@salad.com](mailto:cloud@salad.com)
+
+### Migration Support
+
+- Use [SaladCloud's web terminal](/container-engine/tutorials/development-tools/interactive-terminal) for debugging
+- Leverage [portal logs](/container-engine/explanation/container-groups/container-logs) for troubleshooting
+- Configure [external logging](/container-engine/explanation/infrastructure-platform/external-logging) for advanced
+  analysis
+- Review [health probes documentation](/container-engine/explanation/infrastructure-platform/health-probes) for
+  container lifecycle management
+
+### RunPod-Specific Migration Support
+
+**Former Cloud GPU Users:**
+
+- [Docker deployment tutorial](/container-engine/tutorials/deployment/docker-run)
+- [SSH alternative: Interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal)
+
+**Former Serverless Users:**
+
+- [Job Queue implementation guides](/container-engine/explanation/job-processing/job-queues)
+- [Container Gateway setup](/container-engine/explanation/gateway/load-balancer-options)
+
+**Former Hub Users:**
+
+- [SaladCloud Recipes overview](/container-engine/reference/recipes/overview)
+- [Custom container deployment](/container-engine/tutorials/quickstart)
+
+## What You'll Gain
+
+Migrating from RunPod to SaladCloud provides immediate benefits:
+
+- **Cost Savings**: Up to 90% reduction in compute costs compared to traditional cloud providers
+- **Global Scale**: Access to 11,000+ active GPUs across 190+ countries
+- **Reliability**: Automatic failover and load balancing across distributed nodes
+- **Simplicity**: Managed container orchestration eliminates infrastructure management
+- **Flexibility**: Per-second billing with no long-term commitments
+- **Performance**: Dedicated GPU access on each node without sharing
+
+**RunPod-Specific Benefits:**
+
+**For Cloud GPU Users:**
+
+- No more SSH key management or manual environment setup
+- Automatic scaling instead of manual pod management
+- Built-in load balancing and health monitoring
+
+**For Serverless Users:**
+
+- More control over scaling behavior and resource allocation
+- Better cost predictability with per-second billing
+- Enhanced debugging and monitoring capabilities
+
+**For Hub Users:**
+
+- Open-source, forkable recipes instead of proprietary templates
+- Greater customization flexibility
+- Community-driven template sharing
+
+**For All Users:**
+
+- Longer cold start times (from a few to tens of minutes vs. RunPod's ~1 second serverless scaling) but with significant
+  cost advantages
+- Global distribution for reduced latency once running
+- Enterprise-grade security and compliance
+
+The containerization process, while requiring initial effort, results in more portable, scalable, and maintainable
+applications. Most teams find their deployment workflow is significantly improved after migration, with better
+monitoring, automatic scaling, and simplified operations.
+
+For more information on SaladCloud's architecture and benefits, see our
+[Core Concepts documentation](/container-engine/explanation/core-concepts/overview) and
+[Architectural Overview](/container-engine/explanation/core-concepts/architectural-overview).
+
+Ready to get started? Create your SaladCloud account and begin your migration today!
+
+## Related Resources
+
+### Migration and Integration
+
+- [Vast.ai migration guide](/container-engine/how-to-guides/migration/migrate-from-vast) - Learn from migration patterns
+  for VM-style infrastructure
+- [Kubernetes integration](/container-engine/explanation/platform-integrations/kubernetes-integration) - For
+  orchestration-aware workloads
+- [Platform integrations](/container-engine/how-to-guides/platform-integrations/service-access) - Connect with external
+  services
+
+### Specialized Deployment Guides
+
+- [Image generation with Stable Diffusion](/container-engine/explanation/ai-machine-learning/image-generation-overview)
+- [Triton Inference Server](/container-engine/tutorials/machine-learning/run-triton-server) for multi-model serving
+- [Computer vision workloads](/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial)
+- [High-performance applications](/container-engine/tutorials/performance/high-performance-apps) optimization guide
+
+### Development and Operations
+
+- [Interactive development tools](/container-engine/tutorials/development-tools/interactive-terminal)
+- [Performance monitoring and optimization](/container-engine/tutorials/performance/performance-monitoring)
+- [Advanced logging and monitoring](/container-engine/explanation/infrastructure-platform/external-logging)
+- [Job processing and queue management](/container-engine/explanation/job-processing/job-queues)
