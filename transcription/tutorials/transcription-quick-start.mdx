@@ -47,7 +47,7 @@ Copy your SaladCloud API key from your account [here.](https://portal.salad.com/
 We provide several examples and resources to help you use the API effectively:
 
 - For a **cURL example** and parameter descriptions, refer to
-  [Example cURL Post Transcript](#example-curl-post-transcript) on this page.
+  [Example cURL Post](#example-curl-post-with-salad-transcription-api) on this page.
 - For **easy testing** with our API reference, visit the [API Reference](#api-reference).
 - For **process automation**, see [Transcription Automation](#transcription-automation).
 
@@ -142,7 +142,7 @@ To find more information about each parameter, please, visit **"Features"** opti
 
 Update the JSON input parameters to customize your transcription output.
 
-#### "url"
+#### url
 
 The url parameter should be a downloadable link to your audio or video file. We recommend using a file service like AWS
 S3, Azure Blob Storage, Dropbox, or Google Drive that offers secure, downloadable links. For instructions on how to
@@ -154,27 +154,27 @@ Send media in any of these formats.
     	*Audio:* AIFF, FLAC, M4A, MP3, WAV
     	*Video:* MKV, MOV, WEBM, WMA, MP4 (most codecs), AVI
 
-#### "return_as_file"
+#### return_as_file
 
 Set to true to receive the transcription output as a downloadable file URL. This is useful for large outputs. Default is
 false.
 
-#### “language_code”
+#### language_code
 
 Transcription is available in 97 languages. We automatically identify the source language. You only need to specify the
 "language_code" if diarization is required. Please note that accuracy varies across languages — some may perform better
 than others. For detailed accuracy information, refer to our
 [language benchmark results](/transcription/reference/accuracy-benchmarks).
 
-#### “sentence_level_timestamps”
+#### sentence_level_timestamps
 
 Sentence level timestamps are returned on default. Set to false if not needed.
 
-#### “word_level_timestamps”
+#### word_level_timestamps
 
 Set to "true" for word level timestamps. Set to "false” on default.
 
-#### “diarization”
+#### diarization
 
 Set to _"true"_ for speaker separation and identification. If you don't require it, set it to _"false”_.
 
@@ -186,24 +186,24 @@ _"pl"_ (Polish), _"hu"_ (Hungarian), _"fi"_ (Finnish), _"fa"_ (Persian), _"el"_ 
 (Danish), _"he"_ (Hebrew), _"vi"_ (Vietnamese), _"ko"_ (Korean), _"ur"_ (Urdu), _"te"_ (Telugu), _"hi"_ (Hindi), _"ca"_
 (Catalan), _"ml"_ (Malayalam).
 
-#### "sentence_diarization"
+#### sentence_diarization
 
 Set to `true` to include speaker information at the sentence level. Requires language_code to be specified. Default is
 `false`.
 
-#### “multichannel”
+#### multichannel
 
 Set to `true` to enable multichannel transcription. Each channel will be transcribed separately and labeled with
 `channel` and `speaker`. Falls back to regular speaker diarization if only one channel is present. Requires
 `diarization` for word-level speaker and channel labeling, or `sentence_diarization` for sentence-level speaker and
 channel labeling.
 
-#### "translate"
+#### translate
 
 Set `"translate": "to_eng"` to translate the transcription into English. This replaces the original transcription with
 the English translation. All additional parameters may also be used alongside translation.
 
-#### "llm_translation"
+#### llm_translation
 
 _(Salad Transcription API only)_
 
@@ -211,11 +211,11 @@ Provide a comma-separated list of target languages to translate the transcriptio
 integration. The original transcription will be returned as normal, along with the translations. **Supported
 languages:** English, French, German, Italian, Portuguese, Hindi, Spanish, Thai
 
-#### “srt”
+#### srt
 
 Set to _"true"_ to generate a .srt output for caption and subtitles. If you don't require it, set it to _"false"_.
 
-#### "srt_translation"
+#### srt_translation
 
 _(Salad Transcription API only)_
 
@@ -223,45 +223,45 @@ Provide a comma-separated list of target languages to translate the generated SR
 original transcription and SRT content will be returned as normal. **Supported languages:** English, French, German,
 Italian, Portuguese, Hindi, Spanish, Thai
 
-#### "summarize"
+#### summarize
 
 _(Salad Transcription API only)_
 
 Set to an integer value representing the maximum number of words for the summary of the transcription.
 
-#### "custom_vocabulary" (preview)
+#### custom_vocabulary (preview)
 
 _(Salad Transcription API only)_
 
 Provide a comma-separated list of custom words or phrases to improve transcription accuracy for domain-specific terms.
 
-#### "custom_prompt" (preview)
+#### custom_prompt (preview)
 
 _(Salad Transcription API only)_
 
 Provide a custom instruction to perform specific analyses on the transcription using our LLM integration.
 
-#### "classification_labels"
+#### classification_labels
 
-#### "overall_classification"
+#### overall_classification
 
 _(Salad Transcription API only)_
 
 Use the classification_labels parameter in conjunction with overall_classification to classify the entire transcription
 into specified categories using an LLM.
 
-#### "overall_sentiment_analysis"
+#### overall_sentiment_analysis
 
 _(Salad Transcription API only)_
 
 Set "overall_sentiment_analysis": true to perform sentiment analysis.
 
-### "webhook"
+### webhook
 
 \*Optional. Webhook is a method that enables application to transmit data to another application immediately when
 process is finished. Specify your webhook url to use.
 
-#### "my-job-id"
+#### my-job-id
 
 \*Optional. If you need an identifier from your system you can the job id as desired.
 
