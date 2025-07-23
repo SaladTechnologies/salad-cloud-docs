@@ -3,10 +3,13 @@
 alwayson
 amqps
 amzn
+APAC
 Apim
 ASGI
 assemblyai
 astype
+autoscaler
+autoscaling
 azcopy
 Bqan
 btop
@@ -17,6 +20,8 @@ CivitAI
 ckpt
 clid
 cloudamqp
+Cloudflare
+CloudWatch
 Cnexn
 cnqj
 comfyui
@@ -46,8 +51,10 @@ dreambooth
 dreamshaper
 dsnp
 dubinsky
+EMEA
 encodedimage
 esports
+EventBridge
 Falco
 fastapi
 ffprobe
@@ -138,6 +145,7 @@ ollama
 Ollama
 ONNX
 OpenAPI
+openmm
 outtmpl
 Pabbly
 Pabbly’s
@@ -193,6 +201,7 @@ sdapi
 sdnext
 sdxl
 SDXL
+serverless
 Shona
 sklearn
 spanish
@@ -233,10 +242,10 @@ vkapp
 vram
 webui
 WORKDIR
+wrangler
 xformers
 xlvaeapp
 yolob8m-custom
 yolov8
 zapier
 zset
-openmm
