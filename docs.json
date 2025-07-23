@@ -194,7 +194,10 @@
               },
               {
                 "group": "Autoscaling & Resource Management",
-                "pages": ["container-engine/how-to-guides/autoscaling/enable-autoscaling"]
+                "pages": [
+                  "container-engine/how-to-guides/autoscaling/enable-autoscaling",
+                  "container-engine/how-to-guides/autoscaling/time-of-day-scaling"
+                ]
               },
               {
                 "group": "Gateway & Networking",

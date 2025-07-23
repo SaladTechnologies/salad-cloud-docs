@@ -240,3 +240,10 @@ yolov8
 zapier
 zset
 openmm
+autoscaling
+autoscaler
+serverless
+Cloudflare
+wrangler
+EventBridge
+CloudWatch
