@@ -1,0 +1,77 @@
+---
+title: OpenMM Playground Environment Recipe
+sidebarTitle: OpenMM
+description: Deploy an OpenMM playground environment to run and explore molecular dynamics simulations on SaladCloud.
+---
+
+_Last Updated: July 24, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+Please familiarize yourself with [OpenMM](https://openmm.org/), [OpenMM Setup](https://github.com/openmm/openmm-setup)
+and the [OpenMM solution on SaladCloud](/container-engine/how-to-guides/molecular-dynamics-simulation/openmm-srcg)
+before running the recipe.
+
+This recipe provides a OpenMM playground environment designed for running and exploring molecular dynamics simulations
+on SaladCloud. It is ideal for researchers, students, and developers who want to experiment with OpenMM in a Cloud-based
+and GPU-accelerated environment without needing to set up complex local installations.
+
+The environment includes:
+
+- **Python Environment** - Miniconda 25.5.1 with Python 3.12
+- **JupyterLab 4.4.4** - For interactive data analysis, notebook creation and terminal access
+- **[OpenMM 8.3.0 (CUDA 12.6)](https://github.com/openmm/openmm/tree/8.3.0)** - For high-performance molecular dynamics
+  simulations
+- **[OpenMM Setup 1.6](https://github.com/openmm/openmm-setup/tree/v1.6)** - The GUI to run OpenMM simulations
+  interactively
+- **[OpenMM example programs](https://github.com/openmm/openmm/tree/8.3.0/examples)** - Available in the /app/examples
+  folder
+- **VS Code Server** - Optional remote development access
+- **Nginx HTTP Server** - Routes incoming requests to the OpenMM Setup GUI and JupyterLab based on URL prefixes
+  (`/jupyter` and `/openmm`)
+
+## Deployment
+
+When launching the recipe, you’ll need to provide the Container Group Name and set the Replica Count to 1. You can
+adjust the hardware configuration—including vCPU, memory, and GPU—as needed. The Container Gateway is mandatory and
+cannot be disabled.
+
+Please remember to shut down the instance manually in the Portal once you’re finished.
+
+Also keep in mind that SaladCloud instances are ephemeral and can be reallocated at any time, reverting to a fresh
+image. For production workloads, consider integrating your container with cloud storage to ensure data persistence.
+
+## Access Options
+
+Once deployed, you can access the environment through multiple interfaces:
+
+#### Web Terminal
+
+Click on any running instance in the SaladCloud Portal to access a browser-based terminal for command-line operations.
+
+#### OpemMM Setup GUI
+
+Access OpenMM Setup at `https://your-deployment-url.salad.cloud/openmm/` for interactive molecular dynamics simulations.
+
+![](/container-engine/images/openmm-recipe1.png)
+
+#### JupyterLab
+
+Access JupyterLab at `https://your-deployment-url.salad.cloud/jupyter/` for interactive Python development, data
+analysis, and notebook creation. You can easily upload and download files directly through the JupyterLab interface.
+Additionally, you can use the integrated JupyterLab terminal to run OpenMM example programs for simulations and testing.
+
+![](/container-engine/images/openmm-recipe2.png)
+
+#### Visual Studio Code
+
+To debug code, you can start the VS Code Server using either the JupyterLab terminal or the Web Terminal, and then
+connect to it using VS Code. Please refer to
+[this guide](/container-engine/tutorials/development-tools/vscode-remote-development#interactive-mode) for more details.
+
+## Source Code
+
+The complete source code for this recipe is available in the
+[SaladCloud Recipes GitHub repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/openmm-srcg).
