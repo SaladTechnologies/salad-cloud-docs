@@ -336,6 +336,14 @@
               "transcription/how-to-guides/speech-to-text",
               "transcription/how-to-guides/transcribe-a-local-file",
               {
+                "group": "SDK's",
+                "pages": [
+                  "transcription/how-to-guides/sdk/python-sdk",
+                  "transcription/how-to-guides/sdk/python-sdk-quick-start",
+                  "transcription/how-to-guides/sdk/python-sdk-examples"
+                ]
+              },
+              {
                 "group": "Platform Integrations",
                 "pages": [
                   "transcription/how-to-guides/platform-integrations/transcribe-youtube",

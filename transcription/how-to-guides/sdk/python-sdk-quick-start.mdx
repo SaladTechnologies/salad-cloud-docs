@@ -1,0 +1,79 @@
+---
+title: 'Transcription API Python SDK Quick Start'
+sidebarTitle: 'Quick Start'
+---
+
+_Last Updated: July 25, 2025_
+
+This quick start tutorial will teach you the basics of using the **Salad Transcription API Python SDK**. It demonstrates
+how to install the SDK, authenticate with your API key, submit transcription jobs, and access results.
+
+---
+
+## Assumptions
+
+Before you begin, ensure that:
+
+- You have a **SaladCloud account** and a valid **API key**. Generate one via the Salad Portal.
+- You have **Python 3.9+** with `pip` properly configured on your system.
+
+---
+
+## Step 1: Install the SDK
+
+Install the SaladCloud Transcription SDK using pip:
+
+```bash
+pip install salad-cloud-transcription-sdk
+```
+
+## Step 2: Submit a file for transcription and retrieve the result
+
+The following example demonstrates how to transcribe a local audio or video file.
+
+Replace:
+
+- `<YOUR_API_KEY>` with your SaladCloud API key
+- `<ORG_NAME>` with your organization name
+- `<FILE_PATH>` with the path to your local file (or use a downloadable URL)
+
+```python
+from salad_cloud_transcription_sdk import SaladCloudTranscriptionSdk
+from salad_cloud_transcription_sdk.models.transcription_job_input import TranscriptionJobInput
+from salad_cloud_transcription_sdk.models.transcription_request import TranscriptionRequest
+
+# Initialize the SDK with your API key
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+# Configure the transcription job parameters
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(
+        language_code="en",
+        srt=True,
+        return_as_file=False,
+    ),
+    metadata={"project": "quick_start_example"},
+
+# Submit the job and wait for it to finish
+job = sdk.transcribe(
+    source="<FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=request,
+    auto_poll=True  # Automatically waits until the job completes
+)
+
+# Print the transcript text
+print("Transcript:\n", job.output['text'])
+
+# Access full JSON output (timestamps, SRT, metadata)
+print("\nFull output object:\n", job.output)
+```
+
+## Next Steps
+
+You should now have a working transcription pipeline. To learn more:
+
+- Explore [Code Examples](/transcription/how-to-guides/sdk/python-sdk-examples) for polling jobs options, webhook
+  handling, Lite vs. Full engine usage and parameters setup.
+- Review the [Full Documentation](/transcription/how-to-guides) for advanced features like summaries, translations,
+  custom vocabulary, and sentiment analysis.
