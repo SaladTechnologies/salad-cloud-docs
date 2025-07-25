@@ -72,13 +72,12 @@ protect busy instances during scale-down operations:
 - **API Authentication**: Requires SaladCloud API key and proper permissions
 - **Batch Updates**: Can update multiple instances in a single operation
 
-Both approaches set deletion costs as utilization percentage (0-100) where higher values protect instances from
-termination.
+Both approaches set deletion costs as integer values where higher values protect instances from termination.
 
 **IMDS Endpoints:**
 
 - `GET /v1/deletion-cost` - [Get current deletion cost](/reference/imds/get-deletion-cost)
-- `PUT /v1/deletion-cost` - [Set deletion cost (0-100)](/reference/imds/replace-deletion-cost)
+- `PUT /v1/deletion-cost` - [Set deletion cost (integer)](/reference/imds/replace-deletion-cost)
 - `GET /v1/status` - [Get instance readiness/startup status](/reference/imds/get-status)
 - `GET /v1/token` - [Get JWT for external authentication](/reference/imds/get-token)
 
@@ -125,7 +124,7 @@ def check_instance_status(client):
 
 def update_deletion_cost(client, utilization):
     """Update deletion cost using the shared client"""
-    deletion_cost = int(utilization)  # 0-100 based on utilization
+    deletion_cost = int(utilization * 100)  # Scale to integer for higher precision
     client.metadata.replace_container_deletion_cost(deletion_cost=deletion_cost)
     print(f"Updated deletion cost to {deletion_cost}")
 
@@ -422,7 +421,7 @@ def push_metrics_to_prometheus(metrics, pushgateway_url):
 
         deletion_cost = Gauge(
             'saladcloud_deletion_cost',
-            'Instance deletion cost (0-100)',
+            'Instance deletion cost (integer)',
             labels,
             registry=registry
         )
@@ -497,7 +496,7 @@ def metrics_collection_loop():
             )
 
             # Update deletion cost based on current utilization using the shared client
-            deletion_cost = int(max_utilization)  # 0-100 based on utilization
+            deletion_cost = int(max_utilization * 100)  # Scale to integer for higher precision
             try:
                 imds_client.metadata.replace_container_deletion_cost(deletion_cost=deletion_cost)
             except Exception as e:
@@ -873,7 +872,7 @@ def update_instance_deletion_costs(instances: List[Dict[str, Any]], metrics: Lis
 
                 # Base cost on the higher of GPU or CPU utilization
                 max_util = max(gpu_util, cpu_util)
-                deletion_cost = int(max_util)  # 0-100 based on utilization percentage
+                deletion_cost = int(max_util * 100)  # Scale to integer for higher precision
 
                 # Update deletion cost via public API
                 try:
@@ -1529,17 +1528,20 @@ function calculateScaling(metrics, currentReplicas, config) {
 Use this checklist to verify your autoscaling implementation:
 
 1. **Metrics Collection**
+
    - [ ] Metrics are being collected from all active instances
    - [ ] Data is accurate and up-to-date (< 5 minutes old)
    - [ ] No missing or null values in critical metrics
 
 2. **Decision Logic**
+
    - [ ] Scale-up triggers activate under high load
    - [ ] Scale-down occurs during low utilization periods
    - [ ] Thermal protection prevents overheating
    - [ ] Instance health checks prevent scaling unhealthy nodes
 
 3. **Integration Testing**
+
    - [ ] Lambda function executes successfully
    - [ ] SaladCloud API calls complete without errors
    - [ ] CloudWatch metrics are published correctly
