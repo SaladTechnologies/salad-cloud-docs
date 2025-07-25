@@ -9,23 +9,27 @@ description:
 _Last Updated: July 25, 2025_
 
 This guide demonstrates how to implement hardware utilization-based autoscaling for SaladCloud container groups by
-monitoring GPU, CPU, and memory metrics and dynamically adjusting replica counts. Unlike queue-based autoscaling that
-reacts to job volume, hardware utilization autoscaling responds to actual resource usage, making it ideal for
-GPU-intensive workloads, real-time inference services, and applications with variable compute demands.
+monitoring GPU, CPU, and memory metrics and dynamically adjusting replica counts. Unlike
+[queue-based autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) that reacts to job volume,
+hardware utilization autoscaling responds to actual resource usage, making it ideal for GPU-intensive workloads,
+real-time inference services, and applications with variable compute demands.
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-- ✅ **SaladCloud API Key**: You'll need a valid API key with permissions to manage container groups
+- ✅ **SaladCloud API Key**: You'll need a valid API key with permissions to manage container groups. See our
+  [API usage guide](/reference/api-usage) for instructions on obtaining your API key.
 - ✅ **Organization and Project**: An active organization and project in SaladCloud
-- ✅ **Container Group**: An existing container group that you want to scale based on hardware metrics
+- ✅ **Container Group**: An existing [container group](/container-engine/explanation/container-groups/container-groups)
+  that you want to scale based on hardware metrics
 - ✅ **Monitoring Infrastructure**: A solution to collect and aggregate metrics (self-hosted or cloud service)
 - ✅ **Serverless Platform Access**: Account on a platform like AWS Lambda or Cloudflare Workers for autoscaling logic
 
 <Tip>
   **GPU Optimization**: Hardware utilization autoscaling is particularly effective for GPU workloads where you want to
-  maintain optimal GPU utilization (typically 70-90%) while avoiding thermal throttling or memory exhaustion.
+  maintain optimal GPU utilization (typically 70-90%) while avoiding thermal throttling or memory exhaustion. For GPU
+  workload examples, see our [AI & Machine Learning guides](/container-engine/how-to-guides/ai-machine-learning/).
 </Tip>
 
 ## Overview
@@ -35,14 +39,16 @@ Hardware utilization autoscaling works by:
 1. **Collecting metrics** from running container instances (GPU, CPU, memory usage)
 2. **Aggregating data** across all instances to determine overall utilization
 3. **Making scaling decisions** based on predefined thresholds and rules
-4. **Calling the SaladCloud API** to adjust replica counts
+4. **Calling the SaladCloud API** to adjust replica counts (see
+   [managing deployments](/container-engine/how-to-guides/managing-deployments) for more details)
 5. **Managing deletion costs** automatically via the SaladCloud IMDS SDK to protect busy instances during scale-down
 
 This approach is ideal for:
 
 - **GPU-intensive workloads**: Maintain optimal GPU utilization without overheating
 - **Variable compute demands**: Scale based on actual resource usage patterns
-- **Cost optimization**: Right-size your deployment based on real utilization
+- **Cost optimization**: Right-size your deployment based on real utilization (see
+  [billing details](/container-engine/explanation/billing-pricing/billing))
 - **Performance optimization**: Prevent resource exhaustion and maintain quality of service
 
 ### **Instance Deletion Cost Management**
@@ -71,10 +77,10 @@ termination.
 
 **IMDS Endpoints:**
 
-- `GET /v1/deletion-cost` - Get current deletion cost
-- `PUT /v1/deletion-cost` - Set deletion cost (0-100)
-- `GET /v1/status` - Get instance readiness/startup status
-- `GET /v1/token` - Get JWT for external authentication
+- `GET /v1/deletion-cost` - [Get current deletion cost](/reference/imds/get-deletion-cost)
+- `PUT /v1/deletion-cost` - [Set deletion cost (0-100)](/reference/imds/replace-deletion-cost)
+- `GET /v1/status` - [Get instance readiness/startup status](/reference/imds/get-status)
+- `GET /v1/token` - [Get JWT for external authentication](/reference/imds/get-token)
 
 **Public API Endpoint:**
 
@@ -109,7 +115,10 @@ from salad_cloud_imds_sdk import SaladCloudImdsSdk
 client = SaladCloudImdsSdk()
 
 def check_instance_status(client):
-    """Get container status using the shared client"""
+    """Get container status using the shared client
+
+    For more details, see: /container-engine/how-to-guides/imds/container-status-endpoint
+    """
     status = client.metadata.get_container_status()
     print(f"Container ready: {status.ready}, started: {status.started}")
     return status
@@ -133,16 +142,10 @@ update_deletion_cost(client, 75)
 ```
 
 <Tip>
-  **Performance Best Practice**: Initialize the `SaladCloudImdsSdk` client once at the start of your application and
-  reuse it throughout your code. This avoids the overhead of creating new connections and improves performance,
-  especially in tight loops or frequent operations. Pass the client instance to functions that need it rather than
-  creating new instances.
-</Tip>
-
-<Tip>
   **Error Handling**: The IMDS SDK automatically handles common error scenarios like network timeouts and temporary
   service unavailability. Your code should still include try/catch blocks for graceful degradation, but the SDK reduces
-  the need for manual retry logic.
+  the need for manual retry logic. For additional troubleshooting guidance, see our [troubleshooting
+  guide](/container-engine/how-to-guides/troubleshooting).
 </Tip>
 
 ## Step 1: Implement Metrics Collection
@@ -160,12 +163,6 @@ use just the components you need for your specific metrics destination.
   **Choose Your Integration**: You only need to implement the specific metrics destination functions for your use case.
   For example, if you're using CloudWatch, you only need the core collection functions and the CloudWatch integration
   section.
-</Tip>
-
-<Tip>
-  **Performance Best Practice**: Always place imports and client initializations (like `boto3.client()`,
-  `initialize_datadog()`) at the module level, outside of functions. This avoids repeated initialization overhead and
-  improves performance, especially in loops or frequently called functions.
 </Tip>
 
 #### **Core Metrics Collection Functions**
@@ -575,6 +572,7 @@ if __name__ == '__main__':
 Add the metrics pusher to your container alongside your main application:
 
 ```dockerfile
+# For container registry options, see: /container-engine/how-to-guides/registries/
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -639,7 +637,8 @@ prometheus-client==0.17.1  # Only if using Prometheus Pushgateway
 
 ### **Environment Variables Configuration**
 
-Configure metrics pushing through environment variables in your SaladCloud container group:
+Configure metrics pushing through [environment variables](/container-engine/how-to-guides/environment-variables) in your
+SaladCloud container group:
 
 ```bash
 # CloudWatch (requires AWS credentials)
@@ -689,7 +688,7 @@ import urllib.request
 import urllib.error
 
 # Configuration from environment variables
-SALAD_API_KEY = os.environ['SALAD_API_KEY']
+SALAD_API_KEY = os.environ['SALAD_API_KEY']  # Get your API key: /reference/api-usage
 SALAD_ORG = os.environ['SALAD_ORG']
 SALAD_PROJECT = os.environ['SALAD_PROJECT']
 CONTAINER_GROUP_NAME = os.environ['CONTAINER_GROUP_NAME']
@@ -743,7 +742,10 @@ def make_salad_request(method: str, path: str, data: Optional[Dict] = None) -> D
         raise Exception(f"SaladCloud API error {e.code}: {error_body}")
 
 def get_container_group() -> Dict[str, Any]:
-    """Get current container group status"""
+    """Get current container group status
+
+    For details on container group states, see: /container-engine/explanation/container-groups/deployment-lifecycle
+    """
     path = f"/organizations/{SALAD_ORG}/projects/{SALAD_PROJECT}/containers/{CONTAINER_GROUP_NAME}"
     return make_salad_request('GET', path)
 
@@ -1198,10 +1200,21 @@ Deploy the autoscaler as an AWS Lambda function:
 2. **Set environment variables**:
 
 ```bash
-SALAD_API_KEY=your_api_key SALAD_ORG=your_organization SALAD_PROJECT=your_project
-CONTAINER_GROUP_NAME=your_container_group GPU_SCALE_UP_THRESHOLD=85 GPU_SCALE_DOWN_THRESHOLD=50
-CPU_SCALE_UP_THRESHOLD=80 CPU_SCALE_DOWN_THRESHOLD=40 MIN_REPLICAS=1 MAX_REPLICAS=10 SCALE_UP_INCREMENT=2
-SCALE_DOWN_INCREMENT=1 SCALE_UP_COOLDOWN=300 SCALE_DOWN_COOLDOWN=600 METRICS_SOURCE=cloudwatch
+SALAD_API_KEY=your_api_key
+SALAD_ORG=your_organization
+SALAD_PROJECT=your_project
+CONTAINER_GROUP_NAME=your_container_group
+GPU_SCALE_UP_THRESHOLD=85
+GPU_SCALE_DOWN_THRESHOLD=50
+CPU_SCALE_UP_THRESHOLD=80
+CPU_SCALE_DOWN_THRESHOLD=40
+MIN_REPLICAS=1
+MAX_REPLICAS=10
+SCALE_UP_INCREMENT=2
+SCALE_DOWN_INCREMENT=1
+SCALE_UP_COOLDOWN=300
+SCALE_DOWN_COOLDOWN=600
+METRICS_SOURCE=cloudwatch
 PROMETHEUS_URL=http://your-prometheus:9090
 ```
 
@@ -1509,305 +1522,7 @@ function calculateScaling(metrics, currentReplicas, config) {
 }
 ```
 
-## Step 4: Monitoring and Observability
-
-### **CloudWatch Integration**
-
-Add comprehensive monitoring to your autoscaler:
-
-```python
-import boto3
-
-# Initialize AWS clients once for better performance
-cloudwatch = boto3.client('cloudwatch')
-sns = boto3.client('sns')
-
-def publish_scaling_metrics(metrics: List[Dict], scaling_action: str,
-                          current_replicas: int, desired_replicas: int):
-    """Publish custom metrics to CloudWatch"""
-    # Calculate aggregate metrics
-    avg_gpu_util = statistics.mean([
-        m['aggregate'].get('gpu_utilization', 0) for m in metrics
-    ]) if metrics else 0
-
-    avg_cpu_util = statistics.mean([
-        m['aggregate'].get('cpu_utilization', 0) for m in metrics
-    ]) if metrics else 0
-
-    max_gpu_temp = max([
-        m['aggregate'].get('gpu_temperature', 0) for m in metrics
-    ]) if metrics else 0
-
-    # Publish metrics
-    cloudwatch.put_metric_data(
-        Namespace='SaladCloud/Autoscaling',
-        MetricData=[
-            {
-                'MetricName': 'AverageGPUUtilization',
-                'Value': avg_gpu_util,
-                'Unit': 'Percent',
-                'Dimensions': [
-                    {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
-                ]
-            },
-            {
-                'MetricName': 'AverageCPUUtilization',
-                'Value': avg_cpu_util,
-                'Unit': 'Percent',
-                'Dimensions': [
-                    {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
-                ]
-            },
-            {
-                'MetricName': 'MaxGPUTemperature',
-                'Value': max_gpu_temp,
-                'Unit': 'None',
-                'Dimensions': [
-                    {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
-                ]
-            },
-            {
-                'MetricName': 'CurrentReplicas',
-                'Value': current_replicas,
-                'Unit': 'Count',
-                'Dimensions': [
-                    {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
-                ]
-            },
-            {
-                'MetricName': 'HealthyInstances',
-                'Value': len([m for m in metrics if assess_instance_health(m)['healthy']]),
-                'Unit': 'Count',
-                'Dimensions': [
-                    {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
-                ]
-            }
-        ]
-    )
-
-    # Log scaling events
-    if scaling_action != 'none':
-        cloudwatch.put_metric_data(
-            Namespace='SaladCloud/Autoscaling',
-            MetricData=[
-                {
-                    'MetricName': 'ScalingEvents',
-                    'Value': 1,
-                    'Unit': 'Count',
-                    'Dimensions': [
-                        {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME},
-                        {'Name': 'ScalingAction', 'Value': scaling_action}
-                    ]
-                }
-            ]
-        )
-```
-
-### **Alerting Setup**
-
-Configure alerts for critical conditions:
-
-```python
-def check_alert_conditions(metrics: List[Dict]) -> List[Dict]:
-    """Check for conditions that require alerts"""
-    alerts = []
-
-    if not metrics:
-        alerts.append({
-            'severity': 'warning',
-            'category': 'monitoring',
-            'message': 'No hardware metrics available for autoscaling decisions'
-        })
-        return alerts
-
-    # Check for thermal issues
-    hot_instances = [m for m in metrics
-                    if m.get('aggregate', {}).get('gpu_temperature', 0) > 85]
-    if hot_instances:
-        alerts.append({
-            'severity': 'critical',
-            'category': 'thermal',
-            'message': f'Critical GPU temperature detected on {len(hot_instances)} instances',
-            'instances': [m['instance_id'] for m in hot_instances]
-        })
-
-    # Check for memory pressure
-    memory_pressure_instances = [m for m in metrics
-                               if m.get('aggregate', {}).get('memory_utilization', 0) > 95]
-    if memory_pressure_instances:
-        alerts.append({
-            'severity': 'warning',
-            'category': 'memory',
-            'message': f'High memory pressure on {len(memory_pressure_instances)} instances',
-            'instances': [m['instance_id'] for m in memory_pressure_instances]
-        })
-
-    # Check for unhealthy instances
-    unhealthy_instances = [m for m in metrics
-                         if not assess_instance_health(m)['healthy']]
-    if len(unhealthy_instances) > len(metrics) * 0.3:  # More than 30% unhealthy
-        alerts.append({
-            'severity': 'critical',
-            'category': 'health',
-            'message': f'{len(unhealthy_instances)}/{len(metrics)} instances are unhealthy',
-            'instances': [m['instance_id'] for m in unhealthy_instances]
-        })
-
-    return alerts
-
-def send_alerts(alerts: List[Dict]):
-    """Send alerts via SNS or other notification service"""
-    if not alerts:
-        return
-
-    topic_arn = os.environ.get('SNS_TOPIC_ARN')
-
-    if not topic_arn:
-        print("SNS_TOPIC_ARN not configured, skipping alert notifications")
-        return
-
-    for alert in alerts:
-        try:
-            message = {
-                'severity': alert['severity'],
-                'category': alert['category'],
-                'message': alert['message'],
-                'container_group': CONTAINER_GROUP_NAME,
-                'timestamp': datetime.utcnow().isoformat()
-            }
-
-            if 'instances' in alert:
-                message['affected_instances'] = alert['instances']
-
-            sns.publish(
-                TopicArn=topic_arn,
-                Subject=f"SaladCloud Alert: {alert['category'].title()} - {alert['severity'].title()}",
-                Message=json.dumps(message, indent=2)
-            )
-
-            print(f"Sent {alert['severity']} alert for {alert['category']}")
-
-        except Exception as e:
-            print(f"Failed to send alert: {e}")
-
-def assess_instance_health(metric: Dict) -> Dict[str, Any]:
-    """Assess the health of an instance based on its metrics"""
-    health_status = {
-        'healthy': True,
-        'issues': []
-    }
-
-    if 'aggregate' not in metric:
-        health_status['healthy'] = False
-        health_status['issues'].append('No metrics available')
-        return health_status
-
-    agg = metric['aggregate']
-
-    # Check GPU temperature
-    gpu_temp = agg.get('gpu_temperature', 0)
-    if gpu_temp > 85:
-        health_status['healthy'] = False
-        health_status['issues'].append(f'GPU temperature critical: {gpu_temp}°C')
-    elif gpu_temp > 80:
-        health_status['issues'].append(f'GPU temperature high: {gpu_temp}°C')
-
-    # Check memory usage
-    memory_util = agg.get('memory_utilization', 0)
-    if memory_util > 95:
-        health_status['healthy'] = False
-        health_status['issues'].append(f'Memory utilization critical: {memory_util}%')
-    elif memory_util > 90:
-        health_status['issues'].append(f'Memory utilization high: {memory_util}%')
-
-    # Check if metrics are stale (older than 5 minutes)
-    metric_age = datetime.utcnow().timestamp() - metric.get('timestamp', 0)
-    if metric_age > 300:  # 5 minutes
-        health_status['healthy'] = False
-        health_status['issues'].append(f'Stale metrics: {metric_age:.0f}s old')
-
-    return health_status
-```
-
-## Step 5: Testing and Validation
-
-### **Load Testing Script**
-
-Create a script to validate your autoscaling behavior:
-
-```python
-# test_autoscaling.py
-import requests
-import time
-import threading
-import argparse
-
-def generate_load(target_url: str, duration: int, thread_count: int):
-    """Generate sustained load to test autoscaling"""
-    def worker():
-        start_time = time.time()
-        request_count = 0
-
-        while time.time() - start_time < duration:
-            try:
-                response = requests.get(target_url, timeout=5)
-                request_count += 1
-
-                if request_count % 100 == 0:
-                    print(f"Thread sent {request_count} requests")
-
-                # Small delay to prevent overwhelming
-                time.sleep(0.01)
-
-            except Exception as e:
-                print(f"Request failed: {e}")
-                time.sleep(1)
-
-    print(f"Starting load test with {thread_count} threads for {duration} seconds")
-    threads = []
-
-    for i in range(thread_count):
-        thread = threading.Thread(target=worker)
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()
-
-    print("Load test completed")
-
-def monitor_metrics(container_group: str, duration: int):
-    """Monitor scaling metrics during the test"""
-    # This would connect to your monitoring system
-    start_time = time.time()
-
-    while time.time() - start_time < duration:
-        # Query CloudWatch metrics
-        print(f"Monitoring metrics for {container_group}...")
-        time.sleep(30)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Test autoscaling behavior')
-    parser.add_argument('--url', required=True, help='Target URL for load testing')
-    parser.add_argument('--duration', type=int, default=300, help='Test duration in seconds')
-    parser.add_argument('--threads', type=int, default=10, help='Number of concurrent threads')
-    parser.add_argument('--container-group', required=True, help='Container group name to monitor')
-
-    args = parser.parse_args()
-
-    # Start monitoring in background
-    monitor_thread = threading.Thread(
-        target=monitor_metrics,
-        args=(args.container_group, args.duration)
-    )
-    monitor_thread.start()
-
-    # Run load test
-    generate_load(args.url, args.duration, args.threads)
-
-    # Wait for monitoring to complete
-    monitor_thread.join()
-```
+## Step 5: Validation
 
 ### **Validation Checklist**
 
@@ -1832,21 +1547,25 @@ Use this checklist to verify your autoscaling implementation:
    - [ ] SaladCloud API calls complete without errors
    - [ ] CloudWatch metrics are published correctly
    - [ ] Alerts fire for critical conditions
+   - [ ] Consider setting up [external logging](/container-engine/how-to-guides/external-logging/) for better
+         observability
 
 4. **Performance Validation**
    - [ ] Scaling actions complete within expected time frames
    - [ ] No thrashing between scale-up and scale-down
    - [ ] Cost optimization goals are met
    - [ ] Application performance maintained during scaling
+   - [ ] If issues arise, consult our [troubleshooting guide](/container-engine/how-to-guides/troubleshooting)
 
 ## Conclusion
 
 This guide provides a complete framework for implementing hardware-metrics-based autoscaling with SaladCloud. The key
 benefits include:
 
-- **Cost Optimization**: Scale down during low utilization to reduce costs
+- **Cost Optimization**: Scale down during low utilization to reduce costs (see
+  [billing details](/container-engine/explanation/billing-pricing/billing))
 - **Performance Assurance**: Scale up proactively to maintain application responsiveness
-- **Thermal Protection**: Prevent GPU overheating that could damage hardware
+- **Thermal Protection**: Prevent GPU thermal throttling that degrades compute performance
 - **Operational Visibility**: Comprehensive monitoring and alerting for production confidence
 
 Remember to:
@@ -1858,3 +1577,7 @@ Remember to:
 
 The modular architecture allows you to mix and match different integration approaches, so you can start with CloudWatch
 and add Prometheus monitoring as your requirements evolve.
+
+For other autoscaling approaches, see our guides on
+[queue-based autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) and
+[time-of-day scaling](/container-engine/how-to-guides/autoscaling/time-of-day-scaling).
