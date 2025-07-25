@@ -336,7 +336,7 @@
               "transcription/how-to-guides/speech-to-text",
               "transcription/how-to-guides/transcribe-a-local-file",
               {
-                "group": "SDK's",
+                "group": "SDKs",
                 "pages": [
                   "transcription/how-to-guides/sdk/python-sdk",
                   "transcription/how-to-guides/sdk/python-sdk-quick-start",
