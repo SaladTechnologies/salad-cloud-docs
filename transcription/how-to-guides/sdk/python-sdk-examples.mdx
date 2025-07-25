@@ -1,0 +1,262 @@
+---
+title: 'Transcription API Python SDK Code Examples'
+sidebarTitle: 'Code Examples'
+---
+
+_Last Updated: July 25, 2025_
+
+Use the code samples below to quickly get started developing with the **Salad Transcription Python SDK**. For a complete
+list of supported parameters and request fields, refer to the **Request Options** below and
+[API Reference](/transcription/reference/api).
+
+---
+
+## Submit a local file for transcription
+
+```python
+from salad_cloud_transcription_sdk import SaladCloudTranscriptionSdk
+from salad_cloud_transcription_sdk.models import TranscriptionRequest, TranscriptionJobInput
+
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(
+        language_code="en",
+        return_as_file=False,
+    ),
+)
+
+job = sdk.transcribe(
+    source="<LOCAL_FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=request,
+    auto_poll=True
+)
+
+print("Transcript text:\n", job.output['text'])
+```
+
+## Submit a remote file for transcription
+
+```python
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(language_code="en",return_as_file=False),
+)
+
+job = sdk.transcribe(
+    source="https://example.com/audio.mp3",
+    organization_name="<ORG_NAME>",
+    request=request,
+    auto_poll=True
+)
+
+print(job.output['text'])
+```
+
+## Poll for job status
+
+```python
+import time
+from salad_cloud_transcription_sdk import SaladCloudTranscriptionSdk
+from salad_cloud_sdk.models import Status
+from salad_cloud_transcription_sdk.models import TranscriptionRequest, TranscriptionJobInput
+
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+# Setup the request
+request_object = TranscriptionRequest(
+    options=TranscriptionJobInput(,
+        return_as_file=False,
+    ),
+    metadata={"project": "example_project"}
+)
+
+job = sdk.transcribe(
+    source="<FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=TranscriptionRequest(
+        options=TranscriptionJobInput(language_code="en")
+    ),
+    auto_poll=False
+)
+
+while True:
+    job = sdk.get_transcription_job("<ORG_NAME>", job.id_)
+    if job.status in [
+        Status.SUCCEEDED.value,
+        Status.FAILED.value,
+        Status.CANCELLED.value,
+        ]:
+        break
+    time.sleep(5)
+
+if job.status == Status.SUCCEEDED.value:
+    print(job.output)
+```
+
+## Use the Lite model engine
+
+```python
+from salad_cloud_transcription_sdk import SaladCloudTranscriptionSdk
+from salad_cloud_transcription_sdk.models import (
+    TranscriptionEngine,
+    TranscriptionRequest,
+    TranscriptionJobInput
+)
+
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(
+        sentence_level_timestamps=True,
+    ),
+)
+
+job = sdk.transcribe(
+    source="<FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=request,
+    engine=TranscriptionEngine.Lite,
+    auto_poll=True
+)
+```
+
+## Add a custom vocabulary and summary (Full engine)
+
+```python
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(
+        language_code="en",
+        custom_vocabulary=["SaladCloud", "GPU", "transcription"],
+        summarize=100  # Target ~100 words
+    ),
+)
+
+job = sdk.transcribe(
+    source="<FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=request,
+    auto_poll=True
+)
+
+print("Summary:\n", job.output['summary'])
+```
+
+## Download transcription results as a file (`return_as_file`)
+
+When processing **large jobs** (over ~1 MB of response data), or if you prefer a **downloadable JSON file** instead of
+inline results, you can set `return_as_file=True`. Even if you don’t set it, responses exceeding 1 MB will automatically
+be returned as a file link.
+
+Refer to the [Features Guide](/transcription/how-to-guides/speech-to-text) and
+[API Reference](/transcription/reference/api) for details.
+
+```python
+from salad_cloud_transcription_sdk import SaladCloudTranscriptionSdk
+from salad_cloud_transcription_sdk.models import TranscriptionRequest, TranscriptionJobInput
+
+sdk = SaladCloudTranscriptionSdk(api_key="<YOUR_API_KEY>")
+
+# Configure the job to return the transcription as a file URL
+request = TranscriptionRequest(
+    options=TranscriptionJobInput(
+        language_code="en",
+        return_as_file=True,  # Force output as file
+    ),
+    metadata={"project": "file_download_example"},
+)
+
+job = sdk.transcribe(
+    source="<FILE_PATH>",
+    organization_name="<ORG_NAME>",
+    request=request,
+    auto_poll=True
+)
+
+# The job output will contain a signed Salad S4 URL
+print("Download your transcription from:", job.output['url'])
+```
+
+## Request Options
+
+Below is a list of parameters supported by the Python SDK’s `TranscriptionJobInput`. For full details, refer to the
+[API Reference](/transcription/reference/api).
+
+### `return_as_file` (bool)
+
+Set to `"True"` to receive the transcription output as a **downloadable file URL** (useful for large responses).
+Default: `"False"`, which returns the transcription inline in the API response.
+
+> **Note:** If the response exceeds **1 MB**, it will _always_ be returned as a file link, even if `return_as_file` is
+> `False`.
+
+### `language_code` (str)
+
+Transcription supports multiple. The SDK auto-detects the source language, but specifying might improve accuracy.
+
+### `translate` (str)
+
+Enables **translation to English** by setting:
+
+```python
+translate="to_eng"
+```
+
+When translation is enabled: Original transcription is not returned. Other features (timestamps, SRT, diarization) can
+still be combined.
+
+### sentence_level_timestamps (bool)
+
+Returns timestamps per sentence. Default: false.
+
+### word_level_timestamps (bool)
+
+Returns timestamps per word. Default: false.
+
+### diarization (bool)
+
+Enables speaker separation and identification at the word level. Default: false.
+
+### sentence_diarization (bool)
+
+Adds speaker attribution per sentence. Default: false.
+
+### srt (bool)
+
+Generates srt captions for use as subtitles. Default: false.
+
+### summarize (int)
+
+Returns a summary of the transcription, capped at the specified number of words. Available in Full model engine only.
+Default: 0 (no summary).
+
+### llm_translation (list of TranslationLanguage)
+
+Uses the built-in LLM to translate the transcription into multiple target languages. Supported languages: English,
+French, German, Italian, Portuguese, Hindi, Spanish, Thai. Available in Full model engine only.
+
+### srt_translation (list of TranslationLanguage)
+
+Uses the LLM to translate the generated SRT captions into multiple target languages (same languages as llm_translation).
+Available in Full model engine only.
+
+### custom_vocabulary (str)
+
+Comma-separated list of domain-specific terms or phrases to improve recognition accuracy. Currently in preview.
+Available in Full model engine only.
+
+### custom_prompt (str)
+
+Custom prompt to guide the LLM in generating summaries, insights, or other LLM-powered outputs. Available in Full model
+engine only.
+
+```python
+custom_prompt="what is the text about?"
+```
+
+### multichannel (bool)
+
+Enables multichannel audio processing, allowing the model to handle separate audio channels independently. Default:
+false.
