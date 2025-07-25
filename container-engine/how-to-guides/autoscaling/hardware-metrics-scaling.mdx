@@ -1528,20 +1528,17 @@ function calculateScaling(metrics, currentReplicas, config) {
 Use this checklist to verify your autoscaling implementation:
 
 1. **Metrics Collection**
-
    - [ ] Metrics are being collected from all active instances
    - [ ] Data is accurate and up-to-date (< 5 minutes old)
    - [ ] No missing or null values in critical metrics
 
 2. **Decision Logic**
-
    - [ ] Scale-up triggers activate under high load
    - [ ] Scale-down occurs during low utilization periods
    - [ ] Thermal protection prevents overheating
    - [ ] Instance health checks prevent scaling unhealthy nodes
 
 3. **Integration Testing**
-
    - [ ] Lambda function executes successfully
    - [ ] SaladCloud API calls complete without errors
    - [ ] CloudWatch metrics are published correctly
