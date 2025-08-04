@@ -8,7 +8,7 @@ createdAt: 'Mon Nov 13 2023 19:06:19 GMT+0000 (Coordinated Universal Time)'
 updatedAt: 'Tue Apr 09 2024 16:06:40 GMT+0000 (Coordinated Universal Time)'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: August 04, 2025_
 
 TGI (Text Generation Interface) is a toolkit for deploying and service Large Language Models (LLMs). TGI enables
 high-performance text generation for the most popular open-source LLMs, including Llama, Falcon, StarCoder, BLOOM,
@@ -65,3 +65,48 @@ python -c "import requests,sys;sys.exit(0 if requests.get('http://localhost:80/h
 ```
 
 <img src="/container-engine/images/e851b39-image.png" />
+
+## Optional - Multi-GPU TGI Inference on SaladCloud Secure
+
+[**SaladCloud Secure**](/container-engine/explanation/core-concepts/saladcloud-secure) is a high-performance
+infrastructure tier with data center GPUs, available in blocks of **8 GPUs per node**. These machines are ideal for
+running large-scale language models using TGI with multi-GPU support.
+
+TGI supports **model sharding across multiple GPUs**, allowing you to load and serve much larger models efficiently. To
+take advantage of this on SaladCloud Secure, configure the following environment variables when launching your
+container:
+
+### Required Environment Variables
+
+- `SHARDED=true` Enables TGI's sharded mode. If this is set and no additional options are provided, TGI will use **all
+  visible GPUs**. Requires `CUDA_VISIBLE_DEVICES` to be set to expose GPUs to TGI.
+
+- `NUM_SHARD=<int>` Specifies how many shards to split the model across. Must match the number of GPUs you want TGI to
+  use (and must be ≤ the number of visible devices). If this environment variable is set, `SHARDED` is not required.
+  `CUDA_VISIBLE_DEVICES` must still be set to expose specified GPUs to TGI.
+
+- `CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7` **Required to expose multiple GPUs to the TGI container.** By default, TGI will
+  only detect one GPU unless this variable is set. You can also use this to run **multiple workloads** on a single 8-GPU
+  node by isolating which GPUs are used by each container. To specify which GPUs TGI should use, provide a list of
+  integers as a value.
+
+#### Example: Use All 8 GPUs
+
+```env
+SHARDED=true
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+```
+
+or
+
+```env
+NUM_SHARD=8
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+```
+
+#### Example: Use Only 2 GPUs
+
+```env
+NUM_SHARD=2
+CUDA_VISIBLE_DEVICES=0,1
+```
