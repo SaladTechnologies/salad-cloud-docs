@@ -195,6 +195,7 @@
               {
                 "group": "Autoscaling & Resource Management",
                 "pages": [
+                  "container-engine/how-to-guides/autoscaling/overview",
                   "container-engine/how-to-guides/autoscaling/enable-autoscaling",
                   "container-engine/how-to-guides/autoscaling/time-of-day-scaling",
                   "container-engine/how-to-guides/autoscaling/hardware-metrics-scaling"
