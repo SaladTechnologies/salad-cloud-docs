@@ -1,0 +1,1579 @@
+---
+title: 'Hardware Utilization-Based Autoscaling for Container Groups'
+sidebarTitle: 'Hardware Utilization Autoscaling'
+description:
+  'Learn how to implement autoscaling based on GPU, CPU, and memory utilization metrics for your SaladCloud container
+  groups to optimize performance and cost efficiency.'
+---
+
+_Last Updated: July 25, 2025_
+
+This guide demonstrates how to implement hardware utilization-based autoscaling for SaladCloud container groups by
+monitoring GPU, CPU, and memory metrics and dynamically adjusting replica counts. Unlike
+[queue-based autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) that reacts to job volume,
+hardware utilization autoscaling responds to actual resource usage, making it ideal for GPU-intensive workloads,
+real-time inference services, and applications with variable compute demands.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- ✅ **SaladCloud API Key**: You'll need a valid API key with permissions to manage container groups. See our
+  [API usage guide](/reference/api-usage) for instructions on obtaining your API key.
+- ✅ **Organization and Project**: An active organization and project in SaladCloud
+- ✅ **Container Group**: An existing [container group](/container-engine/explanation/container-groups/container-groups)
+  that you want to scale based on hardware metrics
+- ✅ **Monitoring Infrastructure**: A solution to collect and aggregate metrics (self-hosted or cloud service)
+- ✅ **Serverless Platform Access**: Account on a platform like AWS Lambda or Cloudflare Workers for autoscaling logic
+
+<Tip>
+  **GPU Optimization**: Hardware utilization autoscaling is particularly effective for GPU workloads where you want to
+  maintain optimal GPU utilization (typically 70-90%) while avoiding thermal throttling or memory exhaustion. For GPU
+  workload examples, see our [AI & Machine Learning guides](/container-engine/how-to-guides/ai-machine-learning/).
+</Tip>
+
+## Overview
+
+Hardware utilization autoscaling works by:
+
+1. **Collecting metrics** from running container instances (GPU, CPU, memory usage)
+2. **Aggregating data** across all instances to determine overall utilization
+3. **Making scaling decisions** based on predefined thresholds and rules
+4. **Calling the SaladCloud API** to adjust replica counts (see
+   [managing deployments](/container-engine/how-to-guides/managing-deployments) for more details)
+5. **Managing deletion costs** automatically via the SaladCloud IMDS SDK to protect busy instances during scale-down
+
+This approach is ideal for:
+
+- **GPU-intensive workloads**: Maintain optimal GPU utilization without overheating
+- **Variable compute demands**: Scale based on actual resource usage patterns
+- **Cost optimization**: Right-size your deployment based on real utilization (see
+  [billing details](/container-engine/explanation/billing-pricing/billing))
+- **Performance optimization**: Prevent resource exhaustion and maintain quality of service
+
+### **Instance Deletion Cost Management**
+
+SaladCloud provides two ways to manage instance deletion costs based on current utilization. Higher deletion costs
+protect busy instances during scale-down operations:
+
+#### **Option 1: IMDS SDK (Recommended for Self-Management)**
+
+- **Automatic Updates**: Instances continuously update deletion costs via the SaladCloud IMDS SDK
+- **Local Performance**: Uses local IMDS endpoint for better performance
+- **No Authentication**: No API keys required within the instance
+- **Real-time**: Immediate updates as utilization changes
+- **Error Handling**: Built-in retry logic and exception handling
+- **Type Safety**: Fully typed method calls and responses
+
+#### **Option 2: SaladCloud Public API (External Management)**
+
+- **External Control**: Autoscaler updates deletion costs via external API calls
+- **Centralized**: Managed by the autoscaling service rather than individual instances
+- **API Authentication**: Requires SaladCloud API key and proper permissions
+- **Batch Updates**: Can update multiple instances in a single operation
+
+Both approaches set deletion costs as integer values where higher values protect instances from termination.
+
+**IMDS Endpoints:**
+
+- `GET /v1/deletion-cost` - [Get current deletion cost](/reference/imds/get-deletion-cost)
+- `PUT /v1/deletion-cost` - [Set deletion cost (integer)](/reference/imds/replace-deletion-cost)
+- `GET /v1/status` - [Get instance readiness/startup status](/reference/imds/get-status)
+- `GET /v1/token` - [Get JWT for external authentication](/reference/imds/get-token)
+
+**Public API Endpoint:**
+
+- `PATCH /organizations/{org}/projects/{project}/containers/{group}/instances/{container_group_instance_id}` - Update
+  deletion cost
+
+This guide demonstrates the IMDS approach using the Python IMDS SDK for better performance, simplicity, and error
+handling. The SDK automatically handles authentication headers, retries, and provides typed responses.
+
+### **Using the SaladCloud IMDS SDK**
+
+The SaladCloud IMDS SDK provides a clean, typed interface for interacting with the Instance Metadata Service. Key
+benefits include:
+
+- **Automatic error handling**: Built-in retry logic and proper exception handling
+- **Type safety**: Fully typed responses and request parameters
+- **Simplified API**: No need to manually handle HTTP headers or JSON parsing
+- **Better performance**: Optimized connection pooling and timeout handling
+
+Install the IMDS SDK alongside your application dependencies:
+
+```bash
+pip install salad-cloud-imds-sdk
+```
+
+Example usage:
+
+```python
+from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+# Initialize the SDK client once and reuse it
+client = SaladCloudImdsSdk()
+
+def check_instance_status(client):
+    """Get container status using the shared client
+
+    For more details, see: /container-engine/how-to-guides/imds/container-status-endpoint
+    """
+    status = client.metadata.get_container_status()
+    print(f"Container ready: {status.ready}, started: {status.started}")
+    return status
+
+def update_deletion_cost(client, utilization):
+    """Update deletion cost using the shared client"""
+    deletion_cost = int(utilization * 100)  # Scale to integer for higher precision
+    client.metadata.replace_container_deletion_cost(deletion_cost=deletion_cost)
+    print(f"Updated deletion cost to {deletion_cost}")
+
+def get_current_deletion_cost(client):
+    """Get current deletion cost using the shared client"""
+    cost = client.metadata.get_container_deletion_cost()
+    print(f"Current deletion cost: {cost.deletion_cost}")
+    return cost.deletion_cost
+
+# Use the shared client across multiple operations
+status = check_instance_status(client)
+current_cost = get_current_deletion_cost(client)
+update_deletion_cost(client, 75)
+```
+
+<Tip>
+  **Error Handling**: The IMDS SDK automatically handles common error scenarios like network timeouts and temporary
+  service unavailability. Your code should still include try/catch blocks for graceful degradation, but the SDK reduces
+  the need for manual retry logic. For additional troubleshooting guidance, see our [troubleshooting
+  guide](/container-engine/how-to-guides/troubleshooting).
+</Tip>
+
+## Step 1: Implement Metrics Collection
+
+Since SaladCloud containers can only expose one port (used by your main application), instances must push their metrics
+to an external metrics store rather than exposing a metrics endpoint. This section shows how to collect and push
+hardware metrics to external services.
+
+### **Metrics Pusher Script**
+
+Create a script that collects hardware metrics and pushes them to an external service. The script is modular - you can
+use just the components you need for your specific metrics destination.
+
+<Tip>
+  **Choose Your Integration**: You only need to implement the specific metrics destination functions for your use case.
+  For example, if you're using CloudWatch, you only need the core collection functions and the CloudWatch integration
+  section.
+</Tip>
+
+#### **Core Metrics Collection Functions**
+
+These functions collect hardware metrics from the instance:
+
+```python
+# metrics_pusher.py
+import subprocess
+import psutil
+import json
+import time
+import threading
+import os
+import requests
+from datetime import datetime
+from salad_cloud_imds_sdk import SaladCloudImdsSdk
+
+def get_gpu_stats():
+    """Collect basic GPU metrics using nvidia-smi"""
+    try:
+        # Query only essential GPU metrics
+        result = subprocess.run([
+            "nvidia-smi",
+            "--query-gpu=utilization.gpu,utilization.memory,temperature.gpu",
+            "--format=csv,noheader,nounits"
+        ], capture_output=True, text=True, check=True)
+
+        lines = result.stdout.strip().split('\n')
+        if lines and lines[0]:
+            values = lines[0].split(', ')
+            return {
+                'gpu_utilization': int(values[0]) if values[0] != 'N/A' else 0,
+                'memory_utilization': int(values[1]) if values[1] != 'N/A' else 0,
+                'temperature': int(values[2]) if values[2] != 'N/A' else 0
+            }
+    except Exception as e:
+        print(f"Error getting GPU stats: {e}")
+
+    return None
+
+def get_system_stats():
+    """Collect basic CPU and memory metrics"""
+    cpu_percent = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory()
+
+    return {
+        "cpu_utilization": cpu_percent,
+        "memory_utilization": memory.percent,
+    }
+```
+
+#### **AWS CloudWatch Integration**
+
+For sending metrics to AWS CloudWatch:
+
+```python
+import boto3
+
+# Initialize CloudWatch client once for better performance
+cloudwatch = boto3.client('cloudwatch')
+
+def push_metrics_to_cloudwatch(metrics):
+    """Push metrics to AWS CloudWatch"""
+    try:
+        metric_data = []
+
+        # Add instance-level metrics
+        machine_id = metrics['instance']['machine_id']
+
+        if metrics['gpu']:
+            metric_data.extend([
+                {
+                    'MetricName': 'GPUUtilization',
+                    'Value': metrics['gpu']['gpu_utilization'],
+                    'Unit': 'Percent',
+                    'Dimensions': [
+                        {'Name': 'MachineId', 'Value': machine_id},
+                        {'Name': 'ContainerGroup', 'Value': metrics['instance']['container_group']}
+                    ]
+                },
+                {
+                    'MetricName': 'GPUTemperature',
+                    'Value': metrics['gpu']['temperature'],
+                    'Unit': 'None',
+                    'Dimensions': [
+                        {'Name': 'MachineId', 'Value': machine_id},
+                        {'Name': 'ContainerGroup', 'Value': metrics['instance']['container_group']}
+                    ]
+                }
+            ])
+
+        metric_data.extend([
+            {
+                'MetricName': 'CPUUtilization',
+                'Value': metrics['system']['cpu_utilization'],
+                'Unit': 'Percent',
+                'Dimensions': [
+                    {'Name': 'MachineId', 'Value': machine_id},
+                    {'Name': 'ContainerGroup', 'Value': metrics['instance']['container_group']}
+                ]
+            },
+            {
+                'MetricName': 'MemoryUtilization',
+                'Value': metrics['system']['memory_utilization'],
+                'Unit': 'Percent',
+                'Dimensions': [
+                    {'Name': 'MachineId', 'Value': machine_id},
+                    {'Name': 'ContainerGroup', 'Value': metrics['instance']['container_group']}
+                ]
+            }
+        ])
+
+        cloudwatch.put_metric_data(
+            Namespace='SaladCloud/Hardware',
+            MetricData=metric_data
+        )
+        print(f"Pushed {len(metric_data)} metrics to CloudWatch")
+
+    except Exception as e:
+        print(f"Error pushing to CloudWatch: {e}")
+```
+
+#### **Webhook/HTTP Endpoint Integration**
+
+For sending metrics to a custom webhook or HTTP endpoint:
+
+```python
+def push_metrics_to_webhook(metrics, webhook_url):
+    """Push metrics to a webhook endpoint"""
+    try:
+        headers = {'Content-Type': 'application/json'}
+
+        payload = {
+            'timestamp': metrics['timestamp'],
+            'machine_id': metrics['instance']['machine_id'],
+            'container_group': metrics['instance']['container_group'],
+            'metrics': {
+                'gpu': metrics['gpu'],
+                'system': metrics['system']
+            }
+        }
+
+        response = requests.post(webhook_url, json=payload, headers=headers, timeout=10)
+        response.raise_for_status()
+        print(f"Successfully pushed metrics to webhook")
+
+    except Exception as e:
+        print(f"Error pushing to webhook: {e}")
+```
+
+#### **Datadog Integration**
+
+For sending metrics to Datadog:
+
+```python
+from datadog import initialize, api
+
+# Initialize Datadog client once (call this during application startup)
+def initialize_datadog(api_key):
+    """Initialize Datadog client once at startup"""
+    initialize(api_key=api_key)
+
+def push_metrics_to_datadog(metrics, api_key=None):
+    """Push metrics to Datadog"""
+    try:
+        # Initialize if not already done (for backward compatibility)
+        if api_key:
+            initialize(api_key=api_key)
+
+        timestamp = int(metrics['timestamp'])
+        machine_id = metrics['instance']['machine_id']
+        container_group = metrics['instance']['container_group']
+
+        metric_points = []
+
+        if metrics['gpu']:
+            metric_points.extend([
+                {
+                    'metric': 'saladcloud.gpu.utilization',
+                    'points': [(timestamp, metrics['gpu']['gpu_utilization'])],
+                    'tags': [f'machine:{machine_id}', f'container_group:{container_group}']
+                },
+                {
+                    'metric': 'saladcloud.gpu.temperature',
+                    'points': [(timestamp, metrics['gpu']['temperature'])],
+                    'tags': [f'machine:{machine_id}', f'container_group:{container_group}']
+                }
+            ])
+
+        metric_points.extend([
+            {
+                'metric': 'saladcloud.cpu.utilization',
+                'points': [(timestamp, metrics['system']['cpu_utilization'])],
+                'tags': [f'machine:{machine_id}', f'container_group:{container_group}']
+            },
+            {
+                'metric': 'saladcloud.memory.utilization',
+                'points': [(timestamp, metrics['system']['memory_utilization'])],
+                'tags': [f'machine:{machine_id}', f'container_group:{container_group}']
+            }
+        ])
+
+        api.Metric.send(metric_points)
+        print(f"Pushed {len(metric_points)} metrics to Datadog")
+
+    except Exception as e:
+        print(f"Error pushing to Datadog: {e}")
+```
+
+#### **Prometheus Integration**
+
+For sending metrics to Prometheus via a Pushgateway:
+
+```python
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+
+def push_metrics_to_prometheus(metrics, pushgateway_url):
+    """Push metrics to Prometheus via Pushgateway"""
+    try:
+        # Create a new registry for this push
+        registry = CollectorRegistry()
+
+        machine_id = metrics['instance']['machine_id']
+        container_group = metrics['instance']['container_group']
+
+        # Define metrics with labels
+        labels = ['machine_id', 'container_group']
+
+        gpu_utilization = Gauge(
+            'saladcloud_gpu_utilization_percent',
+            'GPU utilization percentage',
+            labels,
+            registry=registry
+        )
+
+        gpu_temperature = Gauge(
+            'saladcloud_gpu_temperature_celsius',
+            'GPU temperature in Celsius',
+            labels,
+            registry=registry
+        )
+
+        cpu_utilization = Gauge(
+            'saladcloud_cpu_utilization_percent',
+            'CPU utilization percentage',
+            labels,
+            registry=registry
+        )
+
+        memory_utilization = Gauge(
+            'saladcloud_memory_utilization_percent',
+            'Memory utilization percentage',
+            labels,
+            registry=registry
+        )
+
+        deletion_cost = Gauge(
+            'saladcloud_deletion_cost',
+            'Instance deletion cost (integer)',
+            labels,
+            registry=registry
+        )
+
+        # Set metric values
+        label_values = [machine_id, container_group]
+
+        if metrics['gpu']:
+            gpu_utilization.labels(*label_values).set(metrics['gpu']['gpu_utilization'])
+            gpu_temperature.labels(*label_values).set(metrics['gpu']['temperature'])
+
+        cpu_utilization.labels(*label_values).set(metrics['system']['cpu_utilization'])
+        memory_utilization.labels(*label_values).set(metrics['system']['memory_utilization'])
+        deletion_cost.labels(*label_values).set(metrics.get('deletion_cost', 0))
+
+        # Push to Pushgateway
+        job_name = f'saladcloud-{container_group}'
+        instance_name = machine_id
+
+        push_to_gateway(
+            pushgateway_url,
+            job=job_name,
+            registry=registry,
+            grouping_key={'instance': instance_name}
+        )
+
+        print(f"Successfully pushed metrics to Prometheus Pushgateway")
+
+    except Exception as e:
+        print(f"Error pushing to Prometheus: {e}")
+```
+
+#### **Main Collection Loop**
+
+The main loop that coordinates metrics collection and pushing:
+
+```python
+def metrics_collection_loop():
+    """Background thread to continuously collect and push metrics"""
+    webhook_url = os.environ.get('METRICS_WEBHOOK_URL')
+    datadog_api_key = os.environ.get('DATADOG_API_KEY')
+    prometheus_pushgateway_url = os.environ.get('PROMETHEUS_PUSHGATEWAY_URL')
+    push_to_cloudwatch = os.environ.get('PUSH_TO_CLOUDWATCH', 'false').lower() == 'true'
+
+    # Initialize IMDS client once for better performance and reuse throughout the loop
+    imds_client = SaladCloudImdsSdk()
+
+    # Initialize Datadog client once if API key is provided
+    if datadog_api_key:
+        initialize_datadog(datadog_api_key)
+
+    while True:
+        try:
+            gpu_stats = get_gpu_stats()
+            system_stats = get_system_stats()
+
+            # Get instance status using the shared client
+            try:
+                status_response = imds_client.metadata.get_container_status()
+                instance_status = {
+                    "ready": status_response.ready,
+                    "started": status_response.started
+                }
+            except Exception as e:
+                print(f"Error getting instance status: {e}")
+                instance_status = {"ready": True, "started": True}
+
+            # Calculate instance utilization for deletion cost
+            max_utilization = max(
+                system_stats.get('cpu_utilization', 0),
+                gpu_stats.get('gpu_utilization', 0) if gpu_stats else 0
+            )
+
+            # Update deletion cost based on current utilization using the shared client
+            deletion_cost = int(max_utilization * 100)  # Scale to integer for higher precision
+            try:
+                imds_client.metadata.replace_container_deletion_cost(deletion_cost=deletion_cost)
+            except Exception as e:
+                print(f"Error setting deletion cost: {e}")
+
+            metrics = {
+                "timestamp": time.time(),
+                "machine_id": os.environ.get("SALAD_MACHINE_ID", "unknown"),
+                "container_group": os.environ.get("SALAD_CONTAINER_GROUP_ID", "unknown"),
+                "system": system_stats,
+                "gpu": gpu_stats,
+                "status": instance_status,
+                "deletion_cost": deletion_cost
+            }
+
+            # Push to configured destinations
+            if push_to_cloudwatch:
+                # Restructure metrics for CloudWatch
+                cloudwatch_metrics = {
+                    "timestamp": metrics["timestamp"],
+                    "instance": {
+                        "machine_id": metrics["machine_id"],
+                        "container_group": metrics["container_group"]
+                    },
+                    "gpu": metrics["gpu"],
+                    "system": metrics["system"]
+                }
+                push_metrics_to_cloudwatch(cloudwatch_metrics)
+
+            if webhook_url:
+                push_metrics_to_webhook(metrics, webhook_url)
+
+            if datadog_api_key:
+                # Restructure metrics for Datadog
+                datadog_metrics = {
+                    "timestamp": metrics["timestamp"],
+                    "instance": {
+                        "machine_id": metrics["machine_id"],
+                        "container_group": metrics["container_group"]
+                    },
+                    "gpu": metrics["gpu"],
+                    "system": metrics["system"]
+                }
+                push_metrics_to_datadog(datadog_metrics)  # API key already initialized
+
+            if prometheus_pushgateway_url:
+                # Restructure metrics for Prometheus
+                prometheus_metrics = {
+                    "timestamp": metrics["timestamp"],
+                    "instance": {
+                        "machine_id": metrics["machine_id"],
+                        "container_group": metrics["container_group"]
+                    },
+                    "gpu": metrics["gpu"],
+                    "system": metrics["system"],
+                    "deletion_cost": metrics["deletion_cost"]
+                }
+                push_metrics_to_prometheus(prometheus_metrics, prometheus_pushgateway_url)
+
+        except Exception as e:
+            print(f"Error in metrics collection: {e}")
+
+        time.sleep(30)  # Push metrics every 30 seconds
+
+if __name__ == '__main__':
+    print("Starting metrics collection and push service...")
+    metrics_collection_loop()
+```
+
+### **Integrate with Your Application**
+
+Add the metrics pusher to your container alongside your main application:
+
+```dockerfile
+# For container registry options, see: /container-engine/how-to-guides/registries/
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY main.py .
+COPY metrics_pusher.py .
+COPY start.sh .
+
+RUN chmod +x start.sh
+
+# Expose your application port (not metrics)
+EXPOSE 8000
+
+CMD ["./start.sh"]
+```
+
+**start.sh:**
+
+```bash
+#!/bin/bash
+
+# Start metrics pusher in background
+python metrics_pusher.py &
+
+# Start main application on the exposed port
+python main.py
+
+# Wait for any process to exit
+wait -n
+exit $?
+```
+
+**requirements.txt:**
+
+```
+# Core dependencies (always required)
+psutil==5.9.8
+requests==2.31.0
+salad-cloud-imds-sdk  # For IMDS operations
+
+# Optional: AWS CloudWatch integration
+boto3==1.26.137  # Only if using CloudWatch
+
+# Optional: Datadog integration
+datadog==0.44.0  # Only if using Datadog
+
+# Optional: Prometheus integration
+prometheus-client==0.17.1  # Only if using Prometheus Pushgateway
+
+# Your application dependencies...
+```
+
+### **Environment Variables Configuration**
+
+Configure metrics pushing through [environment variables](/container-engine/how-to-guides/environment-variables) in your
+SaladCloud container group:
+
+```bash
+# CloudWatch (requires AWS credentials)
+PUSH_TO_CLOUDWATCH=true
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_DEFAULT_REGION=us-east-1
+
+# Webhook endpoint
+METRICS_WEBHOOK_URL=https://your-metrics-api.com/webhook
+
+# Datadog
+DATADOG_API_KEY=your_datadog_api_key
+
+# Prometheus Pushgateway
+PROMETHEUS_PUSHGATEWAY_URL=http://your-pushgateway:9091
+```
+
+## Step 2: Implement Metrics Aggregation
+
+Next, implement a system to collect metrics from your external metrics store and make scaling decisions. This can be
+done using a serverless function that periodically queries the metrics store and calculates scaling actions.
+
+The autoscaler is modular - you can use just the components you need for your specific metrics destination and
+deployment platform.
+
+<Tip>
+  **Choose Your Integration**: You only need to implement the specific metrics collection functions for your use case.
+  For example, if you're using CloudWatch, you only need the core autoscaler functions and the CloudWatch integration
+  section.
+</Tip>
+
+### **Core Autoscaler Functions**
+
+These functions provide the foundation for the autoscaling logic:
+
+```python
+# lambda_autoscaler.py
+import json
+import os
+import statistics
+import boto3
+import requests
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
+import urllib.request
+import urllib.error
+
+# Configuration from environment variables
+SALAD_API_KEY = os.environ['SALAD_API_KEY']  # Get your API key: /reference/api-usage
+SALAD_ORG = os.environ['SALAD_ORG']
+SALAD_PROJECT = os.environ['SALAD_PROJECT']
+CONTAINER_GROUP_NAME = os.environ['CONTAINER_GROUP_NAME']
+
+# Scaling thresholds
+GPU_SCALE_UP_THRESHOLD = float(os.environ.get('GPU_SCALE_UP_THRESHOLD', '85'))
+GPU_SCALE_DOWN_THRESHOLD = float(os.environ.get('GPU_SCALE_DOWN_THRESHOLD', '50'))
+CPU_SCALE_UP_THRESHOLD = float(os.environ.get('CPU_SCALE_UP_THRESHOLD', '80'))
+CPU_SCALE_DOWN_THRESHOLD = float(os.environ.get('CPU_SCALE_DOWN_THRESHOLD', '40'))
+MIN_REPLICAS = int(os.environ.get('MIN_REPLICAS', '1'))
+MAX_REPLICAS = int(os.environ.get('MAX_REPLICAS', '10'))
+SCALE_UP_INCREMENT = int(os.environ.get('SCALE_UP_INCREMENT', '2'))
+SCALE_DOWN_INCREMENT = int(os.environ.get('SCALE_DOWN_INCREMENT', '1'))
+
+# Cooldown periods (in seconds)
+SCALE_UP_COOLDOWN = int(os.environ.get('SCALE_UP_COOLDOWN', '300'))  # 5 minutes
+SCALE_DOWN_COOLDOWN = int(os.environ.get('SCALE_DOWN_COOLDOWN', '600'))  # 10 minutes
+
+SALAD_BASE_URL = "https://api.salad.com/api/public"
+
+# Initialize AWS clients once for better performance
+cloudwatch = boto3.client('cloudwatch')
+dynamodb = boto3.resource('dynamodb')  # For webhook storage example
+
+# Store last scaling action time (in production, use DynamoDB or similar)
+last_scale_time = {}
+
+def make_salad_request(method: str, path: str, data: Optional[Dict] = None) -> Dict[str, Any]:
+    """Make a request to the SaladCloud API"""
+    url = f"{SALAD_BASE_URL}{path}"
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Salad-Api-Key': SALAD_API_KEY
+    }
+
+    if method == 'PATCH':
+        headers['Content-Type'] = 'application/merge-patch+json'
+
+    req_data = None
+    if data:
+        req_data = json.dumps(data).encode('utf-8')
+
+    request = urllib.request.Request(url, data=req_data, headers=headers, method=method)
+
+    try:
+        with urllib.request.urlopen(request) as response:
+            return json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        raise Exception(f"SaladCloud API error {e.code}: {error_body}")
+
+def get_container_group() -> Dict[str, Any]:
+    """Get current container group status
+
+    For details on container group states, see: /container-engine/explanation/container-groups/deployment-lifecycle
+    """
+    path = f"/organizations/{SALAD_ORG}/projects/{SALAD_PROJECT}/containers/{CONTAINER_GROUP_NAME}"
+    return make_salad_request('GET', path)
+
+def get_container_instances() -> List[Dict[str, Any]]:
+    """Get list of running container instances"""
+    path = f"/organizations/{SALAD_ORG}/projects/{SALAD_PROJECT}/containers/{CONTAINER_GROUP_NAME}/instances"
+    response = make_salad_request('GET', path)
+    return response.get('items', [])
+
+def calculate_scaling_decision(metrics: List[Dict[str, Any]], current_replicas: int) -> int:
+    """Calculate desired replica count based on collected metrics"""
+    if not metrics:
+        print("No metrics available, maintaining current replica count")
+        return current_replicas
+
+    # Extract utilization values
+    gpu_utilizations = []
+    cpu_utilizations = []
+    gpu_temperatures = []
+
+    for m in metrics:
+        if 'aggregate' in m:
+            agg = m['aggregate']
+            if 'gpu_utilization' in agg:
+                gpu_utilizations.append(agg['gpu_utilization'])
+            if 'gpu_temperature' in agg:
+                gpu_temperatures.append(agg['gpu_temperature'])
+            if 'cpu_utilization' in agg:
+                cpu_utilizations.append(agg['cpu_utilization'])
+
+    # Calculate averages
+    avg_gpu_util = statistics.mean(gpu_utilizations) if gpu_utilizations else 0
+    avg_cpu_util = statistics.mean(cpu_utilizations) if cpu_utilizations else 0
+    max_gpu_temp = max(gpu_temperatures) if gpu_temperatures else 0
+
+    print(f"Metrics summary - Instances: {len(metrics)}, "
+          f"Avg GPU: {avg_gpu_util:.1f}%, Avg CPU: {avg_cpu_util:.1f}%, "
+          f"Max GPU Temp: {max_gpu_temp}°C")
+
+    # Determine scaling action
+    desired_replicas = current_replicas
+
+    # Check if we need to scale up
+    scale_up_needed = False
+    if gpu_utilizations and avg_gpu_util > GPU_SCALE_UP_THRESHOLD:
+        scale_up_needed = True
+        print(f"GPU utilization {avg_gpu_util:.1f}% exceeds threshold {GPU_SCALE_UP_THRESHOLD}%")
+    elif avg_cpu_util > CPU_SCALE_UP_THRESHOLD:
+        scale_up_needed = True
+        print(f"CPU utilization {avg_cpu_util:.1f}% exceeds threshold {CPU_SCALE_UP_THRESHOLD}%")
+    elif max_gpu_temp > 85:  # Emergency scale up for temperature
+        scale_up_needed = True
+        print(f"GPU temperature {max_gpu_temp}°C is critical")
+
+    # Check if we need to scale down
+    scale_down_needed = False
+    if current_replicas > MIN_REPLICAS:
+        if gpu_utilizations and avg_gpu_util < GPU_SCALE_DOWN_THRESHOLD:
+            if avg_cpu_util < CPU_SCALE_DOWN_THRESHOLD:
+                scale_down_needed = True
+                print(f"Both GPU ({avg_gpu_util:.1f}%) and CPU ({avg_cpu_util:.1f}%) "
+                      f"below scale-down thresholds")
+        elif not gpu_utilizations and avg_cpu_util < CPU_SCALE_DOWN_THRESHOLD:
+            scale_down_needed = True
+            print(f"CPU utilization {avg_cpu_util:.1f}% below threshold {CPU_SCALE_DOWN_THRESHOLD}%")
+
+    # Apply scaling decision
+    if scale_up_needed:
+        desired_replicas = min(current_replicas + SCALE_UP_INCREMENT, MAX_REPLICAS)
+    elif scale_down_needed:
+        desired_replicas = max(current_replicas - SCALE_DOWN_INCREMENT, MIN_REPLICAS)
+
+    return desired_replicas
+
+def check_cooldown(action_type: str) -> bool:
+    """Check if we're still in cooldown period"""
+    global last_scale_time
+
+    if action_type not in last_scale_time:
+        return False
+
+    cooldown = SCALE_UP_COOLDOWN if action_type == 'scale_up' else SCALE_DOWN_COOLDOWN
+    elapsed = datetime.now() - last_scale_time[action_type]
+
+    if elapsed.total_seconds() < cooldown:
+        print(f"Still in cooldown for {action_type} "
+              f"({elapsed.total_seconds():.0f}s < {cooldown}s)")
+        return True
+
+    return False
+
+def update_instance_deletion_costs(instances: List[Dict[str, Any]], metrics: List[Dict[str, Any]]):
+    """
+    Update deletion costs - instances can handle this automatically via IMDS,
+    or it can be managed centrally via the public API (shown below).
+
+    IMDS approach (recommended): Instances update their own costs automatically
+    Public API approach: Autoscaler updates costs for all instances centrally
+    """
+
+    # Option 1: Let instances manage their own deletion costs via IMDS
+    # (This is what our metrics collection script does automatically)
+    print(f"Instances manage deletion costs automatically via IMDS")
+
+    # Option 2: Centrally manage deletion costs via public API (alternative approach)
+    if os.environ.get('USE_CENTRAL_DELETION_COST_MANAGEMENT', 'false').lower() == 'true':
+        metrics_by_id = {m['instance_id']: m for m in metrics}
+
+        for instance in instances:
+            if instance['state'] != 'running':
+                continue
+
+            instance_id = instance['instance_id']
+            if instance_id not in metrics_by_id:
+                continue
+
+            # Calculate deletion cost based on utilization
+            m = metrics_by_id[instance_id]
+            if 'aggregate' in m:
+                agg = m['aggregate']
+
+                # Higher deletion cost for instances with higher utilization
+                gpu_util = agg.get('gpu_utilization', 0)
+                cpu_util = agg.get('cpu_utilization', 0)
+
+                # Base cost on the higher of GPU or CPU utilization
+                max_util = max(gpu_util, cpu_util)
+                deletion_cost = int(max_util * 100)  # Scale to integer for higher precision
+
+                # Update deletion cost via public API
+                try:
+                    path = f"/organizations/{SALAD_ORG}/projects/{SALAD_PROJECT}/containers/{CONTAINER_GROUP_NAME}/instances/{instance_id}"
+                    make_salad_request('PATCH', path, {'deletion_cost': deletion_cost})
+                    print(f"Updated deletion cost for {instance_id} to {deletion_cost} via API")
+                except Exception as e:
+                    print(f"Failed to update deletion cost for {instance_id}: {e}")
+    else:
+        print("Using IMDS-based deletion cost management (instances handle automatically)")
+
+    # Note: Both approaches achieve the same result - protecting busy instances during scale-down
+
+def set_replicas(replicas: int):
+    """Set the number of replicas for the container group"""
+    path = f"/organizations/{SALAD_ORG}/projects/{SALAD_PROJECT}/containers/{CONTAINER_GROUP_NAME}"
+    return make_salad_request('PATCH', path, {'replicas': replicas})
+```
+
+#### **AWS CloudWatch Integration**
+
+For collecting metrics from AWS CloudWatch:
+
+```python
+def collect_metrics_from_cloudwatch() -> List[Dict[str, Any]]:
+    """Collect metrics from CloudWatch"""
+    end_time = datetime.utcnow()
+    start_time = end_time - timedelta(minutes=5)  # Last 5 minutes
+
+    metrics = []
+
+    try:
+        # Get all instances for this container group
+        instances = get_container_instances()
+        running_instances = [i for i in instances if i['state'] == 'running']
+
+        for instance in running_instances:
+            instance_id = instance['instance_id']
+
+            instance_metrics = {
+                'instance_id': instance_id,
+                'timestamp': end_time.timestamp(),
+                'aggregate': {}
+            }
+
+            # Query CloudWatch for each metric type
+            metric_queries = [
+                ('GPUUtilization', 'gpu_utilization'),
+                ('CPUUtilization', 'cpu_utilization'),
+                ('MemoryUtilization', 'memory_utilization'),
+                ('GPUTemperature', 'gpu_temperature')
+            ]
+
+            for metric_name, key in metric_queries:
+                try:
+                    response = cloudwatch.get_metric_statistics(
+                        Namespace='SaladCloud/Hardware',
+                        MetricName=metric_name,
+                        Dimensions=[
+                            {'Name': 'InstanceId', 'Value': instance_id},
+                            {'Name': 'ContainerGroup', 'Value': CONTAINER_GROUP_NAME}
+                        ],
+                        StartTime=start_time,
+                        EndTime=end_time,
+                        Period=300,  # 5 minute periods
+                        Statistics=['Average']
+                    )
+
+                    if response['Datapoints']:
+                        # Get the most recent datapoint
+                        latest = max(response['Datapoints'], key=lambda x: x['Timestamp'])
+                        instance_metrics['aggregate'][key] = latest['Average']
+
+                except Exception as e:
+                    print(f"Error querying {metric_name} for {instance_id}: {e}")
+
+            if instance_metrics['aggregate']:
+                metrics.append(instance_metrics)
+
+    except Exception as e:
+        print(f"Error collecting metrics from CloudWatch: {e}")
+
+    return metrics
+```
+
+#### **Webhook/Database Integration**
+
+For collecting metrics from webhook storage (DynamoDB, PostgreSQL, etc.):
+
+```python
+def collect_metrics_from_webhook_store() -> List[Dict[str, Any]]:
+    """Collect metrics from webhook storage (implement based on your storage)"""
+    # This is a placeholder - implement based on where you store webhook data
+    # For example, if using DynamoDB, S3, or another database
+
+    metrics = []
+
+    try:
+        # Example for DynamoDB
+        table = dynamodb.Table('salad-metrics')  # Your metrics table
+
+        # Query recent metrics (last 5 minutes)
+        five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
+
+        response = table.scan(
+            FilterExpression='#ts > :timestamp AND container_group = :cg',
+            ExpressionAttributeNames={'#ts': 'timestamp'},
+            ExpressionAttributeValues={
+                ':timestamp': five_minutes_ago.timestamp(),
+                ':cg': CONTAINER_GROUP_NAME
+            }
+        )
+
+        # Group by instance and get latest metrics
+        instance_metrics = {}
+        for item in response['Items']:
+            instance_id = item['instance_id']
+            timestamp = float(item['timestamp'])
+
+            if instance_id not in instance_metrics or timestamp > instance_metrics[instance_id]['timestamp']:
+                instance_metrics[instance_id] = {
+                    'instance_id': instance_id,
+                    'timestamp': timestamp,
+                    'aggregate': item.get('metrics', {})
+                }
+
+        metrics = list(instance_metrics.values())
+
+    except Exception as e:
+        print(f"Error collecting metrics from webhook store: {e}")
+
+    return metrics
+```
+
+#### **Prometheus Integration**
+
+For collecting metrics from Prometheus:
+
+```python
+def collect_metrics_from_prometheus() -> List[Dict[str, Any]]:
+    """Collect metrics from Prometheus"""
+    prometheus_url = os.environ.get('PROMETHEUS_URL', 'http://prometheus:9090')
+
+    metrics = []
+
+    try:
+        # Get all instances for this container group
+        instances = get_container_instances()
+        running_instances = [i for i in instances if i['state'] == 'running']
+
+        # Time range for queries (last 5 minutes)
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(minutes=5)
+
+        for instance in running_instances:
+            instance_id = instance['instance_id']
+
+            instance_metrics = {
+                'instance_id': instance_id,
+                'timestamp': end_time.timestamp(),
+                'aggregate': {}
+            }
+
+            # Define PromQL queries for each metric
+            queries = {
+                'gpu_utilization': f'saladcloud_gpu_utilization_percent{{machine_id="{instance_id}",container_group="{CONTAINER_GROUP_NAME}"}}',
+                'cpu_utilization': f'saladcloud_cpu_utilization_percent{{machine_id="{instance_id}",container_group="{CONTAINER_GROUP_NAME}"}}',
+                'memory_utilization': f'saladcloud_memory_utilization_percent{{machine_id="{instance_id}",container_group="{CONTAINER_GROUP_NAME}"}}',
+                'gpu_temperature': f'saladcloud_gpu_temperature_celsius{{machine_id="{instance_id}",container_group="{CONTAINER_GROUP_NAME}"}}'
+            }
+
+            for metric_key, query in queries.items():
+                try:
+                    # Query Prometheus for the metric
+                    params = {
+                        'query': query,
+                        'time': end_time.isoformat() + 'Z'
+                    }
+
+                    response = requests.get(
+                        f"{prometheus_url}/api/v1/query",
+                        params=params,
+                        timeout=10
+                    )
+                    response.raise_for_status()
+
+                    data = response.json()
+
+                    if data['status'] == 'success' and data['data']['result']:
+                        # Get the latest value
+                        result = data['data']['result'][0]
+                        value = float(result['value'][1])
+                        instance_metrics['aggregate'][metric_key] = value
+
+                except Exception as e:
+                    print(f"Error querying Prometheus for {metric_key} on {instance_id}: {e}")
+
+            if instance_metrics['aggregate']:
+                metrics.append(instance_metrics)
+
+    except Exception as e:
+        print(f"Error collecting metrics from Prometheus: {e}")
+
+    return metrics
+```
+
+#### **Main Lambda Handler**
+
+The main function that coordinates metrics collection and scaling decisions:
+
+```python
+def lambda_handler(event, context):
+    """Main Lambda handler function"""
+    global last_scale_time
+
+    try:
+        # Get current container group status
+        container_group = get_container_group()
+        current_replicas = container_group['replicas']
+        current_state = container_group['current_state']['status']
+
+        print(f"Container group '{CONTAINER_GROUP_NAME}' - "
+              f"State: {current_state}, Current replicas: {current_replicas}")
+
+        if current_state != 'running':
+            print("Container group not running, skipping autoscaling")
+            return {
+                'statusCode': 200,
+                'body': json.dumps({'message': 'Container group not running'})
+            }
+
+        # Get running instances
+        instances = get_container_instances()
+        running_instances = [i for i in instances if i['state'] == 'running']
+
+        print(f"Found {len(running_instances)} running instances")
+
+        # Collect metrics from external store
+        metrics_source = os.environ.get('METRICS_SOURCE', 'cloudwatch')
+
+        if metrics_source == 'cloudwatch':
+            metrics = collect_metrics_from_cloudwatch()
+        elif metrics_source == 'prometheus':
+            metrics = collect_metrics_from_prometheus()
+        else:
+            metrics = collect_metrics_from_webhook_store()
+
+        if not metrics:
+            print("No metrics collected from external store")
+            return {
+                'statusCode': 200,
+                'body': json.dumps({'message': 'No metrics available'})
+            }
+
+        # Update instance deletion costs based on utilization
+        update_instance_deletion_costs(running_instances, metrics)
+
+        # Calculate scaling decision
+        desired_replicas = calculate_scaling_decision(metrics, current_replicas)
+
+        # Check if scaling is needed
+        if desired_replicas == current_replicas:
+            print("No scaling needed")
+            return {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'message': 'No scaling needed',
+                    'current_replicas': current_replicas,
+                    'metrics_collected': len(metrics)
+                })
+            }
+
+        # Determine scaling direction and check cooldown
+        if desired_replicas > current_replicas:
+            if check_cooldown('scale_up'):
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps({'message': 'Scale up in cooldown'})
+                }
+            action = 'scale_up'
+        else:
+            if check_cooldown('scale_down'):
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps({'message': 'Scale down in cooldown'})
+                }
+            action = 'scale_down'
+
+        # Apply scaling
+        print(f"Scaling from {current_replicas} to {desired_replicas} replicas")
+        set_replicas(desired_replicas)
+
+        # Update last scale time
+        last_scale_time[action] = datetime.now()
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'message': f'Scaled {action} successfully',
+                'previous_replicas': current_replicas,
+                'new_replicas': desired_replicas,
+                'metrics_collected': len(metrics)
+            })
+        }
+
+    except Exception as e:
+        print(f"Error during autoscaling: {str(e)}")
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'error': str(e),
+                'message': 'Autoscaling operation failed'
+            })
+        }
+```
+
+### **AWS Lambda Deployment**
+
+Deploy the autoscaler as an AWS Lambda function:
+
+#### **Deployment Steps**
+
+1. **Create the Lambda function** with Python 3.9+ runtime
+2. **Set environment variables**:
+
+```bash
+SALAD_API_KEY=your_api_key
+SALAD_ORG=your_organization
+SALAD_PROJECT=your_project
+CONTAINER_GROUP_NAME=your_container_group
+GPU_SCALE_UP_THRESHOLD=85
+GPU_SCALE_DOWN_THRESHOLD=50
+CPU_SCALE_UP_THRESHOLD=80
+CPU_SCALE_DOWN_THRESHOLD=40
+MIN_REPLICAS=1
+MAX_REPLICAS=10
+SCALE_UP_INCREMENT=2
+SCALE_DOWN_INCREMENT=1
+SCALE_UP_COOLDOWN=300
+SCALE_DOWN_COOLDOWN=600
+METRICS_SOURCE=cloudwatch
+PROMETHEUS_URL=http://your-prometheus:9090
+```
+
+3. **Create EventBridge rule** to trigger every 2 minutes:
+
+```bash
+aws events put-rule \
+  --name salad-hardware-autoscaler \
+  --schedule-expression "rate(2 minutes)"
+
+aws events put-targets \
+  --rule salad-hardware-autoscaler \
+  --targets "Id"="1","Arn"="arn:aws:lambda:region:account:function:your-function-name"
+```
+
+## Step 3: Alternative Deployment Options
+
+### **Cloudflare Workers Implementation**
+
+For a serverless alternative to AWS Lambda, you can use Cloudflare Workers:
+
+```javascript
+// cloudflare-worker.js
+export default {
+  async scheduled(controller, env, ctx) {
+    await handleAutoscaling(env)
+  },
+
+  async fetch(request, env, ctx) {
+    if (request.method === 'POST') {
+      await handleAutoscaling(env)
+      return new Response('Autoscaling triggered', { status: 200 })
+    }
+    return new Response('Hardware Metrics Autoscaler', { status: 200 })
+  },
+}
+
+async function handleAutoscaling(env) {
+  const config = {
+    saladApiKey: env.SALAD_API_KEY,
+    saladOrg: env.SALAD_ORG,
+    saladProject: env.SALAD_PROJECT,
+    containerGroupName: env.CONTAINER_GROUP_NAME,
+    gpuScaleUpThreshold: parseFloat(env.GPU_SCALE_UP_THRESHOLD || '85'),
+    gpuScaleDownThreshold: parseFloat(env.GPU_SCALE_DOWN_THRESHOLD || '50'),
+    minReplicas: parseInt(env.MIN_REPLICAS || '1'),
+    maxReplicas: parseInt(env.MAX_REPLICAS || '10'),
+  }
+
+  try {
+    // Get container group status
+    const containerGroup = await saladApiRequest(
+      'GET',
+      `/organizations/${config.saladOrg}/projects/${config.saladProject}/containers/${config.containerGroupName}`,
+      config.saladApiKey,
+    )
+
+    if (containerGroup.current_state.status !== 'running') {
+      console.log('Container group not running, skipping autoscaling')
+      return
+    }
+
+    // Get running instances
+    const instancesResponse = await saladApiRequest(
+      'GET',
+      `/organizations/${config.saladOrg}/projects/${config.saladProject}/containers/${config.containerGroupName}/instances`,
+      config.saladApiKey,
+    )
+
+    const runningInstances = instancesResponse.items.filter((i) => i.state === 'running')
+
+    // Collect metrics from external store
+    const metrics = await collectMetricsFromStore(runningInstances, env)
+
+    if (metrics.length === 0) {
+      console.log('No metrics available')
+      return
+    }
+
+    // Calculate scaling decision
+    const currentReplicas = containerGroup.replicas
+    const desiredReplicas = calculateScaling(metrics, currentReplicas, config)
+
+    if (desiredReplicas !== currentReplicas) {
+      await saladApiRequest(
+        'PATCH',
+        `/organizations/${config.saladOrg}/projects/${config.saladProject}/containers/${config.containerGroupName}`,
+        config.saladApiKey,
+        { replicas: desiredReplicas },
+      )
+
+      console.log(`Scaled from ${currentReplicas} to ${desiredReplicas} replicas`)
+    }
+  } catch (error) {
+    console.error('Autoscaling error:', error)
+  }
+}
+
+async function saladApiRequest(method, path, apiKey, data = null) {
+  const url = `https://api.salad.com/api/public${path}`
+  const headers = {
+    'Content-Type': 'application/json',
+    'Salad-Api-Key': apiKey,
+  }
+
+  if (method === 'PATCH') {
+    headers['Content-Type'] = 'application/merge-patch+json'
+  }
+
+  const response = await fetch(url, {
+    method,
+    headers,
+    body: data ? JSON.stringify(data) : null,
+  })
+
+  if (!response.ok) {
+    throw new Error(`SaladCloud API error: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+async function collectMetricsFromStore(instances, env) {
+  const metrics = []
+
+  try {
+    // Option 1: CloudWatch metrics (if using AWS CloudWatch)
+    if (env.METRICS_SOURCE === 'cloudwatch') {
+      const cloudwatchUrl = `${env.CLOUDWATCH_API_URL}/metrics/recent`
+      const response = await fetch(cloudwatchUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.CLOUDWATCH_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          container_group: env.CONTAINER_GROUP_NAME,
+          instance_ids: instances.map((i) => i.instance_id),
+          time_range: '5m',
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data.metrics || []
+      }
+    }
+
+    // Option 2: Prometheus metrics
+    else if (env.METRICS_SOURCE === 'prometheus') {
+      const prometheusUrl = env.PROMETHEUS_URL || 'http://prometheus:9090'
+      const endTime = new Date().toISOString()
+
+      for (const instance of instances) {
+        const instanceId = instance.instance_id
+        const instanceMetrics = {
+          instance_id: instanceId,
+          timestamp: Date.now() / 1000,
+          aggregate: {},
+        }
+
+        // Query each metric type
+        const queries = {
+          gpu_utilization: `saladcloud_gpu_utilization_percent{machine_id="${instanceId}",container_group="${env.CONTAINER_GROUP_NAME}"}`,
+          cpu_utilization: `saladcloud_cpu_utilization_percent{machine_id="${instanceId}",container_group="${env.CONTAINER_GROUP_NAME}"}`,
+          memory_utilization: `saladcloud_memory_utilization_percent{machine_id="${instanceId}",container_group="${env.CONTAINER_GROUP_NAME}"}`,
+          gpu_temperature: `saladcloud_gpu_temperature_celsius{machine_id="${instanceId}",container_group="${env.CONTAINER_GROUP_NAME}"}`,
+        }
+
+        for (const [metricKey, query] of Object.entries(queries)) {
+          try {
+            const queryUrl = `${prometheusUrl}/api/v1/query?query=${encodeURIComponent(query)}&time=${endTime}`
+            const response = await fetch(queryUrl)
+
+            if (response.ok) {
+              const data = await response.json()
+              if (data.status === 'success' && data.data.result.length > 0) {
+                const value = parseFloat(data.data.result[0].value[1])
+                instanceMetrics.aggregate[metricKey] = value
+              }
+            }
+          } catch (error) {
+            console.error(`Error querying ${metricKey} for ${instanceId}:`, error)
+          }
+        }
+
+        if (Object.keys(instanceMetrics.aggregate).length > 0) {
+          metrics.push(instanceMetrics)
+        }
+      }
+
+      return metrics
+    }
+
+    // Option 3: Custom webhook storage (DynamoDB, etc.)
+    else if (env.METRICS_SOURCE === 'webhook') {
+      const webhookUrl = `${env.METRICS_WEBHOOK_URL}/metrics/query`
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.METRICS_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          container_group: env.CONTAINER_GROUP_NAME,
+          instance_ids: instances.map((i) => i.instance_id),
+          time_range: 300, // Last 5 minutes in seconds
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data.metrics || []
+      }
+    }
+
+    // Option 4: InfluxDB or other time-series database
+    else if (env.METRICS_SOURCE === 'influxdb') {
+      const influxUrl = `${env.INFLUXDB_URL}/api/v2/query`
+      const query = `
+        from(bucket: "${env.INFLUXDB_BUCKET}")
+          |> range(start: -5m)
+          |> filter(fn: (r) => r._measurement == "hardware_metrics")
+          |> filter(fn: (r) => r.container_group == "${env.CONTAINER_GROUP_NAME}")
+          |> group(columns: ["instance_id"])
+          |> last()
+      `
+
+      const response = await fetch(influxUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Token ${env.INFLUXDB_TOKEN}`,
+          'Content-Type': 'application/vnd.flux',
+          Accept: 'application/csv',
+        },
+        body: query,
+      })
+
+      if (response.ok) {
+        const csvData = await response.text()
+        return parseInfluxCSV(csvData)
+      }
+    }
+  } catch (error) {
+    console.error('Failed to collect metrics from store:', error)
+  }
+
+  return metrics
+}
+
+function parseInfluxCSV(csvData) {
+  // Simple CSV parser for InfluxDB response
+  const lines = csvData.split('\n').filter((line) => line.trim())
+  const headers = lines[0].split(',')
+  const metrics = []
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',')
+    const row = {}
+
+    headers.forEach((header, index) => {
+      row[header.trim()] = values[index]?.trim()
+    })
+
+    if (row.instance_id) {
+      metrics.push({
+        instance_id: row.instance_id,
+        timestamp: new Date(row._time).getTime() / 1000,
+        aggregate: {
+          gpu_utilization: parseFloat(row.gpu_utilization) || 0,
+          cpu_utilization: parseFloat(row.cpu_utilization) || 0,
+          memory_utilization: parseFloat(row.memory_utilization) || 0,
+          gpu_temperature: parseFloat(row.gpu_temperature) || 0,
+        },
+      })
+    }
+  }
+
+  return metrics
+}
+
+function calculateScaling(metrics, currentReplicas, config) {
+  const gpuUtils = metrics.map((m) => m.aggregate?.gpu_utilization).filter((util) => util !== undefined)
+
+  const cpuUtils = metrics.map((m) => m.aggregate?.cpu_utilization).filter((util) => util !== undefined)
+
+  if (gpuUtils.length === 0 && cpuUtils.length === 0) {
+    return currentReplicas
+  }
+
+  const avgGpuUtil = gpuUtils.length > 0 ? gpuUtils.reduce((a, b) => a + b, 0) / gpuUtils.length : 0
+  const avgCpuUtil = cpuUtils.reduce((a, b) => a + b, 0) / cpuUtils.length
+
+  // Scale up conditions
+  if ((gpuUtils.length > 0 && avgGpuUtil > config.gpuScaleUpThreshold) || avgCpuUtil > 80) {
+    return Math.min(currentReplicas + 2, config.maxReplicas)
+  }
+
+  // Scale down conditions
+  if (currentReplicas > config.minReplicas && avgGpuUtil < config.gpuScaleDownThreshold && avgCpuUtil < 40) {
+    return Math.max(currentReplicas - 1, config.minReplicas)
+  }
+
+  return currentReplicas
+}
+```
+
+## Step 4: Validation
+
+### **Validation Checklist**
+
+Use this checklist to verify your autoscaling implementation:
+
+1. **Metrics Collection**
+   - [ ] Metrics are being collected from all active instances
+   - [ ] Data is accurate and up-to-date (< 5 minutes old)
+   - [ ] No missing or null values in critical metrics
+
+2. **Decision Logic**
+   - [ ] Scale-up triggers activate under high load
+   - [ ] Scale-down occurs during low utilization periods
+   - [ ] Thermal protection prevents overheating
+   - [ ] Instance health checks prevent scaling unhealthy nodes
+
+3. **Integration Testing**
+   - [ ] Lambda function executes successfully
+   - [ ] SaladCloud API calls complete without errors
+   - [ ] CloudWatch metrics are published correctly
+   - [ ] Alerts fire for critical conditions
+   - [ ] Consider setting up [external logging](/container-engine/how-to-guides/external-logging/) for better
+         observability
+
+4. **Performance Validation**
+   - [ ] Scaling actions complete within expected time frames
+   - [ ] No thrashing between scale-up and scale-down
+   - [ ] Cost optimization goals are met
+   - [ ] Application performance maintained during scaling
+   - [ ] If issues arise, consult our [troubleshooting guide](/container-engine/how-to-guides/troubleshooting)
+
+## Conclusion
+
+This guide provides a complete framework for implementing hardware-metrics-based autoscaling with SaladCloud. The key
+benefits include:
+
+- **Cost Optimization**: Scale down during low utilization to reduce costs (see
+  [billing details](/container-engine/explanation/billing-pricing/billing))
+- **Performance Assurance**: Scale up proactively to maintain application responsiveness
+- **Thermal Protection**: Prevent GPU thermal throttling that degrades compute performance
+- **Operational Visibility**: Comprehensive monitoring and alerting for production confidence
+
+Remember to:
+
+1. **Start Conservatively**: Begin with broader thresholds and adjust based on observed behavior
+2. **Monitor Continuously**: Use the provided dashboards and alerts to track performance
+3. **Test Thoroughly**: Validate scaling behavior under various load patterns before production deployment
+4. **Iterate and Improve**: Refine your thresholds and logic based on operational experience
+
+The modular architecture allows you to mix and match different integration approaches, so you can start with CloudWatch
+and add Prometheus monitoring as your requirements evolve.
+
+For other autoscaling approaches, see our guides on
+[queue-based autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) and
+[time-of-day scaling](/container-engine/how-to-guides/autoscaling/time-of-day-scaling).
