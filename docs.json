@@ -301,6 +301,7 @@
                   "container-engine/reference/recipes/ollama",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
+                  "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/yolo",
                   "container-engine/reference/recipes/gromacs-srcg",
