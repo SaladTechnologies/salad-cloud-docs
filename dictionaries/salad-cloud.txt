@@ -237,6 +237,7 @@ Uvicorn
 vaeapp
 Valencian
 vCPU
+VCPU
 vcpus
 vimeo
 vkapp
