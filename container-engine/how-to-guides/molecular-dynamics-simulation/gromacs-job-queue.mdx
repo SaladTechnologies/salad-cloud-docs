@@ -1,0 +1,322 @@
+---
+title: 'Run GROMACS on SaladCloud'
+sidebarTitle: 'GROMACS with Job Queue'
+description: 'Integrate GROMACS workloads with a job queue system.'
+---
+
+_Last Updated: August 13, 2025_
+
+## Introduction
+
+Please begin by reviewing
+[the GROMACS-SRCG solution](/container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg) and
+[Salad Kelpie](/container-engine/how-to-guides/job-processing/kelpie).
+
+For production workloads involving a large number of simulation jobs, using a job queue is critical for both efficiency
+and scalability. If a node fails during job execution, the queue’s built-in retry mechanism can automatically reassign
+the job to another available node, minimizing downtime. Autoscaling can also be implemented to dynamically adjust the
+GPU resource pool on SaladCloud in response to changing system loads.
+
+Several job queue systems are available, including Salad Kelpie, AWS SQS, GCP Pub/Sub, and custom solutions such as
+RabbitMQ or Redis. Once the GROMACS-SRCG solution with
+[chunked simulation support](/container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg#chunking-large-simulations)
+is implemented, integrating it with a job queue is typically straightforward and can usually be completed within a few
+hours to a few days.
+
+Based on customer implementations on SaladCloud, the following are common patterns for solution integration:
+
+|                      | Option 1: Salad Kelpie with Self-Managed Data Synchronization                                                                            | Option 2: Salad Kelpie with Managed Data Synchronization                                                                                                    | Option 3: Other Queue Systems                                                                                                                                                                          |
+| :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Solution Description | Use Kelpie solely as the job queue, while implementing your own data management workflow.                                                | Use Kelpie as both the job queue and data management solution, leveraging its built-in upload and download capabilities to simplify application development | Use third-party or custom queue systems alongside your own data management solution.                                                                                                                   |
+| Job Queue            | Salad Kelpie                                                                                                                             | Salad Kelpie                                                                                                                                                | AWS SQS, GCP Pub/Sub or custom queue                                                                                                                                                                   |
+| Cloud Storage        | Any Storage                                                                                                                              | S3-Compatible storage                                                                                                                                       | Any Storage                                                                                                                                                                                            |
+| Auto Scaling         | Based on the number of pending jobs in the queue, as well as the active jobs and their execution times on Salad nodes, managed by Kelpie | Based on the number of pending jobs in the queue, as well as the active jobs and their execution times on Salad nodes, managed by Kelpie                    | Custom implementation using [the Instance Deletion Cost](/container-engine/explanation/infrastructure-platform/instance-deletion-cost) feature on SaladCloud, efficiently managing scale-in behaviors. |
+| Use Cases            | Applications that require full visibility and direct control on the data transfer process to optimize performance and reliability.       | Typical applications, supporting chunked simulations and processing one job per node at a time.                                                             | Complex applications that run multiple jobs simultaneously on a single node, and also migrate or consolidate jobs between nodes for greater efficiency.                                                |
+
+## Salad Kelpie with Self-Managed Data Synchronization
+
+### Job Definition
+
+To illustrate how the solution works, consider the following job definition example:
+
+```bash
+    "command": "python",
+    "arguments": [
+        "/app/main.py"
+    ],
+    "environment": {
+        "BUCKET": "BUCKET",
+        "PREFIX": "PREFIX",
+        "FOLDER": "job1",
+        "TPR_FILE": "j1.tpr",
+        "MAX_STEPS": "50000",
+        "SAVING_INTERVAL_HOURS": "0.0167",
+        "MAX_NO_RESPONSE_TIME": "3600",
+        "TASK_CREATION_TIME": "2025-08-11 14:49:42"
+    },
+    "container_group_id": "CONTAINER_GROUP_ID_FROM_SALADCLOUD",
+    "sync": {}
+
+```
+
+When a Kelpie worker running on SaladCloud retrieves this job, it executes `python /app/main.py` (within the same image)
+using the provided environment variables. The `container_group_id` ensures that only specific Kelpie workers within the
+designated container group can process the job. **This ID must first be retrieved from the container group on
+SaladCloud.**
+
+The `sync` section is left empty, meaning that `main.py` is responsible for handling data synchronization on its own.
+When executed, it downloads the required files from the cloud storage at `BUCKET/PREFIX/job1/`, processes the job, and
+uploads the state and results back. If a node fails and the job restarts on a new node, the application should be
+designed to resume from the last saved state and continue processing until the task either completes successfully or
+fails.
+
+The Kelpie platform marks a job as `COMPLETED` when the application exits with a status code of 0. If the application
+exits with a non-zero status code on a node, the platform automatically retries the job on another node. After three
+failed attempts (configurable, excluding infrastructure-related failures, such as node reallocation), the Kelpie
+platform marks the job as `FAILED`.
+
+Please review
+[the detailed job information](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/no_sync_client/job.txt)
+for the various statuses.
+
+### Submitting Jobs
+
+Starting with Kelpie 0.6.0, all requests to the Kelpie platform require your `Salad API Key` to be included in the
+Salad-Api-Key header. Please refer to
+[the example code](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/no_sync_client/11_submit_jobs.py)
+for submitting jobs, where you will also need the necessary environment variables to run the code.
+
+```bash
+# Access to the Kelpie platform.
+KELPIE_API_URL=https://kelpie.saladexamples.com
+SALAD_API_KEY=salad_cloud_user_******
+SALAD_ORGANIZATION=******
+SALAD_PROJECT=******
+
+# Retrieve the ID upon workload creation or query in SaladCloud.
+SALAD_CONTAINER_GROUP_ID=<CONTAINER_GROUP_ID_FROM_SALADCLOUD>
+# For local testing, you can use a dummy ID that should match the ID passed to the container.
+# SALAD_CONTAINER_GROUP_ID="local_test"
+
+BUCKET="BUCKET_NAME"
+PREFIX="PREFIX_NAME"
+
+# To keep track of all submitted job IDs for querying their status later.
+JOB_HISTORY="job_history.txt"
+```
+
+The job input files must be uploaded to the cloud storage before submitting the job.
+
+```bash
+BUCKET/PREFIX/job1/j1.tpr
+```
+
+### Processing jobs
+
+[The application](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/no_sync_image/main.py) needs only
+minor modifications from [the one](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/main_salad.py) used
+in the GROMACS SRCG solution when integrated with Kelpie. Previously, task-related environment variables were provided
+during container group creation via the SaladCloud APIs. Now, these variables are delivered by the Kelpie platform.
+
+In the [Dockerfile](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/no_sync_image/Dockerfile),
+configure the Kelpie worker as the entry point, replacing the previous direct execution of the application.
+
+```Dockerfile
+# Select a base image: https://hub.docker.com/r/continuumio/miniconda3
+FROM continuumio/miniconda3:25.1.1-0
+
+RUN apt-get update && apt-get install -y curl net-tools iputils-ping
+
+# Optional: Install VS Code Server for remote debugging
+# https://docs.salad.com/tutorials/vscode-remote-development#interactive-mode
+# Log in the instance using the terminal, and then run the following commands:
+# code tunnel user login --provider github
+# nohup code tunnel --accept-server-license-terms --name XXX &> output.log &
+RUN curl -Lk 'https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64' -o vscode_cli.tar.gz && \
+    tar -xf vscode_cli.tar.gz && \
+    mv code /usr/local/bin/code && \
+    rm vscode_cli.tar.gz
+
+# Install GROMACS 2024.5，with CUDA and without MPI
+# https://anaconda.org/conda-forge/gromacs
+# No GPU when building the image, so we use CONDA_OVERRIDE_CUDA to simulate CUDA during build
+RUN CONDA_OVERRIDE_CUDA="11.8" conda install -c conda-forge gromacs=2024.5=nompi_cuda_h5cb645a_0 -y
+
+RUN pip install --upgrade pip
+RUN pip install python-dotenv boto3
+
+# Install the Kelpie worker (executable)
+RUN wget https://github.com/SaladTechnologies/kelpie/releases/download/0.6.0/kelpie -O /kelpie && chmod +x /kelpie
+
+WORKDIR /app
+COPY helper.py main.py /app/
+
+# Run the Kelpie worker
+CMD ["/kelpie"]
+
+# The pre-built image:
+# docker.io/saladtechnologies/mds:001-gromacs-kelpie-no-sync
+```
+
+### Local Run
+
+If you have access to a local GPU environment, perform a test of the image before running it on SaladCloud. Use
+`docker compose` to start the container defined in
+[the docker-compose.yaml](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/no_sync_image/docker-compose.yaml).
+The command automatically loads environment variables from the .env file in the same directory.
+
+```bash
+docker compose up
+```
+
+The following environment variables are required for local run:
+
+```bash
+# Access to the Kelpie platform.
+SALAD_API_KEY=salad_cloud_user_******
+SALAD_ORGANIZATION=******
+SALAD_PROJECT=******
+
+# You can use dummy IDs for local testing.
+SALAD_CONTAINER_GROUP_ID="local_test"
+SALAD_MACHINE_ID="local_001"
+
+# Access to Cloud Storage
+AWS_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+AWS_ACCESS_KEY_ID=******
+AWS_SECRET_ACCESS_KEY=******
+AWS_REGION=******
+```
+
+### Deployment on SaladCloud
+
+Run [salad_deploy.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/salad_deploy.py) to deploy a
+container group on SaladCloud, which can return `SALAD_CONTAINER_GROUP_ID` for job submission.
+
+The following environment variables are required for the deployment:
+
+```bash
+# Access to the Kelpie platform and SaladCloud
+SALAD_API_KEY=salad_cloud_user_******
+SALAD_ORGANIZATION=******
+SALAD_PROJECT=******
+
+# Unique identifier for each container group on SaladCloud.
+CONTAINER_GROUP_NAME="gromacs-kelpie-no-sync-001"
+
+IMAGE="docker.io/saladtechnologies/mds:001-gromacs-kelpie-no-sync"
+
+# Access to Cloud Storage
+AWS_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+AWS_ACCESS_KEY_ID=******
+AWS_SECRET_ACCESS_KEY=******
+AWS_REGION=******
+```
+
+## Salad Kelpie with Managed Data Synchronization
+
+### Job Definition
+
+To demonstrate how the managed data synchronization works, consider the following job definition example:
+
+```bash
+   "command": "python",
+   "arguments": [
+        "/app/main.py"
+    ],
+    "environment": {
+        "BUCKET": "BUCKET",
+        "PREFIX": "PREFIX",
+        "FOLDER": "job2",
+        "TPR_FILE": "j2.tpr",
+        "MAX_STEPS": "50000",
+        "SAVING_INTERVAL_HOURS": "0.0167",
+        "TASK_CREATION_TIME": "2025-08-11 15:19:41"
+    },
+    "container_group_id": "CONTAINER_GROUP_ID_FROM_SALADCLOUD",
+    "sync": {
+        "during": [
+            {
+                "bucket": "BUCKET",
+                "prefix": "PREFIX/job2/",
+                "local_path": "/app/kelpie_managed_upload_folder/",
+                "direction": "upload"
+            }
+        ]
+    }
+```
+
+In this case, the application uses Kelpie only to upload the output and checkpoint files for each chunked run, while
+managing the downloads independently.
+
+Any changes to files in the container’s `/app/kelpie_managed_upload_folder/` directory will be automatically and
+concurrently uploaded by the Kelpie worker to the S3-compatible storage at `BUCKET/PREFIX/job2/`. However, the upload
+order may differ from the order in which files are written due to factors like modification time, file size, and upload
+duration. The Kelpie worker can ensure that all ongoing uploads complete after the application exits.
+
+If the application requires full visibility and direct control over the data transfer process—such as node filtering for
+network performance optimization, upload backlog and error monitoring, and strict ordering guarantees—it is recommended
+to implement self-managed data synchronization.
+
+Please review
+[the detailed job information](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_client/job.txt)
+for the various statuses.
+
+### Submitting Jobs
+
+Please refer to
+[the example code](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_client/11_submit_jobs.py) for
+submitting jobs. The environment variables to run the code are the same as in the previous section.
+
+The job input files must be uploaded to the cloud storage before submitting the job.
+
+```bash
+BUCKET/PREFIX/job2/j2.tpr
+```
+
+### Processing jobs
+
+[The application](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_image/main.py) is significantly
+simplified compared to [the one](https://github.com/SaladTechnologies/mds/blob/main/gromacs-srcg/main_salad.py) used in
+the GROMACS SRCG solution when integrated with Kelpie, as the upload thread and local queue are no longer required.
+Ensure that [output](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_image/main.py#L144) and
+[checkpoint](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_image/main.py#L149) files are moved
+to the `/app/kelpie_managed_upload_folder/` directory only once they are finalized and ready for upload.
+
+In the [Dockerfile](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_image/Dockerfile), configure
+the Kelpie worker as the entry point, replacing the previous direct execution of the application.
+
+### Local Run
+
+As described in the previous section, use `docker compose` to start the container defined in
+[the docker-compose.yaml](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/sync_image/docker-compose.yaml).
+The required environment variables are from the .env file, as described in the previous section.
+
+```bash
+docker compose up
+```
+
+### Deployment on SaladCloud
+
+Run [salad_deploy.py](https://github.com/SaladTechnologies/mds/blob/main/gromacs-kelpie/salad_deploy.py) to deploy a
+container group on SaladCloud, which can return `SALAD_CONTAINER_GROUP_ID` for job submission.
+
+The following environment variables are required for the deployment:
+
+```bash
+# Access to the Kelpie platform and SaladCloud
+SALAD_API_KEY=salad_cloud_user_******
+SALAD_ORGANIZATION=******
+SALAD_PROJECT=******
+
+# Unique identifier for each container group on SaladCloud.
+CONTAINER_GROUP_NAME="gromacs-kelpie-sync-001"
+
+IMAGE="docker.io/saladtechnologies/mds:001-gromacs-kelpie-sync"
+
+# Access to Cloud Storage
+AWS_ENDPOINT_URL=https://******.r2.cloudflarestorage.com
+AWS_ACCESS_KEY_ID=******
+AWS_SECRET_ACCESS_KEY=******
+AWS_REGION=******
+```
