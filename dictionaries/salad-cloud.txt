@@ -237,6 +237,7 @@ Uvicorn
 vaeapp
 Valencian
 vCPU
+vcpus
 vimeo
 vkapp
 vram
@@ -244,6 +245,7 @@ webui
 WORKDIR
 wrangler
 xformers
+xlarge
 xlvaeapp
 yolob8m-custom
 yolov8
