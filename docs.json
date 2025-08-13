@@ -283,6 +283,7 @@
                 "group": "Specialized Workloads",
                 "pages": [
                   "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg",
+                  "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-job-queue",
                   "container-engine/how-to-guides/molecular-dynamics-simulation/openmm-srcg"
                 ]
               }
