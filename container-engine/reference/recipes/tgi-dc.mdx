@@ -134,7 +134,7 @@ must be configured to listen on a **different path** while sharing the same port
 
 This approach is **not part of this recipe**, but you can still use this recipe as a base and adapt it for multi-LLM
 deployments. For example, you could deploy two instances of the TGI container on the same node, one serving Llama 3 70B
-Chat on `/llama2` and another serving Mixtral 8×7B Instruct v0.1 on `/mixtral`, both listening on port `80`.
+Chat on `/llama3` and another serving Mixtral 8×7B Instruct v0.1 on `/mixtral`, both listening on port `80`.
 
 In order to do that you need to pass the following environment variables when creating or editing your container group:
 
