@@ -154,7 +154,9 @@ localhost HTTP calls. This means your application doesn't need IPv6 binding or e
 
 **AWS Batch:** Containers start when jobs are assigned, run the job, then terminate.
 
-**SaladCloud:** Containers run continuously and process multiple jobs. Your application should:
+**SaladCloud:** Containers run continuously and process multiple jobs. You can use
+[Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) to automatically scale to zero
+when you have no jobs left to process. Your application should:
 
 - Start an HTTP server to receive jobs
 - Process jobs when received
@@ -329,6 +331,11 @@ if __name__ == "__main__":
 ```
 
 ## Step 3: Choose Your Job Queue Solution
+
+<Info>
+  These patterns can be implemented with any job queue, including those not on the Salad platform, but these two have
+  platform integration with SaladCloud.
+</Info>
 
 ### Salad Job Queues vs. Kelpie
 
