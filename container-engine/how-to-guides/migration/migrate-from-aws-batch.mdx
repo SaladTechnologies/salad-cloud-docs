@@ -1,0 +1,1138 @@
+---
+title: 'AWS Batch to SaladCloud Migration Guide'
+sidebarTitle: 'From AWS Batch'
+description:
+  'Complete guide to migrating your batch processing workloads from AWS Batch to SaladCloud, achieving significant cost
+  savings while maintaining job orchestration capabilities.'
+---
+
+_Last Updated: August 13, 2025_
+
+# Overview
+
+Migrating from **AWS Batch** to **SaladCloud** enables you to reduce batch processing costs by up to 90% while
+maintaining robust job orchestration and scaling capabilities. If you're currently running batch jobs on AWS Batch
+compute environments, you'll find that SaladCloud offers similar patterns for job queuing, automatic scaling, and
+distributed processing — but at a fraction of the cost.
+
+**What Stays Exactly the Same:**
+
+- Your application code and processing logic remain unchanged
+- Same containerized workloads (Docker/ECS task definitions convert easily)
+- Job submission and monitoring patterns
+- Automatic retry logic for failed jobs
+- Queue-based job distribution
+
+**What Gets Simpler:**
+
+- No complex compute environment configuration
+- Simplified job definitions (just containers and resources)
+- Straightforward pricing without EC2/Fargate complexity
+- Built-in global distribution without multi-region setup
+
+**Key Differences to Consider:**
+
+- SaladCloud uses distributed consumer GPUs instead of EC2/Fargate
+- Job processing through HTTP endpoints rather than AWS Batch agents
+- Cloud storage patterns instead of EBS volumes
+- Slower cold starts but dramatically lower costs
+
+The migration primarily involves adapting your AWS Batch job definitions to SaladCloud's container-based job processing
+model while preserving your existing batch processing workflows.
+
+> 💡 **New to SaladCloud?** Check out our [getting started guide](/container-engine/tutorials/quickstart) for an
+> introduction to deploying on SaladCloud, or explore our
+> [job queue documentation](/container-engine/explanation/job-processing/job-queues) to understand how SaladCloud
+> handles batch processing.
+
+## Why Migrate from AWS Batch to SaladCloud?
+
+AWS Batch has served as a reliable batch processing solution, but its costs can quickly escalate, especially for
+GPU-intensive workloads. SaladCloud offers a compelling alternative that addresses common AWS Batch pain points:
+
+**Cost Advantages:**
+
+- **90% Lower Compute Costs**: GPU + CPU + RAM combined cost a fraction of EC2 instances
+  - RTX 4090 setup: \$0.36/hr vs P3.2xlarge: \$3.06/hr
+- **Transparent Component Pricing**: Simple rates - \$0.004/vCPU/hour + \$0.001/GB RAM/hour + GPU rate
+- **Per-Second Billing**: Hourly rates tracked per second for running containers
+- **No Hidden Costs**: No charges for VPC endpoints, NAT gateways, or data transfer between AZs
+
+**Operational Benefits:**
+
+- **Simplified Management**: No compute environment configuration or AMI management
+- **Automatic Global Distribution**: Access to 11,000+ GPUs worldwide without multi-region complexity
+- **Built-in Resilience**: Automatic failover and retry logic included
+- **No Infrastructure Overhead**: Focus on your batch jobs, not EC2 fleet management
+
+**When SaladCloud Excels:**
+
+- Long-running batch jobs where startup time is less critical
+- GPU-intensive workloads (ML training, rendering, simulations)
+- Cost-sensitive batch processing
+- Non-time-critical workloads (batch priority adds 40-50% savings on top of base 90% savings)
+- Globally distributed data processing
+- Development and testing environments
+
+**Trade-offs to Consider:**
+
+- **Cold Start Times**: Container startup takes minutes vs. seconds on pre-warmed EC2 instances
+- **Storage Model**: No EBS volumes; use cloud storage APIs instead
+- **Service Integration**: Fewer native AWS service integrations
+- **Job Complexity**: Better suited for containerized workloads than complex multi-step pipelines
+
+# Product Comparison: AWS Batch vs. SaladCloud
+
+## Core Component Mapping
+
+| AWS Batch Component     | SaladCloud Equivalent            | Key Differences                                         |
+| ----------------------- | -------------------------------- | ------------------------------------------------------- |
+| **Compute Environment** | **Container Groups**             | No EC2 configuration needed; automatic GPU provisioning |
+| **Job Queues**          | **Salad Job Queues**             | HTTP-based job distribution instead of agent-based      |
+| **Job Definitions**     | **Container Configuration**      | Simpler format; no need for vCPU/memory registration    |
+| **Array Jobs**          | **Multiple Job Submissions**     | Submit individual jobs; same parallelization benefits   |
+| **Job Dependencies**    | **Application-Level Logic**      | Handle dependencies in your code or orchestration layer |
+| **CloudWatch Logs**     | **Portal Logs/External Logging** | Built-in logs or integrate with Datadog, Axiom, etc.    |
+| **Step Functions**      | **External Orchestrators**       | Use Airflow, Temporal, or similar for complex workflows |
+
+## Feature Comparison
+
+| Feature                | AWS Batch                            | SaladCloud                                           |
+| ---------------------- | ------------------------------------ | ---------------------------------------------------- |
+| **Job Scheduling**     | Priority-based with fair share       | FIFO queue processing                                |
+| **Auto Scaling**       | Based on queue depth                 | Queue-based or custom metrics                        |
+| **Spot/On-Demand Mix** | Configurable compute environments    | 4 priority tiers (batch adds 40-50% to base savings) |
+| **GPU Support**        | Accelerated Computing instances      | Consumer GPUs (RTX 4090, 5090, etc.)                 |
+| **Container Runtime**  | ECS or EKS                           | Docker containers                                    |
+| **Job Retries**        | Configurable retry attempts          | Automatic 3 retries (4 total attempts)               |
+| **Job Timeouts**       | Configurable per job                 | Container-level configuration                        |
+| **Long-Running Jobs**  | Supported with spot instance risks   | Use Kelpie for checkpointing/resumption              |
+| **Multi-Step Jobs**    | Via Step Functions                   | Single container jobs (orchestrate externally)       |
+| **Storage**            | EBS volumes, EFS                     | S3-compatible cloud storage (e.g., R2)               |
+| **Networking**         | VPC, Security Groups                 | No networking config needed with Job Queues          |
+| **Monitoring**         | CloudWatch Metrics/Logs              | Portal metrics, external monitoring tools            |
+| **Cost Model**         | EC2/Fargate pricing + Batch overhead | Simple hourly rates (billed per second)              |
+
+## Migration Requirements
+
+### Technical Requirements
+
+- **Containerization**: Jobs must run in Docker containers (you likely already have this with ECS task definitions)
+- **HTTP Interface**: Jobs receive work via HTTP endpoints instead of AWS Batch job parameters
+- **Cloud Storage**: Replace EBS/EFS with S3-compatible storage (Cloudflare R2 recommended for no egress fees)
+- **Queue Worker**: Add the Salad Job Queue Worker binary to your container (handles job distribution)
+
+### Architectural Shifts
+
+- **From Agent-Based to Queue Worker**: AWS Batch agents pull jobs; SaladCloud Queue Worker receives and forwards jobs
+  locally
+- **From EC2 Fleets to Distributed Nodes**: No direct control over compute instances
+- **From VPC Networking to No Networking**: Job Queues eliminate networking configuration entirely
+- **From IAM Roles to API Keys**: Different authentication model
+
+## Before You Begin: Key Concepts
+
+### Understanding the Job Processing Model
+
+**AWS Batch Model:**
+
+```
+Job Queue → Compute Environment → EC2 Instance → Batch Agent → Container
+```
+
+**SaladCloud Model:**
+
+```
+Job Queue → Container Group → Distributed Nodes → Queue Worker → Your App
+```
+
+The key difference is that SaladCloud uses an HTTP-based job distribution model where the Salad Job Queue Worker (a
+lightweight binary you add to your container) receives jobs from the queue and forwards them to your application via
+localhost HTTP calls. This means your application doesn't need IPv6 binding or external network access.
+
+### Container Startup Behavior
+
+**AWS Batch:** Containers start when jobs are assigned, run the job, then terminate.
+
+**SaladCloud:** Containers run continuously and process multiple jobs. You can use
+[Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) to automatically scale to zero
+when you have no jobs left to process. Your application should:
+
+- Start an HTTP server to receive jobs
+- Process jobs when received
+- Return results via HTTP response
+- Stay running to process more jobs
+
+### Storage Patterns
+
+Since SaladCloud doesn't support mounted volumes, you'll need to adapt your storage strategy.
+
+**Important: Use Egress-Free Storage** We strongly recommend using egress-free storage providers like Cloudflare R2
+instead of AWS S3. SaladCloud's distributed nodes are not in datacenters, so egress fees from traditional cloud storage
+can add up quickly.
+
+```python
+# AWS Batch pattern with EBS
+def process_job(job_params):
+    input_file = f"/mnt/efs/inputs/{job_params['file_id']}"
+    output_file = f"/mnt/efs/outputs/{job_params['file_id']}.result"
+
+    data = load_from_disk(input_file)
+    result = process_data(data)
+    save_to_disk(result, output_file)
+
+# SaladCloud pattern with Cloudflare R2 (recommended) or S3
+import boto3
+
+# For Cloudflare R2 (no egress fees)
+s3 = boto3.client('s3',
+    endpoint_url='https://your-account.r2.cloudflarestorage.com',
+    aws_access_key_id='your-r2-access-key',
+    aws_secret_access_key='your-r2-secret'
+)
+
+# Or for AWS S3 (will incur egress charges)
+# s3 = boto3.client('s3')
+
+def process_job(job_params):
+    # Download from S3
+    input_data = s3.get_object(
+        Bucket=job_params['input_bucket'],
+        Key=job_params['input_key']
+    )['Body'].read()
+
+    # Process in memory or temp storage
+    result = process_data(input_data)
+
+    # Upload to S3
+    s3.put_object(
+        Bucket=job_params['output_bucket'],
+        Key=job_params['output_key'],
+        Body=result
+    )
+```
+
+# Step-by-Step Migration Process
+
+## Step 1: Prepare Your SaladCloud Environment
+
+### Account Setup
+
+1. Create account at [portal.salad.com](https://portal.salad.com)
+2. Set up organization and project
+3. Generate API key for programmatic access
+
+### Install SaladCloud SDK (Optional)
+
+```bash
+# Python
+pip install salad-cloud-sdk
+
+# Node.js
+npm install @saladtechnologies/salad-cloud-sdk
+```
+
+## Step 2: Convert AWS Batch Job Definitions
+
+### Transform ECS Task Definitions
+
+**AWS Batch Job Definition:**
+
+```json
+{
+  "jobDefinitionName": "image-processing",
+  "type": "container",
+  "containerProperties": {
+    "image": "my-ecr-repo/processor:latest",
+    "vcpus": 4,
+    "memory": 8192,
+    "jobRoleArn": "arn:aws:iam::123456789012:role/BatchJobRole",
+    "environment": [{ "name": "PROCESSING_MODE", "value": "batch" }],
+    "resourceRequirements": [{ "type": "GPU", "value": "1" }]
+  }
+}
+```
+
+**SaladCloud Container Configuration:**
+
+```dockerfile
+# Dockerfile with Salad Job Queue Worker
+FROM my-ecr-repo/processor:latest
+
+# Download the Salad Job Queue Worker binary
+ADD https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-job-queue-worker-linux-amd64 /usr/local/bin/salad-job-queue-worker
+RUN chmod +x /usr/local/bin/salad-job-queue-worker
+
+# Your existing application setup
+WORKDIR /app
+COPY . .
+
+# You'll need to manage both processes - your app and the queue worker
+# See /container-engine/how-to-guides/job-processing/queue-worker for s6-overlay or wrapper approaches
+# The queue worker will forward jobs to your app on localhost:8080
+# Your app does NOT need IPv6 binding when using job queues
+```
+
+### Adapt Job Input/Output Patterns
+
+**AWS Batch Job Script:**
+
+```python
+import os
+import json
+
+def main():
+    # AWS Batch provides job parameters via environment variables
+    job_params = json.loads(os.environ.get('BATCH_JOB_PARAMETERS', '{}'))
+    input_file = job_params['inputFile']
+    output_location = job_params['outputLocation']
+
+    # Process the job
+    result = process_file(input_file)
+
+    # Save results
+    save_to_s3(result, output_location)
+
+if __name__ == "__main__":
+    main()
+```
+
+**SaladCloud HTTP Handler:**
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class JobRequest(BaseModel):
+    inputFile: str
+    outputLocation: str
+
+@app.post("/process")
+async def process_job(request: JobRequest):
+    try:
+        # Process the job (same logic as before)
+        result = process_file(request.inputFile)
+        save_to_s3(result, request.outputLocation)
+
+        return {
+            "status": "success",
+            "output": request.outputLocation
+        }
+    except Exception as e:
+        # Return 500 to trigger retry
+        raise HTTPException(status_code=500, detail=str(e))
+
+# When using Job Queues, bind to localhost (queue worker handles external access)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # No IPv6 needed with job queues!
+```
+
+## Step 3: Choose Your Job Queue Solution
+
+<Info>
+  These patterns can be implemented with any job queue, including those not on the Salad platform, but these two have
+  platform integration with SaladCloud.
+</Info>
+
+### Salad Job Queues vs. Kelpie
+
+SaladCloud offers two job queue solutions, each optimized for different use cases:
+
+**Salad Job Queues** (Recommended for most AWS Batch migrations):
+
+- Best for jobs that complete in minutes to a few hours
+- Built-in retry logic (3 retries, 4 total attempts)
+- Simple HTTP-based job distribution
+- Native autoscaling based on queue depth
+- No additional setup required
+
+**[Salad Kelpie](https://github.com/SaladTechnologies/kelpie)** (For long-running or interruptible workloads):
+
+- Designed for jobs running many hours or days (ML training, simulations)
+- Built-in checkpointing and resumption capabilities
+- Automatic cloud storage integration for progress saves
+- Handles node interruptions gracefully
+- Ideal for workloads that need to survive node failures
+
+**When to use Kelpie instead of Job Queues:**
+
+- Jobs that run longer than 30 minutes
+- ML model training or fine-tuning
+- Molecular dynamics simulations
+- Any workload where losing progress would be costly
+- Jobs that need to save and resume from checkpoints
+
+For this guide, we'll use Salad Job Queues as they're the closest match to AWS Batch for most use cases. If you have
+long-running workloads, see our [Kelpie documentation](/container-engine/how-to-guides/job-processing/kelpie).
+
+### Create a Salad Job Queue
+
+Job Queues can only be created via the API (not available in the portal):
+
+```bash
+curl -X POST "https://api.salad.com/api/public/organizations/$ORG/projects/$PROJECT/queues" \
+  -H "Salad-Api-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "batch-processing-queue",
+    "display_name": "Batch Processing Queue",
+    "description": "Queue for batch processing jobs migrated from AWS Batch"
+  }'
+```
+
+Or via Python SDK:
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+queue = sdk.queues.create_queue(
+    organization_name="your-org",
+    project_name="your-project",
+    request_body={
+        "name": "batch-processing-queue",
+        "display_name": "Batch Processing Queue"
+    }
+)
+```
+
+## Step 4: Deploy Container Group with Queue
+
+### Container Group Configuration
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+# Create container group connected to job queue
+# Note: Container Gateway is NOT needed when using Job Queues
+container_group = sdk.container_groups.create_container_group(
+    organization_name="your-org",
+    project_name="your-project",
+    request_body={
+        "name": "batch-processor",
+        "container": {
+            "image": "your-registry/batch-processor:latest",
+            "resources": {
+                "cpu": 4,
+                "memory": 8192,
+                "gpu_classes": ["ed563892-aacd-40f5-80b7-90c9be6c759b"]  # RTX 4090 (24 GB)
+            },
+            "environment_variables": {
+                "PROCESSING_MODE": "batch",
+                "AWS_REGION": "us-east-1"  # For S3 access
+            }
+        },
+        "queue_connection": {
+            "queue_name": "batch-processing-queue",
+            "port": 8080  # Port where your app listens locally
+        },
+        "replicas": 3,  # Start with desired capacity
+        "autostart_policy": True,
+        "restart_policy": "always"
+        # No networking/gateway configuration needed!
+    }
+)
+```
+
+## Step 5: Submit and Monitor Jobs
+
+### Job Submission
+
+**AWS Batch Pattern:**
+
+```python
+import boto3
+
+batch = boto3.client('batch')
+
+response = batch.submit_job(
+    jobName='process-image-001',
+    jobQueue='my-job-queue',
+    jobDefinition='image-processing',
+    parameters={
+        'inputFile': 's3://bucket/input/image.jpg',
+        'outputLocation': 's3://bucket/output/'
+    }
+)
+job_id = response['jobId']
+```
+
+**SaladCloud Pattern:**
+
+```python
+from salad_cloud_sdk import SaladCloudSdk
+
+sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+# Submit job to queue
+job = sdk.queues.create_job(
+    organization_name="your-org",
+    project_name="your-project",
+    queue_name="batch-processing-queue",
+    request_body={
+        "input": {
+            "inputFile": "s3://bucket/input/image.jpg",
+            "outputLocation": "s3://bucket/output/"
+        }
+    }
+)
+job_id = job.id
+```
+
+### Job Monitoring
+
+```python
+# Check job status
+job_status = sdk.queues.get_job(
+    organization_name="your-org",
+    project_name="your-project",
+    queue_name="batch-processing-queue",
+    job_id=job_id
+)
+
+print(f"Job Status: {job_status.status}")
+if job_status.status == "completed":
+    print(f"Results: {job_status.output}")
+elif job_status.status == "failed":
+    print(f"Error: {job_status.error}")
+```
+
+## Step 6: Implement Autoscaling
+
+### Queue-Based Autoscaling
+
+```python
+# Configure autoscaling based on queue depth
+sdk.container_groups.update_container_group(
+    organization_name="your-org",
+    project_name="your-project",
+    container_group_name="batch-processor",
+    request={
+        "queue_autoscaler": {
+            "min_replicas": 0,  # Scale to zero when idle
+            "max_replicas": 50,  # Maximum capacity
+            "desired_queue_length": 2,  # Target 2 jobs per instance
+            "polling_period": 30  # Check every 30 seconds
+        }
+    }
+)
+```
+
+### Custom Metrics Autoscaling
+
+```python
+import time
+from datetime import datetime
+
+def scale_based_on_time():
+    """Scale up during business hours"""
+    sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+    while True:
+        hour = datetime.now().hour
+
+        # Scale up during business hours (9 AM - 6 PM)
+        if 9 <= hour < 18:
+            target_replicas = 10
+        else:
+            target_replicas = 2
+
+        sdk.container_groups.update_container_group(
+            organization_name="your-org",
+            project_name="your-project",
+            container_group_name="batch-processor",
+            request={"replicas": target_replicas}
+        )
+
+        time.sleep(300)  # Check every 5 minutes
+```
+
+## Migration Patterns for Common AWS Batch Scenarios
+
+### Pattern 1: Simple Batch Processing
+
+**AWS Batch Approach:**
+
+- Submit jobs with parameters
+- Process in container
+- Write results to S3
+
+**SaladCloud Migration:**
+
+```python
+# 1. Container with HTTP endpoint
+@app.post("/process")
+async def process_batch(job: dict):
+    # Same processing logic
+    result = your_existing_function(job['input'])
+    return {"output": result}
+
+# 2. Submit jobs to queue
+for item in batch_items:
+    sdk.queues.create_job(
+        organization_name="your-org",
+        project_name="your-project",
+        queue_name="batch-queue",
+        request_body={"input": item}
+    )
+```
+
+### Pattern 2: Array Jobs
+
+**AWS Batch Array Jobs:**
+
+```bash
+aws batch submit-job \
+  --array-properties size=100 \
+  --job-name array-job \
+  --job-queue my-queue
+```
+
+**SaladCloud Equivalent:**
+
+```python
+# Submit multiple jobs to achieve same parallelization
+jobs = []
+for i in range(100):
+    job = sdk.queues.create_job(
+        organization_name="your-org",
+        project_name="your-project",
+        queue_name="batch-queue",
+        request_body={
+            "input": {
+                "index": i,
+                "total": 100,
+                "data": f"s3://bucket/data/chunk_{i}.json"
+            }
+        }
+    )
+    jobs.append(job.id)
+
+# Monitor all jobs
+for job_id in jobs:
+    status = sdk.queues.get_job(
+        organization_name="your-org",
+        project_name="your-project",
+        queue_name="batch-queue",
+        job_id=job_id
+    )
+    print(f"Job {job_id}: {status.status}")
+```
+
+### Pattern 3: Long-Running Jobs with Kelpie
+
+**AWS Batch Long-Running Jobs:**
+
+- Multi-hour ML training jobs
+- Risk of spot instance termination
+- Manual checkpointing required
+
+**SaladCloud with Kelpie:**
+
+```dockerfile
+# Add Kelpie to your container
+FROM pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime
+
+# Add the Kelpie binary
+ARG KELPIE_VERSION=0.6.0
+ADD https://github.com/SaladTechnologies/kelpie/releases/download/${KELPIE_VERSION}/kelpie /kelpie
+RUN chmod +x /kelpie
+
+# Your training code
+COPY train.py /app/train.py
+WORKDIR /app
+
+# Kelpie handles job execution and checkpointing
+CMD ["/kelpie"]
+```
+
+**Benefits of Kelpie for long jobs:**
+
+- Automatic checkpoint upload to S3-compatible storage
+- Resume from last checkpoint after interruption
+- No data loss from node failures
+- Built-in integration with SaladCloud
+
+See the [Kelpie guide](/container-engine/how-to-guides/job-processing/kelpie) for detailed setup.
+
+### Pattern 4: GPU-Accelerated ML Training
+
+**AWS Batch with GPU:**
+
+```json
+{
+  "resourceRequirements": [
+    { "type": "GPU", "value": "1" },
+    { "type": "MEMORY", "value": "32768" },
+    { "type": "VCPU", "value": "8" }
+  ]
+}
+```
+
+**SaladCloud GPU Configuration:**
+
+```python
+container_group = {
+    "container": {
+        "image": "your-ml-training:latest",
+        "resources": {
+            "cpu": 8,
+            "memory": 32768,
+            "gpu_classes": [
+                "ed563892-aacd-40f5-80b7-90c9be6c759b",  # RTX 4090 (24 GB)
+                "a5db5c50-cbcb-4596-ae80-6a0c8090d80f"   # RTX 3090 (24 GB)
+            ]
+        }
+    }
+}
+```
+
+### Pattern 5: Dependent Jobs
+
+**AWS Batch with Dependencies:**
+
+```python
+job1 = batch.submit_job(jobName="preprocess")
+job2 = batch.submit_job(
+    jobName="process",
+    dependsOn=[{"jobId": job1['jobId']}]
+)
+```
+
+**SaladCloud Pattern:**
+
+```python
+# Implement dependency logic in your application
+@app.post("/process")
+async def process_with_dependencies(job: dict):
+    # Check if prerequisites are complete
+    if job.get('depends_on'):
+        for dep_id in job['depends_on']:
+            dep_status = sdk.queues.get_job(
+                organization_name="your-org",
+                project_name="your-project",
+                queue_name="batch-queue",
+                job_id=dep_id
+            )
+            if dep_status.status != "completed":
+                # Return 503 to retry later
+                raise HTTPException(status_code=503, detail="Dependencies not ready")
+
+    # Process the job
+    result = process_data(job['input'])
+
+    # Trigger dependent jobs if needed
+    if job.get('triggers'):
+        for next_job in job['triggers']:
+            sdk.queues.create_job(
+                organization_name="your-org",
+                project_name="your-project",
+                queue_name="batch-queue",
+                request_body=next_job
+            )
+
+    return {"output": result}
+```
+
+## Monitoring and Logging
+
+### Replace CloudWatch with External Logging
+
+**Configure Axiom Logging (Recommended):**
+
+```python
+# In your container group configuration
+container_group = {
+    "container": {
+        "logging": {
+            "axiom": {
+                "dataset": "salad-batch-jobs",
+                "token": "YOUR_AXIOM_TOKEN",
+                "url": "https://cloud.axiom.co"
+            }
+        }
+    }
+}
+```
+
+**Application-Level Logging:**
+
+```python
+import logging
+import json
+
+# Configure structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+@app.post("/process")
+async def process_job(job: dict):
+    job_id = job.get('id', 'unknown')
+
+    logger.info(json.dumps({
+        "event": "job_started",
+        "job_id": job_id,
+        "input": job['input']
+    }))
+
+    try:
+        result = process_data(job['input'])
+
+        logger.info(json.dumps({
+            "event": "job_completed",
+            "job_id": job_id,
+            "duration": processing_time
+        }))
+
+        return {"output": result}
+
+    except Exception as e:
+        logger.error(json.dumps({
+            "event": "job_failed",
+            "job_id": job_id,
+            "error": str(e)
+        }))
+        raise
+```
+
+## Cost Optimization Strategies
+
+### 1. Use Batch Priority for Non-Time-Sensitive Workloads
+
+SaladCloud offers four priority tiers, with each tier offering additional savings on top of our already competitive base
+pricing (which is typically 80-90% less than AWS). For batch processing that isn't time-critical, the "batch" priority
+tier offers the deepest discounts:
+
+| Priority   | Use Case                  | Additional Savings vs Salad High Priority | Availability |
+| ---------- | ------------------------- | ----------------------------------------- | ------------ |
+| **High**   | Production, time-critical | Baseline (already ~90% less than AWS)     | Highest      |
+| **Medium** | Standard workloads        | ~15-20% additional savings                | Very Good    |
+| **Low**    | Flexible deadlines        | ~25-35% additional savings                | Good         |
+| **Batch**  | Non-urgent processing     | **~40-50% additional savings**            | Variable     |
+
+Example pricing for comparable GPU workload (24 GB VRAM, 8 vCPU, 32 GB RAM):
+
+**AWS P4d.24xlarge (8x A100 40GB):**
+
+- Total: ~\$32.77/hour
+- Per GPU: ~\$4.10/hour
+- Includes: 96 vCPUs, 1152 GB RAM (massive overkill for most batch jobs)
+
+**AWS P3.2xlarge (1x V100 16GB):**
+
+- Total: ~\$3.06/hour
+- Per GPU: \$3.06/hour
+- Includes: 8 vCPUs, 61 GB RAM
+
+**SaladCloud RTX 4090 (24 GB):**
+
+- High Priority: \$0.30/hour GPU + \$0.032/hour (8 vCPU) + \$0.032/hour (32 GB RAM) = **\$0.364/hour total** (88% less
+  than P3.2xlarge)
+- Medium: \$0.26 + \$0.032 + \$0.032 = **\$0.324/hour**
+- Low: \$0.22 + \$0.032 + \$0.032 = **\$0.284/hour**
+- **Batch: \$0.18 + \$0.032 + \$0.032 = \$0.244/hour** (92% less than P3.2xlarge!)
+
+```python
+# Configure container group with batch priority for maximum savings
+# This gives you an additional 40% off SaladCloud's already low prices
+container_group = sdk.container_groups.create_container_group(
+    organization_name="your-org",
+    project_name="your-project",
+    request_body={
+        "name": "batch-processor",
+        "container": {
+            # ... container config
+        },
+        "priority": "batch",  # Additional 40-50% savings on top of base savings
+        "replicas": 10
+    }
+)
+```
+
+### 2. Scale to Zero During Off-Hours
+
+```python
+# Configure minimum replicas to 0 for idle periods
+queue_autoscaler = {
+    "min_replicas": 0,  # Scale to zero when no jobs
+    "max_replicas": 100,
+    "desired_queue_length": 1
+}
+```
+
+### 3. Optimize Container Size
+
+```dockerfile
+# Use multi-stage builds to minimize image size
+FROM python:3.9 AS builder
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
+
+FROM python:3.9-slim
+COPY --from=builder /root/.local /root/.local
+COPY . /app
+WORKDIR /app
+```
+
+### 4. Batch Small Jobs
+
+```python
+@app.post("/process")
+async def process_batch(request: dict):
+    # Process multiple items in one job
+    results = []
+    for item in request['batch']:
+        result = process_item(item)
+        results.append(result)
+
+    return {"outputs": results}
+```
+
+## Migration Checklist
+
+### Pre-Migration
+
+- [ ] Inventory AWS Batch job definitions and compute environments
+- [ ] Identify storage dependencies (EBS, EFS volumes)
+- [ ] Document job dependencies and workflows
+- [ ] Review IAM roles and permissions needed
+- [ ] Estimate monthly job volumes and compute requirements
+
+### Container Preparation
+
+- [ ] Convert job scripts to HTTP endpoints
+- [ ] Add Salad Queue Worker to containers
+- [ ] Update to use cloud storage instead of mounted volumes
+- [ ] Test containers locally with IPv6 binding
+- [ ] Push containers to accessible registry
+
+### SaladCloud Setup
+
+- [ ] Create SaladCloud account and organization
+- [ ] Generate API keys
+- [ ] Create job queues
+- [ ] Deploy container groups with queue connections
+- [ ] Configure autoscaling policies
+
+### Testing
+
+- [ ] Submit test jobs to queues
+- [ ] Verify job processing and retries
+- [ ] Test autoscaling behavior
+- [ ] Validate logging and monitoring
+- [ ] Compare performance with AWS Batch baseline
+
+### Production Migration
+
+- [ ] Migrate batch jobs gradually (start with non-critical)
+- [ ] Monitor costs and performance
+- [ ] Adjust autoscaling based on actual usage
+- [ ] Update job submission scripts/applications
+- [ ] Decommission AWS Batch resources once stable
+
+## Common Challenges and Solutions
+
+### Challenge: No Step Functions Equivalent
+
+**Solution:** Use external workflow orchestrators
+
+```python
+# Apache Airflow DAG example
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
+
+def submit_salad_job(**context):
+    sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+    job = sdk.queues.create_job(
+        organization_name="your-org",
+        project_name="your-project",
+        queue_name="batch-queue",
+        request_body=context['params']
+    )
+    return job.id
+
+dag = DAG('batch_workflow', default_args=default_args)
+
+preprocess = PythonOperator(
+    task_id='preprocess',
+    python_callable=submit_salad_job,
+    params={'input': 'preprocess_config'}
+)
+
+process = PythonOperator(
+    task_id='process',
+    python_callable=submit_salad_job,
+    params={'input': 'process_config'}
+)
+
+preprocess >> process  # Define dependencies
+```
+
+### Challenge: Job Scheduling
+
+**Solution:** Implement cron-based job submission
+
+```python
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+scheduler = BlockingScheduler()
+
+@scheduler.scheduled_job('cron', hour=2)  # Run at 2 AM daily
+def submit_nightly_batch():
+    sdk = SaladCloudSdk(api_key="YOUR_API_KEY")
+
+    # Submit batch jobs
+    for job_config in nightly_jobs:
+        sdk.queues.create_job(
+            organization_name="your-org",
+            project_name="your-project",
+            queue_name="batch-queue",
+            request_body=job_config
+        )
+
+scheduler.start()
+```
+
+### Challenge: Large Data Transfer
+
+**Solution:** Use pre-signed URLs and streaming
+
+```python
+import boto3
+from io import BytesIO
+
+@app.post("/process")
+async def process_large_file(job: dict):
+    s3 = boto3.client('s3')
+
+    # Stream large file from S3
+    response = s3.get_object(
+        Bucket=job['bucket'],
+        Key=job['key']
+    )
+
+    # Process in chunks to avoid memory issues
+    for chunk in response['Body'].iter_chunks(chunk_size=1024*1024):
+        process_chunk(chunk)
+
+    # Upload results with pre-signed URL
+    presigned_url = s3.generate_presigned_url(
+        'put_object',
+        Params={'Bucket': job['output_bucket'], 'Key': job['output_key']},
+        ExpiresIn=3600
+    )
+
+    return {"upload_url": presigned_url}
+```
+
+## Performance Optimization
+
+### Minimize Cold Starts
+
+```python
+# Keep containers warm with minimal replicas
+container_group = {
+    "replicas": 2,  # Always keep 2 instances running
+    "queue_autoscaler": {
+        "min_replicas": 2,  # Never scale below 2
+        "max_replicas": 100
+    }
+}
+```
+
+### Optimize Job Distribution
+
+```python
+# Process multiple small jobs per container invocation
+@app.post("/process")
+async def process_job_batch(request: dict):
+    # Check if this is a batch request
+    if 'batch_size' in request:
+        # Pull multiple jobs from queue
+        jobs = []
+        for _ in range(request['batch_size']):
+            job = await get_next_job()  # Your queue logic
+            if job:
+                jobs.append(job)
+
+        # Process all jobs
+        results = [process_single_job(job) for job in jobs]
+        return {"results": results}
+    else:
+        # Single job processing
+        return process_single_job(request)
+```
+
+## What You'll Gain
+
+Migrating from AWS Batch to SaladCloud provides:
+
+### Immediate Benefits
+
+- **90% Cost Reduction**: Dramatically lower compute costs for batch processing
+- **Simplified Operations**: No compute environment or AMI management
+- **Global Scale**: Access to 11,000+ GPUs worldwide
+- **Transparent Pricing**: Simple per-second billing without complex EC2 pricing tiers
+
+### Operational Improvements
+
+- **Automatic Failover**: Built-in retry logic and node replacement
+- **Flexible Scaling**: Scale to zero or thousands of instances
+- **No Infrastructure Management**: Focus on your batch jobs, not EC2 fleets
+- **Unified Job Processing**: Same patterns for CPU and GPU workloads
+
+### Trade-offs Accepted
+
+- Longer cold start times (minutes vs. seconds)
+- Different storage patterns (cloud APIs vs. mounted volumes)
+- Fewer AWS service integrations
+- HTTP-based job distribution instead of agent-based
+
+## Getting Help
+
+### SaladCloud Resources
+
+- **Documentation**: [docs.salad.com](https://docs.salad.com)
+- **API Reference**: [SaladCloud API Documentation](/reference/saladcloud-api)
+- **Portal**: [portal.salad.com](https://portal.salad.com)
+- **Support**: Contact [cloud@salad.com](mailto:cloud@salad.com)
+
+### Migration Support
+
+- [Job Queue Setup Guide](/container-engine/how-to-guides/job-processing/creating-a-job-queue)
+- [Queue Worker Configuration](/container-engine/how-to-guides/job-processing/queue-worker)
+- [Autoscaling Documentation](/container-engine/how-to-guides/autoscaling/overview)
+- [Container Troubleshooting](/container-engine/how-to-guides/troubleshooting)
+
+## Related Resources
+
+### Job Processing Patterns
+
+- [Job Queue Overview](/container-engine/explanation/job-processing/job-queues)
+- [Kelpie for Long-Running Jobs](/container-engine/how-to-guides/job-processing/kelpie) - Checkpointing and resumption
+- [SQS Integration](/container-engine/how-to-guides/job-processing/sqs) - For existing SQS workflows
+- [Long-Running Tasks](/container-engine/explanation/job-processing/long-running-tasks)
+- [Build Redis Queue](/container-engine/how-to-guides/job-processing/build-redis-queue)
+
+### Migration Guides
+
+- [Migrate from RunPod](/container-engine/how-to-guides/migration/migrate-from-runpod)
+- [Migrate from Vast.ai](/container-engine/how-to-guides/migration/migrate-from-vast)
+
+### GPU Workloads
+
+- [ML Training on SaladCloud](/container-engine/tutorials/machine-learning)
+- [PyTorch with RTX 5090](/container-engine/tutorials/machine-learning/pytorch-rtx5090)
+- [High-Performance Applications](/container-engine/tutorials/performance/high-performance-apps)
+
+Ready to start saving on your batch processing costs? Create your SaladCloud account and begin migrating your AWS Batch
+workloads today!

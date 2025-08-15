@@ -266,6 +266,7 @@
               {
                 "group": "Migration",
                 "pages": [
+                  "container-engine/how-to-guides/migration/migrate-from-aws-batch",
                   "container-engine/how-to-guides/migration/migrate-from-vast",
                   "container-engine/how-to-guides/migration/migrate-from-runpod"
                 ]
