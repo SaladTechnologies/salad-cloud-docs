@@ -298,15 +298,16 @@
                 "group": "Recipes",
                 "pages": [
                   "container-engine/reference/recipes/overview",
+                  "container-engine/reference/recipes/ai-toolkit",
                   "container-engine/reference/recipes/comfyui",
+                  "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
                   "container-engine/reference/recipes/ollama",
+                  "container-engine/reference/recipes/opemm-srcg",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/ubuntu",
-                  "container-engine/reference/recipes/yolo",
-                  "container-engine/reference/recipes/gromacs-srcg",
-                  "container-engine/reference/recipes/opemm-srcg"
+                  "container-engine/reference/recipes/yolo"
                 ]
               },
               {
