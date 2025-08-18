@@ -93,6 +93,7 @@ jemison
 jsonify
 jwks
 konieshadow
+Kryptex
 kubeconfig
 kubelet
 kuzco
@@ -146,12 +147,14 @@ Ollama
 ONNX
 OpenAPI
 openmm
+Oula
 outtmpl
 Pabbly
 Pabbly’s
 pafy
 Pafy
 pbtxt
+Pelagus
 POINTOPOINT
 popitem
 pretrained
