@@ -304,6 +304,7 @@
                   "container-engine/reference/recipes/kuzco",
                   "container-engine/reference/recipes/ollama",
                   "container-engine/reference/recipes/opemm-srcg",
+                  "container-engine/reference/recipes/quai",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/ubuntu",
