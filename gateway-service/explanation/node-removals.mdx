@@ -17,8 +17,8 @@ At the time that the node removal request is received, the node which is connect
 will be removed.
 
 If a node becomes unavailable for any reason, the pool of nodes connected to the SGS server will automatically be
-'topped up' with a fresh node on a best-effort basis. Any streaming sessions with were routed over the unavailable node
-will be transferred to other nodes.
+'topped up' with a fresh node on a best-effort basis. Any streaming sessions routed over the unavailable node will be
+transferred to other nodes.
 
 ## How to request a node removal
 
@@ -37,8 +37,8 @@ A node removal completely boots a node from your SGS server. If the node failed 
 still be viable for other services - or exhibited a transient error. Node removals should therefore be thought of as a
 last resort. If you find that multiple nodes are failing to connect to a specific service it is preferable to reach out
 to your Account Manager first to discuss implementing a
-[Smart Routing filter](/gateway-service/explanation/destination-health-checks). If, however, you find a node which is
-consistently underperforming - either exhibiting high latency or poor connectivity to target services - then a node
+[Destination Health Check](/gateway-service/explanation/destination-health-checks). If, however, you find a node which
+is consistently underperforming - either exhibiting high latency or poor connectivity to target services - then a node
 removal might make sense. Keep in mind that, in countries with a limited number of available nodes, use of the node
 removal feature may result in removed nodes not being replaced immediately. Overuse of the feature could temporarily
 deplete your node pool to the point that throughput levels are impacted, resulting in buffering and other poor
@@ -77,7 +77,9 @@ be assigned that sessionID.
 ## Example request
 
 ```bash
-curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SALAD_JWT" -d '{"sessionId": "$SESSION_ID","timeDetectedAt": $TIME,"removalReason": "$REMOVAL_REASON","service": "$SERVICE"}' https://matrix-rest-api.salad.com/api/v2/sgs/$SGS_ID/removals
+curl -v -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $SALAD_JWT" -d \
+'{"sessionId": "$SESSION_ID","timeDetectedAt": $TIME,"removalReason": "$REMOVAL_REASON","service": "$SERVICE"}' \
+https://matrix-rest-api.salad.com/api/v2/sgs/$SGS_ID/removals
 ```
 
 ```JSON node_removal.json
