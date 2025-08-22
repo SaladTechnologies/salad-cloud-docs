@@ -1,0 +1,142 @@
+---
+title: Text Generation Inference (TGI) on SaladCloud Secure
+sidebarTitle: TGI on SaladCloud Secure
+description: Run large LLMs with multi‑GPU sharding on SaladCloud Secure (DataCenter GPUs).
+---
+
+_Last Updated: August 11, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This guide covers deploying [Text Generation Inference (TGI)](https://github.com/huggingface/text-generation-inference)
+on [**SaladCloud Secure**](/container-engine/explanation/core-concepts/saladcloud-secure) (DataCenter GPUs) to serve
+**Large Language Models** using **multi‑GPU sharding**.
+
+TGI provides optimized inference (continuous batching, tensor parallelism, efficient memory) and an OpenAI‑compatible
+API. On SaladCloud Secure, nodes are provisioned in **blocks of 8 GPUs** (default: **8×L40S, 48 GB each**) so you can
+load and serve models like **70B** parameters and beyond.
+
+## Example Models for SaladCloud Secure
+
+You can deploy any [TGI-compatible model](https://huggingface.co/docs/text-generation-inference/supported_models) that
+fits within the combined VRAM of your available GPUs. Examples:
+
+- [Llama 3 70B Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct) — 70B parameter instruction-tuned
+  model for conversational AI.
+- [Llama 2 70B Chat](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf) — Instruction-tuned conversational model.
+- [Mixtral 8×7B Instruct v0.1](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) — Mixture-of-Experts model
+  for efficiency and reasoning.
+- [DeepSeek R1 Distill Llama 70B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B) — Distilled model
+  for high performance at lower cost. (default in the recipe)
+
+<Callout variation="warning">
+  Models are not bundled with the container. They are downloaded at runtime, which can take several minutes for large
+  checkpoints.
+</Callout>
+
+## Multi‑GPU Configuration
+
+To use multiple GPUs, you must explicitly set:
+
+- **`Model`** — Hugging Face model ID to load.
+- **`Hugging Face Token`** — Optional. Required only if using a private or gated Hugging Face model. You can create a
+  token at huggingface.co/settings/tokens.
+
+## Example Request
+
+Submit chat completion requests to the `/v1/chat/completions` endpoint, and receive generated text in response.
+
+```shell
+curl -X POST <Your Gateway URL> \
+-H "Content-Type: application/json" \
+-H "Salad-Api-Key: <YOUR_API_KEY>" \
+-d @request.json
+```
+
+```json request.json
+{
+  "model": "tgi",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain quantum computing in simple terms:"
+    }
+  ],
+  "max_tokens": 200,
+  "temperature": 0.7,
+  "top_p": 0.95,
+  "frequency_penalty": 0.1,
+  "stream": false
+}
+```
+
+You will get back a json response with the generated text:
+
+```json
+{
+  "id": "chatcmpl-1234567890abcdef",
+  "object": "chat.completion",
+  "created": 1704067200,
+  "model": "tgi",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Quantum computing is a revolutionary approach to computation that harnesses the principles of quantum mechanics..."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 8,
+    "completion_tokens": 156,
+    "total_tokens": 164
+  }
+}
+```
+
+## How To Use This Recipe
+
+### Authentication
+
+If authentication is enabled in the container gateway, all requests must include your SaladCloud API key in the
+`Salad-Api-Key` header. See [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for more
+information.
+
+### Replica Count
+
+We recommend at least **2 replicas** for development and **3–5 replicas** for production. Datacenter GPU nodes are still
+subject to occasional interruptions for maintenance or hardware reallocation.
+
+### Logging
+
+Logs are available in the SaladCloud Portal. For production workloads, connect an external logging source such as
+[Axiom](https://axiom.co/) during deployment.
+
+### Deploy & Wait
+
+When you deploy, SaladCloud will locate qualified datacenter GPU nodes and start downloading the container image and
+model weights. Large models may take **10–20 minutes or more** to fully load.
+
+Once running, a green checkmark in the **"Ready"** column indicates the instance is serving requests. For production,
+wait until your target number of replicas is ready before sending traffic.
+
+---
+
+### Advanced: Running Multiple LLMs on the Same Node
+
+It is possible to deploy multiple LLMs on a single node by configuring different `CUDA_VISIBLE_DEVICES` values for each
+container. Since SaladCloud currently does not support exposing multiple ports per container group, each LLM service
+must be configured to listen on a **different path** while sharing the same port.
+
+This approach is **not part of this recipe**, but you can still use this recipe as a base and adapt it for multi-LLM
+deployments. For example, you could deploy two instances of the TGI container on the same node, one serving Llama 3 70B
+Chat on `/llama3` and another serving Mixtral 8×7B Instruct v0.1 on `/mixtral`, both listening on port `80`.
+
+In order to do that you need to pass the following environment variables when creating or editing your container group:
+
+- **`CUDA_VISIBLE_DEVICES`** — Comma‑separated GPU IDs visible to the container (e.g. `0,1,2,3,4,5,6,7`).
+- **`NUM_SHARD`** — Number of shards to split the model across. Must be ≤ the number of visible GPUs.

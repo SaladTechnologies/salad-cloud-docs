@@ -307,6 +307,7 @@
                   "container-engine/reference/recipes/quai",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
+                  "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/yolo"
                 ]
