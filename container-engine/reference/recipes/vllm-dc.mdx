@@ -1,0 +1,139 @@
+---
+title: vLLM on SaladCloud Secure
+sidebarTitle: vLLM on SaladCloud Secure
+description: Run large LLMs with multi-GPU support on SaladCloud Secure (DataCenter GPUs) using vLLM.
+---
+
+_Last Updated: August 25, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This guide covers deploying [**vLLM**](https://docs.vllm.ai/en/v0.9.1/index.html) on
+[**SaladCloud Secure**](/container-engine/explanation/core-concepts/saladcloud-secure) (DataCenter GPUs) to serve
+**Large Language Models** using **multi-GPU sharding**.
+
+[vLLM](https://vllm.ai/) is a high-throughput, open-source inference engine for LLMs. vLLM is widely adopted in
+production environments because it provides:
+
+- **Continuous batching** for maximizing GPU utilization.
+- **Tensor and pipeline parallelism** for multi-GPU scaling.
+- An [**OpenAI-compatible API**](https://docs.vllm.ai/en/stable/serving/openai_compatible_server.html).
+- Support for quantization formats such as **FP8**, **AWQ**, and **GPTQ**.
+
+On SaladCloud Secure, nodes are provisioned in **blocks of 8 GPUs**. This allows you to run very large models (70B+
+parameters) with parallelism automatically handled by vLLM.
+
+## Example Models for SaladCloud Secure
+
+You can deploy any Hugging Face model that [vLLM supports](https://docs.vllm.ai/en/latest/models/supported_models.html).
+Popular examples:
+
+- [DeepSeek R1 Distill Llama 70B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B) — Distilled 70B
+  model for high performance at lower cost. (default in the recipe)
+- [Llama 3.1 70B Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-70B-Instruct) — 70B parameter
+  instruction-tuned model.
+- [Mixtral 8×7B Instruct v0.1](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1) — Mixture-of-Experts model
+  for efficiency and reasoning.
+- [Qwen2.5 72B Instruct](https://huggingface.co/Qwen/Qwen2.5-72B-Instruct) — General-purpose 72B parameter
+  instruction-tuned model.
+
+<Callout variation="warning">
+  Models are not bundled with the container. They are downloaded at runtime, which can take several minutes for large
+  checkpoints.
+</Callout>
+
+## Multi-GPU Configuration
+
+This recipe automatically configures tensor parallelism (`TP_SIZE`) to all 8 GPUs in the node. You may also set:
+
+- **`Model`** — Hugging Face model ID to load. Set to host DeepSeek R1 Distill Llama 70B on default.
+- **`Hugging Face Token`** — Optional. Required for private or gated models.
+- **`GPU Memory Utilization`** — Fraction of GPU VRAM vLLM may use (default: `0.92`). Lower if you need more headroom.
+
+All other advanced options are pre-set in the recipe but can be overridden if needed.
+
+## Example Request
+
+Submit chat completion requests to the `/v1/chat/completions` endpoint, and receive generated text in response.
+
+```bash
+curl https://<YOUR-GATEWAY-URL>/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <YOUR_API_KEY>' \
+  -d '{
+    "model": "vllm",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is deep learning?"}
+    ],
+    "stream": true,
+    "max_tokens": 20
+  }'
+
+```
+
+## How To Use This Recipe
+
+### Authentication
+
+If authentication is enabled, requests must include your SaladCloud API key in the `Salad-Api-Key` header. See
+[Sending Requests](/container-engine/how-to-guides/gateway/sending-requests).
+
+### Replica Count
+
+We recommend at least **2 replicas** for development and **3–5 replicas** for production. Datacenter GPU nodes are still
+interruptable.
+
+### Logging
+
+Logs are available in the SaladCloud Portal. You can also connect an external logging provider such as
+[Axiom](https://axiom.co/).
+
+### Deploy & Wait
+
+When you deploy, SaladCloud will provision nodes, pull the container image, and download the model weights. Large models
+may take **5-10 minutes or more** to fully load. Once replicas show a green checkmark in the **Ready** column, the
+service is live.
+
+---
+
+### Advanced Settings
+
+By default, this recipe configures **tensor parallelism** across all GPUs. For extremely large models (e.g., 405B
+parameters), you may need to combine **tensor + pipeline parallelism**. You can also adjust additional parameters for
+performance tuning. Below is a list of supported environment variables:
+
+- **`DTYPE`** Controls the compute precision. Options include `auto`, `float16`, `float`, `bfloat16`, `float32`, `half`.
+  Lower precision reduces memory usage and speeds up inference, at a potential cost in accuracy.
+
+- **`TP_SIZE`** Number of tensor parallel groups. (how many GPUs share each layer’s computation). Commonly set to the
+  total GPU count (e.g., `8` for 8 GPUs).
+
+- **`PP_SIZE`** Number of pipeline parallel groups.
+
+- **`MAX_MODEL_LEN`** Model context length (prompt and output).
+
+- **`MAX_NUM_BATCH_TOKENS`** Maximum number of tokens to be processed in a single iteration.
+
+- **`MAX_NUM_SEQS`** Maximum number of sequences to be processed in a single iteration.
+
+- **`GPU_MEM_UTIL`** Fraction of GPU VRAM that vLLM is allowed to use (e.g., `0.92`). Lower this to leave headroom for
+  monitoring or sidecar processes.
+
+- **`QUANTIZATION`** Enables model quantization to save memory and speed up inference. Supported values depend on the
+  model (e.g., `awq`, `gptq`, `marlin`, `fp8`).
+
+- **`KV_CACHE_DTYPE`** Data type for the key/value cache. Options include `auto`, `fp8`, `fp16`, `bf16`. Lower precision
+  reduces memory footprint for long contexts.
+
+- **`DOWNLOAD_DIR`** Directory path where model weights are cached inside the container. Useful if you want to control
+  cache location.
+
+- **`TOKENIZER`** Path or Hugging Face repo ID for a custom tokenizer. By default, vLLM uses the tokenizer bundled with
+  the model.
+
+- **`TRUST_REMOTE_CODE`** Enable this flag (set to any non-empty value) if the model requires custom code from Hugging
+  Face (e.g., non-standard architectures).
