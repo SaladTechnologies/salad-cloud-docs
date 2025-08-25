@@ -1,0 +1,95 @@
+---
+title: GPT-OSS-120B with vLLM on SaladCloud Secure
+sidebarTitle: GPT-OSS-120B on vLLM
+description: Run OpenAI’s GPT-OSS-120B with vLLM on SaladCloud Secure (DataCenter GPUs).
+---
+
+_Last Updated: August 25, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This guide covers deploying [**GPT-OSS-120B**](https://huggingface.co/openai/gpt-oss-120b) with
+[**vLLM**](https://vllm.ai/) on [**SaladCloud Secure**](/container-engine/explanation/core-concepts/saladcloud-secure)
+(DataCenter GPUs).
+
+[GPT-OSS-120B](https://platform.openai.com/docs/models/gpt-oss-120b) is OpenAI’s largest **open-weight** model (Apache
+2.0 license), designed for advanced reasoning, general-purpose tasks, and large-scale experimentation. It is distributed
+via Hugging Face without gating, so you can deploy it directly without requiring a token.
+
+### Key Features
+
+- **Permissive Apache 2.0 license** — Build freely without copyleft restrictions or patent risk—ideal for
+  experimentation, customization, and commercial deployment.
+- **Configurable reasoning effort** — Easily adjust the reasoning effort (`low`, `medium`, `high`) based on your
+  specific use case and latency needs.
+- **Full chain-of-thought** — Gain complete access to the model's reasoning process, facilitating easier debugging and
+  increased trust in outputs.
+- **Fine-tunable** — Fully customize the model to your specific use case through parameter fine-tuning.
+- **Agentic capabilities** — Use the model's native capabilities for function calling, web browsing, Python code
+  execution, and structured outputs.
+
+On SaladCloud Secure, this recipe is tuned for **8× H100 GPUs**, using **tensor parallelism (TP=8)** for maximum
+throughput.
+
+<Callout variation="warning">
+  Model weights are not bundled with the container. GPT-OSS-120B will be downloaded at runtime during the first
+  deployment, which may take 5-10 minutes or longer depending on bandwidth.
+</Callout>
+
+## Configuration
+
+This recipe comes **pre-configured** for GPT-OSS-120B. You don’t need to provide model IDs or parallelism settings. Only
+one option is exposed:
+
+- **GPU Memory Utilization** — Fraction of GPU VRAM vLLM may use (default: `0.95`). Lower this if you want extra memory
+  headroom for monitoring or sidecar processes.
+
+Everything else is already set for you
+
+## Example Request
+
+Submit chat completion requests to the `/v1/chat/completions` endpoint, and receive generated text in response.
+
+```bash
+curl https://<YOUR-GATEWAY-URL>/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <YOUR_API_KEY>' \
+  -d '{
+    "model": "openai/gpt-oss-120b",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "What is deep learning?"}
+    ],
+    "stream": true,
+    "max_tokens": 20
+  }'
+
+```
+
+## How To Use This Recipe
+
+### Authentication
+
+If authentication is enabled, requests must include your SaladCloud API key in the `Salad-Api-Key` header. See
+[Sending Requests](/container-engine/how-to-guides/gateway/sending-requests).
+
+### Replica Count
+
+We recommend at least **2 replicas** for development and **3–5 replicas** for production. Datacenter GPU nodes are still
+interruptable.
+
+### Logging
+
+Logs are available in the SaladCloud Portal. You can also connect an external logging provider such as
+[Axiom](https://axiom.co/).
+
+### Deploy & Wait
+
+When you deploy, SaladCloud will provision nodes, pull the container image, and download the **GPT-OSS-120B** model
+weights. First startup may take **15–20 minutes or more**. Once replicas show a green checkmark in the **Ready** column,
+the service is live.
+
+---
