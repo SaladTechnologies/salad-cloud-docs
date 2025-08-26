@@ -1,0 +1,48 @@
+---
+title: Quai Miner
+description: Mine Quai tokens on Salad
+---
+
+_Last Updated: August 18, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+Mine [Quai](https://docs.qu.ai/learn/introduction) using the official
+[Quai GPU Miner](https://github.com/dominant-strategies/quai-gpu-miner).
+
+1. Create a [Quai wallet](https://docs.qu.ai/learn/use-quai#get-a-quai-wallet) if you do not already have one, and get
+   your wallet address.
+2. Find a [Quai pool](https://docs.qu.ai/guides/miner/pools-software), and note the pool's IP and port.
+
+## Available Wallets
+
+- **[Pelagus Wallet](https://pelaguswallet.io/)** (Browser Extension) Official Quai wallet - Available
+- **[Koala Wallet](https://koalawallet.io/)** (Browser Extension) Multi-chain support - Available
+- **[Blip Mobile](https://blippay.me/)** (Mobile App) Mobile-first experience, $QI support - Beta Access
+
+## Available Mining Pools
+
+- [AlphaPool](https://alphapool.tech)
+- [HeroMiners](https://quai.herominers.com)
+- [K1Pool](https://k1pool.com/pool/quai)
+- [Kryptex](https://pool.kryptex.com/quai)
+- [LuckyPool](https://quai.luckypool.io)
+- [Oula](https://oula.network/en/pool)
+
+## Deploying
+
+SaladCloud will find qualified nodes, and begin the process of downloading the container image to the host machine. It
+may take up to tens of minutes to download to some machines, depending on the network conditions of that particular
+node. Remember, these are privately owned PCs with gaming GPUs in a variety of networking conditions, and performance
+will vary across different nodes.
+
+Eventually, you will see your instances enter the running state, and show a green checkmark in the "Ready" column. You
+are only charged for instances that are in the running state.
+
+Each container instance will have the machine ID as the worker tag.
+
+## Source Code
+
+[<Icon icon="github" size="24" /> Github Repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/quai-miner)
