@@ -300,6 +300,7 @@
                   "container-engine/reference/recipes/overview",
                   "container-engine/reference/recipes/ai-toolkit",
                   "container-engine/reference/recipes/comfyui",
+                  "container-engine/reference/recipes/gromacs-kelpie",
                   "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
                   "container-engine/reference/recipes/ollama",
