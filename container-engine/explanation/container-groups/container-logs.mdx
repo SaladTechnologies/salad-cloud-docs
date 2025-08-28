@@ -120,6 +120,31 @@ Each log event takes the following structure.
 - Any of these fields can be used in the query language. Here are some examples of queries you can make. These queries
   can be passed as the `query` parameter in the body of the request to the API.
 
+### Resource Types And Labels
+
+You can query logs from three different resource types, indicated in the field `resource.type`:
+
+- `container`: Logs from a running container instance. This includes all logs emitted to stdout and stderr within the
+  container.
+- `instance_controller`: System events that occur on the instance level, such as container start and stop events, probes
+  passing and failing, etc.
+- `deployment_controller`: System events that occur on the container group level, such as adjusting replica count, and
+  starting and stopping container groups.
+
+All of these types have the following labels:
+
+- `project_name`: The name of your project in SaladCloud.
+- `container_group_name`: The name of your container group in SaladCloud.
+
+The `container` and `instance_controller` types have the following additional labels:
+
+- `container_group_version`: The version of your container group when the log was emitted.
+- `instance_id`: A unique ID for a specific instantiation of a container instance. This is independent from
+  `machine_id`, because a single machine ID can have multiple instance IDs associated with it, if a container has
+  recreated or restarted a number of times on the same machine. In such a situation, each "run" has its own
+  `instance_id`.
+- `machine_id`: The unique ID of the node running the container that created the log message.
+
 ### Find Logs From All Containers in a Specific Container Group
 
 ```plaintext
