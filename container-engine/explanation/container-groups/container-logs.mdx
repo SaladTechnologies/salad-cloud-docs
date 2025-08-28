@@ -85,6 +85,31 @@ curl --request POST \
 }'
 ```
 
+and receive a response like:
+
+```json
+{
+  "items": [
+    {
+      "json_log": {},
+      "parent_span_id": "<string>",
+      "receive_time": "2023-11-07T05:31:56Z",
+      "resource": {
+        "labels": {},
+        "type": "<string>"
+      },
+      "severity": "debug",
+      "span_Id": "<string>",
+      "time": "2023-11-07T05:31:56Z",
+      "trace_Id": "<string>"
+    }
+  ],
+  "organization_name": "acme-corp",
+  "page_max_time": "2023-11-07T05:31:56Z",
+  "page_min_time": "2023-11-07T05:31:56Z"
+}
+```
+
 Each log event takes the following structure.
 
 ```json
