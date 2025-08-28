@@ -73,9 +73,9 @@ You can query logs by making a POST request to the query logs endpoint like this
 
 ```shell
 curl --request POST \
-  --url https://api.salad.com/api/public/organizations/{organization_name}/log-entries \
+  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
   --header 'Content-Type: application/json' \
-  --header 'Salad-Api-Key: <api-key>' \
+  --header "Salad-Api-Key: $salad_api_key" \
   --data '{
   "end_time": "2023-11-07T05:31:56Z",
   "page_size": 1,
@@ -155,9 +155,9 @@ resource.labels.container_group_name = "my-cg"
 
 ```shell
 curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
   --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --header "Salad-Api-Key: $salad_api_key" \
   --data '{
   "sort_order": "desc",
   "end_time": "2025-08-28T05:54:42Z",
@@ -175,9 +175,9 @@ severity >= "warn"
 
 ```shell
 curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
   --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --header "Salad-Api-Key: $salad_api_key" \
   --data '{
   "sort_order": "desc",
   "end_time": "2025-08-28T05:54:42Z",
@@ -195,9 +195,9 @@ text_log contains "rejected"
 
 ```shell
 curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
   --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --header "Salad-Api-Key: $salad_api_key" \
   --data '{
   "sort_order": "desc",
   "end_time": "2025-08-28T05:54:42Z",
@@ -215,9 +215,9 @@ json_log.custom_field = "value"
 
 ```shell
 curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
   --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --header "Salad-Api-Key: $salad_api_key" \
   --data '{
   "sort_order": "desc",
   "end_time": "2025-08-28T05:54:42Z",
