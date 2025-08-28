@@ -60,3 +60,102 @@ in an early "Preview" stage, with the following considerations:
   - <img src="/container-engine/images/portal-container-logs-error-getting-logs.png" />
 
 ## Advanced Logging
+
+For more advanced on-platform logging capabilities, you can make use of the
+[Query Log Entries endpoint](/reference/saladcloud-api/logs/query-log-entries) in the API. This endpoint, rather than
+being scoped at the container group level, is scoped at the organization level, allowing you to view and aggregate logs
+from any number of container groups and projects.
+
+This endpoint supports a more flexible query language as well, allowing you to make much more sophisticated filters
+across many fields, and supporting filters on structured logs emitted by your application.
+
+You can query logs by making a POST request to the query logs endpoint like this:
+
+```shell
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/log-entries \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <api-key>' \
+  --data '{
+  "end_time": "2023-11-07T05:31:56Z",
+  "page_size": 1,
+  "query": "<string>",
+  "sort_order": "desc",
+  "start_time": "2023-11-07T05:31:56Z"
+}'
+```
+
+Each log event takes the following structure.
+
+```json
+{
+  "time": "string iso8601",
+  "receive_time": "string iso8601",
+  "resource": {
+    "type": "string enum",
+    "labels": {
+      // key-value pairs (string to string) specific to `type`
+    }
+  },
+  "severity": "string enum",
+  "severity_number": "integer",
+
+  "trace_id": "string", // optional
+  "span_id": "string", // optional
+  "parent_span_id": "string", //optional
+
+  // only one of `text_log` or `json_log`
+  "text_log": "string",
+  "json_log": {
+    // key-value pairs (string to any valid JSON type) specific to log entry
+  }
+}
+```
+
+- Note that this will contain **EITHER** `text_log` **OR** `json_log`, but not both. If you emit logs that are valid
+  json, they will end up in the `json_log` field. Otherwise, the full log line will be in the `text_log` field.
+- The `time` field indicates the system time on the node where the log was emitted.
+- the `receive_time` field indicates the time when Axiom (what we use under the hood for log storage) received the log
+  entry.
+- Any of these fields can be used in the query language. Here are some examples of queries you can make. These queries
+  can be passed as the `query` parameter in the body of the request to the API.
+
+### Find Logs From All Containers in a Specific Container Group
+
+```plaintext
+resource.type = "container" and
+resource.labels.project_name = "default" and
+resource.labels.container_group_name = "my-cg"
+```
+
+### Search Logs By severity
+
+```plaintext
+severity >= "warn"
+```
+
+### Search Text in Unstructured Logs
+
+```plaintext
+text_log contains "rejected"
+```
+
+### Search Custom Fields in Structured Logs
+
+```plaintext
+json_log.custom_field = "value"
+```
+
+### Field Promotion in Structured Logs
+
+If you emit structured logs with any of the following fields, it will be removed from the `json_log` field and promoted
+to a top-level field in the log entry.
+
+- `severity`
+- `severity_number`
+- `trace_id`
+- `span_id`
+- `parent_span_id`
+
+Note that including a `time` or `receive_time`field in your structured log **WILL NOT** override the respective time
+fields of the log entry.
