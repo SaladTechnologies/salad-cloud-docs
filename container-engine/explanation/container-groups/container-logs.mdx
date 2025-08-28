@@ -153,10 +153,38 @@ resource.labels.project_name = "default" and
 resource.labels.container_group_name = "my-cg"
 ```
 
+```shell
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --header 'Content-Type: application/json' \
+  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --data '{
+  "sort_order": "desc",
+  "end_time": "2025-08-28T05:54:42Z",
+  "start_time": "2025-08-28T01:44:42Z",
+  "page_size": 20,
+  "query": "resource.type = \"container\" and resource.labels.project_name = \"default\" and resource.labels.container_group_name = \"my-cg\""
+}'
+```
+
 ### Search Logs By severity
 
 ```plaintext
 severity >= "warn"
+```
+
+```shell
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --header 'Content-Type: application/json' \
+  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --data '{
+  "sort_order": "desc",
+  "end_time": "2025-08-28T05:54:42Z",
+  "start_time": "2025-08-28T01:44:42Z",
+  "page_size": 20,
+  "query": "severity >= \"warn\""
+}'
 ```
 
 ### Search Text in Unstructured Logs
@@ -165,10 +193,38 @@ severity >= "warn"
 text_log contains "rejected"
 ```
 
+```shell
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --header 'Content-Type: application/json' \
+  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --data '{
+  "sort_order": "desc",
+  "end_time": "2025-08-28T05:54:42Z",
+  "start_time": "2025-08-28T01:44:42Z",
+  "page_size": 20,
+  "query": "text_log contains \"rejected\""
+}'
+```
+
 ### Search Custom Fields in Structured Logs
 
 ```plaintext
 json_log.custom_field = "value"
+```
+
+```shell
+curl --request POST \
+  --url https://api.salad.com/api/public/organizations/$ORGANIZATION_NAME/log-entries \
+  --header 'Content-Type: application/json' \
+  --header "Salad-Api-Key: $SALAD_API_KEY" \
+  --data '{
+  "sort_order": "desc",
+  "end_time": "2025-08-28T05:54:42Z",
+  "start_time": "2025-08-28T01:44:42Z",
+  "page_size": 20,
+  "query": "json_log.custom_field = \"value\""
+}'
 ```
 
 ### Field Promotion in Structured Logs
@@ -184,3 +240,10 @@ to a top-level field in the log entry.
 
 Note that including a `time` or `receive_time`field in your structured log **WILL NOT** override the respective time
 fields of the log entry.
+
+### Troubleshooting Common Issues
+
+- Ensure that quotes are properly escaped in your `.query` field.
+- Ensure that times are specified in UTC and follow the ISO 8601 format, i.e. `YYYY-MM-DDTHH:MM:SSZ`
+- Ensure that times are within the retention period of your logs.
+- Ensure that times are in the past, i.e. no future times.
