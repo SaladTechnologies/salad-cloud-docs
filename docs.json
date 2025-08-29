@@ -300,6 +300,7 @@
                   "container-engine/reference/recipes/overview",
                   "container-engine/reference/recipes/ai-toolkit",
                   "container-engine/reference/recipes/comfyui",
+                  "container-engine/reference/recipes/gpt-oss-120b-vllm",
                   "container-engine/reference/recipes/gromacs-kelpie",
                   "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
@@ -310,6 +311,7 @@
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
+                  "container-engine/reference/recipes/vllm-dc",
                   "container-engine/reference/recipes/yolo"
                 ]
               },
