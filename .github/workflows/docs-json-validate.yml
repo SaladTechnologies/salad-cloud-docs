@@ -1,0 +1,14 @@
+name: Validate Docs.json
+
+on:
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Docs.json
+        run: python3 .github/scripts/validate_docs_json.py

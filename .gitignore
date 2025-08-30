@@ -92,3 +92,5 @@ $RECYCLE.BIN/
 node_modules/
 
 .venv
+
+**/__pycache__/
