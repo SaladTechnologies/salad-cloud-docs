@@ -2,7 +2,7 @@
 title: 'Using Environment Variables'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: September 03, 2025_
 
 Environment variables are key-value pairs that can be used to configure and customize the behavior of server running
 inside a container. These variables are accessible to processes running within the container and are commonly used to
@@ -11,12 +11,19 @@ store configuration settings, credentials, and other runtime information.
 In SaladCloud Portal, you can set environment variables for your containers by providing a key-value pair. The "**key**"
 represents the name of the environment variable, and the "**value**" represents its associated data.
 
-> 📘 Default Environment Variables
->
-> Note that there are several environment variables that are always passed to, and accessible from, the container:
->
-> **SALAD_MACHINE_ID** is the ID of the machine the particular container instance is running on.
-> **SALAD_CONTAINER_GROUP_ID** is the ID of the entire container group.
+## Default Environment Variables
+
+Note that there are several environment variables that are set by Salad and always available to the container:
+
+- `HOSTNAME`: Defaults to the Instance ID, but can be overridden by the user.
+- `SALAD_ORGANIZATION_NAME`: The name of the organization the container is running under.
+- `SALAD_ORGANIZATION_ID`: The ID of the organization the container is running under.
+- `SALAD_PROJECT_NAME`: The name of the project the container is part of.
+- `SALAD_PROJECT_ID`: The ID of the project the container is part of.
+- `SALAD_CONTAINER_GROUP_NAME`: The name of the container group the container is part of.
+- `SALAD_CONTAINER_GROUP_ID`: The ID of the entire container group.
+- `SALAD_INSTANCE_ID`: The ID of the specific container instance. This is unique to each time a container is started.
+- `SALAD_MACHINE_ID`: The ID of the machine the particular container instance is running on.
 
 ## **Using Environment Variables in SaladCloud Portal**
 
@@ -36,7 +43,7 @@ Settings and click on the "Edit" button.
 <img src="/container-engine/images/portal-edit-environment-variables.png" />
 
 Enter the **key** and **value** for the environment variable you want to set and click the "Configure" button to confirm
-the environment variable. Example: **Key:** APP_VERSION and **Value:** v2.1.0
+the environment variable. Example: **Key:** HF_TOKEN and **Value:** sometokenvalue.
 
 <img src="/container-engine/images/portal-environment-variables-key-value-edit-2.png" />
 
