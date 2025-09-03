@@ -2,13 +2,15 @@
 title: 'Container Logs'
 ---
 
-_Last Updated: August 28, 2025_
+_Last Updated: September 3, 2025_
 
 ## How to Log From Your Container
 
 When running a container on SaladCloud, you can log to the standard output and standard error streams. These logs are
 collected and stored by SaladCloud, and exported to any configured
 [external logging source](/container-engine/explanation/infrastructure-platform/external-logging).
+
+[Learn more about logging best practices.](/container-engine/how-to-guides/external-logging/best-practices)
 
 ## Basic Logging
 
@@ -68,6 +70,7 @@ from any number of container groups and projects.
 
 This endpoint supports a more flexible query language as well, allowing you to make much more sophisticated filters
 across many fields, and supporting filters on structured logs emitted by your application.
+[See the full query reference](/container-engine/reference/log-queries).
 
 You can query logs by making a POST request to the query logs endpoint like this:
 
@@ -144,131 +147,3 @@ Each log event takes the following structure.
   entry.
 - Any of these fields can be used in the query language. Here are some examples of queries you can make. These queries
   can be passed as the `query` parameter in the body of the request to the API.
-
-### Resource Types And Labels
-
-You can query logs from three different resource types, indicated in the field `resource.type`:
-
-- `container`: Logs from a running container instance. This includes all logs emitted to stdout and stderr within the
-  container.
-- `instance_controller`: System events that occur on the instance level, such as container start and stop events, probes
-  passing and failing, etc.
-- `deployment_controller`: System events that occur on the container group level, such as adjusting replica count, and
-  starting and stopping container groups.
-
-All of these types have the following labels:
-
-- `project_name`: The name of your project in SaladCloud.
-- `container_group_name`: The name of your container group in SaladCloud.
-
-The `container` and `instance_controller` types have the following additional labels:
-
-- `container_group_version`: The version of your container group when the log was emitted.
-- `instance_id`: A unique ID for a specific instantiation of a container instance. This is independent from
-  `machine_id`, because a single machine ID can have multiple instance IDs associated with it, if a container has
-  recreated or restarted a number of times on the same machine. In such a situation, each "run" has its own
-  `instance_id`.
-- `machine_id`: The unique ID of the node running the container that created the log message.
-
-### Find Logs From All Containers in a Specific Container Group
-
-```plaintext
-resource.type = "container" and
-resource.labels.project_name = "default" and
-resource.labels.container_group_name = "my-cg"
-```
-
-```shell
-curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
-  --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $salad_api_key" \
-  --data '{
-  "sort_order": "desc",
-  "end_time": "2025-08-28T05:54:42Z",
-  "start_time": "2025-08-28T01:44:42Z",
-  "page_size": 20,
-  "query": "resource.type = \"container\" and resource.labels.project_name = \"default\" and resource.labels.container_group_name = \"my-cg\""
-}'
-```
-
-### Search Logs By severity
-
-```plaintext
-severity >= "warning"
-```
-
-```shell
-curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
-  --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $salad_api_key" \
-  --data '{
-  "sort_order": "desc",
-  "end_time": "2025-08-28T05:54:42Z",
-  "start_time": "2025-08-28T01:44:42Z",
-  "page_size": 20,
-  "query": "severity >= \"warning\""
-}'
-```
-
-### Search Text in Unstructured Logs
-
-```plaintext
-text_log contains "rejected"
-```
-
-```shell
-curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
-  --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $salad_api_key" \
-  --data '{
-  "sort_order": "desc",
-  "end_time": "2025-08-28T05:54:42Z",
-  "start_time": "2025-08-28T01:44:42Z",
-  "page_size": 20,
-  "query": "text_log contains \"rejected\""
-}'
-```
-
-### Search Custom Fields in Structured Logs
-
-```plaintext
-json_log.custom_field = "value"
-```
-
-```shell
-curl --request POST \
-  --url https://api.salad.com/api/public/organizations/$organization_name/log-entries \
-  --header 'Content-Type: application/json' \
-  --header "Salad-Api-Key: $salad_api_key" \
-  --data '{
-  "sort_order": "desc",
-  "end_time": "2025-08-28T05:54:42Z",
-  "start_time": "2025-08-28T01:44:42Z",
-  "page_size": 20,
-  "query": "json_log.custom_field = \"value\""
-}'
-```
-
-### Field Promotion in Structured Logs
-
-If you emit structured logs with any of the following fields, it will be removed from the `json_log` field and promoted
-to a top-level field in the log entry.
-
-- `severity`
-- `severity_number`
-- `trace_id`
-- `span_id`
-- `parent_span_id`
-
-Note that including a `time` or `receive_time`field in your structured log **WILL NOT** override the respective time
-fields of the log entry.
-
-### Troubleshooting Common Issues
-
-- Ensure that quotes are properly escaped in your `.query` field.
-- Ensure that times are specified in UTC and follow the ISO 8601 format, i.e. `YYYY-MM-DDTHH:MM:SSZ`
-- Ensure that times are within the retention period of your logs.
-- Ensure that times are in the past, i.e. no future times.

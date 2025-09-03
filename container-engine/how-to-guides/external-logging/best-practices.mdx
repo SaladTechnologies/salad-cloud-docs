@@ -1,0 +1,112 @@
+---
+title: Logging Best Practices
+description: Get the most out of SaladCloud's logging tools and integrations
+---
+
+## How to Log From Your Container
+
+When running a container on SaladCloud, you can log to the standard output and standard error streams. These logs are
+collected and stored by SaladCloud, and exported to any configured
+[external logging source](/container-engine/explanation/infrastructure-platform/external-logging).
+
+## General Best Practices
+
+- **Use Structured Logging**: Whenever possible, use structured logging (JSON format) instead of unstructured logging
+  (plain text). This makes it easier to query and analyze your logs. This is supported by all major logging frameworks.
+- **Include Contextual Information**: Include relevant metadata in your logs, such as user IDs, request IDs, and
+  timestamps. This information can be invaluable for troubleshooting issues.
+- **Log at the Appropriate Level**: Use the appropriate log level (e.g., DEBUG, INFO, WARN, ERROR) for each log message.
+  This helps to filter and prioritize logs during analysis.
+- **Avoid Logging Sensitive Information**: Be mindful of the data you log. Avoid logging sensitive information, such as
+  passwords or personal data, to protect user privacy and comply with regulations.
+
+## Querying Logs
+
+- **Familiarize Yourself with the Query Language**: Take the time to
+  [learn the query language](/container-engine/reference/log-queries) used for searching logs. Understanding the syntax
+  and available operators will help you craft effective queries.
+- **Use Filters Wisely**: Use filters to narrow down your search results. This can include filtering by time range, log
+  level, or specific metadata fields.
+
+## Integrating with External Logging Tools
+
+- **Choose the Right Tool**: When integrating with external logging tools, choose a tool that fits your needs in terms
+  of features, scalability, and cost.
+- **Use Webhooks for Real-Time Logging**: If your external logging tool supports webhooks, consider using them for
+  real-time log forwarding.
+- **Monitor Your Logging Integration**: Keep an eye on your logging integration to ensure logs are being forwarded
+  correctly and to identify any potential issues.
+
+## Logging Libraries
+
+When implementing logging in your applications, consider using established logging libraries that support structured
+logging and can easily integrate with SaladCloud's logging infrastructure. Some popular logging libraries include:
+
+- [Winston](https://github.com/winstonjs/winston) (Node.js): A versatile logging library for Node.js applications that
+  supports multiple transports and structured logging.
+- [structlog](https://www.structlog.org/en/stable/) (Python): A structured logging library for Python that makes it easy
+  to log contextual information.
+
+These libraries can help you implement best practices for logging and make it easier to integrate with external logging
+tools.
+
+When using these libraries with SaladCloud, configure them to use the field `severity` to indicate log level, rather
+than `level`. This will cause the field to get indexed more efficiently by Salad's logging backend.
+
+### `winston` Examples
+
+```javascript
+const { createLogger, format, transports } = require('winston')
+
+const jsonFormat = format.combine(
+  format((info) => {
+    // Assign the 'level' value to a new 'severity' property
+    info.severity = info.level
+    // Delete the original 'level' property
+    delete info.level
+    return info
+  })(),
+  format.json(),
+)
+
+const logger = createLogger({
+  level: 'info',
+  format: jsonFormat,
+  transports: [new transports.Console()],
+})
+
+logger.info('Hello, world!')
+// {"message":"Hello, world!","severity":"info"}
+
+logger.error('Something went wrong!')
+// {"message":"Something went wrong!","severity":"error"}
+
+logger.warn('This is a warning!', { additional: 'metadata' })
+// {"additional":"metadata","message":"This is a warning!","severity":"warn"}
+```
+
+### `structlog` Examples
+
+```python
+import structlog
+
+
+def rename_level_to_severity(logger, name, event_dict):
+    if "level" in event_dict:
+        event_dict["severity"] = event_dict.pop("level")
+    return event_dict
+
+structlog.configure(
+    processors=[structlog.stdlib.add_log_level, rename_level_to_severity, structlog.processors.JSONRenderer()]
+)
+logger = structlog.get_logger()
+
+logger.info("Hello, world!")
+# {"event": "Hello, world!", "severity": "info"}
+
+logger.error("Something went wrong!")
+# {"event": "Something went wrong!", "severity": "error"}
+
+logger.warn("This is a warning!", additional="metadata")
+# {"additional": "metadata", "event": "This is a warning!", "severity": "warning"}
+```
