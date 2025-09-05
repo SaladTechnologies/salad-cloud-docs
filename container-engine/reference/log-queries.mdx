@@ -20,7 +20,7 @@ field operator value
 ```
 
 - `field`: The log field to query (e.g., `time`, `resource.labels.container_group_name`, `json_log.custom_field`).
-- `operator`: The comparison operator to use (e.g., `=`, `!=`, `>`, `<`, `LIKE`).
+- `operator`: The comparison operator to use (e.g., `=`, `!=`, `>`, `<`, `contains`).
 - `value`: The value to compare against (e.g., a string, number, or date).
 
 For example, the following query retrieves all logs with a severity of "error":
