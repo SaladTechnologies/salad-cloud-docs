@@ -247,6 +247,7 @@
               {
                 "group": "Monitoring & Logging",
                 "pages": [
+                  "container-engine/how-to-guides/external-logging/best-practices",
                   "container-engine/how-to-guides/external-logging/axiom",
                   "container-engine/how-to-guides/external-logging/datadog",
                   "container-engine/how-to-guides/external-logging/http",
@@ -319,6 +320,7 @@
                 "group": "Autoscaling",
                 "pages": ["container-engine/reference/autoscaling/settings"]
               },
+              "container-engine/reference/log-queries",
               "container-engine/reference/quotas"
             ]
           }
