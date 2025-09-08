@@ -96,3 +96,11 @@ A few unique failures can occur when pulling an image from a registry
   image.
 
 If issues persist, **[please contact support here.](mailto:cloud@salad.com)**
+
+# Caching of Container Images
+
+Encrypting and caching image layers on compatible nodes allows us to start your container images much faster in the event the workload fails over to a new node or you make small updates to your container image. By caching image layers across our network, startup and failover times are significantly decreased for workloads using those image layers. Without image layer caching, any time a new node needs to start your container image, the new node would need to download the entire image.
+
+All image layers from public repositories are automatically cached across the network for up to 30 days. Image layers from private repositories are optionally cached for up to 30 days. Image layers from private repositories may be cached for up to 5 minutes to allow for restarts after brief interruptions. Note that all container images across the SaladCloud network are encrypted (AES-256) from when they are pulled up until the image is ready to be started on the node.
+
+
