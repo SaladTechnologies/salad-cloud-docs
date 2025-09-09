@@ -1,0 +1,212 @@
+---
+title: 'Run Blender on SaladCloud – Data Organization and Migration'
+sidebarTitle: 'Blender Input'
+description: 'Create a high-throughput, reliable, and cost-effective rendering workflow on SaladCloud.'
+---
+
+_Last Updated: Sep 10, 2025_
+
+For performance and cost benchmarks of running Blender on SaladCloud, please refer to this
+[blog post](https://blog.salad.com/blender-rendering-benchmark/).
+
+To run Blender efficiently on SaladCloud, several factors must be considered, including input data organization and
+migration, chunked execution, checkpoint management, job queue integration, and Flamenco cluster setup. This guide
+focuses specifically on input data organization and migration.
+
+## Solution Overview
+
+Blender render jobs are GPU-intensive workloads that can take anywhere from a few minutes to several days, depending on
+scene complexity, resolution, number of samples, and total frame count. Each job requires the main .blend file along
+with associated assets—such as images, audio, and linked .blend files—whose total size can range from hundreds of
+megabytes up to several gigabytes or more. Some assets may be shared across multiple .blend files. The output, including
+rendered frames and optionally final video files, is typically much smaller than the input data.
+
+<img src="/container-engine/images/blender_input1.png" />
+
+To run Blender on SaladCloud, you first need to migrate input data from your local environment, such as a NAS, to cloud
+storage (e.g., Cloudflare R2). Then, the job client can submit jobs that reference the data in cloud storage to a job
+queue—such as [AWS SQS](/container-engine/how-to-guides/job-processing/sqs),
+[GCP Pub/Sub](/container-engine/how-to-guides/job-processing/gcp-pub-sub), or
+[Salad Kelpie](/container-engine/how-to-guides/job-processing/kelpie)—which are consumed by the GPU rendering pool on
+SaladCloud. The final rendered artifacts are written to cloud storage, where they can be retrieved by the job client.
+
+For rendering jobs on SaladCloud that run longer than 30 minutes, we recommend implementing
+[checkpoint management](/container-engine/explanation/job-processing/long-running-tasks#save-running-state):
+
+- **Chunked execution**: Start fresh when pulling a new job, and split a large job into smaller subtasks—for example,
+  rendering a few frames at a time.
+- **Checkpoint management**: Regularly save and upload the job’s progress and intermediate artifacts to cloud storage
+  during execution.
+- **Resume capability**: Download and resume from the previously saved state to continue unfinished tasks after node
+  reallocation.
+
+To access data in cloud storage, the job client can [Rclone](https://rclone.org/), which operates over cloud APIs/SDKs
+to simplify data management. With [Rclone Mount](https://rclone.org/commands/rclone_mount/), you can also expose cloud
+storage as a local filesystem, enabling applications to interact with cloud data through standard filesystem APIs.
+
+However, applications running on SaladCloud can currently access cloud storage only via cloud APIs/SDKs; object storage
+mounts are not supported. You can either use Rclone to handle data transfer or build your application directly on top of
+the cloud APIs/SDKs.
+
+**Input data for Blender render jobs can be organized in several ways, depending on the specific use case:**
+
+- **Option 1**: Make the main .blend file fully self-contained by packing all external resources (File → External Data →
+  Pack Resources), converting linked data to local, and baking or converting simulations so that all data is stored
+  within the file. This ensures the .blend file is fully portable and can be processed on any Salad node without missing
+  assets. The main drawback is that shared data may be duplicated across multiple jobs, increasing the total amount of
+  data uploaded to the cloud.
+
+- **Option 2**: Compress the entire project folder—including all .blend files and assets—into a ZIP file and upload it
+  to cloud storage, where it will be downloaded and processed by Salad nodes. However, very large ZIP files (tens of
+  gigabytes) may reduce efficiency and slow processing on SaladCloud.
+
+```bash
+# 3 Example Projects on the job client
+ubuntu@wsl-thinkpad:~$ ls -ls
+    4 drwxr-xr-x 4 ubuntu ubuntu     4096 Sep  2 15:57 classroom
+    4 drwxr-xr-x 2 ubuntu ubuntu     4096 Sep  3 10:05 junkshop
+    4 drwxr-xr-x 2 ubuntu ubuntu     4096 Sep  3 10:05 monster
+
+# The "classroom" project folder contains the main .blend file and all associated assets
+ubuntu@wsl-thinkpad:~$ tree classroom/ -L 1
+classroom/
+├── assets
+├── background.png
+├── main.blend      # The main .blend file
+└── textures
+
+# Compress the "classroom" project folder into a tar.gz file
+ubuntu@wsl-thinkpad:~$ tar -czvf classroom.tar.gz classroom
+
+# Upload the tar.gz file from the job client to cloud storage, which can be downloaded and processed by Salad nodes
+ubuntu@wsl-thinkpad:~$ ls -ls
+70440 -rw-r--r-- 1 ubuntu ubuntu 72127136 Sep  8 11:08 classroom.tar.gz
+
+# Uncompress the tar.gz file to retrieve the original project folder on Salad nodes
+ubuntu@wsl-thinkpad:~$ tar -xzvf classroom.tar.gz
+```
+
+- **Option 3**: The main .blend file contains references to external dependencies. By parsing the main .blend file and
+  any linked .blend files, we can identify all required dependencies and selectively use them to construct a complete
+  job folder to run Blender. This method allows data to be migrated from the NAS to cloud storage without re-packaging
+  or compression. Once stored in the cloud, assets can be shared across multiple jobs, with each Salad node downloading
+  only the files needed for its specific job. The following sections of this guide focus on this approach.
+
+## Migrating Data to Cloud Storage
+
+Follow [this link](https://rclone.org/install/) to install Rclone on the job client, then use
+[the provided code](https://github.com/SaladTechnologies/mds/blob/main/high-performance-storage/config.py#L30) to
+configure Rclone with Cloudflare R2. Once configured, you can run Rclone commands to inspect and transfer data between
+your local system and the cloud.
+
+```bash
+# List the contents of specific folder (prefix) in the cloud
+rclone lsf r2:BUCKET_NAME/PREFIX_NAME
+
+# Both commands are to copy the local test.txt to the specified folder (prefix) in the cloud
+rclone copy test.txt r2:BUCKET_NAME/PREFIX_NAME
+rclone copy test.txt r2:BUCKET_NAME/PREFIX_NAME/test.txt
+```
+
+Rclone commands can be used for the initial bulk transfer from your local environment to the cloud. The following
+command synchronizes a local folder (NFS_MOUNTED_FOLDER) to a folder (prefix) in a cloud bucket, efficiently handling
+symlinks, parallel uploads, large files, and progress tracking, while staying within API rate limits:
+
+```bash
+# Assume the NFS_MOUNTED_FOLDER contains 3 subfolders: classroom, junkshop and monster
+rclone sync NFS_MOUNTED_FOLDER r2:BUCKET_NAME/PREFIX_NAME \
+    --copy-links \
+    --transfers=16 \
+    --checkers=32 \
+    --fast-list \
+    --drive-chunk-size 64M \
+    --tpslimit 10 \
+    --progress
+```
+
+Before migrating data, ensure the following best practices are met in the NFS_MOUNTED_FOLDER:
+
+- Dependencies are stored using relative paths.
+- The .blend files may link to other .blend files to reuse assets, and multiple .blend files can share the same
+  dependencies; however, no reference files should be located outside the folder containing the main .blend files.
+
+After the initial bulk data migration, you can mount the cloud storage using Rclone Mount on the job client and access
+the data through standard filesystem APIs to perform incremental updates or retrieve rendered results. Here is an
+example:
+
+```bash
+rclone mount r2:BUCKET_NAME ./LOCAL_FOLDER \
+  --vfs-cache-mode full \
+  --vfs-cache-max-age 24h
+  --vfs-cache-max-size 10G \
+  --buffer-size 128M \
+  --dir-cache-time 1h \
+  --attr-timeout 1m \
+  --vfs-read-chunk-size 128M \
+  --vfs-read-chunk-size-limit 1G \
+  --vfs-links \
+  --allow-other \
+  -v
+```
+
+With these settings, directory listings are cached for 1 hour. If new files are added to the bucket (e.g., by Salad
+nodes) during that period, they may not appear in the mount immediately until the caches expire. Cached file reads and
+writes are stored in ~/.cache/rclone/vfs and retained for 24 hours before being automatically deleted. While cached,
+rclone may serve these files instead of fetching the latest version from the remote, so stale data could be used until
+the cache expires.
+
+After mounting, you can use standard filesystem commands to interact with the cloud data on the job client, as if it
+were local:
+
+```bash
+# The first list is slow as it fetches data from the cloud, subsequent lists are fast as data is cached locally
+ubuntu@wsl-thinkpad:~$ cd ./LOCAL_FOLDER/PREFIX_NAME
+ubuntu@wsl-thinkpad:~/LOCAL_FOLDER/PREFIX_NAME$ ls
+classroom  junkshop  monster
+ubuntu@wsl-thinkpad:~/LOCAL_FOLDER/PREFIX_NAME$ cd classroom
+ubuntu@wsl-thinkpad:~/LOCAL_FOLDER/PREFIX_NAME/classroom$ tree -L 1
+.
+├── assets
+├── background.png
+├── main.blend
+└── textures
+```
+
+You can also use Rclone commands to access the cloud data directly:
+
+```bash
+rclone lsf r2:BUCKET_NAME/PREFIX_NAME/classroom
+rclone lsf r2:BUCKET_NAME/PREFIX_NAME/classroom/main.blend
+```
+
+## Generating Job Folders on SaladCloud
+
+Since applications on SaladCloud access storage through cloud APIs/SDKs, the job should specify the path to the main
+.blend file in cloud storage. For example, if the job is to render the Classroom scene, the main .blend file is:
+
+```bash
+r2:BUCKET_NAME/PREFIX_NAME/classroom/main.blend
+```
+
+When the job is received, the Salad node downloads the main .blend file from cloud storage using cloud APIs/SDKs. It
+then parses this file, along with any linked .blend files (which are also downloaded), to identify all required
+dependencies and their relative paths to the main file (r2:BUCKET_NAME/PREFIX_NAME/classroom). Finally, it can fetch all
+additional assets (e.g., images, audio) concurrently to assemble a complete job folder (local_classroom) to run Blender.
+
+```bash
+blender -b local_classroom/main.blend -o output/classroom/frame*##### -F PNG -f 1 -- --cycles-device CUDA
+```
+
+Please refer to [the code](https://github.com/SaladTechnologies/rendering/blob/main/basic/generate_job_folder.py) for a
+sample implementation of job folder generation, as well as
+[the example of a generated job folder](https://github.com/SaladTechnologies/rendering/blob/main/basic/generated_job_folder.txt)
+
+For production workloads, you can further separate GPU rendering tasks from I/O tasks by using multiple processes and
+threads, allowing more efficient use of CPU, I/O and GPU resources on Salad nodes. For more details, please refer to
+[this link](https://github.com/SaladTechnologies/mds/tree/main/inference-server#use-a-job-queue).
+
+When SaladCloud supports mounting object storage, the job folder generation step can be skipped, as Blender can load
+dependencies directly from the mounted cloud storage at runtime. However, this approach may increase latency and reduce
+performance, since accessing remote storage is generally slower than local disk access. **Therefore, the above approach
+is still recommended, as it separates I/O from GPU rendering tasks and allows applications to manage inputs and outputs
+more efficiently.**
