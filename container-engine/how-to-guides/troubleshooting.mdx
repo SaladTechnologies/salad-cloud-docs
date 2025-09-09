@@ -4,63 +4,84 @@ sidebarTitle: Troubleshooting
 description: Troubleshooting common issues with Salad Container Engine workloads.
 ---
 
-_Last Updated: May 14, 2025_
+_Last Updated: September 9, 2025_
 
 The following guide addresses common issues encountered when running container workloads on Salad. These solutions will
 help resolve frequent problems with downloads, container failures, networking, and access. If issues persist after
 applying these fixes, please consult our documentation or contact support.
 
-### Downloading Times
+## My Container Group Can't Pull My Image
 
-Salad nodes often run on residential internet connections, so downloads may take longer than expected. If download times
-takes longer then expected try:
+If your container group is unable to pull your container image, try the following steps:
 
-- Checking the logs to confirm the container isn’t failing repeatedly.
-- Reducing your container image size to speed things up.
+- Verify the image url is correct. Check for typos in the image name and registry.
+- If using a private registry, ensure that the credentials provided are valid and have the necessary permissions,
+  including inspecting the manifest and downloading all of the layers. Ensure there are no leading or training
+  whitespace characters in your credentials.
+- If using a private registry, ensure your account level supports an adequate rate limit for the number of container
+  groups you are deploying. This is especially important if you are using Docker Hub, and deploying many single-replica
+  container groups.
+- Ensure the image is in Docker/OCI format and built for AMD64 architecture. Salad does not support ARM64 images.
+- Ensure the image size is \<= 35GB (compressed). Larger images will fail to pull.
+- If using a custom registry, ensure that the registry is publicly accessible from the internet.
 
-_Note that the progress bar is a conservative estimate—actual download time may vary._
+## My Container Group Loops Between Downloading and Allocating
 
-### Repeated Start Failures
+If you see your container group repeatedly transitioning between "Downloading" and "Allocating", this almost always
+indicates that the container is failing immediately when it starts. In this case, Salad will attempt to restart the
+container on the same machine to minimize downtime, but after repeated failures will reallocate the workload to a
+different node. To confirm this is what is happening, you can check the System Events tab in the portal, which will show
+things like when an instance started downloading, and exit codes.
 
-If your container repeatedly fails on startup:
+![System Events Tab](/container-engine/images/system-events-constant-restarting.png)
 
-- Some base images (like ubuntu) exit immediately after setup—add a sleep command to keep them running.
-- Ensure your image is built for AMD64 (not ARM64) and properly configured for GPU workloads.
-- Test the container locally first to rule out configuration issues.
+- If you see repeated exit codes of `0`, this usually indicates that the container is exiting immediately after startup.
+  Some base images (like `ubuntu`) will do this by default. To keep them running, you can add a command like
+  `sleep infinity` to your container configuration. **Containers, unlike VMs, require a long-running process to stay
+  alive.**
+- If you see exit codes like `137`, this usually indicates that the container is running out of memory. Try increasing
+  the memory allocation for your container group.
+- If you see other exit codes, these are usually application-specific. Check your application logs to determine the
+  cause of the failure.
+  - If your application is exiting non-0 with no logs being captured, this usually indicates that the application is
+    failing before it can write to stdout or stderr. To diagnose, try running the container locally to see if it fails
+    immediately, and if so, why. If it works locally, but not on SaladCloud, try changing the `command` field in your
+    container group configuration to `sleep infinity`, which will keep the container up. While it is up, you can use the
+    web terminal to try manually running the application command to see why it is failing.
 
-### Container Exits Unexpectedly
+## My Container Group Is Stuck Downloading / Stuck at Downloading 99%
 
-Salad may restart failed containers on the same machine to minimize downtime.
+If a node has been in the "Downloading" state for a long time (more than 2 minutes per GB of image size), you may have
+landed on a node with below-average network performance. This can happen because Salad nodes often run on residential
+internet connections, where other household devices may share the bandwidth. Many of these nodes will eventually become
+healthy, but if high network performance is essential to your application, try reallocating the node. It will be placed
+on a different machine, with different network conditions.
 
-Check the exit code in system events for debugging:
+_Note that the progress bar is a conservative estimate — actual download time may vary._
 
-- Exit code 137 usually means the container ran out of RAM—try increasing allocation.
-- Most exit codes are application-specific, not SaladCloud issues.
+## My Container Group Is Running But I Get 503 Errors With The Container Gateway
 
-### 503 Errors \- Container Gateway Issues
+- Ensure your container is listening on the correct port. The port you specify in the Salad configuration must match the
+  port your application is listening on inside the container.
+- Ensure your container supports [IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6#enabling-ipv6). Salad
+  Gateway uses IPv6 to route traffic to your container. Enabling IPv6 is typically as easy as setting your host to `::`
+  instead of `0.0.0.0`.
+- Ensure your [readiness probe](/container-engine/explanation/infrastructure-platform/readiness-probes) does not pass
+  until the server is able to accept traffic. If the readiness probe passes before the server is ready, Salad Gateway
+  will route traffic to the container, but the container may not be able to handle it yet, resulting in 503 errors.
+- Ensure at least one node is running and "ready" in the Salad portal. If all nodes are down, or not ready, the gateway
+  will return 503 errors.
 
-If you see 503 errors when accessing your workload:
+## My Container Group Is Running But I Get 403 Errors With The Container Gateway
 
-- Ensure your container supports [IPv6](https://docs.salad.com/products/sce/gateway/enabling-ipv6#enabling-ipv6).
-- Double-check that the correct port is exposed.
-- If IPv6 is configured, the server may still be starting—set up a readiness probe to delay traffic until ready.
+- If your container group has Authentication enabled, ensure that your Salad API Key is valid, and included in the
+  `Salad-Api-Key` header of your requests.
+- If your container group does not have Authentication enabled but you are getting 403 errors, this issue can occur in
+  rare cases due to an internal delay creating the necessary route tables. This usually resolves itself within a few
+  minutes. If it does not, please contact support. In this scenario, duplicating the container group will almost always
+  resolve the issue, but please contact support anyway, so we can track the issue and continue to improve.
 
-### Unable to Access Salad Terminal
+## My Container Group Is Running But I Can't Access It With The Web Terminal
 
-The Salad terminal is in beta and may sometimes fail to connect. If this occurs try:
-
-- Refreshing the page or trying a different instance.
-- Keep in mind that nodes are spot instances and can disconnect unexpectedly.
-- For more reliable access, consider using
-  [Tailscale](https://docs.salad.com/guides/tailscale-integration/basic#add-tailscale-support-into-saladcloud-workloads)
-  or similar tools.
-
-### Container Pull Failures
-
-If Salad can’t pull your container image:
-
-- Verify the image source is correct.
-- Verify the image name and registry are correct.
-- Check that credentials (for private images) are valid.
-- Ensure the image is in Docker/OCI format and built for AMD64.
-- Ensure the image is \<= 35GB in size (compressed).
+- Wait a few seconds after the terminal page loads, as it sometimes takes a moment to establish a connection.
+- Refresh the page if it does not connect after a few seconds.
