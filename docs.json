@@ -167,6 +167,7 @@
               {
                 "group": "Performance",
                 "pages": [
+                  "container-engine/tutorials/performance/service-performance",
                   "container-engine/tutorials/performance/performance-monitoring",
                   "container-engine/tutorials/performance/high-performance-apps",
                   "container-engine/tutorials/performance/high-performance-storage-solutions"
