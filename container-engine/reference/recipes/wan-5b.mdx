@@ -1,0 +1,273 @@
+---
+title: Wan 2.2 TI2V-5B (Kelpie) Recipe
+sidebarTitle: Wan 2.2 TI2V-5B (Kelpie)
+description: Generate short videos from text or image using Wan 2.2 TI2V-5B with Kelpie.
+---
+
+_Last Updated: September 15, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+[**Wan 2.2 TI2V-5B**](https://github.com/Wan-Video/Wan2.2) is a text-to-video / image-to-video model that can produce
+cinematic **720p** clips from a single prompt, or from a prompt plus a reference image.
+[Model](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B) is open sources and can be found on Huggingface.
+
+Running **Wan 2.2 TI2V-5B** on SaladCloud is one of the most efficient and cost-effective ways to generate videos with
+open-source models today. Check our [Benchmark](https://blog.salad.com/benchmarking-wan2-2/) for full performance and
+cost details.
+
+This recipe runs Wan as a [Kelpie worker](https://github.com/SaladTechnologies/kelpie). You send jobs to the Kelpie
+queue; the worker pulls jobs, runs inference, and uploads results to S3-compatible storage of your choice. Image
+references can also be preloaded to s3 storage and synced with the worker.
+
+Kelpie provides a [simple API](https://kelpie.saladexamples.com/docs) for long-running jobs and data sync (download
+inputs before, upload outputs after). It also supports **autoscaling by queue depth** including scale-to-zero when idle.
+
+## Which Recipe Should I Use? (Consumer vs. DataCenter)
+
+We have 2 recipes for running Wan 2.2 TI2V-5B on SaladCloud: Wan 2.2 TI2V-5B using Kelpie and Wan 2.2 TI2V-5B using
+Kelpie (DataCenter).
+
+Both recipes use **Kelpie** (batch jobs + S3 sync) to run **Wan 2.2 TI2V-5B** asynchronously. The main difference is how
+many workers run per node and how you scale parallelism.
+
+### Consumer Recipe (single-GPU nodes)
+
+- **1 worker per node** (one inference process per machine).
+- Targets **consumer GPUs** (≈24 GB+ VRAM), e.g. **RTX 4090 / 5090**.
+- Scaling: each node runs a single inference worker, so your maximum concurrency is exactly the number of nodes you have
+  running (e.g., 10 nodes → 10 parallel jobs).
+
+### DataCenter Recipe (multi-GPU nodes)
+
+- Runs on **DataCenter nodes** that ship with **8 GPUs per node** (default **L40S**).
+- The container launches **8 Kelpie workers per node** (one per GPU) → 8 Wan processes in parallel on a single node.
+- Scaling: each node runs 8 inference worker, so you scale by 8 workers. Deploy 1 DC node → 8 concurrent inferences.
+  Need 32 concurrent? Scale to 4 nodes (4 × 8 = 32).
+
+<Callout variation="info">
+  Both variants use the same job format (Kelpie API) and the same storage pattern (S3-compatible bucket). Choose
+  Consumer for flexible, fine-grained scaling; or choose DataCenter for higher throughput per node and better economics
+  on long video jobs. Check our [Benchmark](https://blog.salad.com/benchmarking-wan2-2/) to make your decision.
+</Callout>
+
+## Prerequisites. Prepare Your Storage and Data
+
+- **S3-compatible storage** (Cloudflare R2 or AWS S3) for outputs and (optionally) reference images. You’ll provide your
+  **Access Key ID**, **Secret Access Key**, **Storage Region** and **Endpoint URL** (R2).
+
+### Choose and create your S3-compatible bucket
+
+Store:
+
+- **Outputs** (MP4s)
+- **Optional inputs** (reference images)
+
+Popular options:
+
+- **AWS S3:** [Get started with Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html)
+- **Cloudflare R2:** [Get started with R2](https://developers.cloudflare.com/r2/get-started/)
+
+See also the Kelpie storage guide:
+[Cloud storage setup](https://docs.salad.com/container-engine/how-to-guides/job-processing/kelpie#cloud-storage%3A-r2).
+
+### Plan your folder layout (prefixes)
+
+We recommend **job-scoped prefixes** so multiple jobs never collide:
+
+```text
+s3://<bucket>/
+├─ assets/<job_id>/    # OPTIONAL: reference images for the job
+└─ outputs/<job_id>/   # MP4s created by the worker
+```
+
+### Paths used by the worker
+
+- **`/opt/outputs`** — final videos (`.mp4`) are written here
+- **`/opt/assets`** — optional reference image is placed here
+
+> Your Kelpie job **must** include a `sync.after` rule that uploads **`/opt/outputs/`** to your bucket. If you provide a
+> reference image, also include a `sync.before` rule to download it into **`/opt/assets/`**.
+
+## Getting Your Container Group ID
+
+```bash
+curl -X GET \
+  --url "https://api.salad.com/api/public/organizations/<organization_name>/projects/<project_name>/containers/<container_group_name>" \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <api-key>'
+```
+
+This returns a JSON object for the container group; copy the value of its .id field for job submissions.
+
+## Parameters you can send (Kelpie job `arguments`)
+
+Pass these flags directly to the worker script.
+
+- `--prompt` (string, **required**) — scene description
+- `--size` (string, default **`1280*704`**) — output resolution
+- `--frame-num` (int, default **`121`**) — total frames (~24 fps ⇒ ~5 s)
+- `--sample-steps` (int, default **`50`**) — higher = better quality, slower
+- `--base-seed` (int, optional) — reproducibility
+- `--sample-solver` (`unipc` or `dpm++`, optional) — sampler choice
+- `--sample-shift` (float, optional) — advanced tweak
+- `--sample-guide-scale` (float, optional) — CFG strength
+- `--output-filename` (string, optional) — base name; worker appends `.mp4` (defaults to job id)
+- **Image input (optional; choose one):**
+  - `--image-b64` — raw base64 or `data:image/...;base64,` URI (highest priority)
+  - `--image-url` — public HTTPS URL
+  - `--image-path` — file already present in `/opt/assets/`
+- `--extra-args-json` (JSON) — pass-through for additional `generate.py` flags
+- `--id` (string, optional) — job id for logs/filenames (defaults to a UUID)
+
+> The worker fixes `--task ti2v-5B`, always enables `--offload_model` and `--t5_cpu`, and writes to
+> `/opt/outputs/<output-filename or job-id>.mp4`.
+
+---
+
+## Submit a Job to Kelpie (Text → Video)
+
+Before running the command below, make sure you got all you need from the previous steps:
+
+- The **container group ID**. Check how to pull it in a step above.
+- An **S3-compatible bucket** and credentials set on the container (Access Key ID, Secret Access Key, and Endpoint URL
+  or Region).
+- Your **Salad API headers** ready: `SALAD_API_KEY`, organization, and project.
+- Chosen **generation parameters**: at minimum a `--prompt`; optionally adjust the rest.
+
+The request enqueues a text-video job. After the job completes, Kelpie uploads the MP4 from `/opt/outputs/` to
+`s3://<bucket>/outputs/job-001/`.
+
+```bash
+export SALAD_API_KEY="<salad-api-key>"
+export SALAD_ORGANIZATION="<organization>"
+export SALAD_PROJECT="<project>"
+
+curl -s -X POST "https://kelpie.saladexamples.com/jobs" \
+  -H "Content-Type: application/json" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" \
+  -d @- <<'JSON'
+{
+  "container_group_id": "<container_group_id>",
+  "command": "python",
+  "arguments": [
+    "/opt/wan_worker.py",
+    "--id", "job-001",
+    "--prompt", "A moody cyberpunk street in the rain, neon reflections, shallow depth of field",
+    "--size", "1280*704",
+    "--frame-num", "121",
+    "--sample-steps", "50"
+  ],
+  "sync": {
+    "after": [
+      { "bucket": "<bucket>", "prefix": "outputs/job-001/", "local_path": "/opt/outputs/", "direction": "upload" }
+    ]
+  }
+}
+JSON
+```
+
+## Submit a Job to Kelpie (Image → Video)
+
+> First, upload your reference image to `s3://<bucket>/assets/job-002/input.jpg`.
+
+```bash
+curl -s -X POST "https://kelpie.saladexamples.com/jobs" \
+  -H "Content-Type: application/json" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" \
+  -d @- <<'JSON'
+{
+  "container_group_id": "<container_group_id>",
+  "command": "python",
+  "arguments": [
+    "/opt/wan_worker.py",
+    "--id", "job-002",
+    "--prompt", "Dreamy golden-hour dolly shot through wildflowers, shallow depth of field",
+    "--size", "1280*704",
+    "--frame-num", "121",
+    "--sample-steps", "50",
+    "--image-path", "/opt/assets/job-002/input.jpg"
+  ],
+  "sync": {
+    "before": [
+      { "bucket": "<bucket>", "prefix": "assets/job-002/", "local_path": "/opt/assets/", "direction": "download" }
+    ],
+    "after": [
+      { "bucket": "<bucket>", "prefix": "outputs/job-002/", "local_path": "/opt/outputs/", "direction": "upload" }
+    ]
+  }
+}
+JSON
+```
+
+### Alternative image inputs (no S3 download)
+
+- `--image-url "https://example.com/my-image.jpg"`
+- `--image-b64 "<base64...>"` (raw or `data:image/...;base64,` URI)
+
+## Monitor a Job
+
+Use the Kelpie API to check the status of a specific job. You can find job IDs in the response when you submit a job.:
+
+```bash
+curl -X GET \
+  --url "https://kelpie.saladexamples.com/jobs/<kelpie-job-id>" \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <salad-api-key>' \
+  --header 'Salad-Organization: <organization-name>' \
+  --header 'Salad-Project: <project-name>'
+```
+
+Replace `kelpie-job-id` and the header placeholders with your values. The response includes the job status, the last
+machine that worked on it, and recent heartbeat info. You can also extend your submission script to trigger a webhook
+when a job completes.
+
+## Autoscaling
+
+Kelpie has an optional autoscaling feature that automates adjusting replica count based on the number of queued jobs,
+including scale-to-zero when the queue is empty. This feature works through the Salad API, and requires adding the
+Kelpie user to your Salad Organization to grant the required API access. Currently that is me
+(shawn.rushefsky@salad.com).
+
+To enable autoscaling, you can submit a request to the Kelpie API to establish scaling rules for your container group.
+
+```bash
+curl -X POST \
+  --url https://kelpie.saladexamples.com/scaling-rules \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <salad-api-key>' \
+  --header 'Salad-Organization: <organization-name>' \
+  --header 'Salad-Project: <project-name>' \
+  --data '{
+    "min_replicas": 0,
+    "max_replicas": 10,
+    "container_group_id": "<container-group-id>"
+}'
+```
+
+Make sure to replace the placeholders with your Salad API key, organization name, project name, and the ID of the
+container group you created earlier. This will create a scaling rule that will scale the container group to a minimum of
+0 replicas and a maximum of 10 replicas. The scaling rules will be applied to all jobs submitted to the container group.
+
+The Kelpie scaling algorithm works as follows:
+
+- Every 5 minutes, all scaling rules are evaluated.
+- The number of replicas in a container group is set to equal the number of queued or running jobs, up to the maximum
+  number of replicas, and down to the minimum number of replicas.
+- If the desired number of replicas is 0, the container group will be stopped.
+- If the desired number of replicas is greater than 0 and the container group is not currently running, the container
+  group will be started.
+
+## Resources
+
+- [AI Toolkit](https://github.com/ostris/ai-toolkit)
+- [Kelpie API](https://kelpie.saladexamples.com/docs)
+- [Kelpie Worker Binary](https://github.com/SaladTechnologies/kelpie)
+- [Recipe Source Code](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/wan2.2-5b-kelpie)
+- [Recipe Source Code - DataCenter](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/wan2.2-5b-kelpie-dc)
