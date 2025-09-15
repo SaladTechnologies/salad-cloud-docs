@@ -1,0 +1,118 @@
+---
+title: vLLM on SaladCloud Community
+sidebarTitle: vLLM
+description: Run LLMs with vLLM on SaladCloud Community GPUs.
+---
+
+_Last Updated: September 15, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This guide covers deploying [**vLLM**](https://docs.vllm.ai/) on SaladCloud Community GPU's consumer GPUs (like
+RTX 4090) to serve Large Language Models efficiently.
+
+[vLLM](https://vllm.ai/) is a high-throughput, open-source inference engine for LLMs. It’s widely adopted in production
+because it provides:
+
+- **Continuous batching** for maximizing GPU utilization.
+- **PagedAttention** for optimized memory management.
+- **Streaming outputs** and
+  [**OpenAI-compatible**](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html).
+- **Quantization support** (FP8, AWQ, GPTQ) to reduce memory usage.
+
+On SaladCloud Community, deployments run on **single consumer GPUs** (default: RTX 4090, 24 GB VRAM). This setup is
+ideal for experimenting with models up to ~14B parameters or running lighter workloads at scale.
+
+## Example Models for SaladCloud Community
+
+You can deploy any Hugging Face model that [vLLM supports](https://docs.vllm.ai/en/latest/models/supported_models.html).
+Popular examples:
+
+- [Llama 3.1 8B Instruct](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct) — 8B parameter model tuned for
+  chat.
+- [Qwen2.5 7B Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) — General-purpose 7B parameter model.
+- [Mistral 7B Instruct v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3) — Compact model optimized for
+  efficiency.
+- [Gemma 2 9B](https://huggingface.co/google/gemma-2-9b) — Open model for reasoning and instruction following.
+- [DeepSeek R1 Distill Llama 8B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B) — Distilled 8B model
+
+<Callout variation="warning">
+  Models are not bundled with the container. They are downloaded at runtime, which can take several minutes depending on
+  size. For production, consider preloading models into the image.
+</Callout>
+
+## Configuration Options
+
+When deploying, you can set:
+
+- **`Model`** — Hugging Face model ID to load (required).
+- **`Hugging Face Token`** — Optional, required only for private or gated models.
+- **`Max Model Length`** — Model context length (default: 4096).
+
+Defaults are tuned for consumer GPUs like the RTX 4090. You can override them in _Advanced Configuration_.
+
+## Example Request
+
+Submit chat completion requests to the `/v1/chat/completions` endpoint:
+
+```bash
+curl https://<YOUR-GATEWAY-URL>/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <YOUR_API_KEY>' \
+  -d '{
+    "model": "vllm",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "List three colors."}
+    ],
+    "stream": false,
+    "max_tokens": 24
+  }'
+```
+
+## How To Use This Recipe
+
+### Authentication
+
+If authentication is enabled, requests must include your SaladCloud API key in the `Salad-Api-Key` header. See
+[Sending Requests](/container-engine/how-to-guides/gateway/sending-requests).
+
+### Replica Count
+
+We recommend at least **2 replicas** for development and **3–5 replicas** for production. Datacenter GPU nodes are still
+interruptable.
+
+### Logging
+
+Logs are available in the SaladCloud Portal. You can also connect an external logging provider such as
+[Axiom](https://axiom.co/).
+
+### Deploy & Wait
+
+When you deploy, SaladCloud will provision nodes, pull the container image, and download the model weights. Large models
+may take **5-10 minutes or more** to fully load. Once replicas show a green checkmark in the **Ready** column, the
+service is live.
+
+---
+
+### Advanced Settings
+
+All settings are pre-configured, but you can override them via environment variables for performance tuning:
+
+- **`DTYPE`** — Compute precision (`auto`, `float16`, `bfloat16`, `float32`).
+- **`MAX_NUM_BATCH_TOKENS`** — Max tokens processed per batch.
+- **`MAX_NUM_SEQS`** — Max concurrent sequences per batch.
+- **`GPU_MEM_UTIL`** — Fraction of GPU VRAM vLLM can use (default `0.92`).
+- **`QUANTIZATION`** — Quantization mode (`awq`, `gptq`, `fp8`, etc.).
+- **`KV_CACHE_DTYPE`** — Precision for the key/value cache (`auto`, `fp8`, `fp16`, `bf16`).
+- **`DOWNLOAD_DIR`** — Directory for caching downloaded models.
+- **`TOKENIZER`** — Custom tokenizer repo or path.
+- **`TRUST_REMOTE_CODE`** — Enable if the model requires custom code from Hugging Face.
+
+## Source Code
+
+The complete source code for this recipe is available in the
+[SaladCloud Recipes GitHub repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/vllm).
