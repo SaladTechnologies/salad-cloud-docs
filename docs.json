@@ -314,6 +314,7 @@
                   "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/vllm-dc",
+                  "container-engine/reference/recipes/wan-5b",
                   "container-engine/reference/recipes/yolo"
                 ]
               },
