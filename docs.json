@@ -313,6 +313,7 @@
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
+                  "container-engine/reference/recipes/vllm",
                   "container-engine/reference/recipes/vllm-dc",
                   "container-engine/reference/recipes/yolo"
                 ]
