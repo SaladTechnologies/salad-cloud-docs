@@ -1,10 +1,10 @@
 ---
-title: 'Service Performance Overview'
-sidebarTitle: 'Service Performance'
-description: 'To build high-performance applications on SaladCloud'
+title: 'Service Performance and Reliability Overview'
+sidebarTitle: 'Performance and Reliability'
+description: 'To develop high-performance, reliable applications on SaladCloud'
 ---
 
-_Last Updated: Sep 15, 2025_
+_Last Updated: Oct 2, 2025_
 
 SaladCloud consists of tens of thousands of globally distributed nodes, primarily high-performance desktop computers and
 servers running the SaladCloud agent. Each node is equipped with either consumer-grade or data center GPUs, along with
@@ -25,75 +25,127 @@ applications on SaladCloud.
 When a container group starts, its image is first pulled from your registry into SaladCloud’s internal caches in Europe
 and the US (only once), and then distributed to the allocated nodes.
 
-Startup times can range from a few minutes to longer, depending on image size and network conditions. Nodes closer to a
-cache or with higher throughput may come online sooner. Using smaller images to reduce transfer and decompression time,
-as well as deploying workloads in specific regions, can further improve startup speed.
+Startup times can range from a few minutes to longer, depending on image size and network conditions. Instances on nodes
+located closer to a cache or with higher throughput typically come online faster. You can further improve startup speed
+by using smaller images to reduce transfer and decompression time, and by deploying workloads in regions closer to the
+EU or US.
 
-The 2024 test results show a batch transcription pipeline running on `100 container instances with an 8.36 GB image` and
-across all consumer GPU types and regions. The test began at 22:00 and ran for 10 hours. The metric reflects the
-system’s actual processing capacity over time, measured as the number of videos downloaded and transcribed per second,
-with an average video duration of 3,515 seconds.
+Our 2025 test measured the startup times for 100 container instances at high-priority across all consumer GPU types and
+regions, using a 5.53 GB image. This metric tracks the number of instances that became operational since startup:
 
 <img src="/container-engine/images/sp1.png" />
 
-Key observations from this test include:
+Key observations are:
 
-- Nodes began coming online, processing requests, and reporting results within `10 minutes` of the test start.
-- `After 30 minutes`, the system reached `70~80%` of its maximum measured capacity, transcribing over 2.5 videos per
-  second.
-- The measured processing capacity fluctuated due to variations in video length and changes in the number of running
-  instances caused by nodes going offline and being reallocated.
+- Instances began coming online and reporting results within `3 minutes` of the test start.
+- `50% of instances` came online by `10 minutes`, `80%` by `20 minutes` and `90%` by `40 minutes`.
+- The count of online instances then briefly dropped by one, indicating one instance was just reallocated.
+- By around `80 minutes`, nearly all 100 instances were online, with minor fluctuations afterward due to reallocations.
 
 **SaladCloud’s data center nodes are typically deployed near the Internet backbone and offer higher bandwidth and
 processing capacity, enabling faster startup.**
 
-## Uptimes
+## Interruptions and Reallocations
 
-A node can go offline for various reasons after coming online, in which case a new node is allocated to continue
-processing.
+An instance may go offline after coming online for several reasons. In such cases, a new instance is allocated to
+continue processing:
 
-The most common reason is that node owners—whether individuals or data center providers—temporarily reclaim their
-resources for their own use, stopping the sharing. As a result, many nodes may fail quickly, running for only a few
-minutes after starting. However, nodes tend to remain stable over time, as their owners continue to earn revenue.
+- **Voluntary Interruptions**: Node owners (individuals or data center providers) may temporarily reclaim their
+  resources for their own use, pausing sharing. However, high-priority workloads that run reliably over long periods
+  generate higher earnings, giving owners less incentive to interrupt.
 
-[Priority](/container-engine/explanation/billing-pricing/priority-pricing#priority-pricing) also plays a role. During
-periods of high SaladCloud usage, higher-priority container groups can preempt lower-priority ones when a higher-paying
-job becomes available.
+- **External Interruptions**: Factors such as power outages, network issues, or hardware failures can also take nodes
+  offline.
 
-The 2024 test results show a workload at batch priority running on `100 container instances` across all consumer GPU
-types and regions for `a duration of 7 days`:
+- **Proactive Reallocation**: During periods of high demand, SaladCloud may reassign resources from lower-priority
+  workloads to higher-priority ones. Applications can also trigger reallocation via IMDS Reallocate API if current
+  instances fail to meet requirements.
 
-- Over 3,000 nodes were utilized, averaging more than 400 nodes per day, with many nodes used multiple times during the
-  period.
-- On average, a node remained online for about `5 hours at a time` before going offline.
-- Approximately `34%` of nodes exited within `the first 60 minutes`.
-- More than `30%` of nodes ran longer than the average duration of 5 hours.
+The same 2025 test also tracked interruptions and reallocations for the 100 container instances over a 7-day period. To
+avoid the effects of initial allocations, the first two hours after startup were excluded. The hourly and daily
+reallocation results are shown below:
 
-<img src="/container-engine/images/sp2.png" />
+<img src="/container-engine/images/sp11.png" />
+<img src="/container-engine/images/sp12.png" />
+
+Key observations are:
+
+- Maximum hourly reallocations: `6`
+- Average hourly reallocations: `1.1 ( 182 reallocations over 168 hours )`
+- Reallocations decreased over time, dropping from more than `45 per day` to fewer than `15 per day`, with some
+  fluctuations along the way. This trend shows that as applications run stably for longer periods on nodes, the
+  likelihood of interruption by node owners decreases.
 
 **SaladCloud’s data center nodes are generally more stable when running workloads at high priority and are less likely
-to be interrupted by their owners, though this cannot be fully guaranteed.**
+to be interrupted by their owners.**
 
-## Node Run-to-Request Ratio
+## Uptimes
 
-Due to variations in node uptimes and startup times, it is not possible to consistently achieve the full requested
+Additionally, the 2025 test measured the uptime distributions of instances over the same period, which are primarily
+influenced by startup times and interruptions. The results show that:
+
+<img src="/container-engine/images/sp13.png" />
+<img src="/container-engine/images/sp14.png" />
+
+Key observations are:
+
+- 100 instances running over 7 days generated `282 samples` (instance runs).
+- Before the container group was shut down, `182` instance runs had already completed (interrupted) while `100`
+  instances were still running.
+- `25` instances ran uninterrupted for full 7-day period.
+- The average uptime across all instance runs (interrupted and uninterrupted) was `60 hours`.
+- The average uptime of interrupted instance runs was `35 hours`.
+
+**High-priority applications on SaladCloud’s data center nodes generally run uninterrupted for extended periods, though
+this cannot be fully guaranteed.**
+
+## Run-to-Request Ratio
+
+Due to variations in instance startup times and uptimes, it is not possible to consistently achieve the full requested
 compute capacity on SaladCloud. When a node goes offline and a replacement is allocated, additional time is required to
-download and decompress the image before the new node becomes operational. These long and variable startup times also
-make real-time autoscaling impractical.
+download and decompress the image before the new instance becomes operational.
 
-Results from the same test—`100 instances over 7 days`—show that both the hourly number of running nodes and reallocated
-nodes fluctuated. However, on average, `90%` of the node run-to-request ratio was achieved.
+Results from the same 2025 test show the instance run-to-request ratio over the 7-day period:
 
-<img src="/container-engine/images/sp3.png" />
+<img src="/container-engine/images/sp15.png" />
 
-As a rule of thumb, you should always provision ~110% of the required nodes about 30 minutes in advance. This adds
-little to no extra cost, as instances are only billed while actively running.
+Key observations are:
+
+- Lowest instance run-to-request ratio: `94%`
+- Average instance run-to-request ratio: `more than 99%`
+- The instance run-to-request ratio can `temporarily exceed 100%` from the application’s perspective. When nodes lose
+  connection to SaladCloud (not charged in this case), applications may continue running briefly before the nodes are
+  fully shut down. During this overlap, as new nodes are allocated and start running, the number of active instances can
+  temporarily exceed the original request.
 
 **SaladCloud’s data center nodes provide 8 GPUs per node. While these nodes are generally more stable and less likely to
-be interrupted, any node going offline removes all 8 GPUs from your resource pool, so you should consider this impact
+be interrupted, any node going offline removes all 8 GPUs from the resource pool, so you should consider this impact
 when deploying workloads.**
 
-## Network Speed, Variance and Throughput
+## Processing Performance
+
+Nodes with the same consumer GPU type can exhibit different performance due to factors such as system configuration
+(CPU, RAM), clock speed, cooling, and power limits. Even for the same node, performance may fluctuate over time because
+of temperature changes and cooling efficiency.
+
+Based on our tests, over 90% of SaladCloud’s consumer GPU nodes provide stable and consistent performance. Here is an
+instance run from the 2025 test, illustrating stable performance (black line) and resource usage over the 7-day
+execution period.
+
+<img src="/container-engine/images/sp16.png" />
+
+Here is another instance run from the same test, showing performance fluctuations caused by temperature changes: as GPU
+temperature rose, performance declined.
+
+<img src="/container-engine/images/sp17.png" />
+
+Performing an initial check and monitoring real-time performance are essential for selecting appropriate nodes and
+ensuring they remain in an optimal state for application execution.For more details, please refer to
+[this guide](/container-engine/tutorials/performance/high-performance-apps#build-high-performance-applications).
+
+**Based on our tests, SaladCloud’s data center nodes can always deliver stable and consistent performance.**
+
+## Network Performance
 
 Salad nodes with consumer GPUs often exhibit asymmetric bandwidth, as many operate on residential networks with high
 download speeds—frequently hundreds of Mbps—but lower upload speeds, sometimes only tens of Mbps.
@@ -117,24 +169,3 @@ If your applications require higher throughput with lower latency, it is recomme
 custom filters to select nodes that meet your specific network requirements and adopt advanced tools and algorithms .
 Please check [this guide](/container-engine/tutorials/performance/high-performance-storage-solutions) for more
 information.
-
-## Processing Performance Variance and Fluctuations
-
-Nodes with the same GPU type may deliver different performance due to factors such as system configuration (CPU, RAM),
-clock speed, cooling, and power limits. Node performance may also fluctuate over time due to the shared nature of the
-consumer GPUs on SaladCloud. When node owners begin using their devices, they are likely to disable the SaladCloud
-agent, triggering node reallocation. However, if the agent remains active while other applications are running, the
-performance of workloads could be impacted.
-
-The 2025 test results, based on over 300 nodes with the same consumer GPU type performing the same rendering task, show
-varying processing times that appear to follow at least two distinct underlying distributions. Similar patterns could be
-observed in other applications, such as image generation and LLM workloads.
-
-<img src="/container-engine/images/sp5.png" />
-
-Performing an initial check and monitoring real-time performance are essential for selecting appropriate nodes and
-ensuring they remain in an optimal state for application execution.For more details, please refer to
-[this guide](/container-engine/tutorials/performance/high-performance-apps#build-high-performance-applications).
-
-**SaladCloud’s data center nodes are fully reserved during workload execution and can consistently deliver stable
-performance.**
