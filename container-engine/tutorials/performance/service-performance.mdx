@@ -57,7 +57,7 @@ continue processing:
 - **External Interruptions**: Factors such as power outages, network issues, or hardware failures can also take nodes
   offline.
 
-- **Proactive Reallocation**: During periods of high demand, SaladCloud may reassign resources from lower-priority
+- **Proactive Reallocations**: During periods of high demand, SaladCloud may reassign resources from lower-priority
   workloads to higher-priority ones. Applications can also trigger reallocation via IMDS Reallocate API if current
   instances fail to meet requirements.
 
@@ -73,8 +73,8 @@ Key observations are:
 - Maximum hourly reallocations: `6`
 - Average hourly reallocations: `1.1 ( 182 reallocations over 168 hours )`
 - Reallocations decreased over time, dropping from more than `45 per day` to fewer than `15 per day`, with some
-  fluctuations along the way. This trend shows that as applications run stably for longer periods on nodes, the
-  likelihood of interruption by node owners decreases.
+  fluctuations along the way. **This trend shows that as applications run stably for longer periods on nodes, the
+  likelihood of interruption by node owners decreases.**
 
 **SaladCloud’s data center nodes are generally more stable when running workloads at high priority and are less likely
 to be interrupted by their owners.**
@@ -134,8 +134,8 @@ execution period.
 
 <img src="/container-engine/images/sp16.png" />
 
-Here is another instance run from the same test, showing performance fluctuations caused by temperature changes: as GPU
-temperature rose, performance declined.
+Another instance run from the same test highlights performance fluctuations due to temperature changes: as GPU
+temperatures increased, performance declined.
 
 <img src="/container-engine/images/sp17.png" />
 
