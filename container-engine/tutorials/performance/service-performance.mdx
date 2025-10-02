@@ -102,11 +102,17 @@ this cannot be fully guaranteed.**
 
 ## Run-to-Request Ratio
 
-Due to variations in instance startup times and uptimes, it is not possible to consistently achieve the full requested
-compute capacity on SaladCloud. When a node goes offline and a replacement is allocated, additional time is required to
-download and decompress the image before the new instance becomes operational.
+The instance run-to-request ratio measures the actual compute capacity available compared to what is requested. For
+example, when requesting 100 instances, the ratio indicates how many are consistently running. When a node goes offline
+and a replacement is allocated, additional time is required to download and decompress the image before the new instance
+becomes operational. Because of variations in startup times and uptimes, a 100% run-to-request ratio cannot be
+guaranteed on SaladCloud’s consumer GPU nodes.
 
-Results from the same 2025 test show the instance run-to-request ratio over the 7-day period:
+Large image sizes can increase startup times, which in turn lowers the run-to-request ratio. To mitigate this, it is
+often necessary to provision additional instances (5~10%) beyond the initial plan, particularly for real-time inference
+workloads.
+
+Results from the 2025 test show the instance run-to-request ratio over the 7-day period:
 
 <img src="/container-engine/images/sp15.png" />
 
