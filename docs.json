@@ -35,6 +35,7 @@
                   "container-engine/explanation/core-concepts/overview",
                   "container-engine/explanation/core-concepts/saladcloud-secure",
                   "container-engine/explanation/core-concepts/architectural-overview",
+                  "container-engine/explanation/core-concepts/service-performance",
                   "container-engine/explanation/core-concepts/recipes-overview",
                   "container-engine/explanation/core-concepts/faqs"
                 ]
@@ -167,7 +168,6 @@
               {
                 "group": "Performance",
                 "pages": [
-                  "container-engine/tutorials/performance/service-performance",
                   "container-engine/tutorials/performance/performance-monitoring",
                   "container-engine/tutorials/performance/high-performance-apps",
                   "container-engine/tutorials/performance/high-performance-storage-solutions"
