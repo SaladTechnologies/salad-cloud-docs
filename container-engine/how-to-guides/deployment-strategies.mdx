@@ -1,0 +1,116 @@
+---
+title: 'Deployment Strategies'
+---
+
+_Last Updated: October 9, 2025_
+
+Deploying to SaladCloud should preserve service continuity. Roll out changes incrementally, validate each stage, and
+keep a clear rollback path so you can recover quickly if issues appear. This article outlines recommended deployment
+patterns and safeguards for reliable updates—**especially because some edits restart all replicas immediately.**
+
+## Key Behavior
+
+When you save a change that creates a **new container version** (image, command/args, env, probes, gateway settings,
+etc.), SaladCloud **restarts every replica right away** to apply the update. There is **no side-by-side mix** of old and
+new versions within the same Container Group. Resource requirement updates are the one exception: the platform keeps
+replicas running if their current nodes satisfy the new configuration and only reallocates the ones that do not. Changes
+to the container group's display name, replica count, or autoscaler settings do not create a new version and therefore
+do not restart healthy replicas.
+
+**Implication:** Treat versioned edits as **service-interrupting** for that group. Use **blue-green deployments** or a
+**canary deployment** to maintain availability.
+
+## Core Principles
+
+- **Prefer parallel capacity for uptime** – Perform upgrades in a separate deployment, then shift traffic.
+- **Pin immutable versions** – Use digests/immutable tags, keep config in version control; make rollbacks predictable.
+- **Validate automatically** – Configure startup/readiness/liveness probes; run smoke tests and alerts before routing
+  external traffic.
+- **Plan for interruptions** – Nodes are interruptible, and **versioned updates restart all replicas**; queue draining
+  and surge capacity in another deployment are essential.
+- **Over-allocate when making changes** – Provision additional replicas temporarily to get some nodes with updated
+  container version faster; scale back down once healthy capacity is confirmed.
+
+## Pre-Rollout Checklist
+
+1. **Stage with production parity** – Mirror prod groups, probes, and Gateway settings in a staging or “green”
+   environment. You can clone an existing Container Group to create a staging version.
+2. **Health & smoke tests** – Exercise the candidate build; promote only on success.
+3. **Capacity & quota** – Ensure you have quota to run **blue + green** concurrently.
+4. **Rollback runbook** – Decide how you’ll flip back.
+
+## How Container Group Updates Apply
+
+- **Version edits (restart all replicas):** image, command/args, environment variables/secrets, health probes, and
+  Container Gateway settings.
+- **Hardware requirement changes:** Updating CPU, RAM, GPU, or disk space class keeps current replicas running if their
+  hardware still satisfies the new limits. Instances that no longer meet the requirements are reallocated to compliant
+  nodes, which results in restarts only for the affected replicas.
+- **Non-versioned edits (no restart):** container group display name, replica count, autoscaler settings do not trigger
+  nodes restart. The container group name itself is immutable once created.
+- **Image pulls lock edits:** If you change the image, the platform pulls/prepares it first; the **Edit** action is
+  disabled until preparation completes.
+
+## Safer Patterns
+
+### Blue-Green deployment (recommended for always-on services)
+
+1. **Clone live (blue)** container group into green deployment with identical config.
+2. **Deploy the new version to green**; scale to intended replica count and wait for probes to pass.
+3. **Run synthetic checks** on green (latency, errors, GPU utilization).
+4. **Shift traffic** to green deployment.
+5. **Observe** for a soak window.
+6. **Retire blue** or hold as hot rollback for a defined period. You can also update the blue deployment and switch
+   traffic back to it if needed.
+
+Use blue-green whenever downtime isn’t acceptable. The pattern works for both Gateway and queue based services.
+
+### Canary deployment (separate deployment)
+
+1. **Stand up a separate deployment** running the candidate version (just like blue-green, this is typically another
+   Salad **Container Group**).
+2. **Route a small percentage of traffic**.
+3. **Promote gradually**—1–5% → 25% → 50% → 100%—by adjusting routing weights.
+4. **Stop and roll back if metrics degrade**—monitor latency, errors and other metrics; if thresholds spike, immediately
+   route traffic back to the stable version.
+
+Canary differs from blue-green in how you expose the new version. Blue-green flips 100% of traffic (or worker load) in
+one step after validation, giving you instant failback. Canary keeps both versions live and increases traffic to the new
+version in stages, so you can watch real production metrics while limiting the blast radius.
+
+### Batch / Async workloads
+
+- **Blue-green is ideal** – Keep the existing (blue) workers finishing running jobs while the new (green) group starts
+  fresh jobs. Because queue consumers pull work rather than receiving routed traffic you can just start the green
+  workers and let them begin consuming when ready.
+- **Optional pause/drain** – If you cannot run two groups, pause new submissions or drain queues before updating a live
+  group so in-flight work finishes cleanly.
+- **Use deletion cost for smooth cutover** – After green is stable, scale the blue group to zero without losing active
+  jobs by enabling
+  [Instance Deletion Cost](/container-engine/explanation/infrastructure-platform/instance-deletion-cost). Nodes finish
+  their current tasks before shutting down, so scaling the old version to zero won’t interrupt jobs still processing.
+
+### In-Place Update Playbook (maintenance window only)
+
+In-place updates are **not recommended** for always-on services
+
+1. **Schedule a maintenance window** and notify customers.
+2. **Over-allocate replicas temporarily** – Increase the desired replica count ahead of time so SaladCloud pulls extra
+   nodes and starts the new version faster. Replicas that are still `Pending` or `Deploying` are removed first when you
+   scale back down, so pre-warming additional nodes helps you converge on healthy capacity quickly.
+3. **Throttle clients / enable back-pressure**; increase Gateway timeouts if applicable.
+4. **Apply the versioned update** (expect immediate restarts for all replicas).
+5. **Verify readiness** via probes and synthetic checks.
+6. **Reopen traffic** gradually and watch error rates/latency.
+
+## Observability During Rollout
+
+Keep watch on every stage of the rollout so you can detect regressions early and react before customers feel impact.
+Combine platform probes with external telemetry and synthetic checks to maintain a live picture of the deployment’s
+health.
+
+- **Enable Probes** – Startup + Readiness + Liveness to gate traffic and auto-isolate bad nodes.
+- **Centralized logs** – Using SaladVCloud Logs or export to your logging stack (Axiom/Datadog/Splunk/HTTP collectors).
+- **Synthetic monitoring** – Ping your Gateway endpoints on a schedule; fail promotion automatically on regression.
+- **Trending metrics** – Track GPU utilization, queue depth, error rates, and latency so you can spot capacity or
+  performance regressions as soon as they appear.
