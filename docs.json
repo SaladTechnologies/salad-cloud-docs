@@ -179,6 +179,7 @@
             "group": "How-to Guides",
             "pages": [
               "container-engine/how-to-guides/managing-deployments",
+              "container-engine/how-to-guides/deployment-strategies",
               "container-engine/how-to-guides/environment-variables",
               "container-engine/how-to-guides/specifying-a-command",
               "container-engine/how-to-guides/troubleshooting",

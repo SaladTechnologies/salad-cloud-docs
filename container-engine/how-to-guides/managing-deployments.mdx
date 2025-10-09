@@ -2,7 +2,7 @@
 title: 'Managing Deployments'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: October 9, 2025_
 
 ### Listing your Container Deployments
 
@@ -81,20 +81,25 @@ your Container Group deployment.
 - You can edit the [Environment Variables](/container-engine/how-to-guides/environment-variables).
 
 This editing functionality lets you update your container images, change hardware requirements, adjust configuration
-aspects, and utilize new features that SaladCloud may release. Changes to your Container Groups can be made with minimal
-downtime and while retaining the original Container Gateway configuration (DNS name). As you make changes, you will see
-the predicted cost associated with those choices updated in real-time.
+aspects, and utilize new features that SaladCloud may release. As you make changes, you will see the predicted cost
+associated with those choices updated in real-time.
+
+**Runtime changes restart replicas when required**
+
+- When you save any change that produces a new container version—such as adjustments to the image, command, health
+  probes, environment variables, or gateway settings—SaladCloud restarts every replica so the new configuration is
+  applied consistently. If the update references a new image, the platform pulls the image first and then restarts the
+  replicas when the download completes.
+- Updating CPU, RAM, GPU class, or disk space settings keeps existing replicas running if their current nodes still
+  satisfy the new requirements. Replicas that fall outside the updated limits are reallocated to compliant nodes, so
+  only those instances restart.
+- Display name edits, replica count adjustments, and autoscaler configuration updates apply without forcing a restart.
+- Because restarts happen right away, plan rollouts carefully and consult
+  [Deployment Strategies on SaladCloud](/container-engine/how-to-guides/deployment-strategies) for approaches that
+  maintain availability during updates.
 
 If you are updating the Image Source, you will not be able to make additional edits until the new image is done
-preparing / pulling. To avoid confusion the “Edit” button will be disabled until this process is complete.
-
-If you update just the display name and/or replica count, the Container Group won't be assigned a new version. However,
-if you update other variables, it will. The instances currently running will continue to run the version of the
-Container Group that they were started with. Any new instance or an instance that gets a new node assigned to it, will
-start running with the new Container Group version. To manually update an instance to run the updated version,
-Reallocate the instance. Using this option will assign a new node to the instance and build the container from scratch.
-In the case that a node no longer meets the new hardware resource requirements, the SaladCloud system will reallocate it
-within a period of 5 minutes or less.
+preparing/pulling. To avoid confusion the “Edit” button will be disabled until this process is complete.
 
 <img src="/container-engine/images/portal-container-instance-actions.png" />
 
