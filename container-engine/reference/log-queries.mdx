@@ -74,6 +74,9 @@ Log events are JSON objects with the following structure:
   entry.
 - Any of these fields can be used in the query language.
 - Time and Date values take the form `YYYY-MM-DDTHH:MM:SSZ`, and are expressed in UTC.
+- You can do full-text search independent of structured fields by querying a special `log` field. The `log` field only
+  supports the `contains` and `!contains` operators, and is case insensitive. It searches across both `text_log` and
+  `json_log` fields.
 
 ### Resource Types And Labels
 
