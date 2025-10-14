@@ -1,0 +1,41 @@
+---
+title: 'Containers vs VPS'
+description: 'Understanding the differences between containers and virtual private servers (VPS).'
+---
+
+SaladCloud is a **managed container service**, which means that we use containers to run your workloads. Containers and
+Virtual Private Servers or Virtual Machines (VPS or VM) are both popular methods for deploying applications, but they
+have some key differences.
+
+### Containers
+
+Containers are a lightweight form of virtualization that allows multiple applications to run on the same operating
+system kernel. They share the host OS and isolate applications at the process level. This makes containers very
+efficient in terms of resource usage, as they do not require a full OS for each application. Containers are typically
+faster to start and stop compared to VMs, making them ideal for scalable and dynamic environments.
+
+In general, containers are more portable and easier to manage than VPS, as they can be easily moved between different
+environments and orchestrated using popular open source tools. They are most often not intended to be interacted with
+via a terminal, but rather to run a specific application or service.
+
+Unlike a VPS which may have dependencies installed on it at runtime, containers are typically built with all necessary
+dependencies included at the time of creation. This makes containers more consistent and predictable in terms of
+behavior across different environments.
+
+### Virtual Private Servers (VPS)
+
+VPS, on the other hand, are a type of virtual machine that runs its own operating system on top of a hypervisor. Each
+VPS is allocated a fixed amount of resources (CPU, RAM, storage) and operates independently of other VPS instances on
+the same host. This provides a higher level of isolation and security, as each VPS has its own OS and file system.
+However, this also means that VPS can be more resource-intensive and slower to start compared to containers.
+
+VPS are often used during development or for applications that require a full OS environment. They are typically managed
+via SSH or a web-based control panel. VPS can be more complex to manage, as they require regular updates and maintenance
+of the underlying OS.
+
+### Summary
+
+In summary, containers are a lightweight and efficient way to run applications, while VPS provide a higher level of
+isolation and security. The choice between the two will depend on the specific requirements of your application and the
+environment in which it will be deployed. For most modern applications, especially those that need to operate at scale,
+containers are often the preferred choice due to their efficiency and portability.
