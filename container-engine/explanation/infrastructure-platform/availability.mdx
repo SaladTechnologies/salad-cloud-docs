@@ -1,0 +1,21 @@
+---
+title: 'Availability'
+sidebarTitle: 'Availability'
+description:
+  'Learn how SaladCloud Job Queue autoscaling automatically adjusts container instances based on queue depth to optimize
+  performance and cost for batch processing workloads.'
+---
+
+_Last Updated: October 10, 2025_
+
+SaladCloud provides estimated availability to help you understand how many nodes are available to run your workloads at different [priority levels](https://docs.salad.com/products/sce/priority). Availability is shown in the SaladCloud Portal when creating container groups and via the [Get GPU Availability](https://docs.salad.com/reference/saladcloud-api/organizations/get-gpu-availability) and [Get CPU Availability](https://docs.salad.com/reference/saladcloud-api/organizations/get-cpu-availability) API endpoints.
+
+Keep in mind the following considerations when interpreting availability counts:
+
+- **Availability only includes currently online nodes.** Many more nodes are available on our network and can be activated as needed. If you need more capacity than is currently available, reach out to [SaladCloud support](mailto:support@salad.com) and we can work to grow the network based on anticipated needs.
+
+- **Node allocation depends on multiple factors, not just priority level.** Even if few nodes are shown as available at your selected priority level, your workload may be able to be allocated nodes from other workloads. For example, if your workload has higher RAM requirements, nodes from same-priority workloads may be reallocated to meet those needs.
+
+- **Failed nodes may still appear in availability counts.** Availability data can include nodes that previously failed to run your workload and will not be reassigned to it. Check your workload’s system events to confirm whether any nodes have failed.
+
+- **Available nodes may not be immediately reassigned.** Some nodes remain with their current workloads for a minimum running duration before being reallocated. This prevents excessive workload churn and repeated image pulls. The minimum duration varies by priority level—from about 30 minutes for low-priority workloads to indefinitely for high-priority workloads, which are never reallocated.
