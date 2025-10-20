@@ -484,6 +484,8 @@
                     "group": "Organizations",
                     "pages": [
                       "reference/saladcloud-api/organizations/list-gpu-classes",
+                      "reference/saladcloud-api/organizations/get-gpu-availability",
+                      "reference/saladcloud-api/organizations/get-cpu-availability",
                       "reference/saladcloud-api/organizations/get-quotas",
                       "reference/saladcloud-api/organizations/get-webhook-secret-key",
                       "reference/saladcloud-api/organizations/update-webhook-secret-key"
