@@ -54,6 +54,7 @@
               {
                 "group": "Infrastructure & Platform",
                 "pages": [
+                  "container-engine/explanation/infrastructure-platform/availability",
                   "container-engine/explanation/infrastructure-platform/container-registries",
                   "container-engine/explanation/infrastructure-platform/external-logging",
                   "container-engine/explanation/infrastructure-platform/networking",
