@@ -315,8 +315,11 @@
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
+                  "container-engine/reference/recipes/unsloth-finetune",
+                  "container-engine/reference/recipes/unsloth-inference",
                   "container-engine/reference/recipes/vllm",
                   "container-engine/reference/recipes/vllm-dc",
+                  "container-engine/reference/recipes/wan2.2-a14b-kelpie-dc",
                   "container-engine/reference/recipes/wan-5b",
                   "container-engine/reference/recipes/yolo"
                 ]
