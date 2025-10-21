@@ -1,0 +1,92 @@
+---
+title: Unsloth Inference Recipe
+sidebarTitle: Unsloth Inference
+description: Serve Unsloth-optimized LLMs behind a FastAPI gateway on SaladCloud with configurable model settings.
+---
+
+_Last Updated: October 21, 2024_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe deploys a lightweight Uvicorn service that loads an Unsloth-optimized large language model and exposes two
+HTTP endpoints:
+
+- `GET /health` for readiness probes
+- `POST /v1/generate` for text generation (supports streaming)
+
+You configure the worker entirely with environment variables—no image rebuild required. The default model is
+`unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit`, but you may point to any compatible Hugging Face repo or local path.
+
+## Configure the Container
+
+Set these environment variables when you deploy (via the Portal form or Salad API):
+
+- `MODEL_ID` — Hugging Face repo or local path for the base model (default
+  `unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit`).
+- `DTYPE` — Tensor dtype (`bfloat16`, `float16`, or `fp16`); defaults to `bfloat16`.
+- `LOAD_IN_4BIT` — `"true"` to enable 4-bit loading (VRAM savings); set `"false"` to disable.
+- `MAX_SEQ_LEN` — Maximum context length accepted by the model (default `8192` tokens).
+- `MAX_NEW_CAP` — Upper bound on `max_new_tokens` per request (default `4096`).
+- `STREAM_STDOUT` — Optional (`"true"` by default). Mirrors generated text to container logs.
+
+Authentication is enabled by default at the Salad gateway (`networking.auth = true`). Disable it if you need anonymous
+access.
+
+## Retrieve Your Container Group ID
+
+```bash
+curl -X GET \
+  --url "https://api.salad.com/api/public/organizations/<organization_name>/projects/<project_name>/containers/<container_group_name>" \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <api-key>'
+```
+
+Copy the `.id` from the response to target this container group in your client integrations.
+
+## Call the API (Non-Streaming)
+
+```bash
+curl -s "https://<your-dns>.salad.cloud/v1/generate" \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Salad-Api-Key: <api-key>" \
+  -d '{
+    "prompt": "Explain LoRA fine-tuning in two sentences.",
+    "max_new_tokens": 256
+  }'
+```
+
+**Response**
+
+```json
+{
+  "status": "completed",
+  "text": "LoRA fine-tuning ...",
+  "generated_tokens": 128
+}
+```
+
+`max_new_tokens` is clamped between 1 and `MAX_NEW_CAP`. Empty prompts return an `"error": "empty prompt"` response.
+
+## Health Checks
+
+The built-in readiness probe hits `GET /health` on port `8000`. You can test it manually:
+
+```bash
+curl -s "https://<your-dns>.salad.cloud/health" \
+  -H "Salad-Api-Key: <api-key>"
+```
+
+An HTTP 200 response with `{"ok": true}` indicates the model is loaded and ready.
+
+## Troubleshooting
+
+- **403 Forbidden** — Gateway auth is enabled. Include the `Salad-Api-Key` header or disable auth during deployment.
+- **Returned `error: empty prompt`** — Provide a non-empty `prompt` string.
+- **`max_new_tokens` ignored** — Value exceeded `MAX_NEW_CAP`; increase the cap or request fewer tokens.
+- **Slow warm-up** — Large models can take time to load at startup. Expect longer cold-start latencies after scaling to
+  zero.
+- **GPU out of memory** — Disable `LOAD_IN_4BIT` only when you have sufficient VRAM. Otherwise, pick a smaller model or
+  keep 4-bit loading enabled.
