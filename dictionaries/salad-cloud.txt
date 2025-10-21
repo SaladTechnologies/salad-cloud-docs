@@ -1,5 +1,6 @@
 -Jxpf
 -topln
+adamw
 alwayson
 amqps
 amzn
@@ -52,6 +53,7 @@ dreambooth
 dreamshaper
 dsnp
 DTYPE
+dtype
 dubinsky
 EMEA
 encodedimage
@@ -75,6 +77,7 @@ getenv
 getsize
 gevent
 GGUF
+gguf
 gsutil
 Healthcheck
 healthz
@@ -115,6 +118,7 @@ LIUM
 llava
 LoRA
 LoRAs
+loftq
 ltxv
 Luxembourgish
 Lykon
@@ -172,6 +176,7 @@ pydantic
 pyenv
 pytorch
 Pytube
+quantizations
 Quickstart
 qwen
 rclone
@@ -185,6 +190,7 @@ rqns
 rqnsa
 rqnsf
 rqnsm
+rslora
 RTMP
 rtsp
 RTSP
@@ -238,6 +244,9 @@ unroutable
 unspec
 unipc
 UNSPEC
+Unsloth
+UNSLOTH
+unsloth
 upscaler
 upscalers
 uvicorn
@@ -257,6 +266,7 @@ wrangler
 xformers
 xlarge
 xlvaeapp
+yahma
 yolob8m-custom
 yolov8
 zapier
