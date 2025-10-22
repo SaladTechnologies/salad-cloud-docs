@@ -1,0 +1,195 @@
+---
+title: Unsloth Fine-Tuning (Kelpie) Recipe
+sidebarTitle: Unsloth Fine-Tuning (Kelpie)
+description: Fine-tune large language models with Unsloth on SaladCloud using Kelpie for queued training and S3 sync.
+---
+
+_Last Updated: October 21, 2024_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+[**Unsloth**](https://docs.unsloth.ai/get-started/fine-tuning-llms-guide) provides an optimized LoRA fine-tuning stack
+for LLM models. Unsloth is an open-source framework that makes LLM fine-tuning up to 30× faster while using 60% less
+memory. It achieves this through custom kernel optimizations in Triton, Flash Attention, and manual autograd, while
+maintaining or even improving accuracy. This recipe packages Unsloth with
+[Kelpie](https://github.com/SaladTechnologies/kelpie) so you can queue fine-tuning jobs on SaladCloud, automatically
+sync checkpoints to S3-compatible storage, and scale workers up or down with the Kelpie autoscaler.
+
+Each worker runs `/opt/unsloth-cli.py`, a wrapper around Unsloth's `FastLanguageModel` APIs. You control the training
+run entirely through Kelpie job arguments—model choice, dataset, LoRA knobs, checkpoint cadence, and save strategy.
+
+## Prerequisites
+
+- **S3-compatible storage** (AWS S3, Cloudflare R2, etc.) to persist checkpoints and final models. Provide Access Key
+  ID, Secret Access Key, Region, and (for R2) Endpoint URL when you deploy the recipe.
+- **Training dataset** accessible from the container. By default the script downloads a Hugging Face dataset; you may
+  also bring your own data via `sync.before` or set `UNSLOTH_USE_MODELSCOPE=true` to read from ModelScope.
+- (Optional) **Hugging Face Hub token** if you want to push artifacts with `--push_model` or `--push_gguf`.
+
+## Worker Storage Layout
+
+- **`/opt/checkpoints`** — incremental checkpoints (used for resume).
+- **`/opt/outputs`** — final merged model or GGUF export.
+
+> Always align your Kelpie `sync` rules with these paths:
+>
+> - `sync.before` → download any previous checkpoints into `/opt/checkpoints/` if resuming.
+> - `sync.during` → regularly upload `/opt/checkpoints/` for safekeeping.
+> - `sync.after` → upload `/opt/outputs/` when training completes.
+
+## Get Your Container Group ID
+
+```bash
+curl -X GET \
+  --url "https://api.salad.com/api/public/organizations/<organization_name>/projects/<project_name>/containers/<container_group_name>" \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <api-key>'
+```
+
+Copy the `.id` from the response; it is required when you enqueue jobs.
+
+## Kelpie Job Arguments (`/opt/unsloth-cli.py`)
+
+### Model Options
+
+- `--model_name` (string, default `unsloth/llama-3-8b`) — base checkpoint to fine-tune.
+- `--max_seq_length` (int, default `2048`) — context window.
+- `--dtype` (string, default `None`) — force dtype; auto-detected when omitted.
+- `--load_in_4bit` (flag) — enable 4-bit loading to save VRAM.
+- `--dataset` (string, default `yahma/alpaca-cleaned`) — Hugging Face or local dataset identifier.
+
+### LoRA Options
+
+- `--r` (int, default `16`) — LoRA rank.
+- `--lora_alpha` (int, default `16`) — LoRA alpha.
+- `--lora_dropout` (float, default `0.0`).
+- `--bias` (string, default `none`).
+- `--use_gradient_checkpointing` (string, default `unsloth`).
+- `--random_state` (int, default `3407`).
+- `--use_rslora` (flag) — enable rank-stabilized LoRA.
+- `--loftq_config` (string, optional) — LoftQ configuration.
+
+### Training Options
+
+- `--per_device_train_batch_size` (int, default `2`).
+- `--gradient_accumulation_steps` (int, default `4`).
+- `--warmup_steps` (int, default `5`).
+- `--max_steps` (int, default `400`).
+- `--learning_rate` (float, default `2e-4`).
+- `--optim` (string, default `adamw_8bit`).
+- `--weight_decay` (float, default `0.01`).
+- `--lr_scheduler_type` (string, default `linear`).
+- `--seed` (int, default `3407`).
+- `--logging_steps` (int, default `1`).
+- `--report_to` (string, default `tensorboard`; set `none` to disable integrations).
+
+### Checkpoint & Resume
+
+- `--save_strategy` (`no|steps|epoch`, default `steps`).
+- `--save_steps` (int, default `500`).
+- `--save_total_limit` (int, optional) — retain the most recent N checkpoints.
+- `--resume` (flag) — auto-resume from the newest `checkpoint-*` in `--output_dir`.
+- `--resume_from_checkpoint` (string) — explicitly pick a checkpoint directory.
+
+<Callout variation="info">
+  Resume logic searches for `checkpoint-*` folders inside `--output_dir`. Make sure your `sync.before` step pulls those
+  directories down before the job starts.
+</Callout>
+
+### Saving & Publishing
+
+- `--output_dir` (string, default `/opt/checkpoints`) — where training checkpoints land.
+- `--save_model` (flag) — write the final model after training.
+- `--save_method` (`merged_16bit|merged_4bit|lora`, default `merged_16bit`).
+- `--save_gguf` (flag) — additionally export GGUF quantizations.
+- `--save_path` (string, default `/opt/outputs`).
+- `--quantization` (one or many, default `q8_0`) — GGUF quantization presets.
+- `--push_model` / `--push_gguf` (flags) — push to Hugging Face Hub; pair with `--hub_path` and `--hub_token`.
+
+## Submit a Fine-Tuning Job
+
+```bash
+export SALAD_API_KEY="<salad-api-key>"
+export SALAD_ORGANIZATION="<organization>"
+export SALAD_PROJECT="<project>"
+
+curl -s -X POST "https://kelpie.saladexamples.com/jobs" \
+  -H "Content-Type: application/json" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" \
+  -d @- <<'JSON'
+{
+  "container_group_id": "<container_group_id>",
+  "command": "python",
+  "arguments": [
+    "/opt/unsloth-cli.py",
+    "--model_name", "unsloth/llama-3-8b",
+    "--dataset", "yahma/alpaca-cleaned",
+    "--max_seq_length", "2048",
+    "--load_in_4bit",
+    "--r", "16",
+    "--lora_alpha", "16",
+    "--lora_dropout", "0.05",
+    "--bias", "none",
+    "--use_gradient_checkpointing", "unsloth",
+    "--per_device_train_batch_size", "2",
+    "--gradient_accumulation_steps", "4",
+    "--warmup_steps", "5",
+    "--max_steps", "1200",
+    "--learning_rate", "2e-4",
+    "--logging_steps", "10",
+    "--optim", "adamw_8bit",
+    "--weight_decay", "0.01",
+    "--lr_scheduler_type", "linear",
+    "--seed", "3407",
+    "--report_to", "none",
+    "--output_dir", "/opt/checkpoints",
+    "--save_model",
+    "--save_path", "/opt/outputs",
+    "--save_method", "merged_16bit",
+    "--save_strategy", "steps",
+    "--save_steps", "100",
+    "--save_total_limit", "3",
+    "--resume"
+  ],
+  "sync": {
+    "before": [
+      { "bucket": "<bucket>", "prefix": "unsloth-checkpoints/", "local_path": "/opt/checkpoints/", "direction": "download" }
+    ],
+    "during": [
+      { "bucket": "<bucket>", "prefix": "unsloth-checkpoints/", "local_path": "/opt/checkpoints/", "direction": "upload" }
+    ],
+    "after": [
+      { "bucket": "<bucket>", "prefix": "unsloth-models/", "local_path": "/opt/outputs/", "direction": "upload" }
+    ]
+  }
+}
+JSON
+```
+
+Queue multiple jobs to keep replicas busy; each worker processes one training job at a time.
+
+## Monitor a Job
+
+```bash
+curl -s "https://kelpie.saladexamples.com/jobs/<kelpie-job-id>" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" | jq .
+```
+
+## Troubleshooting
+
+- **Training restarts from step 0** — Ensure `sync.before` pulls checkpoints into `/opt/checkpoints/` and that you pass
+  `--resume`.
+- **No checkpoints uploaded** — Confirm the `sync.during` rule points at `/opt/checkpoints/` and that the bucket prefix
+  is correct.
+- **OOM errors** — Lower `--max_seq_length`, enable `--load_in_4bit`, or reduce batch size/accumulation steps.
+- **Push to Hub fails** — Provide `--hub_token` with repo write access or disable the `--push_*` flags.
+
+> Need automatic scaling? Kelpie supports **queue-aware autoscaling**, including **scale-to-zero** when the queue is
+> empty. Invite the Kelpie service account to your organization, then create a scaling rule with the
+> [Create Scaling Rule endpoint](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule).

@@ -1,0 +1,161 @@
+---
+title: Wan 2.2 T2V-A14B (Kelpie DataCenter) Recipe
+sidebarTitle: Wan 2.2 T2V-A14B (Kelpie DC)
+description:
+  Run the Wan 2.2 A14B text-to-video model on SaladCloud DataCenter GPUs using Kelpie for queued batch inference.
+---
+
+_Last Updated: October 21, 2024_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+[**Wan 2.2 T2V-A14B**](https://github.com/Wan-Video/Wan2.2) is the highest-quality Wan 2.2 text-to-video model. The
+Salad recipe packages the community **DFloat11** checkpoints so the model fits efficiently on **multi-GPU DataCenter
+nodes (default: 8× L40S)**. Each GPU runs an independent Kelpie worker, giving you up to **8 concurrent jobs per node**.
+
+[Kelpie](https://github.com/SaladTechnologies/kelpie) handles the job queue and S3-compatible data sync. You enqueue
+jobs to the Kelpie API; the workers pull jobs, execute inference with `/opt/t2v.py`, and upload the MP4 result to your
+storage bucket. With Kelpie you can also also enable **queue-aware autoscaling**, including scale-to-zero when idle.
+
+## Why DataCenter Only?
+
+Wan 2.2 A14B requires more VRAM and bandwidth than consumer GPUs can provide reliably. This recipe is tuned specifically
+for SaladCloud DataCenter hardware:
+
+- **8 GPUs per node** with high-bandwidth.
+- Shared model weights on fast local storage to minimize download time.
+- Concurrency baked in: **one worker per GPU**.
+
+If you need a consumer-friendly Wan variant, use the [Wan 2.2 TI2V-5B recipe](./wan-5b).
+
+## Prerequisites. Prepare Your Storage and Data
+
+- **S3-compatible storage** (Cloudflare R2, AWS S3, etc.) for outputs. Provide your **Access Key ID**, **Secret Access
+  Key**, **Region**, and (for R2) **Endpoint URL** when deploying the container group.
+
+### Choose and create your S3-compatible bucket
+
+Store:
+
+- **Outputs** (MP4s)
+
+Popular choices:
+
+- **AWS S3:** [Get started with Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/GetStartedWithS3.html)
+- **Cloudflare R2:** [Get started with R2](https://developers.cloudflare.com/r2/get-started/)
+
+Kelpie storage reference:
+[Cloud storage setup](https://docs.salad.com/container-engine/how-to-guides/job-processing/kelpie#cloud-storage%3A-r2).
+
+### Plan your folder layout (prefixes)
+
+We recommend **job-scoped prefixes** to keep outputs isolated:
+
+```text
+s3://<bucket>/
+└─ outputs/<job_id>/   # MP4s uploaded by the workers
+```
+
+### Paths used by the worker
+
+- **`/opt/outputs`** — worker writes the rendered MP4 here.
+
+> Your Kelpie job **must** include a `sync.after` rule that uploads `/opt/outputs/` to your bucket.
+
+## Getting Your Container Group ID
+
+```bash
+curl -X GET \
+  --url "https://api.salad.com/api/public/organizations/<organization_name>/projects/<project_name>/containers/<container_group_name>" \
+  --header 'Content-Type: application/json' \
+  --header 'Salad-Api-Key: <api-key>'
+```
+
+Record the `.id` from the response; you'll reference it when submitting jobs.
+
+## Parameters you can send (Kelpie job `arguments`)
+
+Workers execute `/opt/t2v.py`. Supply arguments to control video generation:
+
+- `--prompt` (string, **required**) — scene description.
+- `--negative_prompt` (string, optional) — override the default quality/safety filter.
+- `--width` (int, default **`1280`**) — output width in pixels.
+- `--height` (int, default **`720`**) — output height in pixels.
+- `--num_frames` (int, default **`81`**) — frame count (~5 s at 16 fps).
+- `--guidance_scale` (float, default **`4.0`**) — first-stage CFG strength.
+- `--guidance_scale_2` (float, default **`3.0`**) — second-stage CFG strength.
+- `--num_inference_steps` (int, default **`40`**) — diffusion steps.
+- `--cpu_offload` (flag) — offload large layers to CPU when VRAM is tight.
+- `--fps` (int, default **`16`**) — frames per second of the exported MP4.
+- `--output` (string, optional) — full output path (defaults to `/opt/outputs/<job-id>.mp4`).
+- `--id` (string, optional) — job identifier for logs/filenames (random UUID if omitted).
+
+> The worker enables `pipe.enable_model_cpu_offload()` automatically. Stick to known-good resolutions such as 1280×720.
+
+## Submit a Job to Kelpie (Text → Video)
+
+Before running the command below make sure you have:
+
+- Your **container group ID** (see above).
+- An **S3-compatible bucket** and credentials configured on the container.
+- Your **Salad API headers**: `SALAD_API_KEY`, organization, and project.
+- Chosen **generation parameters** (minimum: a `--prompt`).
+
+```bash
+export SALAD_API_KEY="<salad-api-key>"
+export SALAD_ORGANIZATION="<organization>"
+export SALAD_PROJECT="<project>"
+
+curl -s -X POST "https://kelpie.saladexamples.com/jobs" \
+  -H "Content-Type: application/json" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" \
+  -d @- <<'JSON'
+{
+  "container_group_id": "<container_group_id>",
+  "command": "python",
+  "arguments": [
+    "/opt/t2v.py",
+    "--id", "wan-a14b-dc-001",
+    "--prompt", "Epic aerial shot of a futuristic cityscape at dusk, neon reflections glistening on wet streets",
+    "--width", "1280",
+    "--height", "720",
+    "--num_frames", "81",
+    "--cpu_offload"
+  ],
+  "sync": {
+    "after": [
+      { "bucket": "<bucket>", "prefix": "outputs/wan-a14b-dc-001/", "local_path": "/opt/outputs/", "direction": "upload" }
+    ]
+  }
+}
+JSON
+```
+
+Each node launches up to eight workers. Submit multiple jobs to keep all GPUs busy; Kelpie will fan them out
+automatically.
+
+## Monitor a Job
+
+```bash
+curl -s "https://kelpie.saladexamples.com/jobs/<kelpie-job-id>" \
+  -H "Salad-Api-Key: $SALAD_API_KEY" \
+  -H "Salad-Organization: $SALAD_ORGANIZATION" \
+  -H "Salad-Project: $SALAD_PROJECT" | jq .
+```
+
+## Troubleshooting
+
+- **Job “succeeded” but no MP4** — Ensure `sync.after` uploads `/opt/outputs/` and you didn't override `--output` to
+  another folder.
+- **Out-of-memory (OOM)** — Enable `--cpu_offload`, reduce `--num_frames`, or lower resolution.
+- **Uneven GPU utilization** — Confirm you have enough queued jobs; each GPU processes one job at a time.
+- **Unexpected artifacts** — Tweak `--guidance_scale` / `--guidance_scale_2` or reduce `--num_inference_steps`.
+- **Slow generation** — Lower `--num_frames` or `--num_inference_steps`; shorter clips complete faster.
+
+> Need elastic capacity? Kelpie supports **queue-aware autoscaling**, including **scale-to-zero** when idle. Invite the
+> Kelpie service account to your organization, then create a scaling rule via the
+> [Create Scaling Rule endpoint](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule).
