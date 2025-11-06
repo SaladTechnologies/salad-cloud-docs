@@ -99,21 +99,21 @@ GPU-intensive workloads. SaladCloud offers a compelling alternative that address
 
 ## Feature Comparison
 
-| Feature                | AWS Batch                            | SaladCloud                                           |
-| ---------------------- | ------------------------------------ | ---------------------------------------------------- |
-| **Job Scheduling**     | Priority-based with fair share       | FIFO queue processing                                |
-| **Auto Scaling**       | Based on queue depth                 | Queue-based or custom metrics                        |
-| **Spot/On-Demand Mix** | Configurable compute environments    | 4 priority tiers (batch adds 40-50% to base savings) |
-| **GPU Support**        | Accelerated Computing instances      | Consumer GPUs (RTX 4090, 5090, etc.)                 |
-| **Container Runtime**  | ECS or EKS                           | Docker containers                                    |
-| **Job Retries**        | Configurable retry attempts          | Automatic 3 retries (4 total attempts)               |
-| **Job Timeouts**       | Configurable per job                 | Container-level configuration                        |
-| **Long-Running Jobs**  | Supported with spot instance risks   | Use Kelpie for checkpointing/resumption              |
-| **Multi-Step Jobs**    | Via Step Functions                   | Single container jobs (orchestrate externally)       |
-| **Storage**            | EBS volumes, EFS                     | S3-compatible cloud storage (e.g., R2)               |
-| **Networking**         | VPC, Security Groups                 | No networking config needed with Job Queues          |
-| **Monitoring**         | CloudWatch Metrics/Logs              | Portal metrics, external monitoring tools            |
-| **Cost Model**         | EC2/Fargate pricing + Batch overhead | Simple hourly rates (billed per second)              |
+| Feature                | AWS Batch                            | SaladCloud                                         |
+| ---------------------- | ------------------------------------ | -------------------------------------------------- |
+| **Job Scheduling**     | Priority-based with fair share       | FIFO queue processing                              |
+| **Auto Scaling**       | Based on queue depth                 | Queue-based or custom metrics                      |
+| **Spot/On-Demand Mix** | Configurable compute environments    | 4 priority tiers ("Lowest" adds 40-50% to savings) |
+| **GPU Support**        | Accelerated Computing instances      | Consumer GPUs (RTX 4090, 5090, etc.)               |
+| **Container Runtime**  | ECS or EKS                           | Docker containers                                  |
+| **Job Retries**        | Configurable retry attempts          | Automatic 3 retries (4 total attempts)             |
+| **Job Timeouts**       | Configurable per job                 | Container-level configuration                      |
+| **Long-Running Jobs**  | Supported with spot instance risks   | Use Kelpie for checkpointing/resumption            |
+| **Multi-Step Jobs**    | Via Step Functions                   | Single container jobs (orchestrate externally)     |
+| **Storage**            | EBS volumes, EFS                     | S3-compatible cloud storage (e.g., R2)             |
+| **Networking**         | VPC, Security Groups                 | No networking config needed with Job Queues        |
+| **Monitoring**         | CloudWatch Metrics/Logs              | Portal metrics, external monitoring tools          |
+| **Cost Model**         | EC2/Fargate pricing + Batch overhead | Simple hourly rates (billed per second)            |
 
 ## Migration Requirements
 
