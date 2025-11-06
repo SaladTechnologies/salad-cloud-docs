@@ -53,7 +53,7 @@ requirements, no more selecting an instance type from an endlessly long pricing 
 
 When creating a Container Group in SCE, you select the required hardware that will be dedicated to your application when
 it runs on SaladCloud. The current rate for each type of hardware can be found on our
-[pricing page](https://salad.com/pricing).
+[pricing page](https://salad.com/pricing). For GPU container groups, there are no additional charges for RAM and vCPU.
 
 ### Example 1
 
@@ -65,11 +65,11 @@ Per Instance Cost = 1 vCPU x $0.004 per vCPU + 2 GB x $0.001 per GB = $0.006/hr
 
 ### Example 2
 
-You create a Container Group with 4 vCPU, 6 GB RAM, RTX 3060 GPU, and 5 replicas
+You create a Container Group with 4 vCPU, 6 GB RAM, RTX 3060 GPU at "low" priority, and 5 replicas
 
-Per Instance Cost = 4 vCPU x $0.004 per vCPU + 6 GB x $0.001 per GB + 1 RTX 3060 x $0.08 = $0.132/hr
+Per Instance Cost = 1 RTX 3060 at Low Priority x $0.047 = $0.047/hr
 
-**Total Cost** = $0.132/hr (per Instance) x 5 replicas = $0.66/hr
+**Total Cost** = $0.047/hr (per Instance) x 5 replicas = $0.235 /hr
 
 ## Running Time
 

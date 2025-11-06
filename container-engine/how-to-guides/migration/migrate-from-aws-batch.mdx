@@ -6,7 +6,7 @@ description:
   savings while maintaining job orchestration capabilities.'
 ---
 
-_Last Updated: August 13, 2025_
+_Last Updated: November 6, 2025_
 
 # Overview
 
@@ -53,8 +53,10 @@ GPU-intensive workloads. SaladCloud offers a compelling alternative that address
 **Cost Advantages:**
 
 - **90% Lower Compute Costs**: GPU + CPU + RAM combined cost a fraction of EC2 instances
-  - RTX 4090 setup: \$0.36/hr vs P3.2xlarge: \$3.06/hr
-- **Transparent Component Pricing**: Simple rates - \$0.004/vCPU/hour + \$0.001/GB RAM/hour + GPU rate
+  - RTX 4090 setup: \$0.30/hr at high priority vs P3.2xlarge: \$3.06/hr
+- **Transparent Component Pricing**:
+  - **GPU Containers:**GPU hourly rate
+  - **CPU-only Containers:** - \$0.004/vCPU/hour + \$0.001/GB RAM/hour
 - **Per-Second Billing**: Hourly rates tracked per second for running containers
 - **No Hidden Costs**: No charges for VPC endpoints, NAT gateways, or data transfer between AZs
 
