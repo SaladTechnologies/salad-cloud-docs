@@ -2,7 +2,7 @@
 title: 'Priority Pricing'
 ---
 
-_Last Updated: October 30, 2024_
+_Last Updated: November 06, 2025_
 
 ## SaladCloud Infrastructure
 
@@ -20,13 +20,13 @@ redundancy.
 ## Priority Levels
 
 Priority levels let you balance interruptions and cost savings according to your needs. Container Groups run at one of
-four priority levels on our network: High, Medium, Low, or Batch. Lower priority levels have reduced costs. Higher
-priority container groups can preempt lower priority ones if a higher-paying job becomes available. If you find that
-instances at a lower priority level are reallocating too frequently for your needs, you can edit the container group to
-select a higher priority level.
+four priority levels on our network: "High", "Medium", "Low", or "Lowest" (formally "Batch"). Lower priority levels have
+reduced costs. Higher priority container groups can preempt lower priority ones if a higher-paying job becomes
+available. If you find that instances at a lower priority level are reallocating too frequently for your needs, you can
+edit the container group to select a higher priority level.
 
 After adding a GPU to your container group, you can choose between priority levels. At the highest priority level, your
 container group instances will not be interrupted _by other workloads_. However, high priority instances **will** still
 be reallocated if your container exits, you request a reallocation, or the node powering the instance disconnects.
-Container groups without a GPU always run at the Batch priority level, and can be interrupted by any container group
+Container groups without a GPU always run at the "Lowest" priority level, and can be interrupted by any container group
 requesting a GPU.
