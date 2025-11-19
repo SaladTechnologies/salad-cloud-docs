@@ -179,6 +179,9 @@ Pytube
 quantizations
 Quickstart
 qwen
+rzup
+risc
+risczero
 rclone
 Rclone
 reauthentication
