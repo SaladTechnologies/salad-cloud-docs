@@ -1,0 +1,149 @@
+---
+title: RISC Zero (Kelpie) Recipe
+sidebarTitle: RISC Zero (Kelpie)
+description: Queue RISC Zero proving jobs on SaladCloud GPUs using Kelpie and S3-compatible storage.
+---
+
+_Last Updated: October 24, 2025_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe provisions a **GPU-ready Kelpie worker** with the entire [**RISC Zero**](https://github.com/risc0/risc0)
+toolchain already installed:
+
+- Stable Rust + `cargo`
+- `rzup` toolchains (Rust, cargo-risczero, `r0vm`)
+- CUDA 12.x for accelerated proving
+- A clone of the latest `risc0` repo under `/opt/risc0`
+- Sample helpers in `/opt/risc0/examples/`
+
+This container uses the [Kelpie worker](https://github.com/SaladTechnologies/kelpie). You enqueue jobs (via the Kelpie
+API), the worker downloads your project from S3-compatible storage, runs your `cargo` command (e.g.,
+`cargo run -F cuda --release`), and uploads `/opt/results/` back to the same bucket.
+
+Use this recipe when you need to prove custom guest programs or benchmark RISC Zero locally on Salad GPUs without wiring
+up your own infrastructure. You can also use it as a starting point to build more complex proof pipelines of your own.
+
+## Prerequisites
+
+1. **Salad organization + project** where you can deploy recipes and create API keys.
+2. **S3-compatible bucket** (Cloudflare R2, AWS S3, MinIO, etc.) for inputs and outputs. You will provide the Access
+   Key, Secret Key, Region, and (for R2) Endpoint URL when deploying the recipe.
+3. (Optional) **Queued autoscaling** invite the Kelpie service account to your Salad org if you plan to use Kelpie’s
+   queue-aware scaler.
+
+## Deploy the Recipe
+
+1. Open the [SaladCloud Portal](https://portal.salad.com), choose organization and project, then click **Deploy a
+   Container Group** and search for **RISC Zero ZKP**.
+2. Fill in the form:
+   - **Container Group Name** – unique name of the container group.
+   - **Storage Access Key / Secret Key** – credentials for your S3-compatible bucket.
+   - **Storage Region** – e.g., `auto` for Cloudflare R2 or `us-east-1` for AWS.
+   - **Storage Endpoint URL** – leave blank for AWS; for R2 provide the custom endpoint
+     (`https://<account>.r2.cloudflarestorage.com`).
+3. Deploy. The container group comes online with 16 vCPUs, 8 GB RAM, and a 24 GB GPU. You can modify those settings by
+   clicking **Modify Configuration** Each replica runs one Kelpie worker.
+
+## Kelpie Job Flow
+
+Kelpie jobs are simple JSON documents with:
+
+- `command` + `arguments` – what to run (e.g.,
+  `bash -lc "RUSTFLAGS=\"-C target-cpu=native\" cargo run -F cuda --release |& tee /opt/results/hello_world.log"`).
+- `sync.before` – download your project from S3.
+- `sync.after` – upload `/opt/results/` once the job completes.
+
+The repo ships two helper scripts (see `salad-recipes/recipes/risc0/`):
+
+- `submit_kelpie_job.py` – example job submitter
+- `check_kelpie_job.py` – poll job status
+
+These are meant as starting points. Edit them to point at your prefix/bucket.
+
+### Sample Submission Script
+
+The bundled script already knows how to run the hello-world demo on GPU. Update `build_sync` to download your project
+prefix under ""before", then run:
+
+```bash
+export SALAD_API_KEY=...
+export SALAD_ORGANIZATION=your-org
+export SALAD_PROJECT=your-project
+export CONTAINER_GROUP_ID=<container-group-id>
+export BUCKET_NAME=<your-bucket>
+python recipes/risc0/submit_kelpie_job.py
+```
+
+What it does:
+
+1. Creates a job ID (`job-xxxxxx`).
+2. Builds a Kelpie job that:
+   - `sync.after` uploads `/opt/results/` to `s3://<bucket>/hello-world/<job-id>/`
+   - Runs `RUSTFLAGS="-C target-cpu=native" cargo run -F cuda --release` in `/opt/risc0/examples/hello-world` while
+     streaming output to `/opt/results/hello_world.log`
+3. Posts the job to Kelpie and (optionally) polls until it finishes.
+4. Prints Kelpie job id.
+
+Replace the `cargo run ...` command with your own proof pipeline (e.g., running `cargo run --release --bin my-host` or
+`python scripts/prove.py`). Make sure any artifacts you care about land under `/opt/results/` so Kelpie uploads them.
+
+### Sync Patterns
+
+Typical sync for custom projects:
+
+```json
+{
+  "before": [
+    {
+      "bucket": "risc0",
+      "prefix": "projects/my-proof/",
+      "local_path": "/opt/projects/",
+      "direction": "download"
+    }
+  ],
+  "during": [],
+  "after": [
+    {
+      "bucket": "risc0",
+      "prefix": "results/${JOB_ID}/",
+      "local_path": "/opt/results/",
+      "direction": "upload"
+    }
+  ]
+}
+```
+
+Copy that pattern into your submission script. You can reference environment variables (e.g., `${JOB_ID}`) inside
+prefixes to keep outputs separated by job.
+
+## Monitor Jobs
+
+Use the helper or the raw API to check job status:
+
+```bash
+JOB_ID=job_id_returned_in_step_above \
+python recipes/risc0/check_kelpie_job.py
+```
+
+This prints the Kelpie job JSON, including `status`, and all the other metadata.
+
+## Customizing the Worker
+
+- **Different Provers:** Copy your host + guest crates into the bucket and point Kelpie at them via `sync.before`. The
+  base image already has CUDA + Rust.
+- **External Dependencies:** you can download them inside your `bash -lc` script (e.g.,
+  `pip install -r requirements.txt`) or fork the recipe repo and modify it.
+- **Autoscaling:** Kelpie supports **queue-aware autoscaling**, including **scale-to-zero** when the queue is empty.
+  Invite the Kelpie service account to your organization, then create a scaling rule with the
+  [Create Scaling Rule endpoint](https://kelpie.saladexamples.com/docs#/default/post_CreateScalingRule).
+
+## Resources
+
+- [RISC Zero GitHub](https://github.com/risc0/risc0)
+- [Kelpie Job Queue Docs](https://docs.salad.com/container-engine/how-to-guides/job-processing/kelpie)
+- [Kelpie API Reference](https://kelpie.saladexamples.com/docs)
+- [Recipe Repo](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/risc0)
+- [Cloud storage setup for Kelpie](https://docs.salad.com/container-engine/how-to-guides/job-processing/kelpie#cloud-storage%3A-r2)
