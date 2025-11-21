@@ -78,6 +78,8 @@ getsize
 gevent
 GGUF
 gguf
+gnark
+Groth
 gsutil
 Healthcheck
 healthz
@@ -163,6 +165,8 @@ pafy
 Pafy
 pbtxt
 Pelagus
+Plonkish
+Plonky
 POINTOPOINT
 popitem
 pretrained
@@ -212,6 +216,7 @@ saladtechnologies
 salesforce
 schnell
 scnode
+snarkjs
 SD.Next
 sdapi
 sdnext
@@ -226,6 +231,7 @@ srcg
 SRCG
 subseed
 subseeds
+supervisord
 svix
 tedlium
 threadpoolctl
@@ -273,6 +279,8 @@ yahma
 yolob8m-custom
 yolov8
 zapier
+ZKML
+ZKVMs
 zset
 drwxr
 czvf
