@@ -291,7 +291,8 @@
                   "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-srcg",
                   "container-engine/how-to-guides/molecular-dynamics-simulation/gromacs-job-queue",
                   "container-engine/how-to-guides/molecular-dynamics-simulation/openmm-srcg",
-                  "container-engine/how-to-guides/rendering/blender-input"
+                  "container-engine/how-to-guides/rendering/blender-input",
+                  "container-engine/how-to-guides/zero-knowledge-proofs/custom-zk-proofs"
                 ]
               }
             ]

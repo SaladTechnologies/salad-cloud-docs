@@ -1,0 +1,280 @@
+---
+title: 'Run Custom ZK Proofs on SaladCloud'
+sidebarTitle: 'Zero-Knowledge Proofs'
+description: 'Design, deploy, and operate zero-knowledge proving pipelines on SaladCloud'
+---
+
+_Last Updated: November 21, 2025_
+
+## What Zero-Knowledge Proofs Are
+
+Zero-knowledge proofs (ZKPs) let one party prove a statement without revealing the underlying data. Modern provers rely
+on heavy polynomial arithmetic (MSM/FFT) and benefit from GPUs for parallelism. Common proof families you might bring to
+SaladCloud, but not limited include:
+
+- **SNARKs (Groth16, classic PLONK/Plonkish, Marlin)** – short proofs that typically rely on a structured reference
+  string (trusted setup, often universal or updatable); widely used in Halo2/KZG-style workflows.
+- **STARKs** – transparent, FRI-based proofs with larger but more hash-heavy, post-quantum-friendly artifacts (e.g.,
+  Winterfell, StarkWare toolchains, Plonky2-style stacks).
+- **Bulletproofs** – no trusted setup and logarithmic-size proofs, often used for range proofs and relatively small
+  circuits. Usually CPU-bound today, but MSM-heavy steps can be offloaded to GPUs.
+- **ZKML / custom pipelines** – proof systems wrapped around model inference traces, using general-purpose ZKVMs (RISC
+  Zero, SP1) or app-specific circuits built in gnark, halo2, or arkworks.
+
+This guide is a starting point for running your existing provers on SaladCloud, focusing on patterns rather than a
+single recipe so you can choose the storage, queueing, and container strategy that fits your stack.
+
+## Why SaladCloud for ZKP's
+
+- **Elastic GPU capacity for heavy math** – Scale across a large fleet of NVIDIA GPUs for MSM/FFT-heavy proving, scale
+  down to zero when you are done.
+
+- **CPU-only workloads supported** – If your prover (or parts of your pipeline) doesn’t require GPU acceleration, you
+  can run it on CPU-only nodes and use GPUs only when you need them.
+
+- **Queue-native or BYO orchestration** – Use Salad Job Queues or
+  [Kelpie](/container-engine/how-to-guides/job-processing/kelpie) for managed job distribution, retries, and
+  autoscaling, or integrate with existing queues such as SQS, Pub/Sub or RabbitMQ.
+
+- **Flexible storage integration** – Pull inputs and parameters from S3-compatible object storage (for example
+  Cloudflare R2, AWS S3, MinIO) or any HTTP(S) endpoint, and write proofs, logs, and receipts back to the same layout.
+
+- **Built-in data sync, simple workers** – Let Kelpie workers handle downloading inputs, uploading outputs, and syncing
+  checkpoints between nodes' local disk and S3-compatible storage, so containers only need to run the prover binaries
+  and emit artifacts.
+
+- **Bring-your-own proving stack** - Build a Docker image that contains your existing prover toolchain (for example RISC
+  Zero, Halo2, Plonky2, gnark, or a custom CUDA-based prover) and run it on Salad Container Engine. In most cases you
+  can reuse your current build scripts, environment variables, and CI/CD pipelines with only minor changes to the
+  deployment step.
+
+- **Designed for bursty, interruptible workloads** – Use SaladCloud’s distributed, interruptible GPU fleet and priority
+  pricing tiers to run large batches of proofs at low cost and let Salad handle node reallocation and Salad Job Queue or
+  Kelpie manage retries and scaling.
+
+## Choose your deployment pattern
+
+Start by matching your ZK workload shape to one or more common patterns. The following sections show how to prepare
+artifacts and implement each option.
+
+- **Queue-driven batch** – Use a job queue ([Salad Job Queues](/container-engine/explanation/job-processing/job-queues),
+  [Kelpie](/container-engine/how-to-guides/job-processing/kelpie), or your existing system such as
+  [SQS](/container-engine/how-to-guides/job-processing/sqs), Redis, or
+  [RabbitMQ](/container-engine/how-to-guides/job-processing/rabbitmq)) as the front door for proofs. Your Salad
+  container group runs GPU (or CPU-only) workers that pull jobs, run the prover, and upload outputs to object storage.
+  This fits waves of many similarly-sized proofs (rollup batches, blocks, repeated ML traces) and works well with
+  interruptible nodes because retries are handled at the queue level.
+
+- **API-facing prover service** – Keep a small dispatcher or API server running inside a container group, expose it via
+  [Container Gateway](/container-engine/explanation/gateway), and let it turn incoming requests (from your backend, SaaS
+  app, or webhooks) into proof work. For short proofs you can run the prover directly in the same container; for heavier
+  jobs, the dispatcher can write to a queue (Kelpie, Salad Job Queues, or your own broker) and separate worker groups
+  perform the proving.
+
+- **Multi-service worker containers** – If your prover stack currently runs as several containers (for example, a prover
+  process, a separate verifier, and a small coordinator or metrics helper), package those processes into a single Docker
+  image and start them with a process manager such as
+  [s6-overlay](container-engine/how-to-guides/job-processing/queue-worker), supervisord, or a custom entrypoint script.
+  Salad runs one container per node, but that container can host multiple processes. To handle more proofs, you increase
+  the container group replica count so more nodes run the same stack in parallel.
+
+- **On-demand / CI-triggered runs** – Use the
+  [SaladCloud API](reference/saladcloud-api/container-groups/create-container-group) from your CI/CD pipeline or a
+  one-off script to spin up a container group, run a fixed set of proofs (for example regression tests, parameter
+  sweeps, or benchmark runs), and then scale the group back down or stop it when finished. This avoids keeping a queue
+  and workers running between bursts, but you should account for cold starts: large images can take a few minutes to
+  become ready.
+
+If you’re unsure where to start, begin with our ready to go [risc0 recipe](/container-engine/reference/recipes/risc0)
+with Kelpie to test out the system and adapt it to your prover of choice.
+
+## Prepare your proving project for Salad
+
+- **Containerize the prover** – Build a Docker image that includes your prover toolchain (for example Rust + `rzup`/RISC
+  Zero, `snarkjs`, Halo2, `cargo-sp1`, Go + `gnark`, or Python bindings plus CUDA if you need GPU acceleration). Keep
+  the entrypoint simple: it can be a single shell script that starts one prover process, a small script that
+  orchestrates multiple processes, or a Kelpie worker.
+
+- **Separate code from data** – Keep proving keys, guest binaries, inputs, and per-job parameters in object storage (for
+  example S3-compatible bucket) rather than baking them into the image. At runtime, sync the required files into a
+  working directory such as `/opt/projects/<name>/` and write receipts, proofs, and logs to `/opt/results/` for upload.
+
+- **Parameterize with environment variables** – Read the proof “type” (for example which circuit/program to use),
+  proving key locations, input objects, and output prefixes from
+  [environment variables](container-engine/how-to-guides/environment-variables) so the same image can serve multiple use
+  cases or networks without rebuilds. You can change these env vars at deployment time on Salad, which makes it easy to
+  duplicate or tweak container groups without rebuilding the image.
+
+- **Checkpoint long-running work** – For long STARK or ZK-VM jobs, write partial artifacts into the upload folder
+  periodically. If a node is interrupted and the job is retried from the queue, your prover can resume from the latest
+  checkpoint instead of restarting from scratch.
+
+## Build your proving image
+
+1. **Choose a base image** – For GPU-accelerated provers, start from an NVIDIA CUDA runtime base such as
+   `nvidia/cuda:12.3.1-runtime-ubuntu22.04`. For CPU-only provers, a minimal Linux base image (for example
+   `ubuntu:22.04`) is usually sufficient.
+
+2. **Install the prover toolchain** – Add the languages and libraries your stack needs, such as: Rust + `cargo` +
+   `rzup`/RISC Zero or `arkworks`/Halo2 crates, Go + `gnark`, or Python plus any bindings and CLI tools you use to drive
+   the prover. Keep this layer focused on shared tooling rather than per-circuit data.
+
+3. **Decide what to prebuild vs. fetch at runtime** – Keep big or frequently changing artifacts outside of your image in
+   external storage and download them at runtime or at process execution. For small, shared, and rarely changing assets,
+   you may optionally bake them into the image under to avoid repeated downloads. Remember that smaller images will
+   start faster and scale more easily.
+
+4. **Pick standard directories** – Use a consistent layout such as `/opt/projects/<circuit>/` for synced inputs and
+   `/opt/results/` for proofs, receipts, and logs. This makes it easy for queue workers or entrypoint scripts to locate
+   inputs and emit outputs in a predictable place.
+
+Publish the image to a container registry (Docker Hub, GHCR, or a private registry) and reference it when you create
+your Salad container group.
+
+## Organize inputs and outputs in object storage
+
+For most production ZK workloads on SaladCloud, we recommend using an S3-compatible bucket (Cloudflare R2, AWS S3,
+MinIO, etc.) as the source of truth for inputs and outputs. This makes it easy to run many jobs in parallel, retry work
+safely on interruptible nodes, and share results across services.
+
+Not all provers need external storage. For small, ephemeral, or CI-only proofs you can skip object storage and: bake
+small test vectors or fixtures into the image or mount them with your repo, and or API-facing services behind Container
+Gateway, send inputs in the request payload and return results directly. Object storage becomes important once
+inputs/outputs are large, job takes long time to complete or you need concurrent jobs and retries.
+
+Keep circuits, witnesses, and outputs isolated by prefix so multiple jobs can run safely in parallel:
+
+```text
+s3://<bucket>/
+  zkp-inputs/
+    <proof-type>/
+      <job-id>/
+        inputs/           # witnesses, public inputs
+        params/           # per-job proving params if needed
+  zkp-results/
+    <job-id>/
+      proof.log
+      proof.json
+      artifacts/          # extra receipts, checkpoints, metrics
+```
+
+When using Kelpie this will be the worker loop:
+
+- **Before sync**: download the circuit + inputs needed for a single proof into `/opt/projects/<name>/`.
+- **Command**: run your prover inside that directory.
+- **After sync**: upload `/opt/results/` (logs, receipts, benchmark stats) to `zkp-results/<job-id>/`.
+
+## Wire your prover into queues or APIs
+
+### Option 1: Queue Jobs with Kelpie
+
+Use [Kelpie](/container-engine/how-to-guides/job-processing/kelpie) when you want a job queue plus built-in data sync
+and autoscaling for long-running or heavy proofs.
+
+- Deploy a container group using your proving image, or start from the
+  [RISC Zero recipe](/container-engine/reference/recipes/risc0) as a template.
+- Configure S3-compatible storage credentials (Access Key, Secret Key, Region/Endpoint) as environment variables.
+- Point Kelpie at your container group ID and bucket, and submit jobs that specify:
+  - the `command` and `arguments` to run your prover, and
+  - which prefixes to sync into `/opt/projects/...` before the job and from `/opt/results/` after it.
+
+Kelpie monitors queue depth and job outcomes, adjusts replicas for you (optional), and retries failed jobs. Find more
+information about how to submit jobs and pull results in
+[the Kelpie documentation](/container-engine/how-to-guides/job-processing/kelpie) or in the
+[risc0 recipe](/container-engine/reference/recipes/risc0).
+
+### Option 2: Queue-driven batch with Salad Job Queues
+
+If you prefer a fully Salad-managed queue with HTTP-style workers, use
+[Salad Job Queues](/container-engine/explanation/job-processing/job-queues).
+
+- Include the [Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker) binary in your image.
+- Your container runs an HTTP server that:
+  - receives a job request from the Job Queue Worker,
+  - downloads any referenced inputs from object storage into `/opt/projects/...`,
+  - runs the prover,
+  - writes outputs to external storage, or sends response to the worker which will save it directly in to the queue
+  - returns success or failure to the worker.
+
+Job Queues are a good fit when you already have a queue-based solution, and you want queueing, retries, and scaling
+handled by Salad.
+
+### Option 3: API-facing prover behind Container Gateway
+
+If you want to expose your prover as an API, you can run a small HTTP service inside a container group and expose it via
+[Container Gateway](/container-engine/explanation/infrastructure-platform/networking).
+
+The service behaves like a standard API, for example:
+
+- `POST /prove` – accepts a request that describes what to prove and where the data lives.
+- `GET /jobs/<id>` – optionally returns status or a link to results.
+
+There are two common patterns:
+
+- **Synchronous proofs (good for short jobs)** The request contains everything needed to run the proof (for example, a
+  small witness and public inputs in JSON). The API:
+
+  - validates the request,
+  - runs the prover directly inside the handler, and
+  - returns the proof or receipt in the HTTP response.
+
+  This pattern works well when proofs are fast enough to complete within the Gateway timeout and callers expect an
+  immediate result.
+
+- **Reference-based proofs (for larger inputs/outputs)** The request does **not** carry large blobs. Instead, it
+  includes **references** to data locations, such as:
+
+  - pre-signed S3 URLs,
+  - Azure Blob SAS URLs, or
+  - bucket + key prefixes your service can resolve.
+
+  The API:
+
+  - reads those URLs/locations from the request,
+  - downloads the inputs into a local path for example: `/opt/projects/<proof-type>/<job-id>/`,
+  - runs the prover, and
+  - either:
+    - returns the proof/receipt directly in the response for smaller outputs, or
+    - uploads results to a caller-provided destination (for example another pre-signed URL or bucket/prefix) and returns
+      a pointer or job ID.
+
+Using references instead of inlining large payloads keeps requests small and lets you reuse the same storage layout as
+your batch workers.
+
+## Best Practices for Reliable Proofing
+
+- **Chunk big proofs**: Split large witness sets into smaller batches and queue multiple jobs for better parallelism.
+- **Cache parameters**: Keep SRS/CRS files in the container image or a shared prefix to avoid repeated downloads.
+- **Checkpoint**: Write intermediate artifacts so retries can resume (e.g., partial transcript files).
+- **Autoscale**: Enable Kelpie/Queue autoscaler to scale up under load and down to zero when quiet, or use
+  [SaladCloud API](/reference/saladcloud-api/container-groups/update-container-group) to scale programmatically.
+
+## Monitoring and debugging
+
+- **Kelpie jobs** – Use the Kelpie jobs API (for example `GET /jobs/{id}`) to check status, retry history, and log or
+  artifact locations. The RISC Zero recipe includes a helper (`recipes/risc0/check_kelpie_job.py`) you can adapt for
+  your own workloads.
+
+- **Salad Job Queues jobs** – Each enqueued job receives an ID that you can use to query status via the Job Queues API
+  or the Job Queues view in the SaladCloud Portal. Have your worker write proofs and logs to `/opt/results/` and sync
+  them back to object storage so you can inspect outputs even after the node is reallocated.
+
+- **API submitted jobs** – When you submit jobs directly to a container group via the Container Engine API, poll the job
+  status endpoint with the returned job ID.
+
+- **Logs and node metrics** – For deeper visibility, forward application logs and metrics to an
+  [external system](/container-engine/explanation/infrastructure-platform/external-logging) (for example Loki, ELK,
+  Datadog, or Prometheus) from inside your container, or inspect
+  [system and container logs](/container-engine/explanation/container-groups/container-logs) in the SaladCloud Portal.
+  Instrument your prover to emit lightweight telemetry (timings for MSM, FFT, witness generation, memory usage, batch
+  size) and store it with each job’s results to help with performance tuning and debugging.
+
+## Resources
+
+- [RISC Zero Kelpie Worker Recipe](/container-engine/reference/recipes/risc0)
+- [Save up to 77% on Zero-Knowledge Proofs with SaladCloud](https://blog.salad.com/zkp-with-saladcloud/)
+- [Kelpie Job Queue Guide](/container-engine/how-to-guides/job-processing/kelpie)
+- [Kelpie API Docs](https://kelpie.saladexamples.com/docs)
+- [Zero-Knowledge Proofs with SaladCloud](https://blog.salad.com/zkp-with-saladcloud/)
+- [Salad Job Queues](/container-engine/explanation/job-processing/job-queues)
+- [Container Gateway](/container-engine/explanation/infrastructure-platform/networking)
