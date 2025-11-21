@@ -213,7 +213,6 @@ There are two common patterns:
 
 - **Synchronous proofs (good for short jobs)** The request contains everything needed to run the proof (for example, a
   small witness and public inputs in JSON). The API:
-
   - validates the request,
   - runs the prover directly inside the handler, and
   - returns the proof or receipt in the HTTP response.
@@ -223,13 +222,11 @@ There are two common patterns:
 
 - **Reference-based proofs (for larger inputs/outputs)** The request does **not** carry large blobs. Instead, it
   includes **references** to data locations, such as:
-
   - pre-signed S3 URLs,
   - Azure Blob SAS URLs, or
   - bucket + key prefixes your service can resolve.
 
   The API:
-
   - reads those URLs/locations from the request,
   - downloads the inputs into a local path for example: `/opt/projects/<proof-type>/<job-id>/`,
   - runs the prover, and
