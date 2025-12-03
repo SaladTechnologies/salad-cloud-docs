@@ -1,0 +1,309 @@
+---
+title: 'Run Miners on SaladCloud'
+sidebarTitle: 'Miners'
+description: Guidance for deploying GPU or CPU miners on SaladCloud, from quick manual steps to fully automated setups.
+---
+
+_Last Updated: November 26, 2026_
+
+## Why run miners on SaladCloud
+
+- **Lowest-cost GPUs on the market** – Tap into SaladCloud's distributed fleet for GPU-heavy miners while keeping hourly
+  spend low.
+- **CPU-only friendly** – If your miner doesn't need a GPU, select CPU-only hardware to minimize cost.
+- **Ready to scale** – Choose the vCPU, RAM, and GPU profile that matches each miner and scale replica counts up or down
+  whenever you need bursts of capacity.
+- **Flexible images**: Bring your own Docker image or start from our Ubuntu recipe and install only what you need.
+
+This guide outlines two paths: a quick, manual setup that mirrors common miner instructions, and a production-ready,
+automated approach that best fits SaladCloud.
+
+## Manual quick start (easy, semi-automated)
+
+Use this if you want to validate that a miner works on SaladCloud before investing in automation. These steps follow the
+same path most miners document for "run it on Ubuntu/Linux/WSL" tutorials. They are easy but **not interruption
+tolerant**. Since Salad nodes can be interrupted and reallocated, you may need to redo setup steps whenever a node
+moves. This part of the guide is designed for less-technical users.
+
+### 1. Create a container group
+
+Follow the [Create a Container Group](/container-engine/explanation/container-groups/container-groups) instructions in
+the SaladCloud Portal or via API. Give the deployment a descriptive name so you can track it when several miners are
+running at once.
+
+### 2. Choose an Ubuntu recipe (or your miner image)
+
+- For miners that only publish Linux install scripts, pick the official Ubuntu 22.04 recipe on the "Create a New
+  Container Group" page.
+- If the miner has its own recommended Docker image pass recipe page by clicking "Get Started". You will need to pick
+  your hardware on the next few pages and on "Container Configuration" page you will paste the image registry URL
+  instead. You will save time because dependencies are already baked in.
+
+### 3. Tune the hardware configuration
+
+Adjust vCPU, RAM, and GPU class to match the miner's requirements
+
+- For CPU-only miners pick "SaladCloud Community - CPU only".
+- Increase disk size if the miner downloads large DAGs or chains.
+- Save the configuration and deploy a single replica until you confirm the miner works.
+
+### 4. Open the interactive terminal
+
+Once the replica is running, open the built-in terminal from the Container detail page. This gives you shell access
+inside the running container.
+
+### 5. Install tmux and create a session
+
+Portal terminals reset if you close the browser tab or if the network blips. Run the miner inside `tmux` so it survives
+terminal disconnects:
+
+```bash
+apt update
+apt install -y tmux
+tmux new -s miner // "miner" is the session name
+```
+
+Most miners publish "run in a terminal" instructions; use those inside the `tmux` session. Detach with `Ctrl+B, D` and
+re-attach with `tmux attach -t miner` whenever you reconnect.
+
+### 6. Install dependencies and launch the miner
+
+- Follow the miner's Linux or WSL instructions to install packages, wallets, or config files.
+- Keep scripts handy so you can replay them quickly the next time the replica is created.
+- Run the miner inside your tmux session once everything is configured.
+
+### 7. Watch for reallocation events
+
+Salad nodes are interruptible. If Salad reallocates your container (Instance tab shows a new Machine ID or the Events
+tab shows a reallocation), the node that held your manual setup disappears. tmux keeps the terminal alive during browser
+refreshes, but it cannot survive a reallocation, so you must repeat Steps 5 and 6 each time. Monitor the deployment so
+you can redeploy promptly; otherwise you will pay for an idle container while the miner is not running.
+
+## Automated container image (recommended)
+
+Use this approach for the best SaladCloud experience. For stable, repeatable mining on SaladCloud, build or reuse a
+Docker image and automate configuration. This approach requires more upfront work but results in a resilient deployment
+that can scale easily. This guide might not fit every miner, so adapt the steps as needed.
+
+### Prerequisites
+
+- Docker installed locally so you can build and push images.
+- Access to a container registry (Docker Hub, GHCR, AWS ECR, etc.).
+- Miner installation steps or a vendor-provided Docker image.
+- Any runtime secrets (wallets, mnemonics, pool URLs) available as environment variables.
+- Optional but recommended: an object storage bucket or persistent volume that stores long-lived miner IDs and logs.
+
+### If the Miner Provides a Docker Image
+
+Deploy the published image directly. In your container group definition:
+
+- Set required **environment variables** (wallets, worker names, pool endpoints, thread counts).
+- Configure **hardware** to match the miner’s recommendations (GPU type, CPU/RAM, storage).
+
+### If You Need to Build Your Own Image
+
+1. **Start from a base image** such as `ubuntu:22.04` or the miners recommended OS. Use specific GPU-enabled base images
+   if needed.
+2. **Install system packages** directly in the Dockerfile so they do not need to be installed manually at runtime. For
+   example:
+
+   ```Dockerfile
+   FROM ubuntu:22.04
+   ENV DEBIAN_FRONTEND=noninteractive
+   RUN apt-get update && \
+       apt-get install -y curl jq tmux ca-certificates libssl3 && \
+       rm -rf /var/lib/apt/lists/*
+   ```
+
+The packages installed under "RUN apt-get" will depend on the miner's requirements.
+
+3. **Add a command to download and install the miner non-interactively** using the project’s install script or package
+   instructions. For example here is installation of Nocturne miner:
+
+   ```Dockerfile
+    RUN curl -fsSL https://raw.githubusercontent.com/mgpai22/nocturne-miner-releases/main/install.sh -o install.sh && \
+      chmod +x install.sh && \
+      ./install.sh && \
+      rm -f install.sh
+   ```
+
+4. **Add a startup script** that can auto-configure the miner from environment variables and then launch it.
+
+5. **All commands should be non-interactive** so the container can start without user inputs.
+
+### Automate configuration on startup
+
+Use the entrypoint to make the container self-healing:
+
+- Generate, update or pull wallet files if they do not exist. If there are files that the miner needs, make sure they
+  are created at first miners run, are prebuilt into your image, or pulled from object storage.
+- Add environment variables such as `DONATION_ADDRESS`, `WORKER_NAME`, `POOL_URL`, or `THREAD_COUNT` and write them into
+  the miner's config or pass to the miner when it launches.
+- Sync data with a persistent storage so mnemonic phrases, miner IDs, or logs survive across restarts.
+
+### Deploy the automated miner on Salad
+
+1. Push the image to your registry and copy the reference (for example, `ghcr.io/your-org/custom-miner:latest`).
+2. Create or update the container group to use that image, then set the same environment variables you expect inside the
+   entrypoint or OS. You now control miners by editing env vars rather than connecting to the terminal and passing them
+   interactively.
+3. Configure the desired hardware profile (CPU-only or GPU) and replica count.
+
+With this pattern, Salad can interrupt or migrate nodes at any time and your miner will still come back online
+automatically, making it the best experience for long-running miners on SaladCloud.
+
+### Real example with Nocturne Miner
+
+Below is a real-world example that demonstrates how a miner image is constructed and how the container starts up. The
+Nocturne miner uses two files: a `Dockerfile` that builds the image and an `entrypoint.sh` script that runs each time
+the container starts.
+
+```Dockerfile
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install dependencies
+RUN apt-get update && \
+    apt-get install -y curl jq && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /root
+
+# Download and install nocturne-miner
+RUN curl -fsSL https://raw.githubusercontent.com/mgpai22/nocturne-miner-releases/main/install.sh -o install.sh && \
+    chmod +x install.sh && \
+    ./install.sh && \
+    rm -f install.sh
+
+# Add nocturne-miner to PATH
+ENV PATH="/root/.local/bin:$PATH"
+
+# Copy the startup script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command: run miner with optimal settings
+CMD ["nocturne-miner", "--no-menu", "--optimal"]
+```
+
+Step by step:
+
+1. **Base image and non-interactive installs.** Starts from `ubuntu:22.04` and sets `DEBIAN_FRONTEND=noninteractive` so
+   package installs do not prompt for input.
+2. **Installs system utilities.** Installs `curl` and `jq` (used later to fetch the miner and edit JSON settings), then
+   cleans apt caches to keep the image small.
+3. **Working directory**: Sets `WORKDIR /root` so subsequent commands run from the root home directory.
+4. **Installs the miner.** Downloads the project’s `install.sh` script directly from GitHub, makes it executable, runs
+   it, and deletes it. The miner binary is placed under `/root/.local/bin`, which is added to `PATH` for convenience.
+5. **Startup script**: Copies `entrypoint.sh` into the image, marks it executable, sets it as the `ENTRYPOINT`, and uses
+   a default `CMD` of `nocturne-miner --no-menu --optimal`. The entrypoint runs first; the CMD is the miner process it
+   ultimately launches non-interactively with optimal settings.
+
+Entrypoint Flow (What Runs After the Container Starts)
+
+Content of `entrypoint.sh`:
+
+```bash
+
+#!/bin/bash
+set -e
+
+SETTINGS_FILE="/root/settings.json"
+
+# Function to check if settings.json exists
+settings_exists() {
+    [ -f "$SETTINGS_FILE" ]
+}
+
+# If settings.json doesn't exist, generate it with auto mode
+if ! settings_exists; then
+    echo "Generating initial settings.json..."
+    # Run the miner to generate settings.json, it will exit after creating it
+    timeout 20 nocturne-miner --auto --no-menu --optimal || true
+
+fi
+
+# Update settings.json with environment variables if they are set
+if settings_exists; then
+    echo "Updating settings.json with environment variables..."
+
+    # Create a temporary file for jq operations
+    TMP_FILE=$(mktemp)
+
+    # Update donate_to if DONATE_TO is set and not empty
+    if [ -n "$DONATE_TO" ]; then
+        echo "Setting donate_to to: $DONATE_TO"
+        jq --arg donate "$DONATE_TO" '.donate_to = $donate' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    # Update worker_name if WORKER_NAME is set and not empty
+    if [ -n "$WORKER_NAME" ]; then
+        echo "Setting worker_name to: $WORKER_NAME"
+        jq --arg worker "$WORKER_NAME" '.worker_name = $worker' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    # Update worker_threads if WORKER_THREADS is set and not 0
+    if [ -n "$WORKER_THREADS" ]; then
+        echo "Setting worker_threads to: $WORKER_THREADS"
+        jq --argjson threads "$WORKER_THREADS" '.worker_threads = $threads' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    # Update gen_end_index if GEN_END_INDEX is set and not empty
+    if [ -n "$GEN_END_INDEX" ]; then
+        echo "Setting gen_end_index to: $GEN_END_INDEX"
+        jq --argjson gen_end "$GEN_END_INDEX" '.gen_end_index = $gen_end' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    # Update mnemonic if MNEMONIC is set and not empty
+    if [ -n "$MNEMONIC" ]; then
+        echo "Setting mnemonic to: [REDACTED]"
+        jq --arg mnemonic "$MNEMONIC" '.mnemonic = $mnemonic' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    # Update miner_id if MINER_ID is set and not empty
+    if [ -n "$MINER_ID" ]; then
+        echo "Setting miner_id to: $MINER_ID"
+        jq --arg miner_id "$MINER_ID" '.miner_id = $miner_id' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
+    fi
+
+    echo "Settings.json updated successfully!"
+    echo "Current settings:"
+    # Display settings with mnemonic redacted
+    jq '.mnemonic = "[REDACTED]"' "$SETTINGS_FILE"
+else
+    echo "Warning: settings.json was not created!"
+fi
+
+# Now execute the actual mining command
+echo "Starting miner..."
+exec "$@"
+```
+
+Step by step (this happens every time the container starts):
+
+1. **Check a config file exists, create one if it does not.** If `/root/settings.json` is missing, the script runs
+   `nocturne-miner --auto --no-menu --optimal` under a 20-second timeout to generate a default config and then exits.
+   Official miner instructions say that on first launch, Nocturne creates settings.json file with miner ID and would
+   normally ask for inputs (like worker name and number of threads) if run interactively. We do not want to run anything
+   interactively, so we use `--auto` and `--optimal` to generate the file with default values. `--no-menu` option tells
+   it to run without asking for user input.
+2. **Update settings.json with our custom values.** Now when `settings.json` exists, the script uses `jq` to patch
+   fields like `donate_to`, `worker_name`, `worker_threads`, `gen_end_index`, `mnemonic` whenever the corresponding
+   environment variables are set. This is where you inject required values (such as your wallet address) without
+   answering prompts. Environment variables are set through the SaladCloud Portal or API when creating or updating the
+   container group.
+3. **Shows current settings (with mnemonic redacted).** Prints the resulting JSON so you can confirm values without
+   exposing sensitive mnemonics.
+4. **Starts the miner.** `exec "$@"` replaces the shell with the command from `CMD` specified in the Dockerfile
+   (`nocturne-miner --no-menu --optimal`), launching the miner with the updated config.
+
+This pattern keeps the image lean, makes configuration repeatable via environment variables, and ensures the miner
+starts automatically after any SaladCloud reallocation. Since every miner creates it's own id we can safely scale to
+whatever number of workers we want and still pass the earnings to the same wallet
