@@ -6,7 +6,8 @@ This repository contains the Markdown files and media assets for the SaladCloud 
 ## Contributing
 
 We welcome contributions to the SaladCloud documentation. Please see the
-[contributing guidelines](./.github/CONTRIBUTING.md) for more information.
+[contributing guidelines](https://github.com/SaladTechnologies/salad-cloud-docs/blob/main/.github/CONTRIBUTING.md) for
+more information.
 
 ## Running Locally
 
