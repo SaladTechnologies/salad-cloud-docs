@@ -315,6 +315,7 @@
                   "container-engine/reference/recipes/ollama",
                   "container-engine/reference/recipes/openmm-srcg",
                   "container-engine/reference/recipes/quai",
+                  "container-engine/reference/recipes/nockpool-miner",
                   "container-engine/reference/recipes/risc0",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
