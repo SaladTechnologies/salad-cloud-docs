@@ -1,0 +1,52 @@
+---
+title: NockPool GPU Miner
+sidebarTitle: NockPool GPU Miner
+description: Deploy the NockPool GPU miner on SaladCloud to earn NOCK with your NockPool account token.
+---
+
+Run the **NockPool GPU Miner** recipe to connect your SaladCloud workers directly to your NockPool account and start
+earning $NOCK.
+
+## About NOCK Token
+
+NOCK is the native token of the NockPool network, a decentralized GPU mining pool focused on zero-knowledge proof
+generation and other GPU-intensive computation tasks. By running the NockPool miner on SaladCloud, you contribute GPU
+compute power to the network and earn NOCK tokens based on the computational work your nodes submit.
+
+## Prerequisites
+
+- NockPool account at [nockpool.com](https://nockpool.com/) with your wallet connected and payout address set.
+- An account token from the [NockPool Setup](https://nockpool.com/setup) page (starts with `nockacct_`). Keep this
+  secret—it is passed to the container as `ACCOUNT_TOKEN`.
+- A SaladCloud project with access to deploy recipes.
+
+## Deploy the recipe
+
+1. Open the **NockPool GPU Miner** recipe in the SaladCloud catalog.
+2. Enter a container group name and paste your NockPool account token into the form.
+3. Deploy the group; each container will authenticate to NockPool using your token and begin submitting shares.
+
+## Payouts and fees
+
+- You must complete KYC in NockPool before requesting a payout.
+- NockPool processes payout requests once per day based on submissions before **12AM GMT**.
+- The minimum withdrawal is **50.00 NOCK**, and **20.00 NOCK** must remain available to cover network fees.
+- NockPool charges a fee on each payout when earnings are withdrawn.
+
+## Why Run Miners on SaladCloud
+
+SaladCloud is an ideal platform for GPU mining operations, offering:
+
+- **Most affordable GPU pricing on the market**: Keep more of your mining rewards with industry-leading cost efficiency.
+- **Massive scale**: Access thousands of GPU nodes worldwide, allowing you to scale your mining operation instantly.
+- **Easy deployment**: Get started in minutes with pre-configured recipes, no infrastructure management required.
+
+**Need a custom mining setup?** If you're running a different miner or need custom configurations, check out our
+[Run Miners on SaladCloud](https://docs.salad.com/container-engine/how-to-guides/miners/run-miners-on-saladcloud) guide
+to learn how to deploy any containerized mining workload on the platform.
+
+## Helpful links
+
+- [NockPool Setup](https://nockpool.com/setup)
+- [Run miners on SaladCloud](https://docs.salad.com/container-engine/how-to-guides/miners/run-miners-on-saladcloud)
+- [Build custom ZK proofs containers](https://docs.salad.com/container-engine/how-to-guides/zero-knowledge-proofs/custom-zk-proofs)
