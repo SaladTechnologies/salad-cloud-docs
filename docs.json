@@ -47,6 +47,7 @@
                   "container-engine/explanation/container-groups/container-groups",
                   "container-engine/explanation/container-groups/deployment-lifecycle",
                   "container-engine/explanation/container-groups/disk-space",
+                  "container-engine/explanation/container-groups/ssh-and-terminal",
                   "container-engine/explanation/container-groups/container-logs",
                   "container-engine/explanation/container-groups/system-events"
                 ]
