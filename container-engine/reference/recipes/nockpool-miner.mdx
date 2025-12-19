@@ -1,28 +1,29 @@
 ---
-title: NockPool GPU Miner
-sidebarTitle: NockPool GPU Miner
-description: Deploy the NockPool GPU miner on SaladCloud to earn NOCK with your NockPool account token.
+title: NockPool GPU Prover
+sidebarTitle: NockPool GPU Prover
+description: Deploy the NockPool GPU Prover on SaladCloud to earn NOCK with your NockPool account token.
 ---
 
-Run the **NockPool GPU Miner** recipe to connect your SaladCloud workers directly to your NockPool account and start
+Run the **NockPool GPU Prover** recipe to connect your SaladCloud workers directly to your NockPool account and start
 earning $NOCK.
 
 ## About NOCK Token
 
-NOCK is the native token of the NockPool network, a decentralized GPU mining pool focused on zero-knowledge proof
-generation and other GPU-intensive computation tasks. By running the NockPool miner on SaladCloud, you contribute GPU
-compute power to the network and earn NOCK tokens based on the computational work your nodes submit.
+NOCK is the native token of the Nockchain network. Nockchain is a novel Layer-1 blockchain focused on "programmable
+sound money," uniquely using Zero-Knowledge Proof of Work (zkPoW) for consensus, not just traditional hashing, allowing
+for verifiable, efficient, and scalable computation within its network. By running the NockPool prover on SaladCloud,
+you contribute compute power to the network and earn NOCK tokens based on the computational work your nodes submit.
 
 ## Prerequisites
 
 - NockPool account at [nockpool.com](https://nockpool.com/) with your wallet connected and payout address set.
 - An account token from the [NockPool Setup](https://nockpool.com/setup) page (starts with `nockacct_`). Keep this
-  secret—it is passed to the container as `ACCOUNT_TOKEN`.
+  secret. It is passed to the container as `ACCOUNT_TOKEN`.
 - A SaladCloud project with access to deploy recipes.
 
 ## Deploy the recipe
 
-1. Open the **NockPool GPU Miner** recipe in the SaladCloud catalog.
+1. Open the **NockPool GPU Prover** recipe in the SaladCloud catalog.
 2. Enter a container group name and paste your NockPool account token into the form.
 3. Deploy the group; each container will authenticate to NockPool using your token and begin submitting shares.
 
@@ -31,9 +32,10 @@ compute power to the network and earn NOCK tokens based on the computational wor
 - You must complete KYC in NockPool before requesting a payout.
 - NockPool processes payout requests once per day based on submissions before **12AM GMT**.
 - The minimum withdrawal is **50.00 NOCK**, and **20.00 NOCK** must remain available to cover network fees.
-- NockPool charges a fee on each payout when earnings are withdrawn.
+- Nockpool charges a 4% pool fee on all blocks won by the pool. Network transaction fees are included only on
+  withdrawals.
 
-## Why Run Miners on SaladCloud
+## Why Run Miners and Provers on SaladCloud
 
 SaladCloud is an ideal platform for GPU mining operations, offering:
 
