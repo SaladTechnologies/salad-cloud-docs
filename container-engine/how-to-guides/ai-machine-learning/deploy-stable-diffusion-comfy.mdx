@@ -686,13 +686,11 @@ docker run -it --rm --gpus all \
 ```
 
 3. Access the interfaces:
-
    - **API:** http://localhost:3000
    - **Swagger docs:** http://localhost:3000/docs
    - **ComfyUI Web UI:** http://localhost:8188
 
 4. Design your workflow in the Web UI, then export it:
-
    - Open Settings (gear icon)
    - Enable "Dev mode Options"
    - Click "Save (API Format)" to download the workflow JSON
@@ -718,7 +716,6 @@ docker push your-registry/your-image:tag
 
 2. Create a Container Group via the [Portal](https://portal.salad.com) or
    [API](/reference/saladcloud-api/container-groups/create-container-group):
-
    - Set appropriate hardware (see [Hardware Recommendations](#hardware-recommendations))
    - Enable Container Gateway on port **3000**
    - **Use least-connection load balancing** (recommended for inference workloads)
@@ -729,7 +726,6 @@ docker push your-registry/your-image:tag
    - Optional: Enable authentication with `Salad-Api-Key` header
 
 3. Wait for deployment:
-
    - Image caches to SaladCloud's internal registry
    - Nodes download and start your container
    - Warmup workflow runs (if configured)
