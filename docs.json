@@ -57,6 +57,7 @@
                 "pages": [
                   "container-engine/explanation/infrastructure-platform/availability",
                   "container-engine/explanation/infrastructure-platform/container-registries",
+                  "container-engine/explanation/infrastructure-platform/log-explorer",
                   "container-engine/explanation/infrastructure-platform/external-logging",
                   "container-engine/explanation/infrastructure-platform/networking",
                   "container-engine/explanation/infrastructure-platform/health-probes",

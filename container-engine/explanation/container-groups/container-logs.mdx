@@ -2,7 +2,7 @@
 title: 'Container Logs'
 ---
 
-_Last Updated: September 3, 2025_
+_Last Updated: January 6, 2026_
 
 ## How to Log From Your Container
 
@@ -28,9 +28,7 @@ tab with the Machine ID value pre-filled.
 <img src="/container-engine/images/portal-container-instance-actions-view-logs.png" />
 
 The Container Logs feature has a simple interface meant to provide you with enough visibility for basic troubleshooting
-of your applications running on SaladCloud, but it is not an exhaustive logging solution and lacks analytics and
-filtering features that are available on dedicated logging platforms. For more robust logging functionality, we
-recommend configuring the
+of your applications running on SaladCloud. For more robust logging functionality, we recommend configuring the
 [External Logging Service option](/container-engine/explanation/infrastructure-platform/external-logging) in your
 container group.
 
@@ -50,10 +48,11 @@ When your query returns results you will see them in a scrollable table view. Ea
 
 Should your query yield no results, the table view will display "No data to display"
 
-**Availability and Limitations**
+For more sophisticated querying, you can use the Log Explorer or the Public API
+[Query Log Entries endpoint](/reference/saladcloud-api/logs/query-log-entries). Clicking the Log Explorer button will
+take you to the Log Explorer page in the SaladCloud Portal with the current query pre-populated.
 
-This feature is available exclusively through the SaladCloud portal interface, not accessible via the public API. It's
-in an early "Preview" stage, with the following considerations:
+**Availability and Limitations**
 
 - A maximum of 500 logs can be returned per query. Utilize specific query filters and time ranges to get the logs you
   are looking for.
@@ -64,9 +63,9 @@ in an early "Preview" stage, with the following considerations:
 ## Advanced Logging
 
 For more advanced on-platform logging capabilities, you can make use of the
-[Query Log Entries endpoint](/reference/saladcloud-api/logs/query-log-entries) in the API. This endpoint, rather than
-being scoped at the container group level, is scoped at the organization level, allowing you to view and aggregate logs
-from any number of container groups and projects.
+[Query Log Entries endpoint](/reference/saladcloud-api/logs/query-log-entries) in the API. This endpoint is scoped at
+the organization level, rather than the container group level, allowing you to view logs from any number of container
+groups and projects.
 
 This endpoint supports a more flexible query language as well, allowing you to make much more sophisticated filters
 across many fields, and supporting filters on structured logs emitted by your application.
@@ -80,11 +79,11 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --header "Salad-Api-Key: $salad_api_key" \
   --data '{
-  "end_time": "2023-11-07T05:31:56Z",
+  "end_time": "2025-11-07T05:31:56Z",
   "page_size": 1,
   "query": "<string>",
   "sort_order": "desc",
-  "start_time": "2023-11-07T05:31:56Z"
+  "start_time": "2025-11-07T05:31:56Z"
 }'
 ```
 
@@ -96,20 +95,20 @@ and receive a response like:
     {
       "json_log": {},
       "parent_span_id": "<string>",
-      "receive_time": "2023-11-07T05:31:56Z",
+      "receive_time": "2025-11-07T05:31:56Z",
       "resource": {
         "labels": {},
         "type": "<string>"
       },
       "severity": "debug",
       "span_Id": "<string>",
-      "time": "2023-11-07T05:31:56Z",
+      "time": "2025-11-07T05:31:56Z",
       "trace_Id": "<string>"
     }
   ],
   "organization_name": "acme-corp",
-  "page_max_time": "2023-11-07T05:31:56Z",
-  "page_min_time": "2023-11-07T05:31:56Z"
+  "page_max_time": "2025-11-07T05:31:56Z",
+  "page_min_time": "2025-11-07T05:31:56Z"
 }
 ```
 
@@ -145,5 +144,6 @@ Each log event takes the following structure.
 - The `time` field indicates the system time on the node where the log was emitted.
 - the `receive_time` field indicates the time when Axiom (what we use under the hood for log storage) received the log
   entry.
-- Any of these fields can be used in the query language. Here are some examples of queries you can make. These queries
-  can be passed as the `query` parameter in the body of the request to the API.
+- Any of these fields can be used in the query language.
+  [Here](https://docs.salad.com/container-engine/reference/log-queries#examples) are some examples of queries you can
+  make. These queries can be passed as the `query` parameter in the body of the request to the API.
