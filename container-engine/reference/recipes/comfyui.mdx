@@ -4,18 +4,21 @@ sidebarTitle: ComfyUI API
 description: Deploy popular image generation models with ComfyUI API on Salad Container Engine.
 ---
 
-_Last Updated: July 9, 2025_
+_Last Updated: January 8, 2026_
 
 <Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
 
 ## Overview
 
 Inference is powered by [ComfyUI](https://github.com/comfyanonymous/ComfyUI/), exposed via
-[ComfyUI API](https://github.com/SaladTechnologies/comfyui-api) to facilitate horizontally scalable operation. Users can
-make an HTTP request to the provided endpoints and get back one or more outputs in base64 encoded form, via Webhook, or
-via S3.
+[ComfyUI API](https://github.com/SaladTechnologies/comfyui-api) (v1.16.1) to facilitate horizontally scalable operation.
+Users can make an HTTP request to the provided endpoints and get back one or more outputs in base64 encoded form,
+via Webhook, or uploaded to S3, Azure Blob Storage, or Hugging Face.
 
 **THIS RECIPE DOES NOT SERVE THE WEB UI**.
+
+For a comprehensive deployment guide covering custom images, dynamic model loading, video generation, and job queues,
+see the [ComfyUI Deployment Guide](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy).
 
 Several models are available, including:
 

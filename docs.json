@@ -221,7 +221,6 @@
                   "container-engine/how-to-guides/ai-machine-learning/run-ollama",
                   "container-engine/how-to-guides/ai-machine-learning/run-tgi-text-generation-interface",
                   "container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy",
-                  "container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy",
                   "container-engine/how-to-guides/ai-machine-learning/deploy-video-generation-comfy",
                   "container-engine/how-to-guides/ai-machine-learning/manage-stable-diffusion-models",
                   "container-engine/how-to-guides/ai-machine-learning/image-captioning-vlm",
@@ -1386,7 +1385,35 @@
     },
     {
       "source": "/guides/image-generation/basic-how-to-deploy-flux-on-salad-comfy",
-      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/ai-machine-learning/deploy-flux-comfy",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-a1111",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-fooocus",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/guides/image-generation/basic-how-to-deploy-stable-diffusion-on-salad-sdnext",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
     },
     {
       "source": "/guides/image-generation/deploy-video-gen-on-salad-with-comfy",
