@@ -166,13 +166,13 @@ flowchart TB
 
 Models can be downloaded from multiple sources:
 
-| Source       | URL Format                                                                    | Notes                                 |
-| ------------ | ----------------------------------------------------------------------------- | ------------------------------------- |
-| HTTP/HTTPS   | `https://example.com/model.safetensors`                                       | Direct downloads                      |
-| Hugging Face | `https://huggingface.co/org/repo/resolve/main/model.safetensors`              | Supports gated models with `HF_TOKEN` |
-| Civitai      | `https://civitai.com/api/download/models/12345`                               | Use API download URLs                 |
-| S3           | `s3://bucket/path/model.safetensors`                                          | Requires AWS credentials              |
-| Azure        | `https://account.blob.core.windows.net/container/model.safetensors`           | Requires Azure credentials            |
+| Source       | URL Format                                                          | Notes                                 |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------- |
+| HTTP/HTTPS   | `https://example.com/model.safetensors`                             | Direct downloads                      |
+| Hugging Face | `https://huggingface.co/org/repo/resolve/main/model.safetensors`    | Supports gated models with `HF_TOKEN` |
+| Civitai      | `https://civitai.com/api/download/models/12345`                     | Use API download URLs                 |
+| S3           | `s3://bucket/path/model.safetensors`                                | Requires AWS credentials              |
+| Azure        | `https://account.blob.core.windows.net/container/model.safetensors` | Requires Azure credentials            |
 
 For authenticated sources, set the appropriate environment variables (`HF_TOKEN`, `AWS_ACCESS_KEY_ID`, etc.) or use
 [per-request credentials](#credentials-for-protected-sources).
@@ -247,6 +247,7 @@ curl -X POST http://localhost:3000/download \
 ```
 
 Parameters:
+
 - `url` - The URL to download from
 - `model_type` - Where to save the model (e.g., `checkpoints`, `loras`, `vae`, `controlnet`)
 - `filename` - Optional filename override (defaults to URL basename)
@@ -637,7 +638,8 @@ curl -X POST http://localhost:3000/workflow/txt2img \
   }'
 ```
 
-The `input` object contains your workflow-specific parameters (defined by `RequestSchema`), while output options like `s3`, `webhook`, and `convert_output` remain at the root level.
+The `input` object contains your workflow-specific parameters (defined by `RequestSchema`), while output options like
+`s3`, `webhook`, and `convert_output` remain at the root level.
 
 ### AI-Assisted Workflow Generation
 
