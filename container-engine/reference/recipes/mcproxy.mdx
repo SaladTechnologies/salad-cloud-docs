@@ -1,0 +1,259 @@
+---
+title: MCProxy Browser Server
+sidebarTitle: MCProxy
+description: Deploy remote headless browser sessions via MCP (Model Context Protocol) for AI agents on SaladCloud.
+---
+
+_Last Updated: January 8, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+MCProxy enables AI agents to control browsers running on geographically distributed SaladCloud containers. The browser
+server runs on SaladCloud, while the MCP server runs locally on your machine and connects to AI agent clients like
+Claude Desktop, Claude Code, Cursor, or Windsurf.
+
+Use cases include:
+
+- **Regional price checking** - Compare prices from different geographic locations
+- **Geo-targeted content verification** - Test how content appears in different regions
+- **Distributed web automation** - Automate browser tasks across multiple locations
+- **Multi-browser testing** - Test websites across Chromium, Firefox, and WebKit (Safari)
+
+## Key Features
+
+- **Multi-browser support**: Chromium (default), Firefox, or WebKit (Safari)
+- **Mobile device emulation**: 100+ device profiles (iPhone, iPad, Pixel, Galaxy, etc.)
+- **Stealth mode**: WebGL spoofing, navigator overrides, and realistic browser fingerprints
+- **Humanized interactions**: Human-like clicks, typing, and scrolling to avoid bot detection
+- **Cloudflare auto-wait**: Automatically wait for challenges to complete
+- **Cookie persistence**: Save and restore cookies for session management
+- **Location-aware sessions**: Each session reports geographic location (city, country, timezone, ISP)
+- **33 MCP tools**: Full browser automation including coordinate-based clicking for vision agents
+
+## Connecting Your MCP Client
+
+After deploying the recipe, configure your MCP client to connect using the Docker-based MCP server.
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or
+`%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "mcproxy": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "-e",
+        "MCPROXY_AUTH_TOKEN=your-auth-token",
+        "-e",
+        "MCPROXY_DEFAULT_ENDPOINT=wss://your-endpoint.salad.cloud",
+        "ghcr.io/saladtechnologies/mcproxy/mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+### Claude Code
+
+Add to your workspace `.mcp.json` or global settings:
+
+```json
+{
+  "mcpServers": {
+    "mcproxy": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "-e",
+        "MCPROXY_AUTH_TOKEN=your-auth-token",
+        "-e",
+        "MCPROXY_DEFAULT_ENDPOINT=wss://your-endpoint.salad.cloud",
+        "ghcr.io/saladtechnologies/mcproxy/mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+### Cursor / Windsurf
+
+Add to your MCP configuration file:
+
+```json
+{
+  "mcpServers": {
+    "mcproxy": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "-e",
+        "MCPROXY_AUTH_TOKEN=your-auth-token",
+        "-e",
+        "MCPROXY_DEFAULT_ENDPOINT=wss://your-endpoint.salad.cloud",
+        "ghcr.io/saladtechnologies/mcproxy/mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+<Note>
+  Replace `your-auth-token` with the Auth Token you configured when deploying the recipe, and
+  `your-endpoint.salad.cloud` with your container group's DNS endpoint.
+</Note>
+
+## Example Usage
+
+Once your MCP client is connected, you can ask your AI agent to perform browser automation tasks:
+
+### Basic Session Creation
+
+```
+Create a browser session and navigate to example.com
+```
+
+### Mobile Device Emulation
+
+```
+Create an iPhone 15 browser session and navigate to example.com.
+Take a screenshot to see the mobile layout.
+```
+
+### Multi-Browser Testing
+
+```
+Create a Chromium session and a Firefox session.
+Navigate both to example.com and take screenshots to compare rendering.
+```
+
+### Geo-Distributed Price Comparison
+
+```
+Create 3 browser sessions (they will connect to different geographic locations).
+List the sessions and tell me which locations they're in.
+Then compare prices for "iPhone 15" on apple.com from each location.
+```
+
+### Humanized Browsing
+
+```
+Create a session and navigate to the login page. Use humanized typing to
+enter the username and password, then humanized click to submit the form.
+```
+
+### Cloudflare-Protected Sites
+
+```
+Navigate to this Cloudflare-protected site with wait_for_cloudflare enabled.
+Wait up to 20 seconds for any challenges to complete automatically.
+```
+
+## MCP Tools Reference
+
+### Session Management
+
+| Tool                       | Description                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------- |
+| `browser_create_session`   | Create a new browser session with optional browser type and device emulation |
+| `browser_list_sessions`    | List all active sessions with browser type and location                      |
+| `browser_close_session`    | Close a session and free resources                                           |
+| `browser_list_devices`     | List all available device names for mobile emulation                         |
+| `browser_get_capabilities` | Get server capabilities and check for version mismatches                     |
+
+### Navigation
+
+| Tool                 | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `browser_navigate`   | Navigate to a URL with optional Cloudflare auto-wait |
+| `browser_go_back`    | Go back in history                                   |
+| `browser_go_forward` | Go forward in history                                |
+| `browser_reload`     | Reload the current page                              |
+
+### Interaction (Selector-Based)
+
+| Tool             | Description                      |
+| ---------------- | -------------------------------- |
+| `browser_click`  | Click an element by CSS selector |
+| `browser_type`   | Type text into an input          |
+| `browser_select` | Select a dropdown option         |
+| `browser_hover`  | Hover over an element            |
+| `browser_scroll` | Scroll the page or element       |
+
+### Interaction (Coordinate-Based)
+
+Uses relative coordinates (0-1 range) for vision agents:
+
+| Tool                      | Description                       |
+| ------------------------- | --------------------------------- |
+| `browser_click_at`        | Click at relative coordinates     |
+| `browser_double_click_at` | Double-click at coordinates       |
+| `browser_move_mouse`      | Move mouse to coordinates         |
+| `browser_drag`            | Drag from one position to another |
+
+### Content Extraction
+
+| Tool                  | Description                            |
+| --------------------- | -------------------------------------- |
+| `browser_screenshot`  | Take a screenshot (returns base64 PNG) |
+| `browser_get_content` | Get HTML content                       |
+| `browser_get_text`    | Get visible text                       |
+| `browser_evaluate`    | Execute JavaScript                     |
+
+### Cookie Management
+
+| Tool                    | Description                    |
+| ----------------------- | ------------------------------ |
+| `browser_get_cookies`   | Get cookies from the session   |
+| `browser_set_cookies`   | Set cookies in the session     |
+| `browser_clear_cookies` | Clear all cookies from session |
+
+## How To Use This Recipe
+
+### Authentication
+
+The Auth Token you provide when deploying the recipe must match the `MCPROXY_AUTH_TOKEN` configured in your MCP client.
+This shared secret authenticates the connection between your local MCP server and the browser servers running on
+SaladCloud.
+
+### Replica Count
+
+The recipe is configured for 3 replicas by default. Each replica can handle multiple browser contexts (10 by default).
+More replicas give you access to more geographic locations for distributed browsing.
+
+### Configuration Options
+
+| Parameter            | Default    | Description                                          |
+| -------------------- | ---------- | ---------------------------------------------------- |
+| Auth Token           | (required) | Shared secret for authentication                     |
+| Max Browser Contexts | 10         | Maximum concurrent browser contexts per container    |
+| Context TTL (ms)     | 1800000    | Session timeout in milliseconds (30 minutes default) |
+
+### Deploy And Connect
+
+1. Deploy the MCProxy recipe from the [SaladCloud Portal](https://portal.salad.com)
+2. Enter a container group name and your Auth Token
+3. Wait for instances to enter the running state
+4. Note your container group's DNS endpoint (e.g., `vegetable-words-abc123.salad.cloud`)
+5. Configure your MCP client using the endpoint with `wss://` prefix
+6. Start creating browser sessions through your AI agent
+
+## Source Code
+
+[<Icon icon="github" size="24" /> GitHub Repository](https://github.com/SaladTechnologies/mcproxy)
+
+[<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/mcproxy)
