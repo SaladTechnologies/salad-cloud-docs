@@ -4,7 +4,7 @@ sidebarTitle: 'Image Generation'
 description: 'How to deploy an image generation service on SaladCloud'
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: January 8, 2026_
 
 SaladCloud is the perfect platform for deploying image generation services. We power some of the most popular image
 generation sites on the internet, like [Civitai](https://blog.salad.com/civitai-salad/) and
@@ -29,35 +29,12 @@ Here are some popular stable diffusion inference servers that we’ve verified w
 
 > **Note that you will be interacting with these as an API, and not through their browser user interface.**
 
-1. ComfyUI
-   1. Guide: [ComfyUI](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy)
-   1. Git Repo: [https://github.com/ai-dock/comfyui](https://github.com/ai-dock/comfyui)
-   1. Docker Image: [ghcr.io/ai-dock/comfyui:latest-cuda](http://ghcr.io/ai-dock/comfyui:latest-cuda)
+1. ComfyUI with ComfyUI API
+   1. Guide: [ComfyUI Deployment](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy)
+   1. Git Repo: [https://github.com/SaladTechnologies/comfyui-api](https://github.com/SaladTechnologies/comfyui-api)
+   1. Docker Image: `ghcr.io/saladtechnologies/comfyui-api:comfy0.7.0-api1.16.1-torch2.8.0-cuda12.8-runtime`
    1. Model Directory: `/opt/ComfyUI/models`
    1. Custom Node Directory: `/opt/ComfyUI/custom_nodes/`
-2. Automatic1111
-   1. Guide: [Automatic1111](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-a1111)
-   1. Git Repo:
-      [https://github.com/SaladTechnologies/stable-diffusion-webui-docker](https://github.com/SaladTechnologies/stable-diffusion-webui-docker)
-   1. Docker Image: `saladtechnologies/a1111:ipv6-latest`
-   1. Data Directory: `/data`
-   1. Model Directory: `/data/models`
-   1. Extension Directory: `/data/config/auto/extensions`
-   1. Controlnet Model Directory (If controlnet extension is installed):
-      `/data/config/auto/extensions/sd-webui-controlnet/models`
-3. SD.Next
-   1. Guide: [SD.Next](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-sdnext)
-   1. Git Repo: [https://github.com/SaladTechnologies/sdnext](https://github.com/SaladTechnologies/sdnext)
-   1. Docker Image: `saladtechnologies/sdnext:base`
-   1. Data Directory: `/webui/data`
-   1. Model Directory: `/webui/data/models`
-   1. Extension Directory: `/webui/data/extensions`
-   1. Controlnet Model Directory: `/webui/extensions-builtin/sd-webui-controlnet/models`
-4. Fooocus:
-   1. Guide: [Fooocus](/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-fooocus)
-   1. Git Repo: [https://github.com/mrhan1993/Fooocus-API](https://github.com/mrhan1993/Fooocus-API)
-   1. Docker Image: `konieshadow/fooocus-api:v0.4.1.1`
-   1. Model Directory: `/app/repositories/Fooocus/models`
 
 ## Container Gateway or Job Queue?
 
@@ -104,14 +81,13 @@ There are several factors you should consider when choosing between the two opti
 The hardware requirements for your stable diffusion inference server will depend on the type of model you are running,
 and to some extent your choice of inference server.
 
-- For models based on Stable Diffusion 1.5, you can get by with as little as 8gb of VRAM, and at least 8gb of system
+- For models based on Stable Diffusion 1.5, you can get by with as little as 8GB of VRAM, and at least 8GB of system
   RAM. If you are using multiple LoRAs, ControlNets, etc, you may need more VRAM and system RAM. The only way to be
   certain is to measure real-world performance.
-- For models based on Stable Diffusion XL, you will need at least 16gb of VRAM, and 24gb if you intend to use the
-  refiner. For SD.Next and Automatic1111, you will need at least 30gb of system RAM if you intend to use the refiner,
-  and 24gb if you do not. For ComfyUI, you will need at least 16gb of system RAM, but may find better performance with
-  more.
-- For models based on Flux1 (fp8 or nf4), you will want 24gb of VRAM and 24gb of system RAM.
+- For models based on Stable Diffusion XL, you will need at least 12GB of VRAM, and 24GB if you intend to use the
+  refiner. You will need at least 24GB of system RAM.
+- For models based on Flux1 (fp8 or nf4), you will want 16-24GB of VRAM and 24GB of system RAM.
+- For models based on Stable Diffusion 3.5, you will want 16GB of VRAM and 24GB of system RAM.
 
 ## Warming up your server
 

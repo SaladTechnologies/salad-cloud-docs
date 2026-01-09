@@ -17,7 +17,7 @@ description:
 'twitter:image:height': 540
 ---
 
-_Last Updated: February 20, 2025_
+_Last Updated: January 8, 2026_
 
 This guide will take you step by step through the process of creating and deploying a production ready video-generation
 service on SaladCloud. We will be using the following technologies:
@@ -39,6 +39,14 @@ tools, we recommend you familiarize yourself with them before proceeding. Additi
 account to deploy your service. It will be helpful, but not strictly necessary to have a GPU available for local
 development. Any terminal commands in this guide are written for a Unix-like shell, such as bash, and this guide was
 developed using Ubuntu 22.
+
+<Tip>
+  **Production Tip:** For production video generation, we recommend uploading outputs directly to cloud storage (S3,
+  Azure Blob, Hugging Face) rather than returning them as base64 strings in the response. Video files are significantly
+  larger than images and returning them in the response body can cause memory issues. See the [ComfyUI API storage
+  backends documentation](https://github.com/SaladTechnologies/comfyui-api#modular-storage-backends) for configuration
+  options.
+</Tip>
 
 ## Step 1: Set Up Your Development Environment
 
@@ -84,31 +92,43 @@ this guide we're going to install javascript modules, and we don't want to check
 
 ## Step 2: Create a Docker Image
 
+We'll use a manifest file to download models at container startup rather than baking them into the Docker image. This
+keeps the image small and takes advantage of fast model registry downloads.
+
+Create a file called `manifest.yaml`:
+
+```yaml manifest.yaml
+apt:
+  - libgl1
+  - libgl1-mesa-glx
+  - libglib2.0-0
+
+custom_nodes:
+  - comfyui-videohelpersuite
+
+models:
+  before_start:
+    - url: https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.1.safetensors
+      local_path: /opt/ComfyUI/models/checkpoints/ltx-video-2b-v0.9.1.safetensors
+    - url: https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp16.safetensors
+      local_path: /opt/ComfyUI/models/clip/t5xxl_fp16.safetensors
+```
+
 Create another new file, and name it `Dockerfile`. This file will contain the instructions for building your Docker
 image. Add the following content to the file:
 
 ```dockerfile
-FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.3.27-api1.8.2-torch2.6.0-cuda12.4-devel
+FROM ghcr.io/saladtechnologies/comfyui-api:comfy0.7.0-api1.16.1-torch2.8.0-cuda12.8-devel
 
-# Video generation requires a few extra dependencies from the base image
-RUN apt-get update && apt-get install -y \
-  libgl1 \
-  libgl1-mesa-glx \
-  libglib2.0-0 && \
-  rm -rf /var/lib/apt/lists/*
-
-COPY ltx-video-2b-v0.9.1.safetensors ${COMFY_HOME}/models/checkpoints/
-COPY t5xxl_fp16.safetensors ${COMFY_HOME}/models/clip/
-
-RUN comfy node registry-install comfyui-videohelpersuite
+COPY manifest.yaml .
+ENV MANIFEST=manifest.yaml
 ```
 
 This Dockerfile is based on the [ComfyUI API](https://github.com/SaladTechnologies/comfyui-api) image, which is a
 pre-built docker image that includes ComfyUI, the ComfyUI API and all dependencies. The tag indicates the version of
 ComfyUI, ComfyUI API, Torch, and CUDA that the image is built with. The `devel` tag indicates that this image contains
-the full CUDA toolkit, which is necessary for running the LTX Video model. We are copying the model weights we
-downloaded earlier into the image, and installing from the [Comfy Registry](https://registry.comfy.org/) a custom node
-pack that contains helper functions for video generation.
+the full CUDA toolkit, which is necessary for running the LTX Video model. The manifest file specifies the model weights
+and custom nodes to install at startup.
 
 For now, we're going to build this docker image, and then run it to develop our workflow in ComfyUI.
 
@@ -871,7 +891,7 @@ To use the job queue, we simply need to add the Job Queue worker binary to our D
 
 ```dockerfile
 # Download and extract the job queue worker
-RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.4.1/salad-http-job-queue-worker_x86_64.tar.gz && \
+RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.5.0/salad-http-job-queue-worker_x86_64.tar.gz && \
   tar -xvf salad-http-job-queue-worker_x86_64.tar.gz && \
   rm salad-http-job-queue-worker_x86_64.tar.gz && \
   chmod +x salad-http-job-queue-worker

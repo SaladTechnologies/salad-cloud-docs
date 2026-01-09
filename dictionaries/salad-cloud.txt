@@ -1,6 +1,7 @@
 -Jxpf
 -topln
 adamw
+AKIAIOSFODNN
 alwayson
 amqps
 amzn
@@ -85,6 +86,7 @@ Groth
 gsutil
 Healthcheck
 healthz
+heun
 heygordian
 httpie
 imds
@@ -103,6 +105,7 @@ iterrows
 jemison
 jsonify
 jwks
+karras
 konieshadow
 Kryptex
 kubeconfig
