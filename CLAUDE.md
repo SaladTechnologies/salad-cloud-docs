@@ -104,18 +104,37 @@ python scripts/move-file.py        # Move files with reference updates
 5. **Code examples**: Include language tags, test that examples work
 6. **Links**: Use relative paths for internal links
 
-## Custom Validation
+## Tutorial Validation
 
-Use the `/docs-validation` skill to validate tutorials and guides:
+Use the `/docs-validation` skill to validate tutorials and guides. **The primary validation method is to actually follow
+the tutorial step-by-step** - not just check syntax.
 
-- Checks code block syntax (Python, Dockerfile, Bash, JSON, YAML)
-- Validates API examples against OpenAPI specs
-- Verifies portal UI instructions match actual interface
-- Checks content freshness and terminology
+### What Gets Validated
+
+1. **End-to-End Walkthrough** (Primary) - Actually follows each step as a user would
+   - Executes API calls and verifies responses
+   - Follows portal UI instructions in a real browser
+   - Reports any step that fails or is unclear
+2. **Code Blocks** - Checks syntax (Python, Dockerfile, Bash, JSON, YAML)
+3. **API Examples** - Validates against OpenAPI specs AND executes when credentials available
+4. **Portal UI** - Verifies instructions match actual interface
+5. **Content Freshness** - Checks dates, versions, terminology
+
+### Credentials for Full Validation
+
+For complete validation including live API calls and portal UI:
+
+```bash
+export SALAD_API_KEY="your-api-key"                          # For API validation
+export MCPROXY_CREDENTIAL_SALAD_EMAIL="your-email"           # For portal validation
+export MCPROXY_CREDENTIAL_SALAD_PASSWORD="your-password"     # For portal validation
+```
+
+Without credentials, validation still checks syntax and spec compliance but cannot verify the tutorial actually works.
 
 ## Key URLs
 
-- **Production**: https://docs.salad.com
-- **Portal**: https://portal.salad.com
-- **API Base**: https://api.salad.com
-- **Discord**: https://discord.gg/ApSm4Kn7Aq
+- **Production**: <https://docs.salad.com>
+- **Portal**: <https://portal.salad.com>
+- **API Base**: <https://api.salad.com>
+- **Discord**: <https://discord.gg/ApSm4Kn7Aq>

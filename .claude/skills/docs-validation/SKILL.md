@@ -8,7 +8,13 @@ description:
 
 # Documentation Validation Skill
 
-Validates SaladCloud tutorials and how-to guides for accuracy, working code, and UI consistency.
+Validates SaladCloud tutorials and how-to guides by **actually following them step-by-step** to ensure they work
+end-to-end.
+
+## Core Philosophy
+
+**The best way to validate a tutorial is to follow it.** Don't just check syntax - actually attempt each step as a user
+would. If a step fails or is unclear, that's a validation failure.
 
 ## Quick Start
 
@@ -32,6 +38,16 @@ Validate documentation files changed in this PR
 
 ## What Gets Validated
 
+### End-to-End Walkthrough (Primary)
+
+The most important validation - actually following the tutorial:
+
+- Attempt each step as documented
+- Execute API calls and verify responses
+- Follow portal UI instructions in a real browser
+- Verify the workflow achieves its stated goal
+- Report any step that fails, is unclear, or produces unexpected results
+
 ### Code Blocks
 
 - Python syntax and imports
@@ -45,6 +61,7 @@ Validate documentation files changed in this PR
 - Required headers present
 - Request bodies have required fields
 - Endpoints exist
+- **Live execution** when credentials are available
 
 ### Portal UI (with authentication)
 
@@ -75,30 +92,35 @@ See [AUTH.md](AUTH.md) for detailed setup instructions.
 
 ## Validation Modes
 
-### Full Validation
+### Full Walkthrough (Default)
 
-Runs all validators on specified files:
+Actually follows the tutorial end-to-end:
 
-- Code block validation
-- API example validation
-- Portal UI validation (if credentials available)
-- Content freshness check
+1. **tutorial-walkthrough-validator** - Attempts each step as a user would
+2. **code-block-validator** - Validates code syntax
+3. **api-validator** - Checks API examples against specs and executes them
+4. **portal-validator** - Verifies UI instructions in real browser
+5. **content-validator** - Checks freshness and terminology
+
+This is the recommended mode - it catches issues that syntax checking misses.
 
 ### Quick Validation
 
-Skips browser-based checks:
+Skips browser-based and live API checks:
 
-- Code block validation
-- API example validation
+- Code block validation (syntax only)
+- API example validation (spec matching only)
 - Content freshness check
 
-### Auth-Only Validation
+Use when you don't have credentials or need fast feedback.
 
-Only portal UI checks:
+### Syntax-Only Validation
 
-- Screenshot comparison
-- Navigation verification
-- Form field validation
+Just checks code block syntax:
+
+- Python, Dockerfile, Bash, JSON, YAML
+- No API or portal checks
+- Fastest mode
 
 ## File Locations
 
@@ -129,12 +151,30 @@ Only portal UI checks:
 
 | Check        | Status | Issues |
 | ------------ | ------ | ------ |
+| End-to-End   | FAIL   | 1      |
 | Code Blocks  | PASS   | 0      |
 | API Examples | WARN   | 2      |
 | Portal UI    | FAIL   | 1      |
 | Content      | PASS   | 0      |
 
+## Walkthrough Results
+
+| Step | Description             | Status | Notes                         |
+| ---- | ----------------------- | ------ | ----------------------------- |
+| 1    | Obtain API Key          | PASS   | Found in portal as documented |
+| 2    | Deploy Container Image  | FAIL   | 400 error - missing field     |
+| 3    | Select Multiple GPUs    | SKIP   | Depends on Step 2             |
+| 4    | Check Deployment Status | SKIP   | No deployment to check        |
+
+**End-to-End Result:** FAIL - Could not complete tutorial as written
+
 ## Issues
+
+### WALK-001 (Failure)
+
+**Step:** 2 - Deploy Container Image **Type:** API Error **Details:** POST request returned 400 Bad Request - response:
+"autostart_policy is required" **Impact:** User cannot complete tutorial as written **Fix:** Add
+`"autostart_policy": false` to the JSON example
 
 ### API-001 (Warning)
 
@@ -151,8 +191,9 @@ Only portal UI checks:
 
 This skill coordinates several specialized validation agents:
 
+- **tutorial-walkthrough-validator** - Actually follows the tutorial step-by-step (PRIMARY)
 - **code-block-validator** - Validates code syntax and structure
-- **api-validator** - Checks API examples against OpenAPI specs
+- **api-validator** - Checks API examples against OpenAPI specs, executes when possible
 - **portal-validator** - Browser-based UI validation
 - **content-validator** - Freshness and terminology checks
 
