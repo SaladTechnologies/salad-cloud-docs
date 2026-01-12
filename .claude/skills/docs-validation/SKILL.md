@@ -1,6 +1,9 @@
 ---
 name: docs-validation
-description: Validate SaladCloud documentation tutorials and how-to guides. Use when asked to validate, test, verify, or check documentation for accuracy, working code examples, correct API calls, or UI consistency. Supports both authenticated and unauthenticated validation modes.
+description:
+  Validate SaladCloud documentation tutorials and how-to guides. Use when asked to validate, test, verify, or check
+  documentation for accuracy, working code examples, correct API calls, or UI consistency. Supports both authenticated
+  and unauthenticated validation modes.
 ---
 
 # Documentation Validation Skill
@@ -124,28 +127,24 @@ Only portal UI checks:
 
 ## Summary
 
-| Check | Status | Issues |
-|-------|--------|--------|
-| Code Blocks | PASS | 0 |
-| API Examples | WARN | 2 |
-| Portal UI | FAIL | 1 |
-| Content | PASS | 0 |
+| Check        | Status | Issues |
+| ------------ | ------ | ------ |
+| Code Blocks  | PASS   | 0      |
+| API Examples | WARN   | 2      |
+| Portal UI    | FAIL   | 1      |
+| Content      | PASS   | 0      |
 
 ## Issues
 
 ### API-001 (Warning)
 
-**Location:** Line 89
-**Type:** Missing header
-**Details:** curl example missing Content-Type header
-**Fix:** Add `-H "Content-Type: application/json"`
+**Location:** Line 89 **Type:** Missing header **Details:** curl example missing Content-Type header **Fix:** Add
+`-H "Content-Type: application/json"`
 
 ### UI-001 (Failure)
 
-**Location:** Line 45, Step 3
-**Type:** UI text mismatch
-**Details:** Button says "New Container Group", docs say "Create Container Group"
-**Fix:** Update button text in documentation
+**Location:** Line 45, Step 3 **Type:** UI text mismatch **Details:** Button says "New Container Group", docs say
+"Create Container Group" **Fix:** Update button text in documentation
 ```
 
 ## Specialized Agents

@@ -1,6 +1,7 @@
 # SaladCloud Documentation
 
-Official documentation for SaladCloud at [docs.salad.com](https://docs.salad.com). Built with [Mintlify](https://mintlify.com/).
+Official documentation for SaladCloud at [docs.salad.com](https://docs.salad.com). Built with
+[Mintlify](https://mintlify.com/).
 
 ## Tech Stack
 
@@ -23,6 +24,7 @@ scripts/              # Automation scripts
 ```
 
 Each product follows [Diátaxis](https://diataxis.fr/):
+
 - `explanation/` - Conceptual docs (labeled "Products" in nav)
 - `tutorials/` - Step-by-step learning guides
 - `how-to-guides/` - Problem-oriented practical guides
@@ -53,6 +55,7 @@ npx cspell "**/*.{md,mdx}"         # Check spelling
 ## Navigation
 
 All pages must be added to `docs.json` in the appropriate navigation section. The file is ~1,600 lines with:
+
 - Tab definitions and groups
 - 100+ URL redirects (add new ones when moving pages)
 - Theme configuration
@@ -60,6 +63,7 @@ All pages must be added to `docs.json` in the appropriate navigation section. Th
 ## Code Quality
 
 All PRs must pass:
+
 - Prettier formatting check
 - cspell spell check
 - OpenAPI validation
@@ -69,6 +73,7 @@ All PRs must pass:
 ## MDX Components
 
 Common Mintlify components:
+
 ```mdx
 <CardGroup cols={2}>
   <Card title="Title" icon="icon-name" href="/path">
@@ -102,6 +107,7 @@ python scripts/move-file.py        # Move files with reference updates
 ## Custom Validation
 
 Use the `/docs-validation` skill to validate tutorials and guides:
+
 - Checks code block syntax (Python, Dockerfile, Bash, JSON, YAML)
 - Validates API examples against OpenAPI specs
 - Verifies portal UI instructions match actual interface

@@ -2,7 +2,8 @@
 
 ## Overview
 
-The docs validation workflow uses **mcproxy's secure credential handling** to authenticate with the SaladCloud portal. The AI agent never sees actual credential values - it only references them by name.
+The docs validation workflow uses **mcproxy's secure credential handling** to authenticate with the SaladCloud portal.
+The AI agent never sees actual credential values - it only references them by name.
 
 ## How It Works
 
@@ -51,26 +52,27 @@ browser_has_credential("salad_password") -> { exists: true }
 ```
 
 If credentials are missing, the agent will:
+
 1. Report which credentials are needed
 2. Skip authenticated validations
 3. Continue with unauthenticated checks
 
 ## Security Features
 
-| Feature | Protection |
-|---------|------------|
-| Reference-only access | Agent uses names like "salad_password", never actual values |
-| Response scrubbing | Any credential values in page content replaced with `[CREDENTIAL:name]` |
-| Local storage | Credentials stored on your machine, never sent to AI providers |
-| File permissions | `~/.mcproxy/credentials.json` created with 600 (owner read/write only) |
+| Feature               | Protection                                                              |
+| --------------------- | ----------------------------------------------------------------------- |
+| Reference-only access | Agent uses names like "salad_password", never actual values             |
+| Response scrubbing    | Any credential values in page content replaced with `[CREDENTIAL:name]` |
+| Local storage         | Credentials stored on your machine, never sent to AI providers          |
+| File permissions      | `~/.mcproxy/credentials.json` created with 600 (owner read/write only)  |
 
 ## Authentication Tiers
 
-| Tier | Method | What It Validates |
-|------|--------|-------------------|
-| 0 - None | No auth | Code syntax, public pages, login page UI |
-| 1 - API Key | `SALAD_API_KEY` env var | API endpoints, curl examples |
-| 2 - Portal | `MCPROXY_CREDENTIAL_*` | Full portal UI, authenticated workflows |
+| Tier        | Method                  | What It Validates                        |
+| ----------- | ----------------------- | ---------------------------------------- |
+| 0 - None    | No auth                 | Code syntax, public pages, login page UI |
+| 1 - API Key | `SALAD_API_KEY` env var | API endpoints, curl examples             |
+| 2 - Portal  | `MCPROXY_CREDENTIAL_*`  | Full portal UI, authenticated workflows  |
 
 ## Login Flow
 
@@ -87,6 +89,7 @@ The portal-validator agent performs login as follows:
 ```
 
 If login fails:
+
 - Agent reports the failure
 - Takes screenshot for debugging
 - Skips authenticated validations
@@ -96,15 +99,15 @@ If login fails:
 
 ### For Portal UI Validation
 
-| Credential Name | Environment Variable | Purpose |
-|-----------------|---------------------|---------|
-| `salad_email` | `MCPROXY_CREDENTIAL_SALAD_EMAIL` | Portal login email |
+| Credential Name  | Environment Variable                | Purpose               |
+| ---------------- | ----------------------------------- | --------------------- |
+| `salad_email`    | `MCPROXY_CREDENTIAL_SALAD_EMAIL`    | Portal login email    |
 | `salad_password` | `MCPROXY_CREDENTIAL_SALAD_PASSWORD` | Portal login password |
 
 ### For API Validation
 
-| Variable | Purpose |
-|----------|---------|
+| Variable        | Purpose                                  |
+| --------------- | ---------------------------------------- |
 | `SALAD_API_KEY` | Validate API endpoints respond correctly |
 
 ## Troubleshooting
@@ -123,6 +126,7 @@ env | grep MCPROXY_CREDENTIAL
 ### "Login failed" error
 
 Possible causes:
+
 - Credentials are incorrect
 - Portal login flow has changed (update selectors)
 - Account requires MFA (not supported for automation)
@@ -130,7 +134,8 @@ Possible causes:
 
 ### Response shows `[CREDENTIAL:salad_password]`
 
-This is expected behavior - it means response scrubbing is working correctly. The actual password appeared somewhere in page content and was filtered out before the agent could see it.
+This is expected behavior - it means response scrubbing is working correctly. The actual password appeared somewhere in
+page content and was filtered out before the agent could see it.
 
 ## Best Practices
 

@@ -1,6 +1,8 @@
 ---
 name: api-validator
-description: Validates API examples and curl commands against OpenAPI specs. Use when checking API documentation, curl examples, or request/response schemas in tutorials.
+description:
+  Validates API examples and curl commands against OpenAPI specs. Use when checking API documentation, curl examples, or
+  request/response schemas in tutorials.
 tools: Read, Bash, Glob, Grep
 model: sonnet
 ---
@@ -37,6 +39,7 @@ You are an API documentation validator ensuring curl examples match OpenAPI spec
 ## curl Parsing
 
 Extract from patterns like:
+
 ```bash
 curl -X POST \
   https://api.salad.com/v1/organizations/{org}/projects \
@@ -46,6 +49,7 @@ curl -X POST \
 ```
 
 Check:
+
 - HTTP method (-X flag or default GET)
 - URL and path parameters
 - Headers (-H flags)
@@ -76,6 +80,7 @@ Suggestion: Add -H "Content-Type: application/json" to curl command
 ## Summary
 
 At the end, provide:
+
 ```
 Total API examples: N
 Passed: X
