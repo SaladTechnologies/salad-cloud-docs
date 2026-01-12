@@ -244,6 +244,63 @@ Portal Credentials: NOT AVAILABLE
 2. **Wait for page loads** - Use `wait_for_selector` before interacting with elements
 3. **Credential names use hyphens** - mcproxy credentials like `salad-username` not `salad_username`
 
+### SaladCloud Portal Navigation (mcproxy)
+
+The SaladCloud portal uses custom React components that often intercept standard click events. Here are proven
+strategies:
+
+1. **Prefer coordinate clicks over selector clicks** - The portal uses:
+   - Hidden `<input type="radio">` elements that intercept clicks meant for visible labels
+   - Overlay divs (`aria-hidden="true"`) that block selector-based clicks
+   - Custom dropdown components that don't respond to standard select interactions
+
+   ```python
+   # BAD - selector click often times out
+   browser_click(selector="text=1 vCPU")
+
+   # GOOD - coordinate click works reliably
+   browser_click_at(x=0.5, y=0.6)
+   ```
+
+2. **Use JavaScript evaluation for form inputs** - For reliable form filling:
+
+   ```javascript
+   // Set checkbox
+   const checkbox = document.querySelector('input[type="checkbox"]')
+   checkbox.click()
+
+   // Set select/dropdown
+   const select = document.querySelector('select')
+   select.value = 'desired_value'
+   select.dispatchEvent(new Event('change', { bubbles: true }))
+
+   // Set numeric inputs
+   input.value = '8000'
+   input.dispatchEvent(new Event('input', { bubbles: true }))
+   ```
+
+3. **Side panels require scrolling** - Configuration panels (Container Gateway, Health Probes, etc.) have form fields
+   below the visible area. Use `browser_get_text` to see full content, then scroll with JavaScript:
+
+   ```javascript
+   const panel = document.querySelector('.fixed.right-0.top-0.translate-x-0')
+   const scrollable = panel.querySelector('.overflow-y-auto') || panel
+   scrollable.scrollTop += 300
+   ```
+
+4. **Panel state detection** - Multiple fixed panels exist; find the visible one:
+
+   ```javascript
+   // The visible panel has translate-x-0, hidden ones have translate-x-full
+   document.querySelector('.fixed.right-0.top-0.translate-x-0')
+   ```
+
+5. **Common UI patterns**:
+   - "Add X" buttons open side panels with info + "Configure" button
+   - Clicking "Configure" saves and closes the panel
+   - "Edit" links on configured items reopen the configuration panel
+   - Main content area updates to reflect saved configuration
+
 ## Cleanup
 
 If the walkthrough created any resources:
