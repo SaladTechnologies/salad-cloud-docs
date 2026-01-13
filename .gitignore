@@ -94,3 +94,4 @@ node_modules/
 .venv
 
 **/__pycache__/
+.mcp.json

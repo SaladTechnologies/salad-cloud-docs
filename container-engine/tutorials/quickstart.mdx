@@ -4,7 +4,7 @@ sidebarTitle: 'Quickstart'
 description: 'Get your first container up and running on SaladCloud in minutes!'
 ---
 
-_Last Updated: May 5, 2025_
+_Last Updated: January 12, 2026_
 
 <iframe
   src="https://player.vimeo.com/video/1081576659?transparent=0"
@@ -101,12 +101,12 @@ Images up to 35 GB (compressed) are supported.
 
 ---
 
-## Step 3: Create a Container Group
+## Step 3: Deploy a Container Group
 
 In the [SaladCloud Portal](https://portal.salad.com):
 
-1. Navigate to your organization and project (e.g., “salad-benchmarking / Default”).
-2. Click **Create Container Group**.
+1. Navigate to your organization and project (e.g., "salad-benchmarking / Default").
+2. Click **Deploy a Container Group**.
 3. Choose **Custom** (instead of a preconfigured Recipe).
 4. Set the name to `hello-world`.
 5. Under **Image Source**, enter `saladtechnologies/misc:hello-world`.
@@ -123,12 +123,13 @@ In the [SaladCloud Portal](https://portal.salad.com):
 
 ## Step 4: Configure Network Access
 
-- Enable **Container Gateway** to expose your app via a load balancer.
-- Set **Port** to `8000`.
-- Choose **Round Robin** load balancing for this demo (Least Connections is preferred for AI workloads).
+- Click **Add Container Gateway** to expose your app via a load balancer.
+- In the configuration panel, set **Port** to `8000`.
+- Select **Round Robin** for the load balancing algorithm (Least Connections is preferred for AI workloads).
 - Authentication is optional—if enabled, include your Salad API key in the `Salad-Api-Key` header.
 - Optionally restrict concurrency to 1 request per instance. Not relevant for this demo, but useful for workloads with
   high vram usage.
+- Click **Configure** to save the Container Gateway settings.
 
 ---
 

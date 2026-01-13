@@ -1,0 +1,10 @@
+services:
+  browser-server:
+    image: ghcr.io/saladtechnologies/mcproxy/browser-server:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - AUTH_TOKEN=${AUTH_TOKEN:-dev-secret-token}
+      - MAX_CONTEXTS=10
+      - CONTEXT_TTL_MS=1800000
