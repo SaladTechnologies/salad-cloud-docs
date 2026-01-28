@@ -4,20 +4,27 @@ sidebarTitle: 'Autoscaling Overview'
 description: 'Learn the fundamentals of autoscaling on SaladCloud.'
 ---
 
+_Last Updated: January 28, 2026_
+
 # Autoscaling Overview
 
-SaladCloud offers two main methods for autoscaling your containerized workloads:
+SaladCloud offers three main methods for autoscaling your containerized workloads:
 
 1. **[Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling)**: This method allows you
    to scale your workloads based on the number of jobs in your Salad Job Queue. It is particularly useful for workloads
    that can be processed in parallel and where the number of jobs can vary significantly over time.
 
-2. **Programmatic Autoscaling**: This method allows you to scale your workloads
+2. **Scheduled Scaling (Time of Day)**: This method lets you scale replica counts based on a fixed schedule. This is
+   useful for workloads with predictable demand, such as business-hour traffic or nightly batch processing. Scheduled
+   scaling allows you to increase capacity ahead of known peaks and reduce replicas during off-hours. Configuration is
+   available through the SaladCloud Portal or the Salad API. See
+   [Scheduled Scaling (Time of Day)](/container-engine/how-to-guides/autoscaling/time-of-day-scaling) for details.
+
+3. **Programmatic Autoscaling**: This method allows you to scale your workloads
    [via the API](/reference/saladcloud-api/container-groups/update-container-group#body-replicas) based on any custom
    metrics you can come up with. We have detailed guides on how to set up programmatic autoscaling based on:
    - **[Time of Day](/container-engine/how-to-guides/autoscaling/time-of-day-scaling)**: Scale your workloads based on
-     the time of day. This is useful for workloads that have predictable usage patterns, such as aligning with business
-     hours in a particular region.
+     the time of day.
    - **[Hardware Metrics](/container-engine/how-to-guides/autoscaling/hardware-metrics-scaling)**: Scale your workloads
      based on hardware metrics such as GPU utilization. This is useful for workloads that require specific hardware
      resources and where the demand for those resources can vary over time.
