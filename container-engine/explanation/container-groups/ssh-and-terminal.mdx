@@ -2,14 +2,43 @@
 title: 'SSH & Terminal Access'
 ---
 
-_Last Updated: December 15, 2025_
+_Last Updated: January 23, 2026_
 
 You can start an interactive shell inside your running container instances using SSH or the web-based terminal in the
 SaladCloud Portal. This requires your container image to have a shell installed, such as `bash` or `sh`.
 
 ## SSH Access
 
-<Note>Coming Soon!</Note>
+Use SSH to open a shell on a running container instance after adding your public key in the SaladCloud Portal.
+
+1. Create an SSH key (skip this if you already have one):
+
+   ```bash
+   ssh-keygen -t ed25519 -C "you@example.com"
+   ```
+
+   By default, this creates `~/.ssh/id_ed25519` (private key) and `~/.ssh/id_ed25519.pub` (public key).
+
+2. Copy your public key:
+
+   ```bash
+   cat ~/.ssh/id_ed25519.pub
+   ```
+
+3. Add the key in the Portal:
+
+   - Click your username in the upper-right corner.
+   - Select "SSH key".
+   - Paste the public key into the field and save it.
+
+4. Connect to a container instance. Open your container group, select an instance, and copy its SSH IP and port (or the
+   SSH command shown). Run:
+
+   ```bash
+   ssh -i ~/.ssh/id_ed25519 -p <ssh_port> <ssh_user>@<ssh_ip>
+   ```
+
+   If you used a different key name or type, replace `id_ed25519` with your key file name.
 
 ## Terminal Access
 
