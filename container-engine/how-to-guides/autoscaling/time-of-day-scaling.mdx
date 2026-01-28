@@ -303,7 +303,6 @@ def lambda_handler(event, context):
 #### **Deployment Configuration**
 
 1. **Create the Lambda Function**:
-
    - Runtime: Python 3.9 or later
    - Timeout: 30 seconds
    - Memory: 128 MB (sufficient for API calls)
@@ -800,12 +799,10 @@ wrangler deploy --config wrangler-business-start.toml --env staging
 #### **Scheduling Considerations**
 
 1. **Account for Startup Time**: SaladCloud containers can take 5-15 minutes to start
-
    - Schedule scale-up 15-30 minutes before you need the capacity
    - Use multiple scaling events rather than trying to predict exact timing
 
 2. **Minimize Unnecessary Executions**:
-
    - Only schedule functions when you need to change replica counts
    - Each cron trigger should have a specific scaling purpose
    - Avoid overlapping schedules that might conflict
@@ -868,19 +865,16 @@ def calculate_stepped_replicas(base_replicas, current_replicas):
 #### **Common Issues**
 
 1. **Function Not Triggering**:
-
    - Verify cron expressions are correct
    - Check function permissions and environment variables
    - Review platform-specific logs
 
 2. **API Authentication Errors**:
-
    - Ensure API key is correctly set as environment variable
    - Verify API key has necessary permissions
    - Check for trailing spaces in environment variables
 
 3. **Incorrect Scaling**:
-
    - Test your time calculation logic with various dates
    - Verify timezone handling (use UTC consistently)
    - Check for off-by-one errors in hour comparisons
