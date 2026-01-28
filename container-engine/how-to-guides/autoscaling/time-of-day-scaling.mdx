@@ -1,40 +1,29 @@
 ---
-title: 'Time-of-Day Scaling with Scheduled Serverless Functions'
-sidebarTitle: 'Time-of-Day Scaling'
+title: 'Scheduled Scaling (Time of Day)'
+sidebarTitle: 'Scheduled Scaling'
 description:
-  'Learn how to implement predictable time-based autoscaling for your SaladCloud container groups using scheduled
-  serverless functions and the SaladCloud API.'
+  'Configure scheduled time-based autoscaling for SaladCloud container groups using the Portal, the API, or scheduled
+  serverless functions for advanced use cases.'
 ---
 
-_Last Updated: July 23, 2025_
+_Last Updated: January 28, 2026_
 
-This guide demonstrates how to implement time-of-day scaling for SaladCloud container groups using scheduled serverless
-functions. Unlike queue-based autoscaling that reacts to workload, time-of-day scaling proactively adjusts resources
-based on predictable usage patterns, such as business hours, peak traffic times, or scheduled batch processing windows.
+Scheduled scaling (time of day) is now a native SaladCloud feature. You can configure schedules directly in the Portal
+or via the Salad API to adjust replica counts on a fixed timetable. If you need custom logic or integrations, the
+serverless approach is still available and covered below.
 
-## Prerequisites
+## Choose Your Approach
 
-Before you begin, ensure you have:
+- **SaladCloud Native Scheduled Scaling (recommended)**: Configure cron schedules in the Portal or API. Best for fixed
+  schedules and the simplest operational setup.
+- **Serverless Scheduled Scaling (advanced)**: Run scheduled functions (AWS Lambda, Cloudflare Workers, or Google Cloud
+  Functions) that call the Salad API. Best for conditional logic, external signals, or coordinating multiple container
+  groups.
 
-- ✅ **SaladCloud API Key**: You'll need a valid API key with permissions to manage container groups
-- ✅ **Organization and Project**: An active organization and project in SaladCloud
-- ✅ **Container Group**: An existing container group that you want to scale on a schedule
-- ✅ **Serverless Platform Access**: Account on one of the supported platforms (AWS Lambda, Cloudflare Workers, etc.)
-- ✅ **Time Zone Planning**: Clear understanding of your scaling schedule and time zones
+## SaladCloud Scheduled Scaling (Portal and API)
 
-<Tip>
-  **Cost Optimization**: Time-of-day scaling is particularly effective for workloads with predictable patterns, allowing
-  you to scale to zero during off-hours and scale up before peak demand, optimizing both cost and performance.
-</Tip>
-
-## Overview
-
-Time-of-day scaling works by scheduling functions to run at specific times when you want to change your replica count:
-
-1. **Schedule functions** to trigger at exact times when scaling is needed
-2. **Execute scaling actions** directly without checking current time
-3. **Call the SaladCloud API** to set the desired replica count
-4. **Handle state transitions** (starting/stopping container groups as needed)
+Scheduled scaling lets you set replica counts at specific times using cron expressions. It works best for predictable
+usage patterns, such as business hours or nightly batch windows.
 
 This approach is ideal for:
 
@@ -43,11 +32,11 @@ This approach is ideal for:
 - **Global applications**: Adjust capacity based on regional peak times
 - **Cost optimization**: Predictably scale to zero during known low-usage periods
 
-## Step 1: Plan Your Scaling Schedule
+### Plan Your Scaling Schedule
 
 Before implementing, define your scaling schedule:
 
-### **Example Scaling Patterns**
+#### Example Scaling Patterns
 
 **Business Hours Pattern:**
 
@@ -70,35 +59,116 @@ Weekends: 1 replica
 
 ```
 Daily 2:00 AM: Scale to 20 replicas for overnight processing
-Daily 6:00 AM: Scale to 5 replicas for maintenance
 Daily 8:00 AM: Scale to 15 replicas for business hours
 Daily 10:00 PM: Scale to 0 replicas (overnight shutdown)
 ```
 
-### **Key Considerations**
+#### Key Considerations
 
-- **Time Zones**: Use UTC in your functions to avoid daylight saving complications
+- **Time Zones**: Use UTC in cron schedules
 - **Startup Time**: Account for SaladCloud's container startup time (5-15 minutes)
 - **Overlap Periods**: Plan transitions to handle workload handoffs smoothly
 - **Emergency Scaling**: Keep manual override capabilities for unexpected load
 
-## Step 2: Choose Your Implementation
+### SaladCloud Portal
 
-Select one of the following serverless platforms for implementing your time-of-day scaling:
+You can set a schedule while creating a container group or by editing an existing one.
 
-### **Option A: AWS Lambda + EventBridge**
+To add scheduled scaling when creating a container group:
+
+1. On the "Container Configuration" page, find "Scheduled Scaling" just below "Replicas".
+2. Click "Add Scaling Event".
+
+To add scheduled scaling to an existing container group:
+
+1. Open the container group and click "Edit".
+2. Scroll to the bottom of the page to "Scheduled Scaling" and click "Edit".
+
+Make sure the "Enable Scheduled Scaling" checkbox is selected.
+
+### Salad API
+
+You can also configure scheduled scaling through the Salad API when creating or updating a container group. See
+[Create Container Group](/reference/saladcloud-api/container-groups/create-container-group) and
+[Update Container Group](/reference/saladcloud-api/container-groups/update-container-group) for the request details.
+
+### Add Scaling Events
+
+Enter a cron expression and the desired replica count, and SaladCloud will scale the container group on schedule.
+
+<Note>Scaling is not immediate. Plan ahead for instances to download the image and start.</Note>
+
+You can add multiple cron expressions in the portal in two ways:
+
+- Add them one by one and click "Add Scaling Event" after each entry.
+- Click "Bulk Edit" and add one entry per line using the format `cron_expression=replica_count`.
+
+Example bulk entries:
+
+```
+0 8 * * 1-5=10
+0 18 * * 1-5=2
+0 2 * * *=20
+```
+
+Once you click "Configure", you will also see explanations of the cron expressions you entered.
+
+### Cron Expression Examples
+
+- `0 8 * * 1-5` - Weekdays at 08:00.
+- `0 18 * * 1-5` - Weekdays at 18:00.
+- `0 0 1 * *` - First day of every month at 00:00.
+- `0 2 * * *` - Daily at 02:00.
+
+For help building cron expressions, see https://crontab.guru.
+
+## Serverless Scheduled Scaling (Advanced)
+
+Use this approach when you need conditional logic, external signals, or custom integrations. It relies on scheduled
+serverless functions that call the Salad API at specific times.
+
+### Serverless Prerequisites
+
+Before you begin, ensure you have:
+
+- ✅ **SaladCloud API Key**: You'll need a valid API key with permissions to manage container groups
+- ✅ **Organization and Project**: An active organization and project in SaladCloud
+- ✅ **Container Group**: An existing container group that you want to scale on a schedule
+- ✅ **Serverless Platform Access**: Account on one of the supported platforms (AWS Lambda, Cloudflare Workers, etc.)
+- ✅ **Time Zone Planning**: Clear understanding of your scaling schedule and time zones
+
+<Tip>
+  **Cost Optimization**: Time-of-day scaling is particularly effective for workloads with predictable patterns, allowing
+  you to scale to zero during off-hours and scale up before peak demand, optimizing both cost and performance.
+</Tip>
+
+### Serverless Approach Overview
+
+Serverless scheduled scaling works by scheduling functions to run at specific times when you want to change your replica
+count:
+
+1. **Schedule functions** to trigger at exact times when scaling is needed
+2. **Execute scaling actions** directly without checking current time
+3. **Call the SaladCloud API** to set the desired replica count
+4. **Handle state transitions** (starting/stopping container groups as needed)
+
+### Choose Your Serverless Implementation
+
+Select one of the following serverless platforms for implementing serverless scheduled scaling:
+
+#### **Option A: AWS Lambda + EventBridge**
 
 - **Best for**: AWS-heavy environments, complex logic, integration with other AWS services
 - **Scheduling**: EventBridge with cron expressions and event payloads
 - **Cost**: Pay-per-invocation, very cost-effective for periodic scaling
 
-### **Option B: Cloudflare Workers + Cron Triggers**
+#### **Option B: Cloudflare Workers + Cron Triggers**
 
 - **Best for**: Global distribution, simple logic, edge computing integration
 - **Scheduling**: Built-in cron triggers with environment-based configuration
 - **Cost**: Generous free tier, low latency execution
 
-### **Option C: Google Cloud Functions + Cloud Scheduler**
+#### **Option C: Google Cloud Functions + Cloud Scheduler**
 
 - **Best for**: Google Cloud environments, integration with GCP services
 - **Scheduling**: Cloud Scheduler with flexible cron expressions
@@ -106,11 +176,11 @@ Select one of the following serverless platforms for implementing your time-of-d
 
 ---
 
-## AWS Lambda Implementation
+### AWS Lambda Implementation
 
-Here's a complete AWS Lambda implementation for time-of-day scaling:
+Here's a complete AWS Lambda implementation for serverless scheduled scaling:
 
-### **Lambda Function Code**
+#### **Lambda Function Code**
 
 ```python
 import json
@@ -230,7 +300,7 @@ def lambda_handler(event, context):
         }
 ```
 
-### **Deployment Configuration**
+#### **Deployment Configuration**
 
 1. **Create the Lambda Function**:
    - Runtime: Python 3.9 or later
@@ -332,7 +402,7 @@ Resources:
           Input: '{"action":"scale","replicas":3}'
 ```
 
-### **Testing Your Lambda Implementation**
+#### **Testing Your Lambda Implementation**
 
 **Unit Testing**:
 
@@ -396,7 +466,7 @@ def apply_scaling_action(action_type, *args):
 
 ---
 
-## Cloudflare Workers Implementation
+### Cloudflare Workers Implementation
 
 Cloudflare Workers provides a clean single-worker approach where all scaling configuration is defined in the
 `wrangler.toml` file through environment variables:
@@ -501,7 +571,7 @@ async function setReplicas(env, replicas) {
 }
 ```
 
-### **Wrangler Configuration**
+#### **Wrangler Configuration**
 
 The key is to deploy the same worker multiple times with different names and environment variables. Create separate
 `wrangler.toml` files for each scaling action:
@@ -601,7 +671,7 @@ SCALING_REPLICAS = "1"
 SCALING_NAME = "Weekend scale down"
 ```
 
-### **Deployment Commands**
+#### **Deployment Commands**
 
 Deploy each worker with its specific configuration:
 
@@ -627,7 +697,7 @@ wrangler deploy --config wrangler-shutdown.toml
 wrangler deploy --config wrangler-weekend.toml
 ```
 
-### **Simplified Deployment Script**
+#### **Simplified Deployment Script**
 
 Create a `deploy.sh` script to automate the process:
 
@@ -663,7 +733,7 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-### **Testing Your Cloudflare Workers Implementation**
+#### **Testing Your Cloudflare Workers Implementation**
 
 **Manual Trigger Testing**:
 
@@ -724,9 +794,9 @@ wrangler deploy --config wrangler-business-start.toml --env staging
 
 ---
 
-## Step 3: Best Practices
+### Serverless Best Practices
 
-### **Scheduling Considerations**
+#### **Scheduling Considerations**
 
 1. **Account for Startup Time**: SaladCloud containers can take 5-15 minutes to start
    - Schedule scale-up 15-30 minutes before you need the capacity
@@ -742,7 +812,7 @@ wrangler deploy --config wrangler-business-start.toml --env staging
    - Convert business hours to UTC when setting up schedules
    - Document your schedule clearly for future maintenance
 
-### **Error Handling and Reliability**
+#### **Error Handling and Reliability**
 
 ```python
 import time
@@ -771,7 +841,7 @@ def reliable_set_replicas(replicas):
     return set_replicas(replicas)
 ```
 
-### **Cost Optimization**
+#### **Cost Optimization**
 
 1. **Scale to Zero**: Use `0` replicas during guaranteed low-usage periods
 2. **Gradual Scaling**: Implement stepped scaling instead of jumping to max replicas
@@ -790,9 +860,9 @@ def calculate_stepped_replicas(base_replicas, current_replicas):
     return current_replicas
 ```
 
-## Troubleshooting
+### Troubleshooting
 
-### **Common Issues**
+#### **Common Issues**
 
 1. **Function Not Triggering**:
    - Verify cron expressions are correct
@@ -814,7 +884,7 @@ def calculate_stepped_replicas(base_replicas, current_replicas):
    - Check container group status in SaladCloud portal
    - Verify container group name matches exactly
 
-### **Debugging Tools**
+#### **Debugging Tools**
 
 ```python
 def debug_scaling_decision(current_time, desired_replicas):
@@ -843,9 +913,9 @@ def debug_scaling_decision(current_time, desired_replicas):
             print(f"    Days: {schedule['days']}, Hours: {start}-{end}, Replicas: {schedule['replicas']}")
 ```
 
-## Integration with Existing Autoscaling
+### Integration with Existing Autoscaling
 
-You can combine time-of-day scaling with queue-based autoscaling:
+You can combine serverless scheduled scaling with queue-based autoscaling:
 
 ```python
 def hybrid_scaling_logic(current_time, queue_length=None):
@@ -863,7 +933,7 @@ def hybrid_scaling_logic(current_time, queue_length=None):
     return base_replicas
 ```
 
-## Next Steps
+### Next Steps
 
 - 📊 **Monitor Performance**: Set up dashboards to track scaling effectiveness
 - 🔧 **Optimize Schedule**: Adjust timing based on actual usage patterns
@@ -871,7 +941,7 @@ def hybrid_scaling_logic(current_time, queue_length=None):
 - 📈 **Cost Analysis**: Track cost savings from optimized scaling
 - 🔄 **Backup Strategy**: Consider hybrid queue-based scaling for unexpected load
 
-## Related Guides
+### Related Guides
 
 - 📖 [Job Queue Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling)
 - 🔧 [SQS-based Autoscaling](/container-engine/how-to-guides/job-processing/sqs#autoscaling)
