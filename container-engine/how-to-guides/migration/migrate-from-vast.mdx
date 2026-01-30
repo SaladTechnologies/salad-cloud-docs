@@ -20,7 +20,7 @@ familiar patterns—your Python code, ML frameworks, and data processing logic r
 - Your application code and algorithms work unchanged
 - Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
 - Identical API patterns, data processing workflows, and model training approaches
-- Same debugging mindset—just with better tools than SSH
+- Same debugging mindset—just with better tools in addition to SSH
 - Your development environment and local testing process
 
 **What Gets Automated for You:** Instead of manually managing GPU instances, SaladCloud handles instance provisioning,
@@ -88,7 +88,8 @@ learning entirely new concepts, you're automating existing workflows with better
 
 - **Containerization** replaces manual dependency installation on each instance. Instead of SSH-ing in and running the
   same `pip install` commands repeatedly, you write them once in a Dockerfile, Docker builds the dependencies into an
-  immutable image, and that image runs consistently across all instances.
+  immutable image, and that image runs consistently across all instances. You still have SSH access for debugging via
+  the web terminal or traditional SSH post deployment.
 
 - **Storage Strategy** shifts from local file management to cloud-based storage patterns. While cloud APIs provide more
   reliable data persistence than manually copying files between instances, this transition requires rethinking data
@@ -110,8 +111,9 @@ These constraints map directly to what you're already working with, just more co
   [storage integration guide](/storage/explanation/overview) for persistent data patterns
 - **Networking**: [IPv6 support](/container-engine/how-to-guides/gateway/enabling-ipv6) (replace `0.0.0.0` with `::` in
   your bind address)
-- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal) and
-  [portal logs](/container-engine/explanation/container-groups/container-logs) (more convenient than SSH key management)
+- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal),
+  [SSH access](/container-engine/explanation/container-groups/ssh-and-terminal) and
+  [portal logs](/container-engine/explanation/container-groups/container-logs)
 
 > 📘 **Container Registry Options:** SaladCloud supports all major container registries. See our guides for
 > [Docker Hub](/container-engine/how-to-guides/registries/dockerhub),
@@ -634,11 +636,11 @@ async def service2_handler(path: str):
     return handle_service2(path)
 ```
 
-### Challenge: Debugging Without SSH
+### Challenge: Debugging
 
-**Quick Fix**: Use SaladCloud web terminal and comprehensive logging
+**Quick Fix**: Use SaladCloud web terminal or ssh and comprehensive logging
 
-- Access web terminal through portal for interactive debugging
+- Access web terminal through portal for interactive debugging or ssh into running containers
 - Implement detailed logging for troubleshooting
 - Use health probes to monitor application state
 
@@ -647,6 +649,7 @@ async def service2_handler(path: str):
 > - [Troubleshooting guide](/container-engine/how-to-guides/troubleshooting) for common issues
 > - [Performance monitoring](/container-engine/tutorials/performance/performance-monitoring) for optimization
 > - [Interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) for live debugging
+> - [SSH access](/container-engine/explanation/container-groups/ssh-and-terminal) for direct container access
 
 ## Performance Optimization Tips
 

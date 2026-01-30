@@ -390,13 +390,15 @@ Please refer to
 
 ## Enable Shell Access
 
-External SSH access is not supported for running containers on SaladCloud. However, you can access running instances
-through [the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) in the Portal, to
-perform tests and troubleshoot issues directly.
+External SSH access is supported for running containers on SaladCloud. Add your public key in the Portal and use the SSH
+command shown for the instance, or use
+[the interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal) in the Portal for quick
+access and troubleshooting. See [SSH & Terminal Access](/container-engine/explanation/container-groups/ssh-and-terminal)
+for details.
 
-Your containers on SaladCloud must have a continuously running process (such as a web server or I/O worker) to use the
-terminal. Unlike running containers locally, you cannot use the shell with a terminal to start containers on SaladCloud.
-This is a key distinction between local and SaladCloud container usage.
+Your containers on SaladCloud must have a continuously running process (such as a web server or I/O worker) to use SSH
+or the terminal. Unlike running containers locally, you cannot use an SSH session or the web terminal to start
+containers on SaladCloud. This is a key distinction between local and SaladCloud container usage.
 
 If this process in the containers fail to run for any reason, you can override it with "sleep infinity" in
 [the Command section](/container-engine/tutorials/deployment/docker-run#command) of the container group configuration.

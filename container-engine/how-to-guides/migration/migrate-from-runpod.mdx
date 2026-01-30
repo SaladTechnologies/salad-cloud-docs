@@ -21,7 +21,7 @@ pipelines all run unchanged.
 - Your application code, models, and algorithms remain unchanged
 - Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
 - Identical API endpoints, inference workflows, and model training patterns
-- Same debugging approach — but now with browser-based tools instead of SSH
+- Same debugging approach — with browser-based tools or SSH
 - Your local development and testing process
 
 **What Gets Automated for You:** Instead of manually provisioning pods, setting up CUDA drivers, configuring
@@ -46,7 +46,9 @@ SaladCloud's distributed network of GPUs.
 Think of containerization as creating a "recipe" for the manual setup you already do on RunPod—instead of SSH-ing in and
 running `pip install` commands each time, you write those same commands once in a Dockerfile, Docker builds an immutable
 image with everything pre-installed, and that same image runs consistently across all instances. Most developers find
-this eliminates their biggest frustrations with manual instance management while keeping everything else familiar.
+this eliminates their biggest frustrations with manual instance management while keeping everything else familiar. You
+can now also ssh into your running containers or use the web terminal in the portal for debugging, just like you did on
+RunPod.
 
 ## Why Containerization Has Become the Industry Standard
 
@@ -94,7 +96,8 @@ RunPod offers four primary products. Each has a clear equivalent or migration st
 **SaladCloud GPU Containers:**
 
 - Containerized apps running on distributed GPUs
-- No SSH to start — prebuilt containers with automated orchestration. Terminal available post deployment.
+- No SSH required to start — prebuilt containers with automated orchestration. SSH and the web terminal are available
+  post-deployment.
 - Consumer grade and datacenter GPUs [coming now](/container-engine/explanation/core-concepts/saladcloud-secure)
 - Integrated failover, and monitoring
 - Significant Cost savings
@@ -190,7 +193,8 @@ learning entirely new concepts, you're automating existing workflows with better
 
 - **Containerization** replaces manual dependency installation on each instance. Instead of SSH-ing in and running the
   same `pip install` commands repeatedly, you write them once in a Dockerfile, Docker builds the dependencies into an
-  immutable image, and that image runs consistently across all instances.
+  immutable image, and that image runs consistently across all instances. SSH access is still available for debugging
+  via the web terminal or traditional SSH.
 
 - **Storage Strategy** shifts from local file management to cloud-based storage patterns. While cloud APIs provide more
   reliable data persistence than manually copying files between instances, this transition requires rethinking data
@@ -213,8 +217,9 @@ These constraints map directly to what you're already working with, just more co
   services for persistent data
 - **Networking**: [IPv6 support](/container-engine/how-to-guides/gateway/enabling-ipv6) (replace `0.0.0.0` with `::` in
   your bind address)
-- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal) and
-  [portal logs](/container-engine/explanation/container-groups/container-logs) (more convenient than SSH key management)
+- **Debugging**: [Web terminal](/container-engine/tutorials/development-tools/interactive-terminal),
+  [SSH access](/container-engine/explanation/container-groups/ssh-and-terminal), and
+  [portal logs](/container-engine/explanation/container-groups/container-logs)
 
 > 📘 **Container Registry Options:** SaladCloud supports all major container registries. See our guides for
 > [Docker Hub](/container-engine/how-to-guides/registries/dockerhub),
@@ -1082,7 +1087,7 @@ CMD ["python", "app.py"]
 
 ### Challenge: RunPod SSH Access → SaladCloud Debugging
 
-**Quick Fix**: Use SaladCloud web terminal and comprehensive logging
+**Quick Fix**: Use SaladCloud web terminal, ssh access and comprehensive logging
 
 ```python
 # Add debugging endpoints to your application
@@ -1304,7 +1309,7 @@ curl -X POST https://api.salad.com/api/public/organizations/org/projects/project
 **Former Cloud GPU Users:**
 
 - [Docker deployment tutorial](/container-engine/tutorials/deployment/docker-run)
-- [SSH alternative: Interactive terminal](/container-engine/tutorials/development-tools/interactive-terminal)
+- [SSH and Interactive terminal](/container-engine/explanation/container-groups/ssh-and-terminal)
 
 **Former Serverless Users:**
 
@@ -1331,7 +1336,7 @@ Migrating from RunPod to SaladCloud provides immediate benefits:
 
 **For Cloud GPU Users:**
 
-- No more SSH key management or manual environment setup
+- No need for SSH key management or manual environment setup
 - Automatic scaling instead of manual pod management
 - Built-in load balancing and health monitoring
 
