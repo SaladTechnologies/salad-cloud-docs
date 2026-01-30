@@ -2,45 +2,83 @@
 title: 'SSH & Terminal Access'
 ---
 
-_Last Updated: January 23, 2026_
+_Last Updated: January 30, 2026_
 
-You can start an interactive shell inside your running container instances using SSH or the web-based terminal in the
-SaladCloud Portal. This requires your container image to have a shell installed, such as `bash` or `sh`.
+SaladCloud provides two ways to access a shell inside your running container instances: a web-based terminal directly in
+the Portal, and SSH access for connecting from your local machine or other SSH clients.
 
 ## SSH Access
 
 Use SSH to open a shell on a running container instance after adding your public key in the SaladCloud Portal.
 
-1. Create an SSH key (skip this if you already have one):
+### 1. Create or Obtain an SSH Key
+
+If you already have an SSH key pair, you can skip this step. To check for existing keys:
+
+```bash
+ls -la ~/.ssh/
+```
+
+Look for files named `id_ed25519.pub`, `id_rsa.pub`, or similar `.pub` files.
+
+To create a new SSH key:
+
+```bash
+ssh-keygen -t ed25519 -C "you@example.com"
+```
+
+This creates `~/.ssh/id_ed25519` (private key) and `~/.ssh/id_ed25519.pub` (public key). Your public key will look
+similar to this:
+
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHKz8vGk9XpFmEqTcvN7LMfPxWkR5yJQ2nBdW1cLmK4p you@example.com
+```
+
+### 2. Copy Your Public Key
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+### 3. Add the Key in the Portal
+
+There are two ways to access the SSH key settings:
+
+- Click your username in the upper-right corner and select **SSH Keys**, or
+- Click **SSH Keys** in the left sidebar menu
+
+Paste your public key into the field and save it.
+
+![](/container-engine/images/ssh-access-1.png)
+
+### 4. Connect to a Container Instance
+
+1. Open your container group in the Portal and click on a running instance.
+2. You will see an SSH command displayed in a text box above the terminal. Command will look something like this:
 
    ```bash
-   ssh-keygen -t ed25519 -C "you@example.com"
+   ssh root@<hostname> -p <port>
    ```
 
-   By default, this creates `~/.ssh/id_ed25519` (private key) and `~/.ssh/id_ed25519.pub` (public key).
+3. Copy the command and paste it into your terminal.
 
-2. Copy your public key:
+4. The Portal also displays the key fingerprint for verification, so you can confirm you're connecting with the correct
+   key.
 
-   ```bash
-   cat ~/.ssh/id_ed25519.pub
-   ```
+SSH automatically tries default key files from `~/.ssh/` (such as `id_ed25519`, `id_rsa`, `id_ecdsa`), so the command
+shown in the Portal works without modification for most users.
 
-3. Add the key in the Portal:
+If your key has a custom name or is stored in a non-standard location, add the `-i` flag to specify your key name and
+location:
 
-   - Click your username in the upper-right corner.
-   - Select "SSH key".
-   - Paste the public key into the field and save it.
-
-4. Connect to a container instance. Open your container group, select an instance, and copy its SSH IP and port (or the
-   SSH command shown). Run:
-
-   ```bash
-   ssh -i ~/.ssh/id_ed25519 -p <ssh_port> <ssh_user>@<ssh_ip>
-   ```
-
-   If you used a different key name or type, replace `id_ed25519` with your key file name.
+```bash
+ssh -i ~/.ssh/my_custom_key root@<hostname> -p <port>
+```
 
 ## Terminal Access
 
-Open the SaladCloud Portal and navigate to one of your container groups. Click on an instance. Click on the "Terminal"
-tab.
+The web-based terminal provides quick access directly from your browser without any SSH setup.
+
+1. Open the [SaladCloud Portal](https://portal.salad.com) and navigate to your container group.
+2. Click on a running instance.
+3. Click on the **Terminal** tab to open an interactive shell.
