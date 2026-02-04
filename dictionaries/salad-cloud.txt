@@ -12,6 +12,7 @@ assemblyai
 astype
 autoscaler
 autoscaling
+AUTOLYKOS
 azcopy
 bfloat
 Bqan
@@ -64,6 +65,7 @@ esports
 EventBridge
 Falco
 fastapi
+FIROPOW
 ffprobe
 firstphase
 Flickr
@@ -106,6 +108,8 @@ jemison
 jsonify
 jwks
 karras
+Kaspa
+KAWPOW
 konieshadow
 Kryptex
 kubeconfig
