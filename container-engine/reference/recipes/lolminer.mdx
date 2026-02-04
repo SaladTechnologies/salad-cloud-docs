@@ -1,0 +1,130 @@
+---
+title: lolMiner GPU Miner
+sidebarTitle: lolMiner GPU Miner
+description:
+  Deploy lolMiner on SaladCloud to mine Ergo, Ethereum Classic, Kaspa, Ravencoin, Flux, and other cryptocurrencies.
+---
+
+_Last Updated: February 4, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+**lolMiner** is a high-performance, multi-algorithm GPU miner. It enables mining of various cryptocurrencies including
+Ergo (ERG), Ethereum Classic (ETC), Kaspa (KAS), Ravencoin (RVN), Flux (FLUX), and many more.
+
+### Supported Algorithms & Coins
+
+| Algorithm   | Coin                   | Dev Fee |
+| ----------- | ---------------------- | ------- |
+| AUTOLYKOS2  | Ergo (ERG)             | 1.5%    |
+| ETCHASH     | Ethereum Classic (ETC) | 0.7%    |
+| KARLSENHASH | Kaspa (KAS)            | 0.75%   |
+| KAWPOW      | Ravencoin (RVN)        | 1.0%    |
+| ZelHash     | Flux (FLUX)            | 1.0%    |
+| BEAM-III    | Beam (BEAM)            | 1.0%    |
+| FIROPOW     | Firo (FIRO)            | 1.0%    |
+
+See the [lolMiner GitHub](https://github.com/Lolliedieb/lolMiner-releases) for the full list of 30+ supported
+algorithms.
+
+## Configuration
+
+When deploying the recipe, you'll need to provide:
+
+- **Container Group Name** (required) - Unique identifier for your deployment (2-63 lowercase letters, numbers, or
+  hyphens)
+- **Algorithm** (required) - Mining algorithm (e.g., `AUTOLYKOS2`, `ETCHASH`, `KAWPOW`). Defaults to `AUTOLYKOS2`
+- **Pool URL** (required) - Pool address with protocol (e.g., `stratum+tcp://ergo.2miners.com:8888`)
+- **Wallet Address** (required) - Your wallet address for the coin being mined
+- **Worker Name** (optional) - Custom worker name
+- **Extra Arguments** (optional) - Additional lolMiner command-line arguments
+
+## Example Pool URLs
+
+| Coin      | Pool       | URL                                       |
+| --------- | ---------- | ----------------------------------------- |
+| Ergo      | 2miners    | `stratum+tcp://ergo.2miners.com:8888`     |
+| Ergo      | Herominers | `stratum+tcp://ergo.herominers.com:10250` |
+| ETC       | 2miners    | `stratum+tcp://etc.2miners.com:1010`      |
+| Ravencoin | 2miners    | `stratum+tcp://rvn.2miners.com:6060`      |
+| Kaspa     | acc-pool   | `stratum+tcp://kas.acc-pool.pw:16061`     |
+| Flux      | 2miners    | `stratum+tcp://flux.2miners.com:9090`     |
+
+## How To Use This Recipe
+
+### Prerequisites
+
+1. A cryptocurrency wallet address for the coin you want to mine
+2. Choose a mining pool that supports your chosen algorithm/coin
+
+### Deploy the Recipe
+
+1. Open the **lolMiner GPU Miner** recipe in the [SaladCloud Portal](https://portal.salad.com) when creating a new
+   container group.
+2. Enter a container group name.
+3. Select your mining algorithm (defaults to AUTOLYKOS2 for Ergo).
+4. Enter your pool URL with the protocol prefix (`stratum+tcp://` or `stratum+ssl://`).
+5. Enter your wallet address.
+6. Optionally set a worker name and any extra arguments.
+7. Deploy the container group.
+
+### Checking Hashrate
+
+The miner outputs hashrate and share statistics to the container logs. Check the SaladCloud Portal logs for real-time
+output from your mining nodes.
+
+### Replica Count
+
+The recipe is configured for 3 replicas by default. For production mining operations, consider increasing the replica
+count to maximize your hashrate. SaladCloud's distributed GPU cloud allows you to scale to thousands of nodes.
+
+## Mining Payouts
+
+Mining rewards are paid directly to your wallet by the mining pool:
+
+1. Your miner submits shares to the pool as proof of work.
+2. When the pool finds a block, rewards are distributed based on shares contributed.
+3. Each pool has a minimum payout threshold (e.g., 0.5 ERG on 2miners).
+4. Once your balance reaches the threshold, the pool automatically sends coins to your wallet.
+
+Check your mining progress and balance on the pool's dashboard by searching for your wallet address.
+
+## Troubleshooting
+
+### Low Hashrate
+
+- Ensure you're using GPUs with sufficient VRAM for the algorithm
+- AUTOLYKOS2 (Ergo): 4GB+ VRAM recommended
+- ETCHASH (ETC): 4GB+ VRAM required
+- KAWPOW (RVN): 4GB+ VRAM required
+
+### Connection Errors
+
+- Verify the pool URL format includes protocol: `stratum+tcp://` or `stratum+ssl://`
+- Check if the pool is online
+- Try an alternative pool server
+
+### Invalid Shares
+
+- Ensure your wallet address is valid for the coin being mined
+- Check that the algorithm matches the coin/pool
+
+## Why Run Miners on SaladCloud
+
+SaladCloud is an ideal platform for GPU mining operations, offering:
+
+- **Most affordable GPU pricing on the market**: Keep more of your mining rewards with industry-leading cost efficiency.
+- **Massive scale**: Access thousands of GPU nodes worldwide, allowing you to scale your mining operation instantly.
+- **Easy deployment**: Get started in minutes with pre-configured recipes, no infrastructure management required.
+
+**Need a custom mining setup?** Check out our
+[Run Miners on SaladCloud](/container-engine/how-to-guides/miners/run-miners-on-saladcloud) guide to learn how to deploy
+any containerized mining workload on the platform.
+
+## Source Code & Resources
+
+- [lolMiner GitHub](https://github.com/Lolliedieb/lolMiner-releases)
+- [lolMiner Documentation](https://github.com/Lolliedieb/lolMiner-releases/wiki)
+- [Run Miners on SaladCloud](/container-engine/how-to-guides/miners/run-miners-on-saladcloud)
