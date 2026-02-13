@@ -232,6 +232,13 @@
                 ]
               },
               {
+                "group": "OpenClaw",
+                "pages": [
+                  "container-engine/how-to-guides/openclaw/overview",
+                  "container-engine/how-to-guides/openclaw/openclaw-ollama-salad-hosted-telegram"
+                ]
+              },
+              {
                 "group": "Job Processing & Queues",
                 "pages": [
                   "container-engine/how-to-guides/job-processing/creating-a-job-queue",

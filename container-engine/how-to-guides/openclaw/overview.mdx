@@ -1,0 +1,86 @@
+---
+title: 'OpenClaw on SaladCloud Overview'
+sidebarTitle: 'Overview'
+description:
+  'Understand what OpenClaw is, why model costs can grow quickly, and why SaladCloud is a strong hosting option.'
+---
+
+_Last Updated: February 13, 2026_
+
+OpenClaw is a local-first AI agent framework. It can chat, run tools, automate tasks, and connect to channels such as
+Telegram, Discord, and other messaging platforms.
+
+This page explains:
+
+- what OpenClaw is,
+- why model costs can grow quickly,
+- why SaladCloud is a practical way to host models for OpenClaw.
+
+## What OpenClaw is
+
+OpenClaw is the orchestration layer around your model, tools, memory, and channels. The model is the "brain," while
+OpenClaw handles:
+
+- conversation and session state,
+- tool execution and workflow logic,
+- channel integrations,
+- scheduling and background activity.
+
+Because OpenClaw can run frequent background calls and tool-heavy workflows, your model choice and hosting strategy have
+a direct impact on cost and performance.
+
+## Why costs increase with API-hosted models
+
+OpenClaw itself is free, but model inference is not. With traditional API providers, billing is typically token-based.
+Costs tend to grow because of:
+
+- accumulated conversation and tool context,
+- repeated background/heartbeat interactions,
+- sub-agent and multi-step task execution,
+- always-on usage patterns.
+
+In practice, this can make costs hard to predict for active agent workflows.
+
+## Why host OpenClaw models on SaladCloud
+
+SaladCloud changes the cost model from token billing to compute-time billing for your deployment. For many OpenClaw
+workloads, this has three main advantages:
+
+- **Predictability**: pay for runtime, not each generated token.
+- **Control**: scale replicas up/down, including scheduled scale-to-zero windows.
+- **Privacy posture**: keep more prompt/context flow within infrastructure you control.
+
+For users running long sessions, heavy tool usage, or frequent background checks, this can materially reduce total cost.
+
+## Inference options on SaladCloud
+
+You can run OpenClaw-compatible model endpoints with:
+
+- **Ollama**: easiest path for most users.
+- **vLLM**: higher throughput and advanced serving optimizations.
+- **TGI**: strong text-generation serving option for many Hugging Face models.
+
+All can be used with OpenClaw when configured with compatible endpoints and model metadata.
+
+## Recommended operating pattern
+
+A common production pattern is:
+
+1. run OpenClaw locally (or in your controlled environment),
+2. host one or more model endpoints on SaladCloud,
+3. set model fallbacks in OpenClaw,
+4. apply autoscaling/scheduling to align runtime with active hours.
+
+This balances capability, reliability, and cost.
+
+## Next step
+
+Follow the full setup guides to deploy OpenClaw with SaladCloud-hosted models:
+
+- [OpenClaw + Ollama (Salad Hosted) + Telegram](/container-engine/how-to-guides/openclaw/openclaw-ollama-salad-hosted-telegram)
+
+## References
+
+- [Reduce Your OpenClaw LLM Costs: SaladCloud Guide](https://blog.salad.com/reduce-your-openclaw-llm-costs-saladcloud-guide/)
+- [OpenClaw Documentation](https://docs.openclaw.ai/)
+- [Ollama + OpenClaw](https://ollama.com/blog/openclaw)
