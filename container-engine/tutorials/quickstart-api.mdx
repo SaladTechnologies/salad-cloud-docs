@@ -43,8 +43,12 @@ Include the following headers in your request:
 - `accept: application/json`
 - `content-type: application/json`
 
-Include a JSON payload in the data field of the request body with the necessary configuration parameters. Here's an
-example using curl:
+Include a JSON payload in the data field of the request body with the necessary configuration parameters. These
+configuration parameters can be obtained in the Portal by clicking "Copy Configuration" for an existing container group
+or after configuring a container group before deploying. Note that any authentication needed for pulling the container
+image is not copied and will need to be added manually.
+
+Here's an example using curl:
 
 ```bash
 curl --request POST \
