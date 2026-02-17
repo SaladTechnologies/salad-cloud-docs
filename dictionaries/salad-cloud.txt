@@ -15,6 +15,7 @@ autoscaling
 AUTOLYKOS
 azcopy
 bfloat
+BotFather
 Bqan
 btop
 buildx
@@ -80,6 +81,7 @@ getenv
 getsize
 gevent
 gguf
+ggml
 GGUF
 gnark
 gptq
@@ -110,6 +112,7 @@ jwks
 karras
 Kaspa
 KAWPOW
+kimi
 konieshadow
 Kryptex
 kubeconfig
@@ -166,6 +169,8 @@ ollama
 Ollama
 ONNX
 OpenAPI
+openclaw
+OpenClaw
 openmm
 Oula
 outtmpl
