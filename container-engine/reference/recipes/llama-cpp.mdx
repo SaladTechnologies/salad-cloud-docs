@@ -1,0 +1,148 @@
+---
+title: llama.cpp Recipe
+sidebarTitle: llama.cpp
+description: Serve GGUF models with the official llama.cpp server on SaladCloud GPUs.
+---
+
+_Last Updated: February 17, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs [llama.cpp](https://github.com/ggml-org/llama.cpp) using the official `server-cuda` image on SaladCloud
+GPUs. It exposes OpenAI-compatible endpoints for inference and includes the built-in llama.cpp web UI at your deployment
+URL.
+
+<Callout variation="warning">Ensure your use is permissible under the license for the model you deploy.</Callout>
+
+## Model Source
+
+You can set model options in two places:
+
+- During deployment in the recipe form.
+- After deployment by editing container group environment variables.
+
+Portal form labels for model selection:
+
+| Form Label (Portal)            | Value / Example                                  | Environment Variable  |
+| ------------------------------ | ------------------------------------------------ | --------------------- |
+| `Model Source`                 | `Hugging Face Repo (GGUF)` or `Direct Model URL` | N/A (selection only)  |
+| `Hugging Face GGUF Repo`       | `ggml-org/gemma-3-1b-it-GGUF`                    | `LLAMA_ARG_HF_REPO`   |
+| `Hugging Face File (Optional)` | `gemma-3-1b-it-Q4_K_M.gguf`                      | `LLAMA_ARG_HF_FILE`   |
+| `Model URL`                    | Direct `.gguf` URL                               | `LLAMA_ARG_MODEL_URL` |
+| `Hugging Face Token`           | Hugging Face access token                        | `HF_TOKEN`            |
+
+Model source behavior:
+
+- **Hugging Face Repo (GGUF)**: set `LLAMA_ARG_HF_REPO`, and optionally `LLAMA_ARG_HF_FILE` to select a specific
+  quantization file.
+- **Direct Model URL**: set `LLAMA_ARG_MODEL_URL` to a direct `.gguf` file URL.
+
+If the model is private or gated on Hugging Face, set `HF_TOKEN`.
+
+### Example Models
+
+Hugging Face repo examples (`LLAMA_ARG_HF_REPO`):
+
+- `ggml-org/gemma-3-1b-it-GGUF`
+- `bartowski/Qwen2.5-7B-Instruct-GGUF`
+- `unsloth/Qwen3-Coder-Next-GGUF:UD-Q4_K_XL`
+
+Direct URL examples (`LLAMA_ARG_MODEL_URL`):
+
+- `https://huggingface.co/ggml-org/gemma-3-1b-it-GGUF/resolve/main/gemma-3-1b-it-Q4_K_M.gguf`
+- `https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf`
+
+## Runtime Controls
+
+You can also set runtime controls in the deployment form, then adjust later as environment variables.
+
+| Parameter      | Form Label (Portal) | Environment Variable     | Default     | Notes                                                 |
+| -------------- | ------------------- | ------------------------ | ----------- | ----------------------------------------------------- |
+| GPU Layers     | `GPU Layers`        | `LLAMA_ARG_N_GPU_LAYERS` | `auto`      | Use `auto`, `all`, or an integer.                     |
+| Context Size   | `Context Size`      | `LLAMA_ARG_CTX_SIZE`     | `4096`      | Larger context uses more VRAM.                        |
+| Parallel Slots | `Parallel Slots`    | `LLAMA_ARG_N_PARALLEL`   | `1`         | More parallel slots increase concurrent VRAM usage.   |
+| Model Alias    | `Model Alias`       | `LLAMA_ARG_ALIAS`        | `llama-cpp` | Model name returned by `/v1/models` and API requests. |
+| Host           | (advanced config)   | `LLAMA_ARG_HOST`         | `::`        | Default bind address.                                 |
+| Port           | (advanced config)   | `LLAMA_ARG_PORT`         | `8080`      | Internal server port.                                 |
+
+After deployment, update these environment variables in the SaladCloud Portal under your container group settings.
+
+For advanced tuning, add additional supported `LLAMA_ARG_*` variables in Advanced Configuration.
+
+- [Server Args + Env Vars](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md#usage)
+- [llama.cpp Server Documentation](https://github.com/ggml-org/llama.cpp/tree/master/tools/server)
+
+## API Endpoints
+
+- `GET /health` - readiness probe and health check
+- `GET /v1/models` - list available model aliases
+- `POST /v1/chat/completions` - OpenAI-compatible chat completions
+- `POST /v1/completions` - OpenAI-compatible completions
+- `POST /v1/embeddings` - embeddings endpoint (model-dependent)
+
+## Example Request
+
+<Callout variation="note">Omit the `Salad-Api-Key` header if authentication is disabled.</Callout>
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "model": "llama-cpp",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Explain how quantization helps GGUF models."}
+    ],
+    "max_tokens": 128,
+    "temperature": 0
+  }'
+```
+
+## How To Use This Recipe
+
+### Step-by-Step Deployment
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Create an organization if you do not have one yet, or open an existing organization and project.
+3. In your project, click **Deploy Container Group**.
+4. Select the **llama.cpp** recipe.
+5. Fill in the required fields:
+   - Enter a **Container Group Name**.
+   - In **Model Source**, choose:
+     - **Hugging Face Repo (GGUF)** to load from Hugging Face.
+     - **Direct Model URL** to load from a direct `.gguf` link.
+   - If you choose **Hugging Face Repo (GGUF)**, fill **Hugging Face GGUF Repo**, and optionally **Hugging Face File**
+     for a specific file in that repo.
+   - If you choose **Direct Model URL**, fill **Model URL**.
+6. Fill in optional runtime/model fields as needed:
+   - **Model Alias** controls the model name in API requests (default: `llama-cpp`).
+   - Tune performance with **GPU Layers**, **Context Size**, and **Parallel Slots** based on your GPU and traffic needs.
+   - Add **Hugging Face Token** only if your Hugging Face model is private or gated.
+7. Choose whether to require authentication with **Require Container Gateway Authentication**:
+   - Enabled: requests must include a `Salad-Api-Key` header.
+   - Disabled: public unauthenticated access.
+8. Deploy and wait for readiness checks to pass.
+
+### Authentication
+
+Container Gateway authentication is enabled by default. When enabled, include your SaladCloud API key in the
+`Salad-Api-Key` header. See [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for details.
+
+### Replica Count
+
+The recipe defaults to 3 replicas. Keep at least 3 for testing and consider 5+ for production to absorb interruptions
+from individual nodes.
+
+### Deploy And Wait
+
+The model is downloaded at startup. It can take several minutes per replica depending on model size and node network
+conditions. Traffic starts routing only after the readiness probe (`GET /health`) passes.
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/llama-cpp)
+- [llama.cpp Project](https://github.com/ggml-org/llama.cpp)

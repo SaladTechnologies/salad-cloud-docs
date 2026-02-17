@@ -317,6 +317,7 @@
                   "container-engine/reference/recipes/gromacs-kelpie",
                   "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
+                  "container-engine/reference/recipes/llama-cpp",
                   "container-engine/reference/recipes/lolminer",
                   "container-engine/reference/recipes/mcproxy",
                   "container-engine/reference/recipes/ollama",
