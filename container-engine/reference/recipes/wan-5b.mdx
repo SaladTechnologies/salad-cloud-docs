@@ -25,33 +25,12 @@ references can also be preloaded to s3 storage and synced with the worker.
 Kelpie provides a [simple API](https://kelpie.saladexamples.com/docs) for long-running jobs and data sync (download
 inputs before, upload outputs after). It also supports **autoscaling by queue depth** including scale-to-zero when idle.
 
-## Which Recipe Should I Use? (Consumer vs. DataCenter)
-
-We have 2 recipes for running Wan 2.2 TI2V-5B on SaladCloud: Wan 2.2 TI2V-5B using Kelpie and Wan 2.2 TI2V-5B using
-Kelpie (DataCenter).
-
-Both recipes use **Kelpie** (batch jobs + S3 sync) to run **Wan 2.2 TI2V-5B** asynchronously. The main difference is how
-many workers run per node and how you scale parallelism.
-
 ### Consumer Recipe (single-GPU nodes)
 
 - **1 worker per node** (one inference process per machine).
 - Targets **consumer GPUs** (≈24 GB+ VRAM), e.g. **RTX 4090 / 5090**.
 - Scaling: each node runs a single inference worker, so your maximum concurrency is exactly the number of nodes you have
   running (e.g., 10 nodes → 10 parallel jobs).
-
-### DataCenter Recipe (multi-GPU nodes)
-
-- Runs on **DataCenter nodes** that ship with **8 GPUs per node** (default **L40S**).
-- The container launches **8 Kelpie workers per node** (one per GPU) → 8 Wan processes in parallel on a single node.
-- Scaling: each node runs 8 inference worker, so you scale by 8 workers. Deploy 1 DC node → 8 concurrent inferences.
-  Need 32 concurrent? Scale to 4 nodes (4 × 8 = 32).
-
-<Callout variation="info">
-  Both variants use the same job format (Kelpie API) and the same storage pattern (S3-compatible bucket). Choose
-  Consumer for flexible, fine-grained scaling; or choose DataCenter for higher throughput per node and better economics
-  on long video jobs. Check our [Benchmark](https://blog.salad.com/benchmarking-wan2-2/) to make your decision.
-</Callout>
 
 ## Prerequisites. Prepare Your Storage and Data
 
@@ -270,4 +249,3 @@ The Kelpie scaling algorithm works as follows:
 - [Kelpie API](https://kelpie.saladexamples.com/docs)
 - [Kelpie Worker Binary](https://github.com/SaladTechnologies/kelpie)
 - [Recipe Source Code](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/wan2.2-5b-kelpie)
-- [Recipe Source Code - DataCenter](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/wan2.2-5b-kelpie-dc)

@@ -66,16 +66,6 @@ python -c "import requests,sys;sys.exit(0 if requests.get('http://localhost:80/h
 
 <img src="/container-engine/images/e851b39-image.png" />
 
-## Optional - Multi-GPU TGI Inference on SaladCloud Secure
-
-[**SaladCloud Secure**](/container-engine/explanation/core-concepts/saladcloud-secure) is a high-performance
-infrastructure tier with data center GPUs, available in blocks of **8 GPUs per node**. These machines are ideal for
-running large-scale language models using TGI with multi-GPU support.
-
-TGI supports **model sharding across multiple GPUs**, allowing you to load and serve much larger models efficiently. To
-take advantage of this on SaladCloud Secure, configure the following environment variables when launching your
-container:
-
 ### Required Environment Variables
 
 - `SHARDED=true` Enables TGI's sharded mode. If this is set and no additional options are provided, TGI will use **all

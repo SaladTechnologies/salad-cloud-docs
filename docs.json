@@ -33,7 +33,6 @@
                 "group": "Core Concepts",
                 "pages": [
                   "container-engine/explanation/core-concepts/overview",
-                  "container-engine/explanation/core-concepts/saladcloud-secure",
                   "container-engine/explanation/core-concepts/architectural-overview",
                   "container-engine/explanation/core-concepts/service-performance",
                   "container-engine/explanation/core-concepts/recipes-overview",
@@ -314,7 +313,6 @@
                   "container-engine/reference/recipes/overview",
                   "container-engine/reference/recipes/ai-toolkit",
                   "container-engine/reference/recipes/comfyui",
-                  "container-engine/reference/recipes/gpt-oss-120b-vllm",
                   "container-engine/reference/recipes/gromacs-kelpie",
                   "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
@@ -329,13 +327,10 @@
                   "container-engine/reference/recipes/sam3",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tgi",
-                  "container-engine/reference/recipes/tgi-dc",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/unsloth-finetune",
                   "container-engine/reference/recipes/unsloth-inference",
                   "container-engine/reference/recipes/vllm",
-                  "container-engine/reference/recipes/vllm-dc",
-                  "container-engine/reference/recipes/wan2.2-a14b-kelpie-dc",
                   "container-engine/reference/recipes/wan-5b",
                   "container-engine/reference/recipes/yolo"
                 ]
@@ -1054,10 +1049,6 @@
     {
       "source": "/products/sce/getting-started/quickstart-api",
       "destination": "/container-engine/tutorials/quickstart-api"
-    },
-    {
-      "source": "/products/sce/saladcloud-secure",
-      "destination": "/container-engine/explanation/core-concepts/saladcloud-secure"
     },
     {
       "source": "/products/sce/container-groups/container-groups",
