@@ -1,0 +1,485 @@
+---
+title: 'Lambda (lambda.ai) to SaladCloud Migration Guide'
+sidebarTitle: 'From Lambda (lambda.ai)'
+description:
+  'Step-by-step guide to migrating GPU inference and batch workloads from Lambda (lambda.ai) to SaladCloud. Cut costs by
+  up to 90% while keeping your existing code and workflows.'
+---
+
+_Last Updated: February 20, 2026_
+
+# Overview
+
+This guide covers migrating workloads from **Lambda Cloud On-Demand** (Linux GPU virtual machines from
+[`lambda.ai`](https://lambda.ai/)) to **SaladCloud** (containerized workloads running on Salad's distributed GPU
+network).
+
+If you currently work on Lambda Cloud by launching an on-demand instance, SSH-ing in, installing dependencies, and
+running notebooks or scripts, the SaladCloud equivalent is to **build a container image** that encodes that setup and
+deploy it as a **container group**. Your code stays the same, only the runtime environment changes.
+
+## What Stays Exactly the Same
+
+- Your application code, models, and algorithms remain unchanged
+- Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
+- Identical API patterns, data processing workflows, and model inference logic
+- Same Docker containers if you're already containerized
+
+## Key Differences (VMs vs. Containers)
+
+**Lambda Cloud (On-Demand):**
+
+- You get a GPU VM with SSH access and open ports via firewall rules
+- Default image is a pre-configured Ubuntu environment with ML tooling (Lambda Stack)
+- Optional persistent **Filesystems** mount at `/lambda/nfs/<FILESYSTEM_NAME>`
+- Instances start in minutes and are billed per hour
+
+**SaladCloud (Container Engine):**
+
+- You deploy a **container image** to a **container group**
+- You can access replicas via **web terminal** or **SSH** (coming soon)
+- Local disk is ephemeral; plan to persist state to external storage
+- Containers run on distributed consumer GPUs worldwide
+
+**Key Differences to Understand Upfront:**
+
+- Savings of up to 90% compared to Lambda Cloud pricing (workload dependent)
+- Longer startup times but with significant cost advantages
+- Consumer GPUs (RTX 5090, 4090, 3090 and more) instead of datacenter GPUs (H100, A100)
+- Nodes are interruptible; design for resilience, similar to spot instances
+
+Instead of manually managing GPU instances via SSH, SaladCloud handles instance provisioning, automatic failover, and
+global load balancing through [Salad Container Engine (SCE)](/container-engine/explanation/core-concepts/overview).
+
+Think of containerization as creating a "recipe" for the manual setup you already do on Lambda. Instead of SSH-ing in
+and running `pip install` commands each time, you write those same commands once in a Dockerfile, Docker builds an
+immutable image with everything pre-installed, and that same image runs consistently across all instances.
+
+**New to containerization?** Check out our comprehensive [getting started guide](/container-engine/tutorials/quickstart)
+for a step-by-step introduction to deploying on SaladCloud, or explore our
+[architectural overview](/container-engine/explanation/core-concepts/architectural-overview) to understand how
+SaladCloud's distributed GPU network works.
+
+## Product Comparison: Lambda vs. SaladCloud
+
+Lambda Cloud offers three main products. Below we map each to its closest SaladCloud equivalent and assess migration
+fit.
+
+| Lambda Product                                                                                                                                    | SaladCloud Equivalent                                                                                                                                                                                                                                                                                                                | Fit                                                                                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[On-Demand Cloud](https://docs.lambda.ai/public-cloud/on-demand/)**: GPU VM instances with SSH, managed images, and optional add-ons            | [Salad Container Engine (SCE)](/container-engine/explanation/core-concepts/overview): Managed container service with [Container Gateway](/container-engine/how-to-guides/job-processing/use-container-gateway) for real-time inference or [Job Queues](/container-engine/explanation/job-processing/job-queues) for batch processing | ✅ Excellent for inference, batch, and rendering workloads. Interactive dev is different but supported via terminal/SSH.                                                                  |
+| **[1-Click Clusters](https://docs.lambda.ai/public-cloud/1-click-clusters/)**: Multi-node clusters for distributed training (Kubernetes or Slurm) | No equivalent                                                                                                                                                                                                                                                                                                                        | ❌ Not a perfect fit. SaladCloud does not support multi-node training with InfiniBand/NVLink interconnect patterns, but does support long-running jobs which can be adapted for training. |
+| **[Private Cloud](https://docs.lambda.ai/private-cloud/)**: Single-tenant clusters and low-level infrastructure control                           | No equivalent                                                                                                                                                                                                                                                                                                                        | ❌ Not a fit. SaladCloud is a distributed public cloud.                                                                                                                                   |
+
+## Workload Mapping
+
+| Workload Type                                               | Best Fit on SaladCloud                                                                                                                                 | Notes                                                                                                                                                                                         |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Real-Time Inference** (HTTP APIs, streaming tokens)       | Container groups + [Container Gateway](/container-engine/how-to-guides/job-processing/use-container-gateway)                                           | Ensure your app is IPv6-ready: [Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6)                                                                                         |
+| **Batch Processing** (embeddings, transcription, rendering) | [Job Queues](/container-engine/explanation/job-processing/job-queues) or [Kelpie](/container-engine/how-to-guides/job-processing/kelpie) + autoscaling | Prefer queues when cold starts and retries are acceptable                                                                                                                                     |
+| **Interactive Development** (SSH, JupyterLab, notebooks)    | Container groups + terminal/SSH + Tailscale (optional)                                                                                                 | Use [VS Code Remote Dev](/container-engine/tutorials/development-tools/vscode-remote-development) or [Tailscale basic](/container-engine/how-to-guides/platform-integrations/tailscale-basic) |
+| **Single-Node Fine-Tuning** (LoRA, QLoRA)                   | SCE + checkpointing (often with Kelpie patterns)                                                                                                       | See [Kelpie](/container-engine/how-to-guides/job-processing/kelpie) and [Long-running tasks](/container-engine/explanation/job-processing/long-running-tasks)                                 |
+| **Distributed Training** (multi-node)                       | Keep on Lambda (1-Click Clusters)                                                                                                                      | SaladCloud does not support multi-node interconnects at the moment                                                                                                                            |
+
+<Tip>
+  **Quick Start with Recipes:** SaladCloud offers ready-to-deploy
+  [recipes](/container-engine/reference/recipes/overview) for popular inference servers. Deploy with one click from the
+  Portal: [vLLM](/container-engine/reference/recipes/vllm), [Ollama](/container-engine/reference/recipes/ollama), [Text
+  Generation Inference (TGI)](/container-engine/reference/recipes/tgi),
+  [llama.cpp](/container-engine/reference/recipes/llama-cpp), and
+  [ComfyUI](/container-engine/reference/recipes/comfyui).
+</Tip>
+
+<Info>
+  **Hybrid Strategy:** Many teams keep multi-node distributed training on Lambda Cloud, then deploy the trained model to
+  SaladCloud for cost-effective production inference.
+</Info>
+
+# Cost Comparison
+
+SaladCloud pricing shown below is for the **Batch** priority tier (lowest cost). Higher priority tiers cost more but
+provide greater availability guarantees.
+
+| Use Case                       | Lambda GPU              | Lambda $/hr | SaladCloud GPU   | SaladCloud $/hr | Savings |
+| ------------------------------ | ----------------------- | ----------- | ---------------- | --------------- | ------- |
+| LLM Inference (7–13B)          | A10 (24 GB)             | ~$0.86      | RTX 4090 (24 GB) | ~$0.16          | ~81%    |
+| Image Generation (SD/FLUX)     | A10 (24 GB)             | ~$0.86      | RTX 3090 (24 GB) | ~$0.09          | ~90%    |
+| Transcription (Whisper)        | Quadro RTX 6000 (24 GB) | ~$0.58      | RTX 3090 (24 GB) | ~$0.09          | ~84%    |
+| Batch Embeddings               | A100 PCIe (40 GB)       | ~$1.48      | RTX 4090 (24 GB) | ~$0.16          | ~89%    |
+| LLM Inference (34B–70B quant.) | A6000 (48 GB)           | ~$0.92      | RTX 5090 (32 GB) | ~$0.25          | ~73%    |
+
+**Example: 100 GPU-hours of inference per day**
+
+- **Lambda (A10):** 100 × $0.86/hr = ~$2,580/month
+- **SaladCloud (RTX 4090, batch):** 100 × $0.16/hr = ~$480/month
+
+<Note>
+  Prices are approximate and subject to change. Check [salad.com/pricing](https://salad.com/pricing) and
+  [lambda.ai/pricing](https://lambda.ai/pricing) for current rates.
+</Note>
+
+# Step-by-Step Migration
+
+## 1. Inventory What Runs on Lambda Cloud
+
+For each workload, capture:
+
+- Work type: notebook/dev, training, batch processing, or real-time inference
+- Data size and where it lives today (Lambda Filesystem, local disk, S3, etc.)
+- Startup cost: installs, model downloads, compilation steps
+- Whether the workload must survive interruptions (checkpointing requirements)
+
+This determines whether you should deploy a single long-running replica, scale replicas, or move to Job Queues.
+
+## 2. Turn Your VM Setup Into a Container Image
+
+In Lambda Cloud you often "bootstrap" a VM by running `apt-get`, `pip install`, cloning a repo, and launching your app.
+On SaladCloud, put those steps into a Dockerfile so every replica starts the same way.
+
+Good starting points:
+
+- [Quickstart (Portal)](/container-engine/tutorials/quickstart)
+- [Quickstart (API)](/container-engine/tutorials/quickstart-api)
+
+Practical tips:
+
+- Prefer **reproducible builds** (pin dependencies where reasonable)
+- Keep images as small as possible to reduce startup time
+- Prebuild model into the image or download on startup
+
+## 3. Handle Data and Persistence (Replacing Lambda Filesystems)
+
+Lambda Cloud Filesystems are NFS-mounted for sharing datasets and checkpoints across instances. On SaladCloud mounting
+is not supported.
+
+Recommended approach:
+
+- Store datasets, checkpoints, and outputs in **cloud object storage** (S3-compatible is common)
+- Download inputs at startup (or per job), and upload outputs/checkpoints periodically if needed
+
+See the [Storage Migration](#storage-migration) section below for specific tools and code examples.
+
+## 4. Deploy on SaladCloud
+
+Deploy your image as a container group and configure:
+
+- GPU/CPU/RAM resources appropriate for your workload
+- Environment variables and secrets
+- Health probes for services:
+  - [Startup probes](/container-engine/explanation/infrastructure-platform/startup-probes)
+  - [Readiness probes](/container-engine/explanation/infrastructure-platform/readiness-probes)
+  - [Liveness probes](/container-engine/explanation/infrastructure-platform/liveness-probes)
+
+## 5. Scale and Operate
+
+Common patterns:
+
+- **Interactive**: 1 replica, high priority, SSH/terminal access. Recommended for dev and debugging, not production
+  workloads, since nodes are interruptible.
+- **Inference service**: N replicas, gateway load balancing, readiness checks
+- **Batch**: Job Queues + autoscaling based on queue depth / Kelpie for long-running jobs
+
+Relevant docs:
+
+- [Enable autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling)
+- [Service Performance and Reliability](/container-engine/explanation/core-concepts/service-performance)
+
+## 6. Cut Over Safely
+
+1. Deploy on SaladCloud and run in parallel
+2. Replay a small sample of production events (shadow traffic) and compare outputs
+3. Gradually shift traffic/jobs (canary) and monitor performance
+
+## Real-Time Inference: End-to-End Walkthrough
+
+Here is a concrete walkthrough for migrating a FastAPI inference service from Lambda to SaladCloud.
+
+<Steps>
+  <Step title="Capture your Lambda environment">
+    On your Lambda instance, document everything you need to reproduce the setup:
+
+    ```bash
+    # Record installed packages
+    pip freeze > requirements.txt
+
+    # Note your GPU model and VRAM
+    nvidia-smi
+
+    # Note framework versions
+    python -c "import torch; print(torch.__version__)"
+    python -c "import torch; print(torch.cuda.get_device_name(0))"
+
+    # Document your startup commands, model download steps, etc.
+    ```
+
+  </Step>
+
+  <Step title="Create a Dockerfile">
+    Convert your manual Lambda setup into a reproducible Dockerfile. Here's a minimal example for a FastAPI server:
+
+    ```dockerfile
+    FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+
+    WORKDIR /app
+
+    RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
+    COPY requirements.txt .
+    RUN pip3 install --no-cache-dir -r requirements.txt
+
+    COPY . .
+
+    CMD ["python3", "-m", "uvicorn", "main:app", "--host", "::", "--port", "8000"]
+    ```
+
+    <Warning>
+      **IPv6 is required for Container Gateway.** SaladCloud's load balancing operates through IPv6. Bind your server to
+      `::` (all IPv6 interfaces) instead of `0.0.0.0`.
+
+      See [Enabling IPv6](/container-engine/how-to-guides/gateway/enabling-ipv6) for framework-specific examples and
+      workarounds.
+    </Warning>
+
+  </Step>
+
+  <Step title="Build and push your image">
+    ```bash
+    docker build -t your-registry/your-inference:latest .
+
+    # Test locally (with GPU)
+    docker run --gpus all -p 8000:8000 your-registry/your-inference:latest
+
+    docker push your-registry/your-inference:latest
+    ```
+
+    SaladCloud supports images from standard registries including Docker Hub, GitHub Container Registry, Amazon ECR,
+    Google Artifact Registry, Azure Container Registry and others.
+
+  </Step>
+
+  <Step title="Deploy on SaladCloud">
+    Deploy via the [SaladCloud Portal](https://portal.salad.com) or the
+    [API](/reference/saladcloud-api/container-groups/create-container-group):
+
+    1. **Image Source:** `your-registry/your-inference:latest`
+    2. **GPU Class:** Select based on your model's VRAM needs (e.g., RTX 4090 for 24 GB, RTX 5090 for 32 GB)
+    3. **Replicas:** Start with 3+ for production reliability
+    4. **Networking:** Enable Container Gateway for an HTTPS endpoint
+    5. **Health Probes:** Configure [health probes](/container-engine/explanation/infrastructure-platform/health-probes)
+       for your server
+    6. **Environment Variables:** Pass any config (model paths, API keys, etc.)
+
+  </Step>
+
+  <Step title="Update your client code">
+    Replace your Lambda instance IP with the SaladCloud Container Gateway URL:
+
+    ```python
+    # Before (Lambda)
+    ENDPOINT = "http://<lambda-instance-ip>:8000/v1/completions"
+
+    # After (SaladCloud)
+    ENDPOINT = "https://<your-gateway-url>.salad.cloud/v1/completions"
+    ```
+
+    The API interface remains identical; only the URL changes.
+
+  </Step>
+</Steps>
+
+<Tip>
+  **Optimize cold starts:** First instances typically come online within minutes but a full fleet might reaches 90% in
+  tens of minutes depending on image size. To reduce startup latency: bake models into the image when feasible, use
+  multi-stage builds to reduce image size, keep minimum replicas running for latency-sensitive applications, and use
+  [Job Queues](/container-engine/explanation/job-processing/job-queues) for batch workloads where startup time is
+  acceptable. Note, that SaladCloud does not charge for startup time while your container is initializing.
+</Tip>
+
+# Batch Processing: Lambda to SaladCloud Job Queues
+
+If you're running batch processing on Lambda, SaladCloud's
+[Job Queues](/container-engine/explanation/job-processing/job-queues) provide automatic job distribution and retries.
+
+<Tip>
+  You are not limited to Salad Job Queues. For workloads that require long-running execution with checkpointing and
+  resumption, consider [Kelpie](/container-engine/how-to-guides/job-processing/kelpie). If you already have an existing
+  queue system, you can also run your own workers on SaladCloud and keep using it, such as
+  [Redis](/container-engine/how-to-guides/job-processing/build-redis-queue),
+  [RabbitMQ](/container-engine/how-to-guides/job-processing/rabbitmq), [Amazon
+  SQS](/container-engine/how-to-guides/job-processing/sqs), or [GCP
+  Pub/Sub](/container-engine/how-to-guides/job-processing/gcp-pub-sub).
+</Tip>
+
+### Before (Lambda)
+
+1. Spin up one or more GPU instances
+2. SSH in and install dependencies
+3. Upload data or connect to storage
+4. Run processing scripts
+5. Download results
+6. Terminate instances (avoid idle billing)
+
+### After (SaladCloud)
+
+1. Containerize your processing logic as an HTTP API
+2. Deploy on SaladCloud with Job Queues enabled
+3. Submit jobs via the Job Queue API
+4. Jobs are distributed across healthy GPUs and retried on transient failures
+5. Retrieve results via API polling
+6. Autoscale replicas based on queue depth
+
+### Converting Your Script to an HTTP API
+
+Your batch script needs to be wrapped as an HTTP endpoint that the
+[Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker) can call:
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+model = load_model()  # Load once at startup
+
+@app.post("/process")
+async def process(request: dict):
+    result = model.process(request["input"])
+    upload_to_cloud_storage(result)
+    return {"status": "complete", "output_url": result_url}
+
+@app.get("/ready")
+async def ready():
+    return {"status": "ok"}
+```
+
+<Info>
+  **Autoscaling:** Enable [autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) to automatically
+  scale replicas based on queue depth.
+</Info>
+
+# Storage Migration
+
+Lambda offers persistent networked filesystems that mount at `/lambda/nfs/`. SaladCloud containers are **ephemeral**, so
+you must use external cloud storage for durable data.
+
+### Recommended Storage Solutions
+
+| Provider                      | Advantages                          | Best For                         |
+| ----------------------------- | ----------------------------------- | -------------------------------- |
+| **Cloudflare R2**             | S3-compatible; no egress fees       | Many workloads, large outputs    |
+| **AWS S3**                    | Mature ecosystem; extensive tooling | Teams already on AWS             |
+| **Backblaze B2**              | Low cost; S3-compatible             | Large datasets, archival         |
+| **Salad Simple Storage (S4)** | Simple service; clear limits        | Temporary assets (smaller files) |
+
+### Migrating Data from Lambda Filesystems
+
+Before terminating your Lambda instances, copy data to cloud storage:
+
+```bash
+# On your Lambda instance
+curl https://rclone.org/install.sh | sudo bash
+rclone config
+
+rclone sync /lambda/nfs/my-filesystem r2:my-bucket/models/
+rclone check /lambda/nfs/my-filesystem r2:my-bucket/models/
+```
+
+### Accessing Cloud Storage from SaladCloud Containers
+
+Pass storage credentials via environment variables in your container configuration:
+
+```python
+import os
+import boto3
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.environ["S3_ENDPOINT"],
+    aws_access_key_id=os.environ["S3_ACCESS_KEY"],
+    aws_secret_access_key=os.environ["S3_SECRET_KEY"],
+)
+
+s3.download_file("my-bucket", "models/model.safetensors", "/tmp/model.safetensors")
+```
+
+For more detail, see
+[Build High-Performance Storage Solutions](/container-engine/tutorials/performance/high-performance-storage-solutions).
+
+# Best Practices
+
+### Design for Interruptions
+
+SaladCloud nodes are interruptible, similar to spot instances but unlike AWS spot instances, there are no advance
+warning notifications. Your application should:
+
+- **Be stateless**: pull inputs from cloud storage, push results back
+- **Checkpoint periodically**: save progress to cloud storage for long-running tasks
+- **Use Job Queues** for automatic retry on interruptions
+- **Run 3+ replicas** minimum for production real-time services
+
+For long-running jobs that need checkpointing, consider [Kelpie](/container-engine/how-to-guides/job-processing/kelpie).
+
+### Implement Health Probes
+
+Configure [health probes](/container-engine/explanation/infrastructure-platform/health-probes) so SaladCloud can manage
+your container lifecycle:
+
+- **Startup probe:** Runs during initialization; prevents premature traffic
+- **Readiness probe:** Signals when your container is ready to accept work
+- **Liveness probe:** Detects if your container has become unresponsive
+
+### Debugging Running Containers
+
+- [SSH & Terminal Access](/container-engine/explanation/container-groups/ssh-and-terminal)
+- [Container logs](/container-engine/explanation/container-groups/container-logs)
+- [Tailscale basic](/container-engine/how-to-guides/platform-integrations/tailscale-basic)
+
+### Use External Logging
+
+SaladCloud provides built-in container logs, but you can also integrate an external logging provider:
+
+- [External logging overview](/container-engine/explanation/infrastructure-platform/external-logging)
+- [External logging best practices](/container-engine/how-to-guides/external-logging/best-practices)
+
+### Optimize Container Images
+
+- Use multi-stage Docker builds to minimize image size
+- Remove unnecessary build artifacts
+- Keep image size reasonable - larger images mean slower cold starts across the distributed fleet
+
+# Migration Checklist
+
+### Pre-Migration
+
+- [ ] Identify Lambda workloads that are candidates (inference, batch, rendering)
+- [ ] Document current environment: GPU type, libraries, model sizes, storage usage
+- [ ] Verify your model fits within your target GPU VRAM
+- [ ] Create a [SaladCloud account](https://portal.salad.com)
+- [ ] Set up cloud storage if needed (S3-compatible recommended)
+
+### Migration
+
+- [ ] Write a Dockerfile capturing your Lambda environment (or deploy a recipe)
+- [ ] Build and test locally if possible with `docker run --gpus all`
+- [ ] Push image to a container registry
+- [ ] Migrate data from Lambda filesystems to cloud storage
+- [ ] Deploy on SaladCloud: select GPU class, configure replicas, enable gateway or job queues
+- [ ] Configure [health probes](/container-engine/explanation/infrastructure-platform/health-probes)
+
+### Post-Migration
+
+- [ ] Validate output quality against Lambda baseline
+- [ ] Monitor performance: latency, throughput, error rates
+- [ ] Tune replica count and [priority tier](https://salad.com/pricing) based on usage
+- [ ] Terminate Lambda instances once SaladCloud deployment is stable
+
+# Further Resources
+
+- [SaladCloud Quickstart](/container-engine/tutorials/quickstart)
+- [Architectural Overview](/container-engine/explanation/core-concepts/architectural-overview)
+- [Container Gateway Guide](/container-engine/how-to-guides/job-processing/use-container-gateway)
+- [Job Queue Documentation](/container-engine/explanation/job-processing/job-queues)
+- [Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling)
+- [High-Performance Storage Solutions](/container-engine/tutorials/performance/high-performance-storage-solutions)
+- [Migrate from RunPod](/container-engine/how-to-guides/migration/migrate-from-runpod)
+- [Migrate from Vast.ai](/container-engine/how-to-guides/migration/migrate-from-vast)
+- [AWS Batch to SaladCloud Migration Guide](/container-engine/how-to-guides/migration/migrate-from-aws-batch)
+
+Ready to get started? [Create your SaladCloud account](https://portal.salad.com) and begin your migration today!
