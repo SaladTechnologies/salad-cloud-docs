@@ -33,7 +33,6 @@
                 "group": "Core Concepts",
                 "pages": [
                   "container-engine/explanation/core-concepts/overview",
-                  "container-engine/explanation/core-concepts/saladcloud-secure",
                   "container-engine/explanation/core-concepts/architectural-overview",
                   "container-engine/explanation/core-concepts/service-performance",
                   "container-engine/explanation/core-concepts/recipes-overview",
@@ -1054,10 +1053,6 @@
     {
       "source": "/products/sce/getting-started/quickstart-api",
       "destination": "/container-engine/tutorials/quickstart-api"
-    },
-    {
-      "source": "/products/sce/saladcloud-secure",
-      "destination": "/container-engine/explanation/core-concepts/saladcloud-secure"
     },
     {
       "source": "/products/sce/container-groups/container-groups",

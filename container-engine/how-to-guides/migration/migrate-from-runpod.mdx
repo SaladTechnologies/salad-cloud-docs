@@ -78,12 +78,11 @@ portability and consistency benefits of containerization.
 
 RunPod offers four primary products. Each has a clear equivalent or migration strategy on SaladCloud:
 
-| RunPod Products      | SaladCloud Alternative        | Key Specs                                         |
-| -------------------- | ----------------------------- | ------------------------------------------------- |
-| **Cloud GPUs**       | **Container GPU Deployments** | Container-first model, distributed consumer GPUs  |
-| **Instant Clusters** | **SaladCloud Secure (soon)**  | Datacenter GPUs (A100/L40), multi-GPU nodes       |
-| **Serverless**       | **Containers + SDK/API**      | Container lifecycle managed via SDK/API/Job Queue |
-| **Hub**              | **SaladCloud Recipes**        | Salad native, one-click deploy solutions          |
+| RunPod Products | SaladCloud Alternative        | Key Specs                                         |
+| --------------- | ----------------------------- | ------------------------------------------------- |
+| **Cloud GPUs**  | **Container GPU Deployments** | Container-first model, distributed consumer GPUs  |
+| **Serverless**  | **Containers + SDK/API**      | Container lifecycle managed via SDK/API/Job Queue |
+| **Hub**         | **SaladCloud Recipes**        | Salad native, one-click deploy solutions          |
 
 ### 1. RunPod Cloud GPUs → SaladCloud GPU Containers
 
@@ -98,7 +97,7 @@ RunPod offers four primary products. Each has a clear equivalent or migration st
 - Containerized apps running on distributed GPUs
 - No SSH required to start — prebuilt containers with automated orchestration. SSH and the web terminal are available
   post-deployment.
-- Consumer grade and datacenter GPUs [coming now](/container-engine/explanation/core-concepts/saladcloud-secure)
+- Consumer grade GPUs
 - Integrated failover, and monitoring
 - Significant Cost savings
 
@@ -154,19 +153,6 @@ RunPod offers four primary products. Each has a clear equivalent or migration st
 - Open-source, GitHub-based templates
 - Easy for teams to fork, modify, and deploy
 - Community-driven sharing and collaboration
-
-### 4. RunPod Instant Clusters → SaladCloud Secure
-
-**RunPod Instant Clusters:**
-
-- Multi-node GPU clusters
-- Fast interconnect for distributed workloads
-
-[**SaladCloud Secure:**](/container-engine/explanation/core-concepts/saladcloud-secure)
-
-- Datacenter-class nodes with 8 GPUs each
-- Secure networking and high-bandwidth interconnects
-- Ideal for distributed training and multi-GPU inference
 
 ## Key Platform Differences
 
@@ -923,18 +909,6 @@ advanced log analysis and retention beyond the 90 day portal limit.
 3. **Deploy through portal** with one-click deployment
 
 **Key changes**: Switch to SaladCloud recipes, customize as needed
-
-### Scenario 4: RunPod Instant Cluster → SaladCloud Secure (Coming Soon)
-
-**Before (RunPod Instant Cluster)**: Multi-node GPU clusters with fast interconnects
-
-**After (SaladCloud Secure)**: Datacenter-grade nodes with enterprise security
-
-**Migration Strategy:**
-
-- **Current**: Use multiple single-GPU containers for distributed workloads
-- **Future**: Migrate to SaladCloud Secure when available for true multi-GPU nodes
-- **Pattern**: Design applications to work across both architectures
 
 ## Advanced Migration Patterns
 
