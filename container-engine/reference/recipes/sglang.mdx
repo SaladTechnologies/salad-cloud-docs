@@ -1,0 +1,118 @@
+---
+title: SGLang Recipe
+sidebarTitle: SGLang
+description: Serve LLMs with SGLang on SaladCloud GPUs using an OpenAI-compatible API.
+---
+
+_Last Updated: March 24, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs the official [SGLang](https://docs.sglang.io/) runtime on a Salad GPU and exposes an OpenAI-compatible
+API for chat completions and related clients. Model selection and the main runtime controls are all exposed in the
+deployment form.
+
+This recipe is configured for technical users who want to control the serving stack directly:
+
+- choose any supported Hugging Face model ID
+- set parser and backend options yourself
+- connect any OpenAI-compatible tool or SDK after deployment
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **SGLang** recipe.
+3. Enter a **Container Group Name**.
+4. Enter a **Model** such as `Qwen/Qwen3.5-9B`.
+5. Adjust optional runtime fields only if your model needs them.
+6. Decide whether to keep **Require Container Gateway Authentication** enabled.
+7. Deploy and wait for the first startup to finish.
+
+<Callout variation="note">
+  Models are downloaded from Hugging Face at startup, so initial startup can take several minutes depending on model
+  size and node network speed.
+</Callout>
+
+## Current Defaults
+
+The recipe currently defaults to:
+
+- Model: `Qwen/Qwen3.5-9B`
+- Served model name: blank, so SGLang will use the model ID
+- Host bind: `::`
+- Context length: `32768`
+- Memory fraction: `0.8`
+- Load format: `auto`
+- Sampling defaults source: `model`
+- Attention backend: `triton`
+- Reasoning parser: `qwen3`
+- Tool call parser: `qwen3_coder`
+- Trust remote code: `false`
+- Disable CUDA graph: `true`
+- Authentication: enabled by default
+
+These defaults are practical for hybrid Qwen models on Salad consumer GPUs, but they are still only defaults. Override
+any of them in the deployment form when your model needs different settings or by adjusting container group settings.
+
+## Example Models
+
+Examples that fit this recipe well:
+
+- `Qwen/Qwen3.5-9B` with `Reasoning Parser = qwen3` and `Tool Call Parser = qwen3_coder`
+- `Qwen/Qwen2.5-7B-Instruct` with `Tool Call Parser = qwen25`
+- `meta-llama/Llama-3.1-8B-Instruct` with `Tool Call Parser = llama3`
+- `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` with `Reasoning Parser = deepseek-r1`
+- `mistralai/Mistral-7B-Instruct-v0.3` with `Tool Call Parser = mistral`
+
+Examples of raw SGLang option values you can enter in the form:
+
+- `Load Format`: `auto`, `safetensors`, `gguf`, `bitsandbytes`
+- `Sampling Defaults Source`: `model`, `openai`
+- `Attention Backend`: `triton`, `trtllm_mha`
+- `Reasoning Parser`: `qwen3`, `deepseek-r1`, `gpt-oss`
+- `Tool Call Parser`: `qwen3_coder`, `qwen25`, `llama3`, `mistral`
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is enabled by default.
+
+- Enabled: requests must include the `Salad-Api-Key` header.
+- Disabled: anyone with the URL can call the API.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "model": "Qwen/Qwen3.5-9B",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Explain how tensor parallelism affects inference serving."}
+    ],
+    "max_tokens": 256
+  }'
+```
+
+## Notes
+
+- If your model is private or gated on Hugging Face, provide `HF_TOKEN`.
+- Parser settings are model-specific. Leave them blank if your model does not need them.
+- On Blackwell GPUs, hybrid Qwen models may require `Attention Backend = triton`.
+- `Disable CUDA Graph = true` is the safer startup default.
+- If you want a direct response instead of a reasoning response for supported models, include
+  `chat_template_kwargs: {"enable_thinking": false}` in the request body.
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/sglang)
+- [SGLang server arguments](https://docs.sglang.io/advanced_features/server_arguments.html)
+- [SGLang OpenAI-compatible API docs](https://docs.sglang.io/basic_usage/openai_api.html)
+- [SGLang supported models](https://docs.sglang.io/supported_models/generative_models.html)
