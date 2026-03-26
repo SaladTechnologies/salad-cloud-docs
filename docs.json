@@ -165,6 +165,10 @@
                 ]
               },
               {
+                "group": "Agentic Tools",
+                "pages": ["container-engine/tutorials/agentic-tools/use-cline-with-saladcloud"]
+              },
+              {
                 "group": "Security",
                 "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
