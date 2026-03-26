@@ -1,0 +1,138 @@
+---
+title: 'Use Cline with SaladCloud'
+sidebarTitle: 'Cline'
+description: 'Learn how to use the Cline AI coding agent with SaladCloud for AI-powered development.'
+---
+
+_Last Updated: March 26, 2026_
+
+## Introduction
+
+[Cline](https://github.com/cline/cline) is an open-source AI coding agent for VS Code that can create files, edit code,
+run terminal commands, execute bash commands, and more. It acts as an autonomous pair programmer that helps you build
+applications through natural language conversations.
+
+Cline pairs exceptionally well with SaladCloud for several reasons:
+
+- **Per-hour pricing** means no token cost anxiety during extended agentic coding sessions
+- **OpenAI-compatible API** works out of the box with any compatible LLM deployment
+- **Self-hosted models** give you full control over your AI infrastructure
+
+For real-world examples of building applications with Cline and SaladCloud, check out our blog post:
+[Use Cline with SaladCloud: Building Real Apps for Under $0.01](https://blog.salad.com/use-cline-with-saladcloud-building-real-apps-for-under-1-cent/)
+We built a landing page, a Snake game, and a Streamlit dashboard all powered by a self-hosted 35B model.
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com) with an active LLM deployment
+- VS Code installed on your machine
+- Basic familiarity with VS Code extensions
+
+## Step-by-Step Setup
+
+### Step 1: Deploy an LLM Recipe on SaladCloud
+
+First, you need to deploy an OpenAI-compatible LLM server on SaladCloud.
+
+- Go to the [SaladCloud](https://portal.salad.com) portal and create an account if you do not already have one.
+- Create an organization or choose anexisting one, then click “Deploy a container group”.
+- Select an LLM recipe. The best fit for the usecase is Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe page, provide
+  a name for your container group and deploy. The rest is already preconfigured with recommended settings. If needed,
+  you can still open Advanced Settings and adjust parameters or hardware.
+- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+You can still use any of the following recipes:
+
+Ready-to-deploy recipes (best for less technical users):
+
+- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b) — A powerful Mixture of Experts model optimized
+  for instruction-following tasks, ideal for agentic use cases.
+- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) — Optimized for Qwen3.5 9b model
+
+Recipes for custom deployments (best for advanced users):
+
+- [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+- [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+- [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+- [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+- [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+**Recommended model:** Qwen 3.5-35B-A3B or similar models with good instruction-following capabilities for agentic use
+cases.
+
+After deployment, note your:
+
+- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+- **API key** (from your SaladCloud account if you enabled authentication)
+
+### Step 2: Install Cline in VS Code
+
+1. Open VS Code and go to the Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS)
+2. Search for "Cline" or use the extension ID: `saoudrizwan.claude-dev`
+3. Click **Install** on the Cline extension
+4. Once installed, click the Cline icon in the sidebar to open the Cline panel
+
+### Step 3: Configure Cline to Use Your SaladCloud Endpoint
+
+1. In the Cline sidebar, click the **gear icon** (⚙️) to open settings
+2. Set **API Provider** to `OpenAI Compatible`
+3. Configure the following settings:
+   - **Base URL**: Your SaladCloud endpoint (e.g., `https://your-endpoint.salad.cloud/v1`)
+   - **API Key**: It is required, but can be a dummy value.
+   - **Model ID**: The model name from your deployment (e.g., `qwen3.5-35b-a3b`)
+4. If you enabled authentication on your SaladCloud deployment, add a custom header: Header name: Salad-Api-Key; Header
+   value: your Salad API key
+
+**Pro tip:** Cline supports separate models for Plan and Act modes. You can:
+
+- Use a frontier model (like Claude or GPT) for planning and your SaladCloud model for execution
+- Use the same SaladCloud model for both modes to keep costs low. We found that even with a 35B model, performance was
+  strong enough to handle both planning and acting effectively.
+
+### Step 4: Test the Connection
+
+Start with a simple task to verify everything is working:
+
+> "Create a hello world Python script that prints 'Hello from SaladCloud!'"
+
+If Cline successfully creates and runs the file, your setup is complete!
+
+## Tips for Best Results
+
+### Use Incremental Prompting for Complex Tasks
+
+When working with self-hosted models that may have request timeouts (current timeout on SaladCloud is 100 seconds), tell
+Cline to work in small steps and save after each one. This approach:
+
+- Reduces the chance of interrupted generations
+- Makes it easier to recover from errors
+- Helps maintain context across multiple interactions
+- Helps debugging after each step
+
+To do that, just include instructions in the beginning of the prompt like "Important: Work incrementally. Do NOT try to
+write all files at once. Break this into small steps, create and save each file one at a time, and make sure each step
+works before moving on"
+
+### Set a Generous Context Window
+
+Configure your LLM server with a context window of at least **16384 tokens**, ideally **32768** or higher. A larger
+context window helps Cline:
+
+- Remember previous interactions
+- Understand larger codebases
+- Maintain coherence across complex tasks
+
+Our preconfigured recipes such as Qwen 3.5-35B-A3B already have optimal context window settings, but if you're using a
+custom deployment, make sure to adjust this in your model configuration.
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Excellent balance of capability and cost for agentic coding
+
+---
+
+<Callout variation="note">
+  This documentation page was created using Cline powered by an LLM model running on SaladCloud.
+</Callout>
