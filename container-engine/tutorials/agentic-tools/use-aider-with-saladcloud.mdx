@@ -1,0 +1,160 @@
+---
+title: 'Use Aider with SaladCloud'
+sidebarTitle: 'Aider'
+description: 'Learn how to use the Aider AI coding agent from the command line with a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: March 27, 2026_
+
+## Introduction
+
+[Aider](https://aider.chat) is an open-source AI pair programmer that runs in your terminal. It integrates with your
+local git repository, can create and edit files across multiple languages, and commits changes automatically as you
+work. Aider is designed from the ground up to support OpenAI-compatible endpoints, making it one of the simplest tools
+to connect to a self-hosted model on SaladCloud.
+
+Aider pairs well with SaladCloud because:
+
+- **Per-hour pricing** means no per-token cost during long coding sessions
+- **OpenAI-compatible API** works natively - no plugins or proxies required
+- **Self-hosted models** keep your code on infrastructure you control
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- Python 3.8+ installed
+- A local git repository to work in
+
+## Step-by-Step Setup
+
+### Step 1: Deploy an LLM Recipe on SaladCloud
+
+First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+- Create an organization or choose an existing one, then click "Deploy a container group".
+- Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe page,
+  provide a name and deploy — the rest is preconfigured with recommended settings.
+- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+Available recipes:
+
+Ready-to-deploy recipes (best for less technical users):
+
+- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) — A powerful Mixture of Experts model
+  optimized for instruction-following tasks, ideal for agentic use cases.
+- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) — Optimized for Qwen3.5 9B model.
+
+Recipes for custom deployments (best for advanced users):
+
+- [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+- [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+- [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+- [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+- [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+After deployment, note your:
+
+- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+
+### Step 2: Install Aider on your local machine
+
+Install Aider via pip:
+
+```bash
+pip install aider-chat
+```
+
+Verify the installation:
+
+```bash
+aider --version
+```
+
+### Step 3: Configure Aider to Use Your SaladCloud Endpoint
+
+Set the required environment variables before running Aider:
+
+```bash
+export OPENAI_API_BASE=https://your-endpoint.salad.cloud/v1
+export OPENAI_API_KEY=dummy
+```
+
+`OPENAI_API_KEY` is required, but can be set to any non-empty string (e.g., `dummy`).
+
+Alternatively, create a `.aider.conf.yml` file in your project root to persist the configuration:
+
+```yaml
+model: openai/qwen3.5-35b-a3b
+openai-api-base: https://your-endpoint.salad.cloud/
+openai-api-key: your-salad-api-key
+```
+
+If your SaladCloud deployment requires authentication, create .aider.model.settings.yml file and add the following
+header configuration:
+
+```yaml
+- name: openai/qwen3.5-35b-a3b
+  extra_params:
+    extra_headers:
+      Salad-Api-Key: your-salad-api-key
+```
+
+### Step 4: Start Aider and Test the Connection
+
+Navigate to your project directory and start Aider, prefixing the model name with `openai/`:
+
+```bash
+cd /path/to/your/project
+aider --model openai/qwen3.5-35b-a3b
+```
+
+The openai/ prefix is important — it tells Aider to route through the OpenAI-compatible provider.
+
+Test with a simple task:
+
+> "Create a hello world Python script that prints 'Hello from SaladCloud!'"
+
+If Aider successfully creates and commits the file, your setup is complete.
+
+**Note:** Aider may display a warning about an unknown model. This is safe to ignore — Aider is simply checking its
+internal model database and your SaladCloud model won't be listed there.
+
+## Tips for Best Results
+
+### Use the `--edit-format` Flag
+
+For smaller or less capable models, the `whole` edit format is more reliable than the default `diff` format:
+
+```bash
+aider --model openai/qwen3.5-35b-a3b --edit-format whole
+```
+
+The `diff` format produces more efficient edits but requires the model to generate valid unified diffs, which some
+models struggle with.
+
+### Work in a Git Repository
+
+Aider is designed to work inside a git repository. It automatically commits each change it makes, giving you a full undo
+history. Initialize git in your project if you haven't already:
+
+```bash
+git init
+```
+
+### Set a Context Window
+
+When using a custom deployment, ensure your model server is configured with a sufficient context window. Aider works
+best with at least **16384 tokens**, ideally **32768** or higher. Our preconfigured Qwen 3.5-35B-A3B recipe already has
+optimal settings.
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Best balance of capability and cost for agentic coding tasks
+- **Qwen 3.5-9B**: Suitable for simpler tasks; may struggle with complex multi-file edits
+
+<Callout variation="note">
+  This documentation page was created using Aider powered by an LLM model running on SaladCloud.
+</Callout>

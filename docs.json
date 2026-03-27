@@ -166,7 +166,11 @@
               },
               {
                 "group": "Agentic Tools",
-                "pages": ["container-engine/tutorials/agentic-tools/use-cline-with-saladcloud"]
+                "pages": [
+                  "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud"
+                ]
               },
               {
                 "group": "Security",
