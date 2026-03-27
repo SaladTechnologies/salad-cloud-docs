@@ -169,7 +169,8 @@
                 "pages": [
                   "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud"
+                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"
                 ]
               },
               {
