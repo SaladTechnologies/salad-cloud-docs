@@ -146,10 +146,12 @@ metavoiceio
 mintlify
 mlabonne
 myregistry
+hermes-agent
 NemoClaw
 nemoclaw
 Nemotron
 neofetch
+nikolaik
 nflx
 noappend
 NOARP
