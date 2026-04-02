@@ -1,0 +1,142 @@
+---
+title: 'Salad AI Gateway Overview'
+sidebarTitle: 'Overview'
+description: 'OpenAI-compatible LLM API powered by SaladCloud distributed GPU infrastructure.'
+---
+
+_Last Updated: April 2, 2026_
+
+<Warning>
+  Salad AI Gateway is currently in **closed beta**. To request access, sign up at
+  [salad.com/ai-gateway](https://salad.com/ai-gateway).
+</Warning>
+
+## What is Salad AI Gateway?
+
+Salad AI Gateway is a managed LLM API service that gives you direct access to powerful open-source models through a
+single, OpenAI-compatible endpoint - with no infrastructure to deploy or manage. It is powered by SaladCloud's
+distributed GPU network, bringing the same cost-efficiency of self-hosted models with the simplicity of a hosted API.
+
+Any tool or library that supports a custom base URL - Aider, OpenCode, OpenClaw, Cline, Cursor, Goose, Vercel AI SDK,
+and more - works with Salad AI Gateway out of the box.
+
+## API Endpoint
+
+```
+https://ai.salad.cloud:40404/v1
+```
+
+## Available Models
+
+The following models are available during the closed beta:
+
+| Model             | Description                                                                    |
+| :---------------- | :----------------------------------------------------------------------------- |
+| `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+| `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+| `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+Additional models will be added as the service moves toward general availability.
+
+## Quick Start
+
+The API follows the OpenAI `v1/chat/completions` format. Once you have access, send requests using your Salad API key in
+the `Authorization` header:
+
+```bash
+curl https://ai.salad.cloud:40404/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-salad-api-key>" \
+  -d '{
+    "model": "qwen3.5-35b-a3b",
+    "messages": [
+      {"role": "user", "content": "Explain distributed GPU computing in one paragraph."}
+    ]
+  }'
+```
+
+Make sure to replace `<your-salad-api-key>` with your actual Salad API key.
+
+## Use with OpenAI-Compatible Tools
+
+Because Salad AI Gateway exposes a standard OpenAI-compatible endpoint, you can use it with any tool that supports a
+custom base URL.
+
+We have integration guides for many popular agentic tools - Cline, Aider, OpenCode, OpenClaw, Kilo Code, Goose, Hermes
+Agent, and more. All of those guides apply here with one difference: **use standard authentication instead of the
+`Salad-Api-Key` custom header**. Set your Salad API key as the API key in whichever field the tool provides (the
+`Authorization: Bearer` header), and point the base URL to `https://ai.salad.cloud:40404/v1`.
+
+<CardGroup cols={2}>
+  <Card title="Cline" icon="code" href="/container-engine/tutorials/agentic-tools/use-cline-with-saladcloud">
+    VS Code AI coding agent
+  </Card>
+  <Card title="Aider" icon="terminal" href="/container-engine/tutorials/agentic-tools/use-aider-with-saladcloud">
+    CLI AI pair programmer
+  </Card>
+  <Card title="OpenCode" icon="terminal" href="/container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud">
+    Terminal coding agent
+  </Card>
+  <Card title="OpenClaw" icon="terminal" href="/container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud">
+    AI-first code editor
+  </Card>
+  <Card title="Kilo Code" icon="code" href="/container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud">
+    VS Code coding agent
+  </Card>
+  <Card
+    title="Vercel AI SDK"
+    icon="code"
+    href="/container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"
+  >
+    VS Code multi-agent coding
+  </Card>
+  <Card title="Goose" icon="robot" href="/container-engine/tutorials/agentic-tools/use-goose-with-saladcloud">
+    CLI + desktop AI agent
+  </Card>
+  <Card
+    title="Hermes Agent"
+    icon="brain"
+    href="/container-engine/tutorials/agentic-tools/use-hermes-agent-with-saladcloud"
+  >
+    Self-improving AI agent with MCP
+  </Card>
+</CardGroup>
+
+**Python (openai SDK):**
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://ai.salad.cloud:40404/v1",
+    api_key="your-salad-api-key",
+)
+
+response = client.chat.completions.create(
+    model="qwen3.5-35b-a3b",
+    messages=[{"role": "user", "content": "Hello from Salad AI Gateway!"}],
+)
+print(response.choices[0].message.content)
+```
+
+**Environment variables (for tools like Aider, etc.):**
+
+```bash
+export OPENAI_BASE_URL=https://ai.salad.cloud:40404/v1
+export OPENAI_API_KEY=your-salad-api-key
+```
+
+## Why Salad AI Gateway?
+
+- **No Infrastructure** - no container groups to deploy, no replicas to manage, no cold starts to worry about
+- **Always on** - our distributed GPU network ensures high availability and reliability
+- **OpenAI-compatible** - easy integration with any OpenAI-compatible tool
+- **SaladCloud Pricing** - 90% cost savings vs traditional providers
+- **Data Privacy** - your data is never used for training
+- **Powered by Sustainable Computing** - utilizing otherwise wasted GPU resources to reduce carbon footprint
+
+## Get Access
+
+Salad AI Gateway is currently in closed beta.
+
+[Sign up for early access](https://salad.com/ai-gateway)
