@@ -318,6 +318,10 @@
             ]
           },
           {
+            "group": "Storage",
+            "pages": ["storage/explanation/overview", "storage/reference/api"]
+          },
+          {
             "group": "Reference",
             "pages": [
               "container-engine/reference/api",
@@ -465,7 +469,16 @@
         ]
       },
       {
-        "tab": "Gateway Service",
+        "tab": "AI Gateway",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": ["ai-gateway/explanation/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "Gateway Service (SGS)",
         "groups": [
           {
             "group": "Explanation",
@@ -485,19 +498,6 @@
           {
             "group": "Reference",
             "pages": ["gateway-service/reference/sgs-api"]
-          }
-        ]
-      },
-      {
-        "tab": "Storage",
-        "groups": [
-          {
-            "group": "Explanation",
-            "pages": ["storage/explanation/overview"]
-          },
-          {
-            "group": "Reference",
-            "pages": ["storage/reference/api"]
           }
         ]
       },
