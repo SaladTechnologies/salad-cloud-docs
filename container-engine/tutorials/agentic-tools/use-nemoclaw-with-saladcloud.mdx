@@ -54,6 +54,7 @@ Before getting started, make sure you have:
     | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
     | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
     | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
     First, deploy an OpenAI-compatible LLM server on SaladCloud.
@@ -83,6 +84,7 @@ Before getting started, make sure you have:
     After deployment, note your:
 
     - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+
   </Tab>
 </Tabs>
 
@@ -121,6 +123,7 @@ nemoclaw --version
       "Salad-Api-Key": "your-actual-api-key"
     }
     ```
+
   </Tab>
 </Tabs>
 
@@ -139,14 +142,12 @@ When prompted to select an inference endpoint:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    - **Endpoint URL**: `https://ai.salad.cloud:40404/v1`
-    - **API key**: your Salad API key
-    - **Model name**: e.g. `qwen3.5-35b-a3b`
+    - **Endpoint URL**: `https://ai.salad.cloud:40404/v1` - **API key**: your Salad API key - **Model name**: e.g.
+    `qwen3.5-35b-a3b`
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
-    - **Endpoint URL**: `https://your-endpoint.salad.cloud/v1`
-    - **API key**: any non-empty string (e.g., `dummy`) since authentication is disabled
-    - **Model name**: the name of the model you deployed (e.g., `qwen3.5-35b-a3b`)
+    - **Endpoint URL**: `https://your-endpoint.salad.cloud/v1` - **API key**: any non-empty string (e.g., `dummy`) since
+    authentication is disabled - **Model name**: the name of the model you deployed (e.g., `qwen3.5-35b-a3b`)
   </Tab>
 </Tabs>
 
