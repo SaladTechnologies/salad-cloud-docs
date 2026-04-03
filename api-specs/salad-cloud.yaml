@@ -11,7 +11,7 @@ info:
   license:
     name: MIT License
     identifier: MIT
-  version: 0.9.0-alpha.16
+  version: 0.9.0-alpha.17
 servers:
   - url: https://api.salad.com/api/public
 paths:
@@ -51,25 +51,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await
-            client.ContainerGroups.ListContainerGroupsAsync("acme-corp",
-            "dev-env");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -115,6 +96,25 @@ paths:
             })();
           lang: TypeScript
         - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await
+            client.ContainerGroups.ListContainerGroupsAsync("acme-corp",
+            "dev-env");
+
+
+            Console.WriteLine(response);
+          lang: C#
+        - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
             import com.salad.cloud.sdk.config.ApiKeyAuthConfig;
@@ -159,15 +159,18 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
+        - source: >-
             from salad_cloud_sdk import SaladCloudSdk
+
             from salad_cloud_sdk.models import ContainerGroupCreationRequest
+
 
             sdk = SaladCloudSdk(
                 api_key="YOUR_API_KEY",
                 api_key_header="YOUR_API_KEY_HEADER",
                 timeout=10000
             )
+
 
             request_body = ContainerGroupCreationRequest(
                 autostart_policy=False,
@@ -180,13 +183,13 @@ paths:
                     "image_caching": True,
                     "logging": {
                         "axiom": {
-                            "host": "host",
                             "api_token": "api_token",
-                            "dataset": "dataset"
+                            "dataset": "dataset",
+                            "host": "host"
                         },
                         "datadog": {
-                            "host": "host",
                             "api_key": "api_key",
+                            "host": "host",
                             "tags": [
                                 {
                                     "name": "name",
@@ -195,11 +198,7 @@ paths:
                             ]
                         },
                         "http": {
-                            "host": "host",
-                            "port": 46840,
-                            "user": "user",
-                            "password": "password",
-                            "path": "path",
+                            "compression": "none",
                             "format": "json",
                             "headers": [
                                 {
@@ -207,7 +206,11 @@ paths:
                                     "value": "value"
                                 }
                             ],
-                            "compression": "none"
+                            "host": "host",
+                            "password": "password",
+                            "path": "path",
+                            "port": 42056,
+                            "user": "user"
                         },
                         "new_relic": {
                             "host": "host",
@@ -229,12 +232,12 @@ paths:
                             "secret_access_key": "secret_access_key"
                         },
                         "basic": {
-                            "username": "username",
-                            "password": "password"
+                            "password": "password",
+                            "username": "username"
                         },
                         "docker_hub": {
-                            "username": "username",
-                            "personal_access_token": "personal_access_token"
+                            "personal_access_token": "personal_access_token",
+                            "username": "username"
                         },
                         "gcp_gar": {
                             "service_key": "service_key"
@@ -244,19 +247,19 @@ paths:
                         }
                     },
                     "resources": {
-                        "cpu": 924,
-                        "memory": 226493682,
+                        "cpu": 827,
                         "gpu_classes": [
                             "gpu_classes"
                         ],
-                        "storage_amount": 3576666867910,
-                        "shm_size": 64
+                        "memory": 734164836,
+                        "shm_size": 64,
+                        "storage_amount": 761306530849177.9
                     }
                 },
                 country_codes=[
                     "af"
                 ],
-                display_name="592CH6",
+                display_name="KMg0KyVwpb",
                 liveness_probe={
                     "exec_": {
                         "command": [
@@ -299,8 +302,8 @@ paths:
                 },
                 queue_autoscaler={
                     "desired_queue_length": 53,
-                    "max_replicas": 291,
-                    "max_downscale_per_minute": 65,
+                    "max_downscale_per_minute": 59,
+                    "max_replicas": 321,
                     "max_upscale_per_minute": 100,
                     "min_replicas": 54,
                     "polling_period": 140
@@ -340,8 +343,15 @@ paths:
                     },
                     "timeout_seconds": 1
                 },
-                replicas=309,
+                replicas=77,
                 restart_policy="always",
+                scaling_actions=[
+                    {
+                        "replicas": 461,
+                        "schedule": "7kwC/T8C   da       x6Ci   bM-rgGYn     bDY6,vT"
+                    }
+                ],
+                scheduled_scaling_enabled=True,
                 startup_probe={
                     "exec_": {
                         "command": [
@@ -364,15 +374,16 @@ paths:
                         "port": 29069,
                         "scheme": "http"
                     },
-                    "initial_delay_seconds": 1106,
+                    "initial_delay_seconds": 503,
+                    "period_seconds": 3,
+                    "success_threshold": 2,
                     "tcp": {
                         "port": 13817
                     },
-                    "period_seconds": 3,
-                    "success_threshold": 2,
                     "timeout_seconds": 10
                 }
             )
+
 
             result = sdk.container_groups.create_container_group(
                 request_body=request_body,
@@ -380,170 +391,9 @@ paths:
                 project_name="dev-env"
             )
 
+
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var gpuClasses = new List<string>() { "gpu_classes" };
-
-            var resources = new CreateContainerResourceRequirements(924,
-            226493682, gpuClasses, 3576666867910, 64);
-
-            var command = new List<string>() { "command" };
-
-            var axiom = new AxiomLoggingConfiguration("host", "api_token",
-            "dataset");
-
-            var tagsItem = new DatadogTagForContainerLogging("name", "value");
-
-            var tags = new List<DatadogTagForContainerLogging>() { tagsItem };
-
-            var datadog = new DatadogLoggingConfiguration("host", "api_key",
-            tags);
-
-            var headersItem = new ContainerLoggingHttpHeader("name", "value");
-
-            var headers = new List<ContainerLoggingHttpHeader>() { headersItem
-            };
-
-            var http = new ContainerLoggingConfigurationHttp2("host", 46840,
-            ContainerLoggingHttpFormat.Json,
-            ContainerLoggingHttpCompression.None, "user", "password", "path",
-            headers);
-
-            var newRelic = new NewRelicLoggingConfiguration("host",
-            "ingestion_key");
-
-            var splunk = new ContainerLoggingSplunkConfiguration("host",
-            "token");
-
-            var tcp = new TcpLoggingConfiguration("host", 44671);
-
-            var logging = new ContainerConfigurationLogging(axiom, datadog,
-            http, newRelic, splunk, tcp);
-
-            var awsEcr = new
-            ContainerRegistryAuthenticationAwsEcr("access_key_id",
-            "secret_access_key");
-
-            var basic = new ContainerRegistryAuthenticationBasic("username",
-            "password");
-
-            var dockerHub = new
-            ContainerRegistryAuthenticationDockerHub("username",
-            "personal_access_token");
-
-            var gcpGar = new
-            ContainerRegistryAuthenticationGcpGar("service_key");
-
-            var gcpGcr = new
-            ContainerRegistryAuthenticationGcpGcr("service_key");
-
-            var registryAuthentication = new
-            ContainerRegistryAuthentication(awsEcr, basic, dockerHub, gcpGar,
-            gcpGcr);
-
-            var container = new ContainerConfiguration("acme/:latest",
-            resources, command, new object(), true, logging,
-            ContainerGroupPriority.High, registryAuthentication);
-
-            var countryCodes = new List<CountryCode>() { CountryCode.Af };
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var livenessProbe = new ContainerGroupLivenessProbe(3, 670, 10, 1,
-            30, exec, grpc, http, tcp);
-
-            var networking = new CreateContainerGroupNetworking(false, 60000,
-            ContainerNetworkingProtocol.Http, 100000,
-            TheContainerGroupNetworkingLoadBalancer.RoundRobin, 100000, false);
-
-            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(53, 291,
-            54, 65, 100, 140);
-
-            var queueConnection = new ContainerGroupQueueConnection("path",
-            47568, "z1h-3z01x9");
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var readinessProbe = new ContainerGroupReadinessProbe(3, 262, 1, 1,
-            1, exec, grpc, http, tcp);
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var startupProbe = new ContainerGroupStartupProbe(15, 1106, 3, 2,
-            10, exec, grpc, http, tcp);
-
-            var input = new ContainerGroupCreationRequest(false, container,
-            "name", 309, ContainerRestartPolicy.Always, countryCodes, "592CH6",
-            livenessProbe, networking, queueAutoscaler, queueConnection,
-            readinessProbe, startupProbe);
-
-
-            var response = await
-            client.ContainerGroups.CreateContainerGroupAsync(input, "acme-corp",
-            "dev-env");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -566,9 +416,9 @@ paths:
 
 
             axiomLoggingConfiguration := shared.AxiomLoggingConfiguration{
-              Host: util.ToPointer("host"),
               ApiToken: util.ToPointer("api_token"),
               Dataset: util.ToPointer("dataset"),
+              Host: util.ToPointer("host"),
             }
 
 
@@ -581,10 +431,14 @@ paths:
 
 
             datadogLoggingConfiguration := shared.DatadogLoggingConfiguration{
-              Host: util.ToPointer("host"),
               ApiKey: util.ToPointer("api_key"),
+              Host: util.ToPointer("host"),
               Tags: []shared.DatadogTagForContainerLogging{datadogTagForContainerLogging},
             }
+
+
+            containerLoggingHttpCompression :=
+            shared.CONTAINER_LOGGING_HTTP_COMPRESSION_NONE
 
 
             containerLoggingHttpFormat :=
@@ -598,20 +452,16 @@ paths:
             }
 
 
-            containerLoggingHttpCompression :=
-            shared.CONTAINER_LOGGING_HTTP_COMPRESSION_NONE
-
-
             containerLoggingConfigurationHttp2 :=
             containergroups.ContainerLoggingConfigurationHttp2{
-              Host: util.ToPointer("host"),
-              Port: util.ToPointer(int64(46840)),
-              User: util.ToPointer(util.Nullable[string]{ Value: "user" }),
-              Password: util.ToPointer(util.Nullable[string]{ Value: "password" }),
-              Path: util.ToPointer(util.Nullable[string]{ Value: "path" }),
+              Compression: &containerLoggingHttpCompression,
               Format: &containerLoggingHttpFormat,
               Headers: []shared.ContainerLoggingHttpHeader{containerLoggingHttpHeader},
-              Compression: &containerLoggingHttpCompression,
+              Host: util.ToPointer("host"),
+              Password: util.ToPointer(util.Nullable[string]{ Value: "password" }),
+              Path: util.ToPointer(util.Nullable[string]{ Value: "path" }),
+              Port: util.ToPointer(int64(64353)),
+              User: util.ToPointer(util.Nullable[string]{ Value: "user" }),
             }
 
 
@@ -633,7 +483,7 @@ paths:
 
             tcpLoggingConfiguration := shared.TcpLoggingConfiguration{
               Host: util.ToPointer("host"),
-              Port: util.ToPointer(int64(44671)),
+              Port: util.ToPointer(int64(49831)),
             }
 
 
@@ -662,16 +512,16 @@ paths:
 
             containerRegistryAuthenticationBasic :=
             containergroups.ContainerRegistryAuthenticationBasic{
-              Username: util.ToPointer("username"),
               Password: util.ToPointer("password"),
+              Username: util.ToPointer("username"),
             }
 
 
 
             containerRegistryAuthenticationDockerHub :=
             containergroups.ContainerRegistryAuthenticationDockerHub{
-              Username: util.ToPointer("username"),
               PersonalAccessToken: util.ToPointer("personal_access_token"),
+              Username: util.ToPointer("username"),
             }
 
 
@@ -702,11 +552,11 @@ paths:
 
             createContainerResourceRequirements :=
             containergroups.CreateContainerResourceRequirements{
-              Cpu: util.ToPointer(int64(924)),
-              Memory: util.ToPointer(int64(226493682)),
+              Cpu: util.ToPointer(int64(799)),
               GpuClasses: []string{},
-              StorageAmount: util.ToPointer(int64(3576666867910)),
+              Memory: util.ToPointer(int64(820430947)),
               ShmSize: util.ToPointer(int64(64)),
+              StorageAmount: util.ToPointer(int64(1068305813629863)),
             }
 
 
@@ -733,7 +583,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -753,14 +603,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -769,7 +619,7 @@ paths:
               FailureThreshold: util.ToPointer(int64(3)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(670)),
+              InitialDelaySeconds: util.ToPointer(int64(746)),
               PeriodSeconds: util.ToPointer(int64(10)),
               SuccessThreshold: util.ToPointer(int64(1)),
               Tcp: &containerGroupTcpProbe,
@@ -800,12 +650,12 @@ paths:
 
             queueBasedAutoscalerConfiguration :=
             shared.QueueBasedAutoscalerConfiguration{
-              DesiredQueueLength: util.ToPointer(int64(53)),
-              MaxReplicas: util.ToPointer(int64(291)),
-              MaxDownscalePerMinute: util.ToPointer(int64(65)),
-              MaxUpscalePerMinute: util.ToPointer(int64(100)),
-              MinReplicas: util.ToPointer(int64(54)),
-              PollingPeriod: util.ToPointer(int64(140)),
+              DesiredQueueLength: util.ToPointer(int64(21)),
+              MaxDownscalePerMinute: util.ToPointer(int64(84)),
+              MaxReplicas: util.ToPointer(int64(241)),
+              MaxUpscalePerMinute: util.ToPointer(int64(75)),
+              MinReplicas: util.ToPointer(int64(35)),
+              PollingPeriod: util.ToPointer(int64(80)),
             }
 
 
@@ -813,8 +663,8 @@ paths:
             containerGroupQueueConnection :=
             shared.ContainerGroupQueueConnection{
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(47568)),
-              QueueName: util.ToPointer("z1h-3z01x9"),
+              Port: util.ToPointer(int64(19439)),
+              QueueName: util.ToPointer("rjtd6c-o-5jwj"),
             }
 
 
@@ -826,7 +676,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -846,14 +696,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -862,7 +712,7 @@ paths:
               FailureThreshold: util.ToPointer(int64(3)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(262)),
+              InitialDelaySeconds: util.ToPointer(int64(920)),
               PeriodSeconds: util.ToPointer(int64(1)),
               SuccessThreshold: util.ToPointer(int64(1)),
               Tcp: &containerGroupTcpProbe,
@@ -874,6 +724,13 @@ paths:
 
 
 
+            containerGroupScalingAction := shared.ContainerGroupScalingAction{
+              Replicas: util.ToPointer(int64(200)),
+              Schedule: util.ToPointer("S  An J,XICzdmM       5          kdBZz"),
+            }
+
+
+
             containerGroupProbeExec := shared.ContainerGroupProbeExec{
               Command: []string{},
             }
@@ -881,7 +738,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -901,14 +758,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -917,10 +774,10 @@ paths:
               FailureThreshold: util.ToPointer(int64(15)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(1106)),
-              Tcp: &containerGroupTcpProbe,
+              InitialDelaySeconds: util.ToPointer(int64(199)),
               PeriodSeconds: util.ToPointer(int64(3)),
               SuccessThreshold: util.ToPointer(int64(2)),
+              Tcp: &containerGroupTcpProbe,
               TimeoutSeconds: util.ToPointer(int64(10)),
             }
 
@@ -929,15 +786,17 @@ paths:
               AutostartPolicy: util.ToPointer(true),
               Container: &containerConfiguration,
               CountryCodes: []shared.CountryCode{countryCode},
-              DisplayName: util.ToPointer("592CH6"),
+              DisplayName: util.ToPointer("CKdKKxAMvZR"),
               LivenessProbe: &containerGroupLivenessProbe,
               Name: util.ToPointer("name"),
               Networking: &createContainerGroupNetworking,
               QueueAutoscaler: &queueBasedAutoscalerConfiguration,
               QueueConnection: &containerGroupQueueConnection,
               ReadinessProbe: &containerGroupReadinessProbe,
-              Replicas: util.ToPointer(int64(309)),
+              Replicas: util.ToPointer(int64(18)),
               RestartPolicy: &containerRestartPolicy,
+              ScalingActions: []shared.ContainerGroupScalingAction{containerGroupScalingAction},
+              ScheduledScalingEnabled: util.ToPointer(true),
               StartupProbe: &containerGroupStartupProbe,
             }
 
@@ -967,6 +826,7 @@ paths:
               ContainerGroupProbeHttpHeader,
               ContainerGroupQueueConnection,
               ContainerGroupReadinessProbe,
+              ContainerGroupScalingAction,
               ContainerGroupStartupProbe,
               ContainerGroupTcpProbe,
               ContainerLoggingConfigurationHttp2,
@@ -1002,9 +862,9 @@ paths:
               });
 
               const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
-                host: 'host',
                 apiToken: 'api_token',
                 dataset: 'dataset',
+                host: 'host',
               };
 
               const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
@@ -1013,10 +873,12 @@ paths:
               };
 
               const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
-                host: 'host',
                 apiKey: 'api_key',
+                host: 'host',
                 tags: [datadogTagForContainerLogging],
               };
+
+              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
 
               const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
 
@@ -1025,17 +887,15 @@ paths:
                 value: 'value',
               };
 
-              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
-
               const containerLoggingConfigurationHttp2: ContainerLoggingConfigurationHttp2 = {
-                host: 'host',
-                port: 46840,
-                user: 'user',
-                password: 'password',
-                path: 'path',
+                compression: containerLoggingHttpCompression,
                 format: containerLoggingHttpFormat,
                 headers: [containerLoggingHttpHeader],
-                compression: containerLoggingHttpCompression,
+                host: 'host',
+                password: 'password',
+                path: 'path',
+                port: 64353,
+                user: 'user',
               };
 
               const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
@@ -1050,7 +910,7 @@ paths:
 
               const tcpLoggingConfiguration: TcpLoggingConfiguration = {
                 host: 'host',
-                port: 44671,
+                port: 49831,
               };
 
               const containerConfigurationLogging: ContainerConfigurationLogging = {
@@ -1070,13 +930,13 @@ paths:
               };
 
               const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
-                username: 'username',
                 password: 'password',
+                username: 'username',
               };
 
               const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
-                username: 'username',
                 personalAccessToken: 'personal_access_token',
+                username: 'username',
               };
 
               const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
@@ -1096,11 +956,11 @@ paths:
               };
 
               const createContainerResourceRequirements: CreateContainerResourceRequirements = {
-                cpu: 924,
-                memory: 226493682,
+                cpu: 799,
                 gpuClasses: ['gpu_classes'],
-                storageAmount: 3576666867910,
+                memory: 820430947,
                 shmSize: 64,
+                storageAmount: 1068305813629863,
               };
 
               const containerConfiguration: ContainerConfiguration = {
@@ -1121,7 +981,7 @@ paths:
               };
 
               const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
-                port: 37648,
+                port: 31831,
                 service: 'service',
               };
 
@@ -1135,12 +995,12 @@ paths:
               const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
                 headers: [containerGroupProbeHttpHeader],
                 path: 'path',
-                port: 29069,
+                port: 20252,
                 scheme: httpScheme,
               };
 
               const containerGroupTcpProbe: ContainerGroupTcpProbe = {
-                port: 13817,
+                port: 56673,
               };
 
               const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
@@ -1148,7 +1008,7 @@ paths:
                 failureThreshold: 3,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 670,
+                initialDelaySeconds: 746,
                 periodSeconds: 10,
                 successThreshold: 1,
                 tcp: containerGroupTcpProbe,
@@ -1170,18 +1030,18 @@ paths:
               };
 
               const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
-                desiredQueueLength: 53,
-                maxReplicas: 291,
-                maxDownscalePerMinute: 65,
-                maxUpscalePerMinute: 100,
-                minReplicas: 54,
-                pollingPeriod: 140,
+                desiredQueueLength: 21,
+                maxDownscalePerMinute: 84,
+                maxReplicas: 241,
+                maxUpscalePerMinute: 75,
+                minReplicas: 35,
+                pollingPeriod: 80,
               };
 
               const containerGroupQueueConnection: ContainerGroupQueueConnection = {
                 path: 'path',
-                port: 47568,
-                queueName: 'z1h-3z01x9',
+                port: 19439,
+                queueName: 'rjtd6c-o-5jwj',
               };
 
               const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
@@ -1189,7 +1049,7 @@ paths:
                 failureThreshold: 3,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 262,
+                initialDelaySeconds: 920,
                 periodSeconds: 1,
                 successThreshold: 1,
                 tcp: containerGroupTcpProbe,
@@ -1198,15 +1058,20 @@ paths:
 
               const containerRestartPolicy = ContainerRestartPolicy.ALWAYS;
 
+              const containerGroupScalingAction: ContainerGroupScalingAction = {
+                replicas: 200,
+                schedule: 'S  An J,XICzdmM       5          kdBZz',
+              };
+
               const containerGroupStartupProbe: ContainerGroupStartupProbe = {
                 exec: containerGroupProbeExec,
                 failureThreshold: 15,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 1106,
-                tcp: containerGroupTcpProbe,
+                initialDelaySeconds: 199,
                 periodSeconds: 3,
                 successThreshold: 2,
+                tcp: containerGroupTcpProbe,
                 timeoutSeconds: 10,
               };
 
@@ -1214,15 +1079,17 @@ paths:
                 autostartPolicy: true,
                 container: containerConfiguration,
                 countryCodes: [countryCode],
-                displayName: '592CH6',
+                displayName: 'CKdKKxAMvZR',
                 livenessProbe: containerGroupLivenessProbe,
                 name: 'name',
                 networking: createContainerGroupNetworking,
                 queueAutoscaler: queueBasedAutoscalerConfiguration,
                 queueConnection: containerGroupQueueConnection,
                 readinessProbe: containerGroupReadinessProbe,
-                replicas: 309,
+                replicas: 18,
                 restartPolicy: containerRestartPolicy,
+                scalingActions: [containerGroupScalingAction],
+                scheduledScalingEnabled: true,
                 startupProbe: containerGroupStartupProbe,
               };
 
@@ -1235,6 +1102,72 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+            using Salad.Cloud.SDK.Models;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            var gpuClasses = new List<string>() { "gpu_classes" };
+            var resources = new CreateContainerResourceRequirements(910, 347973571, gpuClasses, 64, 760156374545941);
+            var command = new List<string>() { "command" };
+            var axiom = new AxiomLoggingConfiguration("api_token", "dataset", "host");
+            var tagsItem = new DatadogTagForContainerLogging("name", "value");
+            var tags = new List<DatadogTagForContainerLogging>() { tagsItem };
+            var datadog = new DatadogLoggingConfiguration("api_key", "host", tags);
+            var headersItem = new ContainerLoggingHttpHeader("name", "value");
+            var headers = new List<ContainerLoggingHttpHeader>() { headersItem };
+            var http = new ContainerLoggingConfigurationHttp2(ContainerLoggingHttpCompression.None, ContainerLoggingHttpFormat.Json, "host", 50486, headers, "password", "path", "user");
+            var newRelic = new NewRelicLoggingConfiguration("host", "ingestion_key");
+            var splunk = new ContainerLoggingSplunkConfiguration("host", "token");
+            var tcp = new TcpLoggingConfiguration("host", 30869);
+            var logging = new ContainerConfigurationLogging(axiom, datadog, http, newRelic, splunk, tcp);
+            var awsEcr = new ContainerRegistryAuthenticationAwsEcr("access_key_id", "secret_access_key");
+            var basic = new ContainerRegistryAuthenticationBasic("password", "username");
+            var dockerHub = new ContainerRegistryAuthenticationDockerHub("personal_access_token", "username");
+            var gcpGar = new ContainerRegistryAuthenticationGcpGar("service_key");
+            var gcpGcr = new ContainerRegistryAuthenticationGcpGcr("service_key");
+            var registryAuthentication = new ContainerRegistryAuthentication(awsEcr, basic, dockerHub, gcpGar, gcpGcr);
+            var container = new ContainerConfiguration("acme/:latest", resources, command, new object(), true, logging, ContainerGroupPriority.High, registryAuthentication);
+            var countryCodes = new List<CountryCode>() { CountryCode.Af };
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var livenessProbe = new ContainerGroupLivenessProbe(3, 99, 10, 1, 30, exec, grpc, http, tcp);
+            var networking = new CreateContainerGroupNetworking(true, 60000, ContainerNetworkingProtocol.Http, 100000, TheContainerGroupNetworkingLoadBalancer.RoundRobin, 100000, false);
+            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(54, 45, 56, 79, 51, 1534);
+            var queueConnection = new ContainerGroupQueueConnection("path", 40417, "w6m9jphyn87swq-4v");
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var readinessProbe = new ContainerGroupReadinessProbe(3, 383, 1, 1, 1, exec, grpc, http, tcp);
+            var scalingActionsItem = new ContainerGroupScalingAction(470, "SPTp1fzRw   a-3HLB09B         OPvUL      d     WzlHNxbEYn");
+            var scalingActions = new List<ContainerGroupScalingAction>() { scalingActionsItem };
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var startupProbe = new ContainerGroupStartupProbe(15, 620, 3, 2, 10, exec, grpc, http, tcp);
+            var input = new ContainerGroupCreationRequest(true, container, "name", 59, ContainerRestartPolicy.Always, countryCodes, "Ia", livenessProbe, networking, queueAutoscaler, queueConnection, readinessProbe, scalingActions, false, startupProbe);
+
+            var response = await client.ContainerGroups.CreateContainerGroupAsync(input, "acme-corp", "dev-env");
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -1268,6 +1201,8 @@ paths:
             import com.salad.cloud.sdk.models.ContainerGroupQueueConnection;
 
             import com.salad.cloud.sdk.models.ContainerGroupReadinessProbe;
+
+            import com.salad.cloud.sdk.models.ContainerGroupScalingAction;
 
             import com.salad.cloud.sdk.models.ContainerGroupStartupProbe;
 
@@ -1336,239 +1271,253 @@ paths:
 
 
             public class Main {
+                public static void main(String[] args) {
+            		SaladCloudSdkConfig config = SaladCloudSdkConfig.builder()
+            			.apiKeyAuthConfig(
+            				ApiKeyAuthConfig.builder()
+            					.apiKey("YOUR_API_KEY")
+            					.build()
+            			)
+            			.build();
 
-              public static void main(String[] args) {
-                SaladCloudSdkConfig config = SaladCloudSdkConfig.builder()
-                  .apiKeyAuthConfig(ApiKeyAuthConfig.builder().apiKey("YOUR_API_KEY").build())
-                  .build();
+            		SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
-                SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
+            		List<String> commandList = Arrays.asList("command");
 
-                List<String> commandList = Arrays.asList("command");
+            		AxiomLoggingConfiguration axiomLoggingConfiguration = AxiomLoggingConfiguration.builder()
+            			.apiToken("api_token")
+            			.dataset("dataset")
+            			.host("host")
+            			.build();
 
-                AxiomLoggingConfiguration axiomLoggingConfiguration = AxiomLoggingConfiguration.builder()
-                  .host("host")
-                  .apiToken("api_token")
-                  .dataset("dataset")
-                  .build();
+            		DatadogTagForContainerLogging datadogTagForContainerLogging = DatadogTagForContainerLogging.builder()
+            			.name("name")
+            			.value("value")
+            			.build();
 
-                DatadogTagForContainerLogging datadogTagForContainerLogging = DatadogTagForContainerLogging.builder()
-                  .name("name")
-                  .value("value")
-                  .build();
+            		List<DatadogTagForContainerLogging> tagsList = Arrays.asList(datadogTagForContainerLogging);
 
-                List<DatadogTagForContainerLogging> tagsList = Arrays.asList(datadogTagForContainerLogging);
+            		DatadogLoggingConfiguration datadogLoggingConfiguration = DatadogLoggingConfiguration.builder()
+            			.apiKey("api_key")
+            			.host("host")
+            			.tags(tagsList)
+            			.build();
 
-                DatadogLoggingConfiguration datadogLoggingConfiguration = DatadogLoggingConfiguration.builder()
-                  .host("host")
-                  .apiKey("api_key")
-                  .tags(tagsList)
-                  .build();
+            		ContainerLoggingHttpHeader containerLoggingHttpHeader = ContainerLoggingHttpHeader.builder()
+            			.name("name")
+            			.value("value")
+            			.build();
 
-                ContainerLoggingHttpHeader containerLoggingHttpHeader = ContainerLoggingHttpHeader.builder()
-                  .name("name")
-                  .value("value")
-                  .build();
+            		List<ContainerLoggingHttpHeader> headersList = Arrays.asList(containerLoggingHttpHeader);
 
-                List<ContainerLoggingHttpHeader> headersList = Arrays.asList(containerLoggingHttpHeader);
+            		ContainerLoggingConfigurationHttp2 containerLoggingConfigurationHttp2 = ContainerLoggingConfigurationHttp2.builder()
+            			.compression(ContainerLoggingHttpCompression.NONE)
+            			.format(ContainerLoggingHttpFormat.JSON)
+            			.headers(headersList)
+            			.host("host")
+            			.password("password")
+            			.path("path")
+            			.port(42056L)
+            			.user("user")
+            			.build();
 
-                ContainerLoggingConfigurationHttp2 containerLoggingConfigurationHttp2 = ContainerLoggingConfigurationHttp2.builder()
-                  .host("host")
-                  .port(46840L)
-                  .user("user")
-                  .password("password")
-                  .path("path")
-                  .format(ContainerLoggingHttpFormat.JSON)
-                  .headers(headersList)
-                  .compression(ContainerLoggingHttpCompression.NONE)
-                  .build();
+            		NewRelicLoggingConfiguration newRelicLoggingConfiguration = NewRelicLoggingConfiguration.builder()
+            			.host("host")
+            			.ingestionKey("ingestion_key")
+            			.build();
 
-                NewRelicLoggingConfiguration newRelicLoggingConfiguration = NewRelicLoggingConfiguration.builder()
-                  .host("host")
-                  .ingestionKey("ingestion_key")
-                  .build();
+            		ContainerLoggingSplunkConfiguration containerLoggingSplunkConfiguration = ContainerLoggingSplunkConfiguration.builder()
+            			.host("host")
+            			.token("token")
+            			.build();
 
-                ContainerLoggingSplunkConfiguration containerLoggingSplunkConfiguration =
-                  ContainerLoggingSplunkConfiguration.builder().host("host").token("token").build();
+            		TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
+            			.host("host")
+            			.port(44671L)
+            			.build();
 
-                TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
-                  .host("host")
-                  .port(44671L)
-                  .build();
+            		ContainerConfigurationLogging containerConfigurationLogging = ContainerConfigurationLogging.builder()
+            			.axiom(axiomLoggingConfiguration)
+            			.datadog(datadogLoggingConfiguration)
+            			.http(containerLoggingConfigurationHttp2)
+            			.newRelic(newRelicLoggingConfiguration)
+            			.splunk(containerLoggingSplunkConfiguration)
+            			.tcp(tcpLoggingConfiguration)
+            			.build();
 
-                ContainerConfigurationLogging containerConfigurationLogging = ContainerConfigurationLogging.builder()
-                  .axiom(axiomLoggingConfiguration)
-                  .datadog(datadogLoggingConfiguration)
-                  .http(containerLoggingConfigurationHttp2)
-                  .newRelic(newRelicLoggingConfiguration)
-                  .splunk(containerLoggingSplunkConfiguration)
-                  .tcp(tcpLoggingConfiguration)
-                  .build();
+            		ContainerRegistryAuthenticationAwsEcr containerRegistryAuthenticationAwsEcr = ContainerRegistryAuthenticationAwsEcr.builder()
+            			.accessKeyId("access_key_id")
+            			.secretAccessKey("secret_access_key")
+            			.build();
 
-                ContainerRegistryAuthenticationAwsEcr containerRegistryAuthenticationAwsEcr =
-                  ContainerRegistryAuthenticationAwsEcr.builder()
-                    .accessKeyId("access_key_id")
-                    .secretAccessKey("secret_access_key")
-                    .build();
+            		ContainerRegistryAuthenticationBasic containerRegistryAuthenticationBasic = ContainerRegistryAuthenticationBasic.builder()
+            			.password("password")
+            			.username("username")
+            			.build();
 
-                ContainerRegistryAuthenticationBasic containerRegistryAuthenticationBasic =
-                  ContainerRegistryAuthenticationBasic.builder().username("username").password("password").build();
+            		ContainerRegistryAuthenticationDockerHub containerRegistryAuthenticationDockerHub = ContainerRegistryAuthenticationDockerHub.builder()
+            			.personalAccessToken("personal_access_token")
+            			.username("username")
+            			.build();
 
-                ContainerRegistryAuthenticationDockerHub containerRegistryAuthenticationDockerHub =
-                  ContainerRegistryAuthenticationDockerHub.builder()
-                    .username("username")
-                    .personalAccessToken("personal_access_token")
-                    .build();
+            		ContainerRegistryAuthenticationGcpGar containerRegistryAuthenticationGcpGar = ContainerRegistryAuthenticationGcpGar.builder()
+            			.serviceKey("service_key")
+            			.build();
 
-                ContainerRegistryAuthenticationGcpGar containerRegistryAuthenticationGcpGar =
-                  ContainerRegistryAuthenticationGcpGar.builder().serviceKey("service_key").build();
+            		ContainerRegistryAuthenticationGcpGcr containerRegistryAuthenticationGcpGcr = ContainerRegistryAuthenticationGcpGcr.builder()
+            			.serviceKey("service_key")
+            			.build();
 
-                ContainerRegistryAuthenticationGcpGcr containerRegistryAuthenticationGcpGcr =
-                  ContainerRegistryAuthenticationGcpGcr.builder().serviceKey("service_key").build();
+            		ContainerRegistryAuthentication containerRegistryAuthentication = ContainerRegistryAuthentication.builder()
+            			.awsEcr(containerRegistryAuthenticationAwsEcr)
+            			.basic(containerRegistryAuthenticationBasic)
+            			.dockerHub(containerRegistryAuthenticationDockerHub)
+            			.gcpGar(containerRegistryAuthenticationGcpGar)
+            			.gcpGcr(containerRegistryAuthenticationGcpGcr)
+            			.build();
 
-                ContainerRegistryAuthentication containerRegistryAuthentication = ContainerRegistryAuthentication.builder()
-                  .awsEcr(containerRegistryAuthenticationAwsEcr)
-                  .basic(containerRegistryAuthenticationBasic)
-                  .dockerHub(containerRegistryAuthenticationDockerHub)
-                  .gcpGar(containerRegistryAuthenticationGcpGar)
-                  .gcpGcr(containerRegistryAuthenticationGcpGcr)
-                  .build();
+            		List<String> gpuClassesList = Arrays.asList("gpu_classes");
 
-                List<String> gpuClassesList = Arrays.asList("gpu_classes");
+            		CreateContainerResourceRequirements createContainerResourceRequirements = CreateContainerResourceRequirements.builder()
+            			.cpu(827L)
+            			.gpuClasses(gpuClassesList)
+            			.memory(734164836L)
+            			.shmSize(64L)
+            			.storageAmount(761306530849177.9L)
+            			.build();
 
-                CreateContainerResourceRequirements createContainerResourceRequirements =
-                  CreateContainerResourceRequirements.builder()
-                    .cpu(924L)
-                    .memory(226493682L)
-                    .gpuClasses(gpuClassesList)
-                    .storageAmount(3576666867910L)
-                    .shmSize(64L)
-                    .build();
+            		ContainerConfiguration containerConfiguration = ContainerConfiguration.builder()
+            			.command(commandList)
+            			.environmentVariables(new HashMap())
+            			.image("acme/:latest")
+            			.imageCaching(true)
+            			.logging(containerConfigurationLogging)
+            			.priority(ContainerGroupPriority.HIGH)
+            			.registryAuthentication(containerRegistryAuthentication)
+            			.resources(createContainerResourceRequirements)
+            			.build();
 
-                ContainerConfiguration containerConfiguration = ContainerConfiguration.builder()
-                  .command(commandList)
-                  .environmentVariables(new HashMap())
-                  .image("acme/:latest")
-                  .imageCaching(true)
-                  .logging(containerConfigurationLogging)
-                  .priority(ContainerGroupPriority.HIGH)
-                  .registryAuthentication(containerRegistryAuthentication)
-                  .resources(createContainerResourceRequirements)
-                  .build();
+            		List<CountryCode> countryCodesList = Arrays.asList(CountryCode.AF);
 
-                List<CountryCode> countryCodesList = Arrays.asList(CountryCode.AF);
+            		List<String> commandList1 = Arrays.asList("command");
 
-                List<String> commandList1 = Arrays.asList("command");
+            		ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder()
+            			.command(commandList1)
+            			.build();
 
-                ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder().command(commandList1).build();
+            		ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
+            			.port(37648L)
+            			.service("service")
+            			.build();
 
-                ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
-                  .port(37648L)
-                  .service("service")
-                  .build();
+            		ContainerGroupProbeHttpHeader containerGroupProbeHttpHeader = ContainerGroupProbeHttpHeader.builder()
+            			.name("name")
+            			.value("value")
+            			.build();
 
-                ContainerGroupProbeHttpHeader containerGroupProbeHttpHeader = ContainerGroupProbeHttpHeader.builder()
-                  .name("name")
-                  .value("value")
-                  .build();
+            		List<ContainerGroupProbeHttpHeader> headersList1 = Arrays.asList(containerGroupProbeHttpHeader);
 
-                List<ContainerGroupProbeHttpHeader> headersList1 = Arrays.asList(containerGroupProbeHttpHeader);
+            		ContainerGroupHttpProbeConfiguration containerGroupHttpProbeConfiguration = ContainerGroupHttpProbeConfiguration.builder()
+            			.headers(headersList1)
+            			.path("path")
+            			.port(29069L)
+            			.scheme(HttpScheme.HTTP)
+            			.build();
 
-                ContainerGroupHttpProbeConfiguration containerGroupHttpProbeConfiguration =
-                  ContainerGroupHttpProbeConfiguration.builder()
-                    .headers(headersList1)
-                    .path("path")
-                    .port(29069L)
-                    .scheme(HttpScheme.HTTP)
-                    .build();
+            		ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder()
+            			.port(13817L)
+            			.build();
 
-                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(13817L).build();
+            		ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
+            			.exec(containerGroupProbeExec)
+            			.failureThreshold(3L)
+            			.grpc(containerGroupGRpcProbe)
+            			.http(containerGroupHttpProbeConfiguration)
+            			.initialDelaySeconds(670L)
+            			.periodSeconds(10L)
+            			.successThreshold(1L)
+            			.tcp(containerGroupTcpProbe)
+            			.timeoutSeconds(30L)
+            			.build();
 
-                ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
-                  .exec(containerGroupProbeExec)
-                  .failureThreshold(3L)
-                  .grpc(containerGroupGRpcProbe)
-                  .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(670L)
-                  .periodSeconds(10L)
-                  .successThreshold(1L)
-                  .tcp(containerGroupTcpProbe)
-                  .timeoutSeconds(30L)
-                  .build();
+            		CreateContainerGroupNetworking createContainerGroupNetworking = CreateContainerGroupNetworking.builder()
+            			.auth(false)
+            			.clientRequestTimeout(100000L)
+            			.loadBalancer(TheContainerGroupNetworkingLoadBalancer.ROUND_ROBIN)
+            			.port(60000L)
+            			.protocol(ContainerNetworkingProtocol.HTTP)
+            			.serverResponseTimeout(100000L)
+            			.singleConnectionLimit(false)
+            			.build();
 
-                CreateContainerGroupNetworking createContainerGroupNetworking = CreateContainerGroupNetworking.builder()
-                  .auth(false)
-                  .clientRequestTimeout(100000L)
-                  .loadBalancer(TheContainerGroupNetworkingLoadBalancer.ROUND_ROBIN)
-                  .port(60000L)
-                  .protocol(ContainerNetworkingProtocol.HTTP)
-                  .serverResponseTimeout(100000L)
-                  .singleConnectionLimit(false)
-                  .build();
+            		QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
+            			.desiredQueueLength(53L)
+            			.maxDownscalePerMinute(59L)
+            			.maxReplicas(321L)
+            			.maxUpscalePerMinute(100L)
+            			.minReplicas(54L)
+            			.pollingPeriod(140L)
+            			.build();
 
-                QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
-                  .desiredQueueLength(53L)
-                  .maxReplicas(291L)
-                  .maxDownscalePerMinute(65L)
-                  .maxUpscalePerMinute(100L)
-                  .minReplicas(54L)
-                  .pollingPeriod(140L)
-                  .build();
+            		ContainerGroupQueueConnection containerGroupQueueConnection = ContainerGroupQueueConnection.builder()
+            			.path("path")
+            			.port(47568L)
+            			.queueName("z1h-3z01x9")
+            			.build();
 
-                ContainerGroupQueueConnection containerGroupQueueConnection = ContainerGroupQueueConnection.builder()
-                  .path("path")
-                  .port(47568L)
-                  .queueName("z1h-3z01x9")
-                  .build();
+            		ContainerGroupReadinessProbe containerGroupReadinessProbe = ContainerGroupReadinessProbe.builder()
+            			.exec(containerGroupProbeExec)
+            			.failureThreshold(3L)
+            			.grpc(containerGroupGRpcProbe)
+            			.http(containerGroupHttpProbeConfiguration)
+            			.initialDelaySeconds(262L)
+            			.periodSeconds(1L)
+            			.successThreshold(1L)
+            			.tcp(containerGroupTcpProbe)
+            			.timeoutSeconds(1L)
+            			.build();
 
-                ContainerGroupReadinessProbe containerGroupReadinessProbe = ContainerGroupReadinessProbe.builder()
-                  .exec(containerGroupProbeExec)
-                  .failureThreshold(3L)
-                  .grpc(containerGroupGRpcProbe)
-                  .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(262L)
-                  .periodSeconds(1L)
-                  .successThreshold(1L)
-                  .tcp(containerGroupTcpProbe)
-                  .timeoutSeconds(1L)
-                  .build();
+            		ContainerGroupScalingAction containerGroupScalingAction = ContainerGroupScalingAction.builder()
+            			.replicas(461L)
+            			.schedule("7kwC/T8C   da       x6Ci   bM-rgGYn     bDY6,vT")
+            			.build();
 
-                ContainerGroupStartupProbe containerGroupStartupProbe = ContainerGroupStartupProbe.builder()
-                  .exec(containerGroupProbeExec)
-                  .failureThreshold(15L)
-                  .grpc(containerGroupGRpcProbe)
-                  .http(containerGroupHttpProbeConfiguration)
-                  .initialDelaySeconds(1106L)
-                  .tcp(containerGroupTcpProbe)
-                  .periodSeconds(3L)
-                  .successThreshold(2L)
-                  .timeoutSeconds(10L)
-                  .build();
+            		List<ContainerGroupScalingAction> scalingActionsList = Arrays.asList(containerGroupScalingAction);
 
-                ContainerGroupCreationRequest containerGroupCreationRequest = ContainerGroupCreationRequest.builder()
-                  .autostartPolicy(false)
-                  .container(containerConfiguration)
-                  .countryCodes(countryCodesList)
-                  .displayName("592CH6")
-                  .livenessProbe(containerGroupLivenessProbe)
-                  .name("name")
-                  .networking(createContainerGroupNetworking)
-                  .queueAutoscaler(queueBasedAutoscalerConfiguration)
-                  .queueConnection(containerGroupQueueConnection)
-                  .readinessProbe(containerGroupReadinessProbe)
-                  .replicas(309L)
-                  .restartPolicy(ContainerRestartPolicy.ALWAYS)
-                  .startupProbe(containerGroupStartupProbe)
-                  .build();
+            		ContainerGroupStartupProbe containerGroupStartupProbe = ContainerGroupStartupProbe.builder()
+            			.exec(containerGroupProbeExec)
+            			.failureThreshold(15L)
+            			.grpc(containerGroupGRpcProbe)
+            			.http(containerGroupHttpProbeConfiguration)
+            			.initialDelaySeconds(503L)
+            			.periodSeconds(3L)
+            			.successThreshold(2L)
+            			.tcp(containerGroupTcpProbe)
+            			.timeoutSeconds(10L)
+            			.build();
 
-                ContainerGroup response = saladCloudSdk.containerGroups.createContainerGroup(
-                  "acme-corp",
-                  "dev-env",
-                  containerGroupCreationRequest
-                );
+            		ContainerGroupCreationRequest containerGroupCreationRequest = ContainerGroupCreationRequest.builder()
+            			.autostartPolicy(false)
+            			.container(containerConfiguration)
+            			.countryCodes(countryCodesList)
+            			.displayName("KMg0KyVwpb")
+            			.livenessProbe(containerGroupLivenessProbe)
+            			.name("name")
+            			.networking(createContainerGroupNetworking)
+            			.queueAutoscaler(queueBasedAutoscalerConfiguration)
+            			.queueConnection(containerGroupQueueConnection)
+            			.readinessProbe(containerGroupReadinessProbe)
+            			.replicas(77L)
+            			.restartPolicy(ContainerRestartPolicy.ALWAYS)
+            			.scalingActions(scalingActionsList)
+            			.scheduledScalingEnabled(true)
+            			.startupProbe(containerGroupStartupProbe)
+            			.build();
 
-                System.out.println(response);
-              }
+            		ContainerGroup response = saladCloudSdk.containerGroups.createContainerGroup("acme-corp", "dev-env", containerGroupCreationRequest);
+
+            		System.out.println(response);
+                }
             }
           lang: Java
   /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}:
@@ -1611,25 +1560,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await
-            client.ContainerGroups.GetContainerGroupAsync("acme-corp",
-            "dev-env", "mandlebrot");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -1674,6 +1604,25 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await
+            client.ContainerGroups.GetContainerGroupAsync("acme-corp",
+            "dev-env", "mandlebrot");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -1721,9 +1670,11 @@ paths:
       tags:
         - container_groups
       x-codeSamples:
-        - source: |-
+        - source: >-
             from salad_cloud_sdk import SaladCloudSdk
+
             from salad_cloud_sdk.models import ContainerGroupPatch
+
 
             sdk = SaladCloudSdk(
                 api_key="YOUR_API_KEY",
@@ -1731,8 +1682,8 @@ paths:
                 timeout=10000
             )
 
+
             request_body = ContainerGroupPatch(
-                display_name="ZJjdnvu",
                 container={
                     "command": [
                         "command"
@@ -1742,13 +1693,13 @@ paths:
                     "image_caching": True,
                     "logging": {
                         "axiom": {
-                            "host": "host",
                             "api_token": "api_token",
-                            "dataset": "dataset"
+                            "dataset": "dataset",
+                            "host": "host"
                         },
                         "datadog": {
-                            "host": "host",
                             "api_key": "api_key",
+                            "host": "host",
                             "tags": [
                                 {
                                     "name": "name",
@@ -1757,11 +1708,7 @@ paths:
                             ]
                         },
                         "http": {
-                            "host": "host",
-                            "port": 55354,
-                            "user": "user",
-                            "password": "password",
-                            "path": "path",
+                            "compression": "none",
                             "format": "json",
                             "headers": [
                                 {
@@ -1769,7 +1716,11 @@ paths:
                                     "value": "value"
                                 }
                             ],
-                            "compression": "none"
+                            "host": "host",
+                            "password": "password",
+                            "path": "path",
+                            "port": 55354,
+                            "user": "user"
                         },
                         "new_relic": {
                             "host": "host",
@@ -1791,12 +1742,12 @@ paths:
                             "secret_access_key": "secret_access_key"
                         },
                         "basic": {
-                            "username": "username",
-                            "password": "password"
+                            "password": "password",
+                            "username": "username"
                         },
                         "docker_hub": {
-                            "username": "username",
-                            "personal_access_token": "personal_access_token"
+                            "personal_access_token": "personal_access_token",
+                            "username": "username"
                         },
                         "gcp_gar": {
                             "service_key": "service_key"
@@ -1806,22 +1757,19 @@ paths:
                         }
                     },
                     "resources": {
-                        "cpu": 1013,
-                        "memory": 352043675,
+                        "cpu": 191,
                         "gpu_classes": [
                             "gpu_classes"
                         ],
-                        "storage_amount": 1032076497908566.1,
-                        "shm_size": 64
+                        "memory": 909130690,
+                        "shm_size": 64,
+                        "storage_amount": 699558298076245
                     }
                 },
-                replicas=56,
                 country_codes=[
                     "af"
                 ],
-                networking={
-                    "port": 13142
-                },
+                display_name="ykW8yoj HBQ",
                 liveness_probe={
                     "exec_": {
                         "command": [
@@ -1851,6 +1799,17 @@ paths:
                         "port": 13817
                     },
                     "timeout_seconds": 30
+                },
+                networking={
+                    "port": 17025
+                },
+                queue_autoscaler={
+                    "desired_queue_length": 53,
+                    "max_downscale_per_minute": 59,
+                    "max_replicas": 321,
+                    "max_upscale_per_minute": 100,
+                    "min_replicas": 54,
+                    "polling_period": 140
                 },
                 readiness_probe={
                     "exec_": {
@@ -1882,6 +1841,14 @@ paths:
                     },
                     "timeout_seconds": 1
                 },
+                replicas=102,
+                scaling_actions=[
+                    {
+                        "replicas": 461,
+                        "schedule": "7kwC/T8C   da       x6Ci   bM-rgGYn     bDY6,vT"
+                    }
+                ],
+                scheduled_scaling_enabled=True,
                 startup_probe={
                     "exec_": {
                         "command": [
@@ -1904,23 +1871,16 @@ paths:
                         "port": 29069,
                         "scheme": "http"
                     },
-                    "initial_delay_seconds": 1106,
+                    "initial_delay_seconds": 503,
+                    "period_seconds": 3,
+                    "success_threshold": 2,
                     "tcp": {
                         "port": 13817
                     },
-                    "period_seconds": 3,
-                    "success_threshold": 2,
                     "timeout_seconds": 10
-                },
-                queue_autoscaler={
-                    "desired_queue_length": 53,
-                    "max_replicas": 291,
-                    "max_downscale_per_minute": 65,
-                    "max_upscale_per_minute": 100,
-                    "min_replicas": 54,
-                    "polling_period": 140
                 }
             )
+
 
             result = sdk.container_groups.update_container_group(
                 request_body=request_body,
@@ -1929,163 +1889,9 @@ paths:
                 container_group_name="mandlebrot"
             )
 
+
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var command = new List<string>() { "command" };
-
-            var axiom = new AxiomLoggingConfiguration("host", "api_token",
-            "dataset");
-
-            var tagsItem = new DatadogTagForContainerLogging("name", "value");
-
-            var tags = new List<DatadogTagForContainerLogging>() { tagsItem };
-
-            var datadog = new DatadogLoggingConfiguration("host", "api_key",
-            tags);
-
-            var headersItem = new ContainerLoggingHttpHeader("name", "value");
-
-            var headers = new List<ContainerLoggingHttpHeader>() { headersItem
-            };
-
-            var http = new ContainerLoggingConfigurationHttp1("host", 55354,
-            ContainerLoggingHttpFormat.Json, headers,
-            ContainerLoggingHttpCompression.None, "user", "password", "path");
-
-            var newRelic = new NewRelicLoggingConfiguration("host",
-            "ingestion_key");
-
-            var splunk = new ContainerLoggingSplunkConfiguration("host",
-            "token");
-
-            var tcp = new TcpLoggingConfiguration("host", 44671);
-
-            var logging = new UpdateContainerLogging(axiom, datadog, http,
-            newRelic, splunk, tcp);
-
-            var awsEcr = new
-            ContainerRegistryAuthenticationAwsEcr("access_key_id",
-            "secret_access_key");
-
-            var basic = new ContainerRegistryAuthenticationBasic("username",
-            "password");
-
-            var dockerHub = new
-            ContainerRegistryAuthenticationDockerHub("username",
-            "personal_access_token");
-
-            var gcpGar = new
-            ContainerRegistryAuthenticationGcpGar("service_key");
-
-            var gcpGcr = new
-            ContainerRegistryAuthenticationGcpGcr("service_key");
-
-            var registryAuthentication = new
-            ContainerRegistryAuthentication(awsEcr, basic, dockerHub, gcpGar,
-            gcpGcr);
-
-            var gpuClasses = new List<string>() { "gpu_classes" };
-
-            var resources = new ContainerResourceUpdateSchema(1013, 352043675,
-            gpuClasses, 1032076497908566.1, 64);
-
-            var container = new UpdateContainer(command, new object(), "image",
-            true, logging, ContainerGroupPriority.High, registryAuthentication,
-            resources);
-
-            var countryCodes = new List<CountryCode>() { CountryCode.Af };
-
-            var networking = new UpdateContainerGroupNetworking(13142);
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var livenessProbe = new ContainerGroupLivenessProbe(3, 670, 10, 1,
-            30, exec, grpc, http, tcp);
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var readinessProbe = new ContainerGroupReadinessProbe(3, 262, 1, 1,
-            1, exec, grpc, http, tcp);
-
-            var command = new List<string>() { "command" };
-
-            var exec = new ContainerGroupProbeExec(command);
-
-            var grpc = new ContainerGroupGRpcProbe(37648, "service");
-
-            var headersItem = new ContainerGroupProbeHttpHeader("name",
-            "value");
-
-            var headers = new List<ContainerGroupProbeHttpHeader>() {
-            headersItem };
-
-            var http = new ContainerGroupHttpProbeConfiguration(headers, "path",
-            29069, HttpScheme.Http);
-
-            var tcp = new ContainerGroupTcpProbe(13817);
-
-            var startupProbe = new ContainerGroupStartupProbe(15, 1106, 3, 2,
-            10, exec, grpc, http, tcp);
-
-            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(53, 291,
-            54, 65, 100, 140);
-
-            var input = new ContainerGroupPatch("ZJjdnvu", container, 56,
-            countryCodes, networking, livenessProbe, readinessProbe,
-            startupProbe, queueAutoscaler);
-
-
-            var response = await
-            client.ContainerGroups.UpdateContainerGroupAsync(input, "acme-corp",
-            "dev-env", "mandlebrot");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -2107,9 +1913,9 @@ paths:
 
 
             axiomLoggingConfiguration := shared.AxiomLoggingConfiguration{
-              Host: util.ToPointer("host"),
               ApiToken: util.ToPointer("api_token"),
               Dataset: util.ToPointer("dataset"),
+              Host: util.ToPointer("host"),
             }
 
 
@@ -2122,10 +1928,14 @@ paths:
 
 
             datadogLoggingConfiguration := shared.DatadogLoggingConfiguration{
-              Host: util.ToPointer("host"),
               ApiKey: util.ToPointer("api_key"),
+              Host: util.ToPointer("host"),
               Tags: []shared.DatadogTagForContainerLogging{datadogTagForContainerLogging},
             }
+
+
+            containerLoggingHttpCompression :=
+            shared.CONTAINER_LOGGING_HTTP_COMPRESSION_NONE
 
 
             containerLoggingHttpFormat :=
@@ -2139,20 +1949,16 @@ paths:
             }
 
 
-            containerLoggingHttpCompression :=
-            shared.CONTAINER_LOGGING_HTTP_COMPRESSION_NONE
-
-
             containerLoggingConfigurationHttp1 :=
             shared.ContainerLoggingConfigurationHttp1{
-              Host: util.ToPointer("host"),
-              Port: util.ToPointer(int64(55354)),
-              User: util.ToPointer(util.Nullable[string]{ Value: "user" }),
-              Password: util.ToPointer(util.Nullable[string]{ Value: "password" }),
-              Path: util.ToPointer(util.Nullable[string]{ Value: "path" }),
+              Compression: &containerLoggingHttpCompression,
               Format: &containerLoggingHttpFormat,
               Headers: []shared.ContainerLoggingHttpHeader{containerLoggingHttpHeader},
-              Compression: &containerLoggingHttpCompression,
+              Host: util.ToPointer("host"),
+              Password: util.ToPointer(util.Nullable[string]{ Value: "password" }),
+              Path: util.ToPointer(util.Nullable[string]{ Value: "path" }),
+              Port: util.ToPointer(int64(4925)),
+              User: util.ToPointer(util.Nullable[string]{ Value: "user" }),
             }
 
 
@@ -2174,7 +1980,7 @@ paths:
 
             tcpLoggingConfiguration := shared.TcpLoggingConfiguration{
               Host: util.ToPointer("host"),
-              Port: util.ToPointer(int64(44671)),
+              Port: util.ToPointer(int64(49831)),
             }
 
 
@@ -2202,16 +2008,16 @@ paths:
 
             containerRegistryAuthenticationBasic :=
             containergroups.ContainerRegistryAuthenticationBasic{
-              Username: util.ToPointer("username"),
               Password: util.ToPointer("password"),
+              Username: util.ToPointer("username"),
             }
 
 
 
             containerRegistryAuthenticationDockerHub :=
             containergroups.ContainerRegistryAuthenticationDockerHub{
-              Username: util.ToPointer("username"),
               PersonalAccessToken: util.ToPointer("personal_access_token"),
+              Username: util.ToPointer("username"),
             }
 
 
@@ -2242,11 +2048,11 @@ paths:
 
             containerResourceUpdateSchema :=
             containergroups.ContainerResourceUpdateSchema{
-              Cpu: util.ToPointer(util.Nullable[int64]{ Value: int64(1013) }),
-              Memory: util.ToPointer(util.Nullable[int64]{ Value: int64(352043675) }),
+              Cpu: util.ToPointer(util.Nullable[int64]{ Value: int64(121) }),
               GpuClasses: []string{},
-              StorageAmount: util.ToPointer(util.Nullable[int64]{ Value: int64(1032076497908566.1) }),
+              Memory: util.ToPointer(util.Nullable[int64]{ Value: int64(104082568) }),
               ShmSize: util.ToPointer(util.Nullable[int64]{ Value: int64(64) }),
+              StorageAmount: util.ToPointer(util.Nullable[int64]{ Value: int64(86463820446985) }),
             }
 
 
@@ -2266,13 +2072,6 @@ paths:
 
 
 
-            updateContainerGroupNetworking :=
-            containergroups.UpdateContainerGroupNetworking{
-              Port: util.ToPointer(util.Nullable[int64]{ Value: int64(13142) }),
-            }
-
-
-
             containerGroupProbeExec := shared.ContainerGroupProbeExec{
               Command: []string{},
             }
@@ -2280,7 +2079,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -2300,14 +2099,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -2316,7 +2115,7 @@ paths:
               FailureThreshold: util.ToPointer(int64(3)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(670)),
+              InitialDelaySeconds: util.ToPointer(int64(746)),
               PeriodSeconds: util.ToPointer(int64(10)),
               SuccessThreshold: util.ToPointer(int64(1)),
               Tcp: &containerGroupTcpProbe,
@@ -2325,6 +2124,25 @@ paths:
 
 
 
+            updateContainerGroupNetworking :=
+            containergroups.UpdateContainerGroupNetworking{
+              Port: util.ToPointer(util.Nullable[int64]{ Value: int64(56501) }),
+            }
+
+
+
+            queueBasedAutoscalerConfiguration :=
+            shared.QueueBasedAutoscalerConfiguration{
+              DesiredQueueLength: util.ToPointer(int64(21)),
+              MaxDownscalePerMinute: util.ToPointer(int64(84)),
+              MaxReplicas: util.ToPointer(int64(241)),
+              MaxUpscalePerMinute: util.ToPointer(int64(75)),
+              MinReplicas: util.ToPointer(int64(35)),
+              PollingPeriod: util.ToPointer(int64(80)),
+            }
+
+
+
             containerGroupProbeExec := shared.ContainerGroupProbeExec{
               Command: []string{},
             }
@@ -2332,7 +2150,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -2352,14 +2170,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -2368,11 +2186,18 @@ paths:
               FailureThreshold: util.ToPointer(int64(3)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(262)),
+              InitialDelaySeconds: util.ToPointer(int64(920)),
               PeriodSeconds: util.ToPointer(int64(1)),
               SuccessThreshold: util.ToPointer(int64(1)),
               Tcp: &containerGroupTcpProbe,
               TimeoutSeconds: util.ToPointer(int64(1)),
+            }
+
+
+
+            containerGroupScalingAction := shared.ContainerGroupScalingAction{
+              Replicas: util.ToPointer(int64(200)),
+              Schedule: util.ToPointer("S  An J,XICzdmM       5          kdBZz"),
             }
 
 
@@ -2384,7 +2209,7 @@ paths:
 
 
             containerGroupGRpcProbe := shared.ContainerGroupGRpcProbe{
-              Port: util.ToPointer(int64(37648)),
+              Port: util.ToPointer(int64(31831)),
               Service: util.ToPointer("service"),
             }
 
@@ -2404,14 +2229,14 @@ paths:
             shared.ContainerGroupHttpProbeConfiguration{
               Headers: []shared.ContainerGroupProbeHttpHeader{containerGroupProbeHttpHeader},
               Path: util.ToPointer("path"),
-              Port: util.ToPointer(int64(29069)),
+              Port: util.ToPointer(int64(20252)),
               Scheme: &httpScheme,
             }
 
 
 
             containerGroupTcpProbe := shared.ContainerGroupTcpProbe{
-              Port: util.ToPointer(int64(13817)),
+              Port: util.ToPointer(int64(56673)),
             }
 
 
@@ -2420,36 +2245,26 @@ paths:
               FailureThreshold: util.ToPointer(int64(15)),
               Grpc: &containerGroupGRpcProbe,
               Http: &containerGroupHttpProbeConfiguration,
-              InitialDelaySeconds: util.ToPointer(int64(1106)),
-              Tcp: &containerGroupTcpProbe,
+              InitialDelaySeconds: util.ToPointer(int64(199)),
               PeriodSeconds: util.ToPointer(int64(3)),
               SuccessThreshold: util.ToPointer(int64(2)),
+              Tcp: &containerGroupTcpProbe,
               TimeoutSeconds: util.ToPointer(int64(10)),
             }
 
 
-
-            queueBasedAutoscalerConfiguration :=
-            shared.QueueBasedAutoscalerConfiguration{
-              DesiredQueueLength: util.ToPointer(int64(53)),
-              MaxReplicas: util.ToPointer(int64(291)),
-              MaxDownscalePerMinute: util.ToPointer(int64(65)),
-              MaxUpscalePerMinute: util.ToPointer(int64(100)),
-              MinReplicas: util.ToPointer(int64(54)),
-              PollingPeriod: util.ToPointer(int64(140)),
-            }
-
-
             request := containergroups.ContainerGroupPatch{
-              DisplayName: util.ToPointer(util.Nullable[string]{ Value: "ZJjdnvu" }),
               Container: &updateContainer,
-              Replicas: util.ToPointer(util.Nullable[int64]{ Value: int64(56) }),
               CountryCodes: []shared.CountryCode{countryCode},
-              Networking: &updateContainerGroupNetworking,
+              DisplayName: util.ToPointer(util.Nullable[string]{ Value: "4VNc4M8u ZC" }),
               LivenessProbe: &containerGroupLivenessProbe,
-              ReadinessProbe: &containerGroupReadinessProbe,
-              StartupProbe: &containerGroupStartupProbe,
+              Networking: &updateContainerGroupNetworking,
               QueueAutoscaler: &queueBasedAutoscalerConfiguration,
+              ReadinessProbe: &containerGroupReadinessProbe,
+              Replicas: util.ToPointer(util.Nullable[int64]{ Value: int64(76) }),
+              ScalingActions: []shared.ContainerGroupScalingAction{containerGroupScalingAction},
+              ScheduledScalingEnabled: util.ToPointer(true),
+              StartupProbe: &containerGroupStartupProbe,
             }
 
 
@@ -2475,6 +2290,7 @@ paths:
               ContainerGroupProbeExec,
               ContainerGroupProbeHttpHeader,
               ContainerGroupReadinessProbe,
+              ContainerGroupScalingAction,
               ContainerGroupStartupProbe,
               ContainerGroupTcpProbe,
               ContainerLoggingConfigurationHttp1,
@@ -2509,9 +2325,9 @@ paths:
               });
 
               const axiomLoggingConfiguration: AxiomLoggingConfiguration = {
-                host: 'host',
                 apiToken: 'api_token',
                 dataset: 'dataset',
+                host: 'host',
               };
 
               const datadogTagForContainerLogging: DatadogTagForContainerLogging = {
@@ -2520,10 +2336,12 @@ paths:
               };
 
               const datadogLoggingConfiguration: DatadogLoggingConfiguration = {
-                host: 'host',
                 apiKey: 'api_key',
+                host: 'host',
                 tags: [datadogTagForContainerLogging],
               };
+
+              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
 
               const containerLoggingHttpFormat = ContainerLoggingHttpFormat.JSON;
 
@@ -2532,17 +2350,15 @@ paths:
                 value: 'value',
               };
 
-              const containerLoggingHttpCompression = ContainerLoggingHttpCompression.NONE;
-
               const containerLoggingConfigurationHttp1: ContainerLoggingConfigurationHttp1 = {
-                host: 'host',
-                port: 55354,
-                user: 'user',
-                password: 'password',
-                path: 'path',
+                compression: containerLoggingHttpCompression,
                 format: containerLoggingHttpFormat,
                 headers: [containerLoggingHttpHeader],
-                compression: containerLoggingHttpCompression,
+                host: 'host',
+                password: 'password',
+                path: 'path',
+                port: 4925,
+                user: 'user',
               };
 
               const newRelicLoggingConfiguration: NewRelicLoggingConfiguration = {
@@ -2557,7 +2373,7 @@ paths:
 
               const tcpLoggingConfiguration: TcpLoggingConfiguration = {
                 host: 'host',
-                port: 44671,
+                port: 49831,
               };
 
               const updateContainerLogging: UpdateContainerLogging = {
@@ -2577,13 +2393,13 @@ paths:
               };
 
               const containerRegistryAuthenticationBasic: ContainerRegistryAuthenticationBasic = {
-                username: 'username',
                 password: 'password',
+                username: 'username',
               };
 
               const containerRegistryAuthenticationDockerHub: ContainerRegistryAuthenticationDockerHub = {
-                username: 'username',
                 personalAccessToken: 'personal_access_token',
+                username: 'username',
               };
 
               const containerRegistryAuthenticationGcpGar: ContainerRegistryAuthenticationGcpGar = {
@@ -2603,11 +2419,11 @@ paths:
               };
 
               const containerResourceUpdateSchema: ContainerResourceUpdateSchema = {
-                cpu: 1013,
-                memory: 352043675,
+                cpu: 121,
                 gpuClasses: ['gpu_classes'],
-                storageAmount: 1032076497908566.1,
+                memory: 104082568,
                 shmSize: 64,
+                storageAmount: 86463820446985,
               };
 
               const updateContainer: UpdateContainer = {
@@ -2623,16 +2439,12 @@ paths:
 
               const countryCode = CountryCode.AF;
 
-              const updateContainerGroupNetworking: UpdateContainerGroupNetworking = {
-                port: 13142,
-              };
-
               const containerGroupProbeExec: ContainerGroupProbeExec = {
                 command: ['command'],
               };
 
               const containerGroupGRpcProbe: ContainerGroupGRpcProbe = {
-                port: 37648,
+                port: 31831,
                 service: 'service',
               };
 
@@ -2646,12 +2458,12 @@ paths:
               const containerGroupHttpProbeConfiguration: ContainerGroupHttpProbeConfiguration = {
                 headers: [containerGroupProbeHttpHeader],
                 path: 'path',
-                port: 29069,
+                port: 20252,
                 scheme: httpScheme,
               };
 
               const containerGroupTcpProbe: ContainerGroupTcpProbe = {
-                port: 13817,
+                port: 56673,
               };
 
               const containerGroupLivenessProbe: ContainerGroupLivenessProbe = {
@@ -2659,11 +2471,24 @@ paths:
                 failureThreshold: 3,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 670,
+                initialDelaySeconds: 746,
                 periodSeconds: 10,
                 successThreshold: 1,
                 tcp: containerGroupTcpProbe,
                 timeoutSeconds: 30,
+              };
+
+              const updateContainerGroupNetworking: UpdateContainerGroupNetworking = {
+                port: 56501,
+              };
+
+              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
+                desiredQueueLength: 21,
+                maxDownscalePerMinute: 84,
+                maxReplicas: 241,
+                maxUpscalePerMinute: 75,
+                minReplicas: 35,
+                pollingPeriod: 80,
               };
 
               const containerGroupReadinessProbe: ContainerGroupReadinessProbe = {
@@ -2671,11 +2496,16 @@ paths:
                 failureThreshold: 3,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 262,
+                initialDelaySeconds: 920,
                 periodSeconds: 1,
                 successThreshold: 1,
                 tcp: containerGroupTcpProbe,
                 timeoutSeconds: 1,
+              };
+
+              const containerGroupScalingAction: ContainerGroupScalingAction = {
+                replicas: 200,
+                schedule: 'S  An J,XICzdmM       5          kdBZz',
               };
 
               const containerGroupStartupProbe: ContainerGroupStartupProbe = {
@@ -2683,32 +2513,25 @@ paths:
                 failureThreshold: 15,
                 grpc: containerGroupGRpcProbe,
                 http: containerGroupHttpProbeConfiguration,
-                initialDelaySeconds: 1106,
-                tcp: containerGroupTcpProbe,
+                initialDelaySeconds: 199,
                 periodSeconds: 3,
                 successThreshold: 2,
+                tcp: containerGroupTcpProbe,
                 timeoutSeconds: 10,
               };
 
-              const queueBasedAutoscalerConfiguration: QueueBasedAutoscalerConfiguration = {
-                desiredQueueLength: 53,
-                maxReplicas: 291,
-                maxDownscalePerMinute: 65,
-                maxUpscalePerMinute: 100,
-                minReplicas: 54,
-                pollingPeriod: 140,
-              };
-
               const containerGroupPatch: ContainerGroupPatch = {
-                displayName: 'ZJjdnvu',
                 container: updateContainer,
-                replicas: 56,
                 countryCodes: [countryCode],
-                networking: updateContainerGroupNetworking,
+                displayName: '4VNc4M8u ZC',
                 livenessProbe: containerGroupLivenessProbe,
-                readinessProbe: containerGroupReadinessProbe,
-                startupProbe: containerGroupStartupProbe,
+                networking: updateContainerGroupNetworking,
                 queueAutoscaler: queueBasedAutoscalerConfiguration,
+                readinessProbe: containerGroupReadinessProbe,
+                replicas: 76,
+                scalingActions: [containerGroupScalingAction],
+                scheduledScalingEnabled: true,
+                startupProbe: containerGroupStartupProbe,
               };
 
               const { data } = await saladCloudSdk.containerGroups.updateContainerGroup(
@@ -2721,6 +2544,71 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+            using Salad.Cloud.SDK.Models;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            var command = new List<string>() { "command" };
+            var axiom = new AxiomLoggingConfiguration("api_token", "dataset", "host");
+            var tagsItem = new DatadogTagForContainerLogging("name", "value");
+            var tags = new List<DatadogTagForContainerLogging>() { tagsItem };
+            var datadog = new DatadogLoggingConfiguration("api_key", "host", tags);
+            var headersItem = new ContainerLoggingHttpHeader("name", "value");
+            var headers = new List<ContainerLoggingHttpHeader>() { headersItem };
+            var http = new ContainerLoggingConfigurationHttp1(ContainerLoggingHttpCompression.None, ContainerLoggingHttpFormat.Json, headers, "host", 65263, "password", "path", "user");
+            var newRelic = new NewRelicLoggingConfiguration("host", "ingestion_key");
+            var splunk = new ContainerLoggingSplunkConfiguration("host", "token");
+            var tcp = new TcpLoggingConfiguration("host", 30869);
+            var logging = new UpdateContainerLogging(axiom, datadog, http, newRelic, splunk, tcp);
+            var awsEcr = new ContainerRegistryAuthenticationAwsEcr("access_key_id", "secret_access_key");
+            var basic = new ContainerRegistryAuthenticationBasic("password", "username");
+            var dockerHub = new ContainerRegistryAuthenticationDockerHub("personal_access_token", "username");
+            var gcpGar = new ContainerRegistryAuthenticationGcpGar("service_key");
+            var gcpGcr = new ContainerRegistryAuthenticationGcpGcr("service_key");
+            var registryAuthentication = new ContainerRegistryAuthentication(awsEcr, basic, dockerHub, gcpGar, gcpGcr);
+            var gpuClasses = new List<string>() { "gpu_classes" };
+            var resources = new ContainerResourceUpdateSchema(375, gpuClasses, 417503722, 64, 521929467455015.06);
+            var container = new UpdateContainer(command, new object(), "image", true, logging, ContainerGroupPriority.High, registryAuthentication, resources);
+            var countryCodes = new List<CountryCode>() { CountryCode.Af };
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var livenessProbe = new ContainerGroupLivenessProbe(3, 99, 10, 1, 30, exec, grpc, http, tcp);
+            var networking = new UpdateContainerGroupNetworking(14746);
+            var queueAutoscaler = new QueueBasedAutoscalerConfiguration(54, 45, 56, 79, 51, 1534);
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var readinessProbe = new ContainerGroupReadinessProbe(3, 383, 1, 1, 1, exec, grpc, http, tcp);
+            var scalingActionsItem = new ContainerGroupScalingAction(470, "SPTp1fzRw   a-3HLB09B         OPvUL      d     WzlHNxbEYn");
+            var scalingActions = new List<ContainerGroupScalingAction>() { scalingActionsItem };
+            var command = new List<string>() { "command" };
+            var exec = new ContainerGroupProbeExec(command);
+            var grpc = new ContainerGroupGRpcProbe(62368, "service");
+            var headersItem = new ContainerGroupProbeHttpHeader("name", "value");
+            var headers = new List<ContainerGroupProbeHttpHeader>() { headersItem };
+            var http = new ContainerGroupHttpProbeConfiguration(headers, "path", 34880, HttpScheme.Http);
+            var tcp = new ContainerGroupTcpProbe(26920);
+            var startupProbe = new ContainerGroupStartupProbe(15, 620, 3, 2, 10, exec, grpc, http, tcp);
+            var input = new ContainerGroupPatch(container, countryCodes, "PDGT", livenessProbe, networking, queueAutoscaler, readinessProbe, 103, scalingActions, false, startupProbe);
+
+            var response = await client.ContainerGroups.UpdateContainerGroupAsync(input, "acme-corp", "dev-env", "mandlebrot");
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -2748,6 +2636,8 @@ paths:
             import com.salad.cloud.sdk.models.ContainerGroupProbeHttpHeader;
 
             import com.salad.cloud.sdk.models.ContainerGroupReadinessProbe;
+
+            import com.salad.cloud.sdk.models.ContainerGroupScalingAction;
 
             import com.salad.cloud.sdk.models.ContainerGroupStartupProbe;
 
@@ -2812,228 +2702,232 @@ paths:
 
 
             public class Main {
-                public static void main(String[] args) {
-            		SaladCloudSdkConfig config = SaladCloudSdkConfig.builder()
-            			.apiKeyAuthConfig(
-            				ApiKeyAuthConfig.builder()
-            					.apiKey("YOUR_API_KEY")
-            					.build()
-            			)
-            			.build();
 
-            		SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
+              public static void main(String[] args) {
+                SaladCloudSdkConfig config = SaladCloudSdkConfig.builder()
+                  .apiKeyAuthConfig(ApiKeyAuthConfig.builder().apiKey("YOUR_API_KEY").build())
+                  .build();
 
-            		List<String> commandList = Arrays.asList("command");
+                SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
-            		AxiomLoggingConfiguration axiomLoggingConfiguration = AxiomLoggingConfiguration.builder()
-            			.host("host")
-            			.apiToken("api_token")
-            			.dataset("dataset")
-            			.build();
+                List<String> commandList = Arrays.asList("command");
 
-            		DatadogTagForContainerLogging datadogTagForContainerLogging = DatadogTagForContainerLogging.builder()
-            			.name("name")
-            			.value("value")
-            			.build();
+                AxiomLoggingConfiguration axiomLoggingConfiguration = AxiomLoggingConfiguration.builder()
+                  .apiToken("api_token")
+                  .dataset("dataset")
+                  .host("host")
+                  .build();
 
-            		List<DatadogTagForContainerLogging> tagsList = Arrays.asList(datadogTagForContainerLogging);
+                DatadogTagForContainerLogging datadogTagForContainerLogging = DatadogTagForContainerLogging.builder()
+                  .name("name")
+                  .value("value")
+                  .build();
 
-            		DatadogLoggingConfiguration datadogLoggingConfiguration = DatadogLoggingConfiguration.builder()
-            			.host("host")
-            			.apiKey("api_key")
-            			.tags(tagsList)
-            			.build();
+                List<DatadogTagForContainerLogging> tagsList = Arrays.asList(datadogTagForContainerLogging);
 
-            		ContainerLoggingHttpHeader containerLoggingHttpHeader = ContainerLoggingHttpHeader.builder()
-            			.name("name")
-            			.value("value")
-            			.build();
+                DatadogLoggingConfiguration datadogLoggingConfiguration = DatadogLoggingConfiguration.builder()
+                  .apiKey("api_key")
+                  .host("host")
+                  .tags(tagsList)
+                  .build();
 
-            		List<ContainerLoggingHttpHeader> headersList = Arrays.asList(containerLoggingHttpHeader);
+                ContainerLoggingHttpHeader containerLoggingHttpHeader = ContainerLoggingHttpHeader.builder()
+                  .name("name")
+                  .value("value")
+                  .build();
 
-            		ContainerLoggingConfigurationHttp1 containerLoggingConfigurationHttp1 = ContainerLoggingConfigurationHttp1.builder()
-            			.host("host")
-            			.port(55354L)
-            			.user("user")
-            			.password("password")
-            			.path("path")
-            			.format(ContainerLoggingHttpFormat.JSON)
-            			.headers(headersList)
-            			.compression(ContainerLoggingHttpCompression.NONE)
-            			.build();
+                List<ContainerLoggingHttpHeader> headersList = Arrays.asList(containerLoggingHttpHeader);
 
-            		NewRelicLoggingConfiguration newRelicLoggingConfiguration = NewRelicLoggingConfiguration.builder()
-            			.host("host")
-            			.ingestionKey("ingestion_key")
-            			.build();
+                ContainerLoggingConfigurationHttp1 containerLoggingConfigurationHttp1 = ContainerLoggingConfigurationHttp1.builder()
+                  .compression(ContainerLoggingHttpCompression.NONE)
+                  .format(ContainerLoggingHttpFormat.JSON)
+                  .headers(headersList)
+                  .host("host")
+                  .password("password")
+                  .path("path")
+                  .port(55354L)
+                  .user("user")
+                  .build();
 
-            		ContainerLoggingSplunkConfiguration containerLoggingSplunkConfiguration = ContainerLoggingSplunkConfiguration.builder()
-            			.host("host")
-            			.token("token")
-            			.build();
+                NewRelicLoggingConfiguration newRelicLoggingConfiguration = NewRelicLoggingConfiguration.builder()
+                  .host("host")
+                  .ingestionKey("ingestion_key")
+                  .build();
 
-            		TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
-            			.host("host")
-            			.port(44671L)
-            			.build();
+                ContainerLoggingSplunkConfiguration containerLoggingSplunkConfiguration =
+                  ContainerLoggingSplunkConfiguration.builder().host("host").token("token").build();
 
-            		UpdateContainerLogging updateContainerLogging = UpdateContainerLogging.builder()
-            			.axiom(axiomLoggingConfiguration)
-            			.datadog(datadogLoggingConfiguration)
-            			.http(containerLoggingConfigurationHttp1)
-            			.newRelic(newRelicLoggingConfiguration)
-            			.splunk(containerLoggingSplunkConfiguration)
-            			.tcp(tcpLoggingConfiguration)
-            			.build();
+                TcpLoggingConfiguration tcpLoggingConfiguration = TcpLoggingConfiguration.builder()
+                  .host("host")
+                  .port(44671L)
+                  .build();
 
-            		ContainerRegistryAuthenticationAwsEcr containerRegistryAuthenticationAwsEcr = ContainerRegistryAuthenticationAwsEcr.builder()
-            			.accessKeyId("access_key_id")
-            			.secretAccessKey("secret_access_key")
-            			.build();
+                UpdateContainerLogging updateContainerLogging = UpdateContainerLogging.builder()
+                  .axiom(axiomLoggingConfiguration)
+                  .datadog(datadogLoggingConfiguration)
+                  .http(containerLoggingConfigurationHttp1)
+                  .newRelic(newRelicLoggingConfiguration)
+                  .splunk(containerLoggingSplunkConfiguration)
+                  .tcp(tcpLoggingConfiguration)
+                  .build();
 
-            		ContainerRegistryAuthenticationBasic containerRegistryAuthenticationBasic = ContainerRegistryAuthenticationBasic.builder()
-            			.username("username")
-            			.password("password")
-            			.build();
+                ContainerRegistryAuthenticationAwsEcr containerRegistryAuthenticationAwsEcr =
+                  ContainerRegistryAuthenticationAwsEcr.builder()
+                    .accessKeyId("access_key_id")
+                    .secretAccessKey("secret_access_key")
+                    .build();
 
-            		ContainerRegistryAuthenticationDockerHub containerRegistryAuthenticationDockerHub = ContainerRegistryAuthenticationDockerHub.builder()
-            			.username("username")
-            			.personalAccessToken("personal_access_token")
-            			.build();
+                ContainerRegistryAuthenticationBasic containerRegistryAuthenticationBasic =
+                  ContainerRegistryAuthenticationBasic.builder().password("password").username("username").build();
 
-            		ContainerRegistryAuthenticationGcpGar containerRegistryAuthenticationGcpGar = ContainerRegistryAuthenticationGcpGar.builder()
-            			.serviceKey("service_key")
-            			.build();
+                ContainerRegistryAuthenticationDockerHub containerRegistryAuthenticationDockerHub =
+                  ContainerRegistryAuthenticationDockerHub.builder()
+                    .personalAccessToken("personal_access_token")
+                    .username("username")
+                    .build();
 
-            		ContainerRegistryAuthenticationGcpGcr containerRegistryAuthenticationGcpGcr = ContainerRegistryAuthenticationGcpGcr.builder()
-            			.serviceKey("service_key")
-            			.build();
+                ContainerRegistryAuthenticationGcpGar containerRegistryAuthenticationGcpGar =
+                  ContainerRegistryAuthenticationGcpGar.builder().serviceKey("service_key").build();
 
-            		ContainerRegistryAuthentication containerRegistryAuthentication = ContainerRegistryAuthentication.builder()
-            			.awsEcr(containerRegistryAuthenticationAwsEcr)
-            			.basic(containerRegistryAuthenticationBasic)
-            			.dockerHub(containerRegistryAuthenticationDockerHub)
-            			.gcpGar(containerRegistryAuthenticationGcpGar)
-            			.gcpGcr(containerRegistryAuthenticationGcpGcr)
-            			.build();
+                ContainerRegistryAuthenticationGcpGcr containerRegistryAuthenticationGcpGcr =
+                  ContainerRegistryAuthenticationGcpGcr.builder().serviceKey("service_key").build();
 
-            		List<String> gpuClassesList = Arrays.asList("gpu_classes");
+                ContainerRegistryAuthentication containerRegistryAuthentication = ContainerRegistryAuthentication.builder()
+                  .awsEcr(containerRegistryAuthenticationAwsEcr)
+                  .basic(containerRegistryAuthenticationBasic)
+                  .dockerHub(containerRegistryAuthenticationDockerHub)
+                  .gcpGar(containerRegistryAuthenticationGcpGar)
+                  .gcpGcr(containerRegistryAuthenticationGcpGcr)
+                  .build();
 
-            		ContainerResourceUpdateSchema containerResourceUpdateSchema = ContainerResourceUpdateSchema.builder()
-            			.cpu(1013L)
-            			.memory(352043675L)
-            			.gpuClasses(gpuClassesList)
-            			.storageAmount(1032076497908566.1L)
-            			.shmSize(64L)
-            			.build();
+                List<String> gpuClassesList = Arrays.asList("gpu_classes");
 
-            		UpdateContainer updateContainer = UpdateContainer.builder()
-            			.command(commandList)
-            			.environmentVariables(new HashMap())
-            			.image("image")
-            			.imageCaching(true)
-            			.logging(updateContainerLogging)
-            			.priority(ContainerGroupPriority.HIGH)
-            			.registryAuthentication(containerRegistryAuthentication)
-            			.resources(containerResourceUpdateSchema)
-            			.build();
+                ContainerResourceUpdateSchema containerResourceUpdateSchema = ContainerResourceUpdateSchema.builder()
+                  .cpu(191L)
+                  .gpuClasses(gpuClassesList)
+                  .memory(909130690L)
+                  .shmSize(64L)
+                  .storageAmount(699558298076245L)
+                  .build();
 
-            		List<CountryCode> countryCodesList = Arrays.asList(CountryCode.AF);
+                UpdateContainer updateContainer = UpdateContainer.builder()
+                  .command(commandList)
+                  .environmentVariables(new HashMap())
+                  .image("image")
+                  .imageCaching(true)
+                  .logging(updateContainerLogging)
+                  .priority(ContainerGroupPriority.HIGH)
+                  .registryAuthentication(containerRegistryAuthentication)
+                  .resources(containerResourceUpdateSchema)
+                  .build();
 
-            		UpdateContainerGroupNetworking updateContainerGroupNetworking = UpdateContainerGroupNetworking.builder()
-            			.port(13142L)
-            			.build();
+                List<CountryCode> countryCodesList = Arrays.asList(CountryCode.AF);
 
-            		List<String> commandList1 = Arrays.asList("command");
+                List<String> commandList1 = Arrays.asList("command");
 
-            		ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder()
-            			.command(commandList1)
-            			.build();
+                ContainerGroupProbeExec containerGroupProbeExec = ContainerGroupProbeExec.builder().command(commandList1).build();
 
-            		ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
-            			.port(37648L)
-            			.service("service")
-            			.build();
+                ContainerGroupGRpcProbe containerGroupGRpcProbe = ContainerGroupGRpcProbe.builder()
+                  .port(37648L)
+                  .service("service")
+                  .build();
 
-            		ContainerGroupProbeHttpHeader containerGroupProbeHttpHeader = ContainerGroupProbeHttpHeader.builder()
-            			.name("name")
-            			.value("value")
-            			.build();
+                ContainerGroupProbeHttpHeader containerGroupProbeHttpHeader = ContainerGroupProbeHttpHeader.builder()
+                  .name("name")
+                  .value("value")
+                  .build();
 
-            		List<ContainerGroupProbeHttpHeader> headersList1 = Arrays.asList(containerGroupProbeHttpHeader);
+                List<ContainerGroupProbeHttpHeader> headersList1 = Arrays.asList(containerGroupProbeHttpHeader);
 
-            		ContainerGroupHttpProbeConfiguration containerGroupHttpProbeConfiguration = ContainerGroupHttpProbeConfiguration.builder()
-            			.headers(headersList1)
-            			.path("path")
-            			.port(29069L)
-            			.scheme(HttpScheme.HTTP)
-            			.build();
+                ContainerGroupHttpProbeConfiguration containerGroupHttpProbeConfiguration =
+                  ContainerGroupHttpProbeConfiguration.builder()
+                    .headers(headersList1)
+                    .path("path")
+                    .port(29069L)
+                    .scheme(HttpScheme.HTTP)
+                    .build();
 
-            		ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder()
-            			.port(13817L)
-            			.build();
+                ContainerGroupTcpProbe containerGroupTcpProbe = ContainerGroupTcpProbe.builder().port(13817L).build();
 
-            		ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
-            			.exec(containerGroupProbeExec)
-            			.failureThreshold(3L)
-            			.grpc(containerGroupGRpcProbe)
-            			.http(containerGroupHttpProbeConfiguration)
-            			.initialDelaySeconds(670L)
-            			.periodSeconds(10L)
-            			.successThreshold(1L)
-            			.tcp(containerGroupTcpProbe)
-            			.timeoutSeconds(30L)
-            			.build();
+                ContainerGroupLivenessProbe containerGroupLivenessProbe = ContainerGroupLivenessProbe.builder()
+                  .exec(containerGroupProbeExec)
+                  .failureThreshold(3L)
+                  .grpc(containerGroupGRpcProbe)
+                  .http(containerGroupHttpProbeConfiguration)
+                  .initialDelaySeconds(670L)
+                  .periodSeconds(10L)
+                  .successThreshold(1L)
+                  .tcp(containerGroupTcpProbe)
+                  .timeoutSeconds(30L)
+                  .build();
 
-            		ContainerGroupReadinessProbe containerGroupReadinessProbe = ContainerGroupReadinessProbe.builder()
-            			.exec(containerGroupProbeExec)
-            			.failureThreshold(3L)
-            			.grpc(containerGroupGRpcProbe)
-            			.http(containerGroupHttpProbeConfiguration)
-            			.initialDelaySeconds(262L)
-            			.periodSeconds(1L)
-            			.successThreshold(1L)
-            			.tcp(containerGroupTcpProbe)
-            			.timeoutSeconds(1L)
-            			.build();
+                UpdateContainerGroupNetworking updateContainerGroupNetworking = UpdateContainerGroupNetworking.builder()
+                  .port(17025L)
+                  .build();
 
-            		ContainerGroupStartupProbe containerGroupStartupProbe = ContainerGroupStartupProbe.builder()
-            			.exec(containerGroupProbeExec)
-            			.failureThreshold(15L)
-            			.grpc(containerGroupGRpcProbe)
-            			.http(containerGroupHttpProbeConfiguration)
-            			.initialDelaySeconds(1106L)
-            			.tcp(containerGroupTcpProbe)
-            			.periodSeconds(3L)
-            			.successThreshold(2L)
-            			.timeoutSeconds(10L)
-            			.build();
+                QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
+                  .desiredQueueLength(53L)
+                  .maxDownscalePerMinute(59L)
+                  .maxReplicas(321L)
+                  .maxUpscalePerMinute(100L)
+                  .minReplicas(54L)
+                  .pollingPeriod(140L)
+                  .build();
 
-            		QueueBasedAutoscalerConfiguration queueBasedAutoscalerConfiguration = QueueBasedAutoscalerConfiguration.builder()
-            			.desiredQueueLength(53L)
-            			.maxReplicas(291L)
-            			.maxDownscalePerMinute(65L)
-            			.maxUpscalePerMinute(100L)
-            			.minReplicas(54L)
-            			.pollingPeriod(140L)
-            			.build();
+                ContainerGroupReadinessProbe containerGroupReadinessProbe = ContainerGroupReadinessProbe.builder()
+                  .exec(containerGroupProbeExec)
+                  .failureThreshold(3L)
+                  .grpc(containerGroupGRpcProbe)
+                  .http(containerGroupHttpProbeConfiguration)
+                  .initialDelaySeconds(262L)
+                  .periodSeconds(1L)
+                  .successThreshold(1L)
+                  .tcp(containerGroupTcpProbe)
+                  .timeoutSeconds(1L)
+                  .build();
 
-            		ContainerGroupPatch containerGroupPatch = ContainerGroupPatch.builder()
-            			.displayName("ZJjdnvu")
-            			.container(updateContainer)
-            			.replicas(56L)
-            			.countryCodes(countryCodesList)
-            			.networking(updateContainerGroupNetworking)
-            			.livenessProbe(containerGroupLivenessProbe)
-            			.readinessProbe(containerGroupReadinessProbe)
-            			.startupProbe(containerGroupStartupProbe)
-            			.queueAutoscaler(queueBasedAutoscalerConfiguration)
-            			.build();
+                ContainerGroupScalingAction containerGroupScalingAction = ContainerGroupScalingAction.builder()
+                  .replicas(461L)
+                  .schedule("7kwC/T8C   da       x6Ci   bM-rgGYn     bDY6,vT")
+                  .build();
 
-            		ContainerGroup response = saladCloudSdk.containerGroups.updateContainerGroup("acme-corp", "dev-env", "mandlebrot", containerGroupPatch);
+                List<ContainerGroupScalingAction> scalingActionsList = Arrays.asList(containerGroupScalingAction);
 
-            		System.out.println(response);
-                }
+                ContainerGroupStartupProbe containerGroupStartupProbe = ContainerGroupStartupProbe.builder()
+                  .exec(containerGroupProbeExec)
+                  .failureThreshold(15L)
+                  .grpc(containerGroupGRpcProbe)
+                  .http(containerGroupHttpProbeConfiguration)
+                  .initialDelaySeconds(503L)
+                  .periodSeconds(3L)
+                  .successThreshold(2L)
+                  .tcp(containerGroupTcpProbe)
+                  .timeoutSeconds(10L)
+                  .build();
+
+                ContainerGroupPatch containerGroupPatch = ContainerGroupPatch.builder()
+                  .container(updateContainer)
+                  .countryCodes(countryCodesList)
+                  .displayName("ykW8yoj HBQ")
+                  .livenessProbe(containerGroupLivenessProbe)
+                  .networking(updateContainerGroupNetworking)
+                  .queueAutoscaler(queueBasedAutoscalerConfiguration)
+                  .readinessProbe(containerGroupReadinessProbe)
+                  .replicas(102L)
+                  .scalingActions(scalingActionsList)
+                  .scheduledScalingEnabled(true)
+                  .startupProbe(containerGroupStartupProbe)
+                  .build();
+
+                ContainerGroup response = saladCloudSdk.containerGroups.updateContainerGroup(
+                  "acme-corp",
+                  "dev-env",
+                  "mandlebrot",
+                  containerGroupPatch
+                );
+
+                System.out.println(response);
+              }
             }
           lang: Java
     delete:
@@ -3071,21 +2965,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            await client.ContainerGroups.DeleteContainerGroupAsync("acme-corp",
-            "dev-env", "mandlebrot");
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -3130,6 +3009,21 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            await client.ContainerGroups.DeleteContainerGroupAsync("acme-corp",
+            "dev-env", "mandlebrot");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3216,21 +3110,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            await client.ContainerGroups.StartContainerGroupAsync("acme-corp",
-            "dev-env", "mandlebrot");
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -3274,6 +3153,21 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            await client.ContainerGroups.StartContainerGroupAsync("acme-corp",
+            "dev-env", "mandlebrot");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3338,21 +3232,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            await client.ContainerGroups.StopContainerGroupAsync("acme-corp",
-            "dev-env", "mandlebrot");
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -3396,6 +3275,21 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            await client.ContainerGroups.StopContainerGroupAsync("acme-corp",
+            "dev-env", "mandlebrot");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3457,25 +3351,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await
-            client.ContainerGroups.ListContainerGroupInstancesAsync("acme-corp",
-            "dev-env", "mandlebrot");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: |-
             import (
               "fmt"
@@ -3516,6 +3391,25 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await
+            client.ContainerGroups.ListContainerGroupInstancesAsync("acme-corp",
+            "dev-env", "mandlebrot");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3590,25 +3484,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await
-            client.ContainerGroups.GetContainerGroupInstanceAsync("acme-corp",
-            "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: |-
             import (
               "fmt"
@@ -3650,6 +3525,25 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await
+            client.ContainerGroups.GetContainerGroupInstanceAsync("acme-corp",
+            "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3716,7 +3610,7 @@ paths:
 
 
             request_body = ContainerGroupInstancePatch(
-                deletion_cost=34980
+                deletion_cost=19725
             )
 
 
@@ -3731,31 +3625,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var input = new ContainerGroupInstancePatch(34980);
-
-
-            var response = await
-            client.ContainerGroups.UpdateContainerGroupInstanceAsync(input,
-            "acme-corp", "dev-env", "mandlebrot",
-            "db3a4591-efc3-46c0-b06a-3d820c0ec100");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: |-
             import (
               "fmt"
@@ -3773,7 +3642,7 @@ paths:
 
 
             request := containergroups.ContainerGroupInstancePatch{
-              DeletionCost: util.ToPointer(util.Nullable[int64]{ Value: int64(34980) }),
+              DeletionCost: util.ToPointer(util.Nullable[int64]{ Value: int64(73606) }),
             }
 
             response, err := client.ContainerGroups.UpdateContainerGroupInstance(context.Background(), "acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100", request)
@@ -3794,7 +3663,7 @@ paths:
               });
 
               const containerGroupInstancePatch: ContainerGroupInstancePatch = {
-                deletionCost: 34980,
+                deletionCost: 73606,
               };
 
               const { data } = await saladCloudSdk.containerGroups.updateContainerGroupInstance(
@@ -3808,6 +3677,31 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+            using Salad.Cloud.SDK.Models;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var input = new ContainerGroupInstancePatch(19760);
+
+
+            var response = await
+            client.ContainerGroups.UpdateContainerGroupInstanceAsync(input,
+            "acme-corp", "dev-env", "mandlebrot",
+            "db3a4591-efc3-46c0-b06a-3d820c0ec100");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -3830,7 +3724,7 @@ paths:
                 SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
                 ContainerGroupInstancePatch containerGroupInstancePatch = ContainerGroupInstancePatch.builder()
-                  .deletionCost(34980L)
+                  .deletionCost(19725L)
                   .build();
 
                 ContainerGroupInstance response = saladCloudSdk.containerGroups.updateContainerGroupInstance(
@@ -3891,16 +3785,6 @@ paths:
             print(result)
           lang: Python
         - source: |-
-            using Salad.Cloud.SDK;
-            using Salad.Cloud.SDK.Config;
-
-            var config = new SaladCloudSdkConfig{};
-
-            var client = new SaladCloudSdkClient(config);
-
-            await client.ContainerGroups.ReallocateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
-          lang: C#
-        - source: |-
             import (
               "fmt"
               "encoding/json"
@@ -3941,6 +3825,16 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            await client.ContainerGroups.ReallocateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4014,16 +3908,6 @@ paths:
             print(result)
           lang: Python
         - source: |-
-            using Salad.Cloud.SDK;
-            using Salad.Cloud.SDK.Config;
-
-            var config = new SaladCloudSdkConfig{};
-
-            var client = new SaladCloudSdkClient(config);
-
-            await client.ContainerGroups.RecreateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
-          lang: C#
-        - source: |-
             import (
               "fmt"
               "encoding/json"
@@ -4064,6 +3948,16 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            await client.ContainerGroups.RecreateContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4136,16 +4030,6 @@ paths:
             print(result)
           lang: Python
         - source: |-
-            using Salad.Cloud.SDK;
-            using Salad.Cloud.SDK.Config;
-
-            var config = new SaladCloudSdkConfig{};
-
-            var client = new SaladCloudSdkClient(config);
-
-            await client.ContainerGroups.RestartContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
-          lang: C#
-        - source: |-
             import (
               "fmt"
               "encoding/json"
@@ -4186,6 +4070,16 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            await client.ContainerGroups.RestartContainerGroupInstanceAsync("acme-corp", "dev-env", "mandlebrot", "db3a4591-efc3-46c0-b06a-3d820c0ec100");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4251,24 +4145,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await client.Queues.ListQueuesAsync("acme-corp",
-            "dev-env");
-
-
-            Console.WriteLine(response);
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -4311,6 +4187,24 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await client.Queues.ListQueuesAsync("acme-corp",
+            "dev-env");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4367,9 +4261,9 @@ paths:
             )
 
             request_body = QueuePrototype(
-                name="name",
-                display_name="AV3ysQq",
-                description="description"
+                description="description",
+                display_name="tLWSUinMUjM",
+                name="name"
             )
 
             result = sdk.queues.create_queue(
@@ -4380,29 +4274,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var input = new QueuePrototype("name", "AV3ysQq", "description");
-
-
-            var response = await client.Queues.CreateQueueAsync(input,
-            "acme-corp", "dev-env");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -4424,9 +4295,9 @@ paths:
 
 
             request := queues.QueuePrototype{
-              Name: util.ToPointer("name"),
-              DisplayName: util.ToPointer("AV3ysQq"),
               Description: util.ToPointer("description"),
+              DisplayName: util.ToPointer("Yx0."),
+              Name: util.ToPointer("name"),
             }
 
 
@@ -4451,9 +4322,9 @@ paths:
               });
 
               const queuePrototype: QueuePrototype = {
-                name: 'name',
-                displayName: 'AV3ysQq',
                 description: 'description',
+                displayName: 'Yx0.',
+                name: 'name',
               };
 
               const { data } = await saladCloudSdk.queues.createQueue('acme-corp', 'dev-env', queuePrototype);
@@ -4461,6 +4332,29 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+            using Salad.Cloud.SDK.Models;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var input = new QueuePrototype("name", "description", "CTyr.");
+
+
+            var response = await client.Queues.CreateQueueAsync(input,
+            "acme-corp", "dev-env");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4483,9 +4377,9 @@ paths:
                 SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
                 QueuePrototype queuePrototype = QueuePrototype.builder()
-                  .name("name")
-                  .displayName("AV3ysQq")
                   .description("description")
+                  .displayName("tLWSUinMUjM")
+                  .name("name")
                   .build();
 
                 Queue response = saladCloudSdk.queues.createQueue("acme-corp", "dev-env", queuePrototype);
@@ -4535,24 +4429,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await client.Queues.GetQueueAsync("acme-corp",
-            "dev-env", "fifo-queue");
-
-
-            Console.WriteLine(response);
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -4595,6 +4471,24 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await client.Queues.GetQueueAsync("acme-corp",
+            "dev-env", "fifo-queue");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4651,8 +4545,8 @@ paths:
             )
 
             request_body = QueuePatch(
-                display_name="5Ecnf",
-                description="description"
+                description="description",
+                display_name="hB13"
             )
 
             result = sdk.queues.update_queue(
@@ -4664,29 +4558,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var input = new QueuePatch("5Ecnf", "description");
-
-
-            var response = await client.Queues.UpdateQueueAsync(input,
-            "acme-corp", "dev-env", "fifo-queue");
-
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -4708,8 +4579,8 @@ paths:
 
 
             request := queues.QueuePatch{
-              DisplayName: util.ToPointer(util.Nullable[string]{ Value: "5Ecnf" }),
               Description: util.ToPointer(util.Nullable[string]{ Value: "description" }),
+              DisplayName: util.ToPointer(util.Nullable[string]{ Value: "LTTgf1T6nC" }),
             }
 
 
@@ -4734,8 +4605,8 @@ paths:
               });
 
               const queuePatch: QueuePatch = {
-                displayName: '5Ecnf',
                 description: 'description',
+                displayName: 'LTTgf1T6nC',
               };
 
               const { data } = await saladCloudSdk.queues.updateQueue('acme-corp', 'dev-env', 'fifo-queue', queuePatch);
@@ -4743,6 +4614,29 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+            using Salad.Cloud.SDK.Models;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var input = new QueuePatch("description", "MHoT");
+
+
+            var response = await client.Queues.UpdateQueueAsync(input,
+            "acme-corp", "dev-env", "fifo-queue");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4764,7 +4658,7 @@ paths:
 
                 SaladCloudSdk saladCloudSdk = new SaladCloudSdk(config);
 
-                QueuePatch queuePatch = QueuePatch.builder().displayName("5Ecnf").description("description").build();
+                QueuePatch queuePatch = QueuePatch.builder().description("description").displayName("hB13").build();
 
                 Queue response = saladCloudSdk.queues.updateQueue("acme-corp", "dev-env", "fifo-queue", queuePatch);
 
@@ -4805,21 +4699,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            await client.Queues.DeleteQueueAsync("acme-corp", "dev-env",
-            "fifo-queue");
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -4863,6 +4742,21 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            await client.Queues.DeleteQueueAsync("acme-corp", "dev-env",
+            "fifo-queue");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -4930,24 +4824,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await client.Queues.ListQueueJobsAsync("acme-corp",
-            "dev-env", "fifo-queue", 1, 1);
-
-
-            Console.WriteLine(response);
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -5001,6 +4877,24 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await client.Queues.ListQueueJobsAsync("acme-corp",
+            "dev-env", "fifo-queue", 1, 1);
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5081,30 +4975,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-            using Salad.Cloud.SDK.Models;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var input = new QueueJobPrototype(new object {}, new object {},
-            "webhook");
-
-
-            var response = await client.Queues.CreateQueueJobAsync(input,
-            "acme-corp", "dev-env", "fifo-queue");
-
-
-            Console.WriteLine(response);
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -5162,6 +5032,30 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+            using Salad.Cloud.SDK.Models;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var input = new QueueJobPrototype(new object {}, new object {},
+            "webhook");
+
+
+            var response = await client.Queues.CreateQueueJobAsync(input,
+            "acme-corp", "dev-env", "fifo-queue");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5238,24 +5132,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            var response = await client.Queues.GetQueueJobAsync("acme-corp",
-            "dev-env", "fifo-queue", "7dcd6922-50e9-4d56-89b5-91cde26f0211");
-
-
-            Console.WriteLine(response);
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -5304,6 +5180,24 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            var response = await client.Queues.GetQueueJobAsync("acme-corp",
+            "dev-env", "fifo-queue", "7dcd6922-50e9-4d56-89b5-91cde26f0211");
+
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5369,21 +5263,6 @@ paths:
             print(result)
           lang: Python
         - source: >-
-            using Salad.Cloud.SDK;
-
-            using Salad.Cloud.SDK.Config;
-
-
-            var config = new SaladCloudSdkConfig{};
-
-
-            var client = new SaladCloudSdkClient(config);
-
-
-            await client.Queues.DeleteQueueJobAsync("acme-corp", "dev-env",
-            "fifo-queue", "7dcd6922-50e9-4d56-89b5-91cde26f0211");
-          lang: C#
-        - source: >-
             import (
               "fmt"
               "encoding/json"
@@ -5432,6 +5311,21 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: >-
+            using Salad.Cloud.SDK;
+
+            using Salad.Cloud.SDK.Config;
+
+
+            var config = new SaladCloudSdkConfig{};
+
+
+            var client = new SaladCloudSdkClient(config);
+
+
+            await client.Queues.DeleteQueueJobAsync("acme-corp", "dev-env",
+            "fifo-queue", "7dcd6922-50e9-4d56-89b5-91cde26f0211");
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5487,18 +5381,6 @@ paths:
 
             print(result)
           lang: Python
-        - source: |-
-            using Salad.Cloud.SDK;
-            using Salad.Cloud.SDK.Config;
-
-            var config = new SaladCloudSdkConfig{};
-
-            var client = new SaladCloudSdkClient(config);
-
-            var response = await client.Quotas.GetQuotasAsync("acme-corp");
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
             import (
               "fmt"
@@ -5542,6 +5424,18 @@ paths:
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.SDK;
+            using Salad.Cloud.SDK.Config;
+
+            var config = new SaladCloudSdkConfig{};
+
+            var client = new SaladCloudSdkClient(config);
+
+            var response = await client.Quotas.GetQuotasAsync("acme-corp");
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import com.salad.cloud.sdk.SaladCloudSdk;
 
@@ -5827,7 +5721,7 @@ paths:
         default:
           $ref: "#/components/responses/UnknownError"
       tags:
-        - organization_data
+        - organizations
   /organizations/{organization_name}/availability/sce-gpu-availability:
     post:
       operationId: get_gpu_availability
@@ -5854,7 +5748,7 @@ paths:
         default:
           $ref: "#/components/responses/UnknownError"
       tags:
-        - organization_data
+        - organizations
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -5972,6 +5866,16 @@ components:
           $ref: "#/components/schemas/ContainerGroupReplicas"
         restart_policy:
           $ref: "#/components/schemas/ContainerRestartPolicy"
+        scaling-actions:
+          description: List of scaling actions configurations
+          type: array
+          items:
+            $ref: "#/components/schemas/ContainerGroupScalingAction"
+          maxItems: 100
+          minItems: 0
+        scheduled-scaling-enabled:
+          description: Indicates if scheduled scaling is enabled
+          type: boolean
         startup_probe:
           $ref: "#/components/schemas/ContainerGroupStartupProbe"
         update_time:
@@ -6002,6 +5906,8 @@ components:
         - restart_policy
         - update_time
         - version
+        - scheduled-scaling-enabled
+        - scaling-actions
       title: Container Group
     ContainerGroupCollection:
       description: A paginated collection of container groups that provides a
@@ -6034,16 +5940,71 @@ components:
         execution state, readiness, and version of the deployed container group.
       type: object
       properties:
+        cpu_percent:
+          description: The percentage of CPU used by this container group instance. This
+            is updated every minute.
+          type: number
+          format: float
+          minimum: 0
+        cpu_usage:
+          description: The total CPU usage in seconds for this container group instance.
+            This is updated every minute.
+          type: integer
+          format: int64
+          minimum: 0
+        cpu_usage_total:
+          description: The total CPU usage in seconds for this container group instance
+            since it was started. This is updated every minute.
+          type: integer
+          format: int64
+          minimum: 0
+        deletion_cost:
+          description: The cost of deleting the container group instance
+          type: integer
+          default: 0
+          maximum: 100000
+          minimum: 0
         id:
           $ref: "#/components/schemas/ContainerGroupInstanceId"
         machine_id:
           $ref: "#/components/schemas/ContainerGroupMachineId"
+        memory_usage_mb:
+          description: The memory usage in MB for this container group instance. This is
+            updated every minute.
+          type: number
+          format: float
+          minimum: 0
+        memory_usage_percent:
+          description: The percentage of memory used by this container group instance.
+            This is updated every minute.
+          type: number
+          format: float
+          minimum: 0
+        pulling_progress:
+          description: The progress percentage of pulling the container image. This is
+            only relevant when the instance state is 'downloading'.
+          type: number
+          format: float
+          maximum: 100
+          minimum: 0
+        ready:
+          description: Indicates whether the container group instance is currently passing
+            its readiness checks and is able to receive traffic or perform its
+            intended function. If no readiness probe is defined, this will be
+            true once the instance is fully started.
+          type: boolean
+        ssh_host_key_fingerprint:
+          $ref: "#/components/schemas/ContainerGroupInstanceSshHostKeyFingerprint"
         ssh_ip:
           $ref: "#/components/schemas/ContainerGroupInstanceSshIp"
         ssh_port:
           $ref: "#/components/schemas/ContainerGroupInstanceSshPort"
-        ssh_host_key_fingerprint:
-          $ref: "#/components/schemas/ContainerGroupInstanceSshHostKeyFingerprint"
+        started:
+          description: Indicates whether the container group instance has successfully
+            completed its startup sequence and passed any configured startup
+            probes. This will always be true when no startup probe is defined
+            for the container group.
+          type: boolean
         state:
           $ref: "#/components/schemas/ContainerGroupInstanceState"
         update_time:
@@ -6060,24 +6021,6 @@ components:
           format: int32
           maximum: 2147483647
           minimum: 1
-        ready:
-          description: Indicates whether the container group instance is currently passing
-            its readiness checks and is able to receive traffic or perform its
-            intended function. If no readiness probe is defined, this will be
-            true once the instance is fully started.
-          type: boolean
-        started:
-          description: Indicates whether the container group instance has successfully
-            completed its startup sequence and passed any configured startup
-            probes. This will always be true when no startup probe is defined
-            for the container group.
-          type: boolean
-        deletion_cost:
-          description: The cost of deleting the container group instance
-          type: integer
-          default: 0
-          maximum: 100000
-          minimum: 0
       required:
         - id
         - machine_id
@@ -6345,24 +6288,8 @@ components:
       description: Represents a request to update a container group
       type: object
       properties:
-        display_name:
-          description: The display name for the container group. If null is provided, the
-            display name will be set to the container group name.
-          type:
-            - string
-            - "null"
-          maxLength: 63
-          minLength: 2
-          pattern: ^[ ,-.0-9A-Za-z]+$
         container:
           $ref: "#/components/schemas/UpdateContainer"
-        replicas:
-          description: The desired number of instances for your container group deployment.
-          type:
-            - integer
-            - "null"
-          maximum: 500
-          minimum: 0
         country_codes:
           description: List of countries nodes must be located in. Remove this field to
             permit nodes from any country.
@@ -6373,16 +6300,42 @@ components:
             $ref: "#/components/schemas/CountryCode"
           maxItems: 500
           minItems: 1
-        networking:
-          $ref: "#/components/schemas/UpdateContainerGroupNetworking"
+        display_name:
+          description: The display name for the container group. If null is provided, the
+            display name will be set to the container group name.
+          type:
+            - string
+            - "null"
+          maxLength: 63
+          minLength: 2
+          pattern: ^[ ,-.0-9A-Za-z]+$
         liveness_probe:
           $ref: "#/components/schemas/ContainerGroupLivenessProbe"
-        readiness_probe:
-          $ref: "#/components/schemas/ContainerGroupReadinessProbe"
-        startup_probe:
-          $ref: "#/components/schemas/ContainerGroupStartupProbe"
+        networking:
+          $ref: "#/components/schemas/UpdateContainerGroupNetworking"
         queue_autoscaler:
           $ref: "#/components/schemas/ContainerGroupQueueAutoscaler"
+        readiness_probe:
+          $ref: "#/components/schemas/ContainerGroupReadinessProbe"
+        replicas:
+          description: The desired number of instances for your container group deployment.
+          type:
+            - integer
+            - "null"
+          maximum: 500
+          minimum: 0
+        scaling-actions:
+          description: List of scaling actions configurations
+          type: array
+          items:
+            $ref: "#/components/schemas/ContainerGroupScalingAction"
+          maxItems: 100
+          minItems: 0
+        scheduled-scaling-enabled:
+          description: Indicates if scheduled scaling is enabled
+          type: boolean
+        startup_probe:
+          $ref: "#/components/schemas/ContainerGroupStartupProbe"
     ContainerGroupPriority:
       description: Specifies the priority level for container group execution, which
         determines resource allocation and scheduling precedence.
@@ -6560,6 +6513,16 @@ components:
           minimum: 0
         restart_policy:
           $ref: "#/components/schemas/ContainerRestartPolicy"
+        scaling-actions:
+          description: List of scaling action configurations
+          type: array
+          items:
+            $ref: "#/components/schemas/ContainerGroupScalingAction"
+          maxItems: 100
+          minItems: 0
+        scheduled-scaling-enabled:
+          description: Indicates if scheduled scaling is enabled
+          type: boolean
         startup_probe:
           $ref: "#/components/schemas/ContainerGroupStartupProbe"
       required:
@@ -6582,18 +6545,18 @@ components:
           format: int32
           maximum: 100
           minimum: 1
-        max_replicas:
-          description: The maximum number of instances the container can scale up to
-          type: integer
-          format: int32
-          maximum: 500
-          minimum: 1
         max_downscale_per_minute:
           description: The maximum number of instances that can be removed per minute to
             prevent rapid downscaling
           type: integer
           format: int32
           maximum: 100
+          minimum: 1
+        max_replicas:
+          description: The maximum number of instances the container can scale up to
+          type: integer
+          format: int32
+          maximum: 500
           minimum: 1
         max_upscale_per_minute:
           description: The maximum number of instances that can be added per minute to
@@ -6729,6 +6692,24 @@ components:
       maximum: 500
       minimum: 0
       title: Container Group Replicas
+    ContainerGroupScalingAction:
+      description: Represents a scaling action configuration for a container group
+      type: object
+      properties:
+        replicas:
+          description: The number of replicas to scale to during the scheduled period
+          type: integer
+          format: int32
+          maximum: 500
+          minimum: 0
+        schedule:
+          description: The cron-style schedule string defining when the scaling should occur
+          type: string
+          pattern: ^([0-9A-Za-z*/,-]+)([\t ]+[0-9A-Za-z*/,-]+){4}$
+      required:
+        - schedule
+        - replicas
+      title: Container Group Scaling Action
     ContainerGroupsQuotas:
       description: Represents the organization quotas for container groups
       type: object
@@ -6809,8 +6790,6 @@ components:
           default: 0
           maximum: 1200
           minimum: 0
-        tcp:
-          $ref: "#/components/schemas/ContainerGroupProbeTcp"
         period_seconds:
           description: How frequently (in seconds) to perform the probe
           type: integer
@@ -6826,6 +6805,8 @@ components:
           default: 2
           maximum: 10
           minimum: 1
+        tcp:
+          $ref: "#/components/schemas/ContainerGroupProbeTcp"
         timeout_seconds:
           description: Maximum time (in seconds) to wait for a probe response before
             considering it failed
@@ -6932,12 +6913,6 @@ components:
         to the Axiom instance defined by these parameters.
       type: object
       properties:
-        host:
-          description: The Axiom host URL where logs will be sent (e.g. logs.axiom.co)
-          type: string
-          maxLength: 1000
-          minLength: 1
-          pattern: ^.*$
         api_token:
           description: Authentication token for the Axiom API with appropriate write
             permissions
@@ -6952,6 +6927,12 @@ components:
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
+        host:
+          description: The Axiom host URL where logs will be sent (e.g. logs.axiom.co)
+          type: string
+          maxLength: 1000
+          minLength: 1
+          pattern: ^.*$
       required:
         - host
         - api_token
@@ -6962,14 +6943,14 @@ components:
         service.
       type: object
       properties:
-        host:
-          description: The Datadog intake server host URL where logs will be sent.
+        api_key:
+          description: The Datadog API key used for authentication when sending logs.
           type: string
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
-        api_key:
-          description: The Datadog API key used for authentication when sending logs.
+        host:
+          description: The Datadog intake server host URL where logs will be sent.
           type: string
           maxLength: 1000
           minLength: 1
@@ -7014,23 +6995,22 @@ components:
         Defines how logs are formatted, compressed, and transmitted.
       type: object
       properties:
+        compression:
+          $ref: "#/components/schemas/ContainerLoggingHttpCompression"
+        format:
+          $ref: "#/components/schemas/ContainerLoggingHttpFormat"
+        headers:
+          description: Optional HTTP headers to include in log transmission requests
+          type:
+            - array
+            - "null"
+          items:
+            $ref: "#/components/schemas/ContainerLoggingHttpHeader"
+          maxItems: 1000
+          minItems: 0
         host:
           description: The hostname or IP address of the HTTP logging endpoint
           type: string
-          maxLength: 1000
-          minLength: 1
-          pattern: ^.*$
-        port:
-          description: The port number of the HTTP logging endpoint (1-65535)
-          type: integer
-          format: int32
-          maximum: 65535
-          minimum: 1
-        user:
-          description: Optional username for HTTP authentication
-          type:
-            - string
-            - "null"
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
@@ -7050,19 +7030,20 @@ components:
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
-        format:
-          $ref: "#/components/schemas/ContainerLoggingHttpFormat"
-        headers:
-          description: Optional HTTP headers to include in log transmission requests
+        port:
+          description: The port number of the HTTP logging endpoint (1-65535)
+          type: integer
+          format: int32
+          maximum: 65535
+          minimum: 1
+        user:
+          description: Optional username for HTTP authentication
           type:
-            - array
+            - string
             - "null"
-          items:
-            $ref: "#/components/schemas/ContainerLoggingHttpHeader"
-          maxItems: 1000
-          minItems: 0
-        compression:
-          $ref: "#/components/schemas/ContainerLoggingHttpCompression"
+          maxLength: 1000
+          minLength: 1
+          pattern: ^.*$
       required:
         - headers
         - host
@@ -7228,14 +7209,14 @@ components:
         registries
       type: object
       properties:
-        username:
-          description: Username for registry authentication
+        password:
+          description: Password for registry authentication
           type: string
           maxLength: 10000
           minLength: 1
           pattern: ^.*$
-        password:
-          description: Password for registry authentication
+        username:
+          description: Username for registry authentication
           type: string
           maxLength: 10000
           minLength: 1
@@ -7247,14 +7228,14 @@ components:
       description: Authentication details for Docker Hub registry
       type: object
       properties:
-        username:
-          description: Docker Hub username
+        personal_access_token:
+          description: Docker Hub personal access token (PAT)
           type: string
           maxLength: 10000
           minLength: 1
           pattern: ^.*$
-        personal_access_token:
-          description: Docker Hub personal access token (PAT)
+        username:
+          description: Docker Hub username
           type: string
           maxLength: 10000
           minLength: 1
@@ -7295,13 +7276,6 @@ components:
           format: int32
           maximum: 1024
           minimum: 1
-        memory:
-          description: The amount of memory (in MB) required by the container. Must be
-            between 1024 MB and 61440 MB.
-          type: integer
-          format: int32
-          maximum: 1073741824
-          minimum: 1024
         gpu_classes:
           description: A list of GPU class UUIDs required by the container. Can be null if
             no GPU is required.
@@ -7311,13 +7285,13 @@ components:
             format: uuid
           maxItems: 100
           minItems: 0
-        storage_amount:
-          description: The amount of storage (in bytes) required by the container. Must be
-            between 1 GB (1073741824 bytes) and 250 GB (268435456000 bytes).
+        memory:
+          description: The amount of memory (in MB) required by the container. Must be
+            between 1024 MB and 61440 MB.
           type: integer
-          format: int64
-          maximum: 1125899906842624
-          minimum: 1073741824
+          format: int32
+          maximum: 1073741824
+          minimum: 1024
         shm_size:
           description: The size of the shared memory (/dev/shm) in MB. If not specified,
             defaults to 1024MB.
@@ -7326,6 +7300,13 @@ components:
           default: 64
           maximum: 1073741824
           minimum: 64
+        storage_amount:
+          description: The amount of storage (in bytes) required by the container. Must be
+            between 1 GB (1073741824 bytes) and 250 GB (268435456000 bytes).
+          type: integer
+          format: int64
+          maximum: 1125899906842624
+          minimum: 1073741824
       required:
         - cpu
         - memory
@@ -7339,8 +7320,9 @@ components:
         - never
       title: Container Restart Policy
     CountryCode:
-      description: ISO 3166-1 alpha-2 country codes
+      description: ISO 3166-1 alpha-2 country code
       type: string
+      example: us
       enum:
         - af
         - al
@@ -7608,35 +7590,32 @@ components:
     CpuAvailabilityPrototype:
       type: object
       properties:
-        cpu:
-          description: The number of available CPU cores
-          type:
-            - integer
-            - "null"
-          format: int32
-          example: 4
-        memory:
-          description: The amount of available memory in MB
-          type:
-            - integer
-            - "null"
-          format: int64
-          example: 8192
-        storage_amount:
-          description: The amount of available storage in bytes
-          type:
-            - integer
-            - "null"
-          format: int64
-          example: 1000000000
         country_codes:
           description: A list of country codes where the resources are available
           type: array
           items:
             $ref: "#/components/schemas/CountryCode"
           example:
-            - US
-            - CA
+            - us
+            - ca
+        cpu:
+          description: The number of available CPU cores
+          type: integer
+          format: int32
+          example: 4
+          nullable: true
+        memory:
+          description: The amount of available memory in MB
+          type: integer
+          format: int64
+          example: 8192
+          nullable: true
+        storage_amount:
+          description: The amount of available storage in bytes
+          type: integer
+          format: int64
+          example: 1000000000
+          nullable: true
     CreateContainer:
       description: Configuration for creating a container within a container group.
         Defines the container image, resource requirements, environment
@@ -7735,23 +7714,20 @@ components:
         Defines how logs are formatted, compressed, and transmitted.
       type: object
       properties:
+        compression:
+          $ref: "#/components/schemas/ContainerLoggingHttpCompression"
+        format:
+          $ref: "#/components/schemas/ContainerLoggingHttpFormat"
+        headers:
+          description: Optional HTTP headers to include in log transmission requests
+          type: array
+          items:
+            $ref: "#/components/schemas/ContainerLoggingHttpHeader"
+          maxItems: 1000
+          minItems: 0
         host:
           description: The hostname or IP address of the HTTP logging endpoint
           type: string
-          maxLength: 1000
-          minLength: 1
-          pattern: ^.*$
-        port:
-          description: The port number of the HTTP logging endpoint (1-65535)
-          type: integer
-          format: int32
-          maximum: 65535
-          minimum: 1
-        user:
-          description: Optional username for HTTP authentication
-          type:
-            - string
-            - "null"
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
@@ -7771,17 +7747,20 @@ components:
           maxLength: 1000
           minLength: 1
           pattern: ^.*$
-        format:
-          $ref: "#/components/schemas/ContainerLoggingHttpFormat"
-        headers:
-          description: Optional HTTP headers to include in log transmission requests
-          type: array
-          items:
-            $ref: "#/components/schemas/ContainerLoggingHttpHeader"
-          maxItems: 1000
-          minItems: 0
-        compression:
-          $ref: "#/components/schemas/ContainerLoggingHttpCompression"
+        port:
+          description: The port number of the HTTP logging endpoint (1-65535)
+          type: integer
+          format: int32
+          maximum: 65535
+          minimum: 1
+        user:
+          description: Optional username for HTTP authentication
+          type:
+            - string
+            - "null"
+          maxLength: 1000
+          minLength: 1
+          pattern: ^.*$
       required:
         - host
         - port
@@ -7799,13 +7778,6 @@ components:
           format: int32
           maximum: 1024
           minimum: 1
-        memory:
-          description: The amount of memory to allocate to the container in megabytes
-            (between 1024 and 1073741824).
-          type: integer
-          format: int32
-          maximum: 1073741824
-          minimum: 1024
         gpu_classes:
           description: A list of GPU class UUIDs required by the container. Can be null if
             no GPU is required.
@@ -7815,13 +7787,13 @@ components:
             format: uuid
           maxItems: 100
           minItems: 0
-        storage_amount:
-          description: The amount of storage to allocate to the container in bytes
-            (between 1 GB and 1 PB).
+        memory:
+          description: The amount of memory to allocate to the container in megabytes
+            (between 1024 and 1073741824).
           type: integer
-          format: int64
-          maximum: 1125899906842624
-          minimum: 1073741824
+          format: int32
+          maximum: 1073741824
+          minimum: 1024
         shm_size:
           description: The amount of shared memory to allocate to the container via
             `/dev/shm` in megabytes (between 64 and 1073741824). If not
@@ -7831,6 +7803,13 @@ components:
           default: 64
           maximum: 1073741824
           minimum: 64
+        storage_amount:
+          description: The amount of storage to allocate to the container in bytes
+            (between 1 GB and 1 PB).
+          type: integer
+          format: int64
+          maximum: 1125899906842624
+          minimum: 1073741824
       required:
         - cpu
         - memory
@@ -7858,6 +7837,11 @@ components:
           type: integer
           format: int32
           example: 2
+        available_gpu_high:
+          description: The number of available high-end GPUs
+          type: integer
+          format: int32
+          example: 0
         available_gpu_low:
           description: The number of available low-end GPUs
           type: integer
@@ -7868,11 +7852,6 @@ components:
           type: integer
           format: int32
           example: 1
-        available_gpu_high:
-          description: The number of available high-end GPUs
-          type: integer
-          format: int32
-          example: 0
         on_call_gpu:
           description: The number of on-call GPUs available
           type: integer
@@ -7881,6 +7860,20 @@ components:
     GpuAvailabilityPrototype:
       type: object
       properties:
+        country_codes:
+          description: A list of country codes where the resources are available
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryCode"
+          example:
+            - us
+            - ca
+        cpu:
+          description: The number of available CPU cores
+          type: integer
+          format: int32
+          example: 4
+          nullable: true
         gpu_classes:
           description: A list of available GPU class names
           type: array
@@ -7891,45 +7884,73 @@ components:
             - 550e8400-e29b-41d4-a716-446655440000
             - 6ba7b810-9dad-11d1-80b4-00c04fd430c8
           minItems: 1
-        cpu:
-          description: The number of available CPU cores
-          type:
-            - integer
-            - "null"
-          format: int32
-          example: 4
         memory:
           description: The amount of available memory in MB
-          type:
-            - integer
-            - "null"
+          type: integer
           format: int64
           example: 8192
+          nullable: true
         storage_amount:
           description: The amount of available storage in bytes
-          type:
-            - integer
-            - "null"
+          type: integer
           format: int64
           example: 1000000000
-        country_codes:
-          description: A list of country codes where the resources are available
-          type: array
-          items:
-            $ref: "#/components/schemas/CountryCode"
-          example:
-            - US
-            - CA
+          nullable: true
       required:
         - gpu_classes
     GpuClass:
       description: Represents a GPU Class
       type: object
       properties:
+        gpu_class_type:
+          description: The type of GPU class
+          type: string
+          enum:
+            - community
+            - secure
+        gpu_count:
+          description: The number of GPUs in the cluster
+          type: integer
+          format: int32
+          maximum: 512
+          minimum: 1
         id:
           description: The unique identifier
           type: string
           format: uuid
+        is_high_demand:
+          description: Whether the GPU class is in high demand
+          type: boolean
+        max_ram:
+          description: The maximum RAM amount in MB
+          type: integer
+          format: int32
+          minimum: 0
+        max_storage:
+          description: The maximum storage amount in bytes
+          type: integer
+          format: int64
+          minimum: 0
+        max_vcpu:
+          description: The maximum vCPU count
+          type: integer
+          format: int32
+          minimum: 0
+        min_ram:
+          description: The minimum RAM amount in MB
+          type: integer
+          format: int32
+          minimum: 0
+        min_storage:
+          description: The minimum storage amount in bytes
+          type: integer
+          format: int64
+          minimum: 0
+        min_vcpu:
+          description: The minimum vCPU count
+          type: integer
+          format: int32
+          minimum: 0
         name:
           description: The GPU class name
           type: string
@@ -7943,51 +7964,6 @@ components:
             $ref: "#/components/schemas/GpuClassPrice"
           maxItems: 100
           minItems: 1
-        is_high_demand:
-          description: Whether the GPU class is in high demand
-          type: boolean
-        gpu_class_type:
-          description: The type of GPU class
-          type: string
-          enum:
-            - community
-            - secure
-        gpu_count:
-          description: The number of GPUs in the cluster
-          type: integer
-          format: int32
-          maximum: 512
-          minimum: 1
-        min_vcpu:
-          description: The minimum vCPU count
-          type: integer
-          format: int32
-          minimum: 0
-        max_vcpu:
-          description: The maximum vCPU count
-          type: integer
-          format: int32
-          minimum: 0
-        min_ram:
-          description: The minimum RAM amount in MB
-          type: integer
-          format: int32
-          minimum: 0
-        max_ram:
-          description: The maximum RAM amount in MB
-          type: integer
-          format: int32
-          minimum: 0
-        min_storage:
-          description: The minimum storage amount in bytes
-          type: integer
-          format: int64
-          minimum: 0
-        max_storage:
-          description: The maximum storage amount in bytes
-          type: integer
-          format: int64
-          minimum: 0
       required:
         - id
         - name
@@ -8009,14 +7985,14 @@ components:
       description: Represents the price of a GPU class for a given container group priority
       type: object
       properties:
-        priority:
-          $ref: "#/components/schemas/ContainerGroupPriority"
         price:
           description: The price
           type: string
           maxLength: 20
           minLength: 1
           pattern: ^.*$
+        priority:
+          $ref: "#/components/schemas/ContainerGroupPriority"
       required:
         - priority
         - price
@@ -8024,19 +8000,31 @@ components:
       description: Represents an inference endpoint
       type: object
       properties:
+        description:
+          $ref: "#/components/schemas/Description"
+        display_name:
+          $ref: "#/components/schemas/DisplayName"
+        icon_url:
+          description: The URL of the icon image
+          type: string
+          format: url
+          maxLength: 2048
+          minLength: 1
+          pattern: ^.*$
         id:
           $ref: "#/components/schemas/InferenceEndpointId"
+        input_schema:
+          description: The input schema
+          type: string
+          maxLength: 100000
+          minLength: 1
+          pattern: ^.*$
         name:
           $ref: "#/components/schemas/InferenceEndpointName"
         organization_name:
           $ref: "#/components/schemas/OrganizationName"
-        display_name:
-          $ref: "#/components/schemas/DisplayName"
-        description:
-          $ref: "#/components/schemas/Description"
-        readme:
-          description: A markdown file containing a detailed description of the inference
-            endpoint
+        output_schema:
+          description: The output schema
           type: string
           maxLength: 100000
           minLength: 1
@@ -8047,21 +8035,9 @@ components:
           maxLength: 100
           minLength: 1
           pattern: ^.*$
-        icon_url:
-          description: The URL of the icon image
-          type: string
-          format: url
-          maxLength: 2048
-          minLength: 1
-          pattern: ^.*$
-        input_schema:
-          description: The input schema
-          type: string
-          maxLength: 100000
-          minLength: 1
-          pattern: ^.*$
-        output_schema:
-          description: The output schema
+        readme:
+          description: A markdown file containing a detailed description of the inference
+            endpoint
           type: string
           maxLength: 100000
           minLength: 1
@@ -8110,16 +8086,38 @@ components:
       description: Represents a inference endpoint job
       type: object
       properties:
+        create_time:
+          description: The time the job was created.
+          type: string
+          format: date-time
+          title: Create Time
+        events:
+          description: The list of events.
+          type: array
+          items:
+            $ref: "#/components/schemas/InferenceEndpointJobEvent"
+          maxItems: 1000
+          minItems: 0
+          title: Events
         id:
           $ref: "#/components/schemas/InferenceEndpointJobId"
         inference_endpoint_name:
           $ref: "#/components/schemas/InferenceEndpointName"
-        organization_name:
-          $ref: "#/components/schemas/OrganizationName"
         input:
           $ref: "#/components/schemas/InferenceEndpointJobInput"
         metadata:
           $ref: "#/components/schemas/InferenceEndpointJobMetadata"
+        organization_name:
+          $ref: "#/components/schemas/OrganizationName"
+        output:
+          $ref: "#/components/schemas/InferenceEndpointJobOutput"
+        status:
+          $ref: "#/components/schemas/InferenceEndpointJobStatus"
+        update_time:
+          description: The time the job was last updated.
+          type: string
+          format: date-time
+          title: Update Time
         webhook:
           description: The webhook URL called when the job completes.
           type: string
@@ -8135,28 +8133,6 @@ components:
           maxLength: 2048
           minLength: 1
           title: Webhook
-        status:
-          $ref: "#/components/schemas/InferenceEndpointJobStatus"
-        events:
-          description: The list of events.
-          type: array
-          items:
-            $ref: "#/components/schemas/InferenceEndpointJobEvent"
-          maxItems: 1000
-          minItems: 0
-          title: Events
-        output:
-          $ref: "#/components/schemas/InferenceEndpointJobOutput"
-        create_time:
-          description: The time the job was created.
-          type: string
-          format: date-time
-          title: Create Time
-        update_time:
-          description: The time the job was last updated.
-          type: string
-          format: date-time
-          title: Update Time
       required:
         - create_time
         - events
@@ -8442,31 +8418,6 @@ components:
       description: Represents an API error
       type: object
       properties:
-        type:
-          description: The URI reference that identifies the error type.
-          type: string
-          format: url
-          default: about:blank
-          examples:
-            - https://example.com/errors/invalid-request
-          maxLength: 2048
-          minLength: 1
-        title:
-          description: The short, human-readable summary of the error type.
-          type: string
-          examples:
-            - Not Found
-          maxLength: 2000
-          minLength: 1
-        status:
-          description: The HTTP status code generated by the origin server for this
-            occurrence of the error.
-          type: integer
-          format: int32
-          examples:
-            - 404
-          maximum: 599
-          minimum: 100
         detail:
           description: The human-readable explanation specific to this occurrence of the
             error.
@@ -8484,6 +8435,31 @@ components:
             - https://example.com/error-instances/12345
           maxLength: 2048
           minLength: 1
+        status:
+          description: The HTTP status code generated by the origin server for this
+            occurrence of the error.
+          type: integer
+          format: int32
+          examples:
+            - 404
+          maximum: 599
+          minimum: 100
+        title:
+          description: The short, human-readable summary of the error type.
+          type: string
+          examples:
+            - Not Found
+          maxLength: 2000
+          minLength: 1
+        type:
+          description: The URI reference that identifies the error type.
+          type: string
+          format: url
+          default: about:blank
+          examples:
+            - https://example.com/errors/invalid-request
+          maxLength: 2048
+          minLength: 1
     ProjectName:
       description: The project name.
       type: string
@@ -8496,30 +8472,6 @@ components:
       description: Represents a queue.
       type: object
       properties:
-        id:
-          description: The queue identifier. This is automatically generated and assigned
-            when the queue is created.
-          type: string
-          format: uuid
-        name:
-          description: The queue name. This must be unique within the project.
-          type: string
-          maxLength: 63
-          minLength: 2
-          pattern: ^[a-z][a-z0-9-]{0,61}[a-z0-9]$
-        display_name:
-          description: The display name. This may be used as a more human-readable name.
-          type: string
-          maxLength: 63
-          minLength: 2
-          pattern: ^[ ,-.0-9A-Za-z]+$
-        description:
-          description: The description. This may be used as a space for notes or other
-            information about the queue.
-          type: string
-          maxLength: 500
-          minLength: 0
-          pattern: ^.*$
         container_groups:
           description: The container groups that are part of this queue. Each container
             group represents a scalable set of identical containers running as a
@@ -8533,16 +8485,40 @@ components:
           description: The date and time the queue was created.
           type: string
           format: date-time
-        update_time:
-          description: The date and time the queue was last updated.
-          type: string
-          format: date-time
         current_queue_length:
           description: The current length of the queue
           type: integer
           format: int32
           maximum: 2147483647
           minimum: 0
+        description:
+          description: The description. This may be used as a space for notes or other
+            information about the queue.
+          type: string
+          maxLength: 500
+          minLength: 0
+          pattern: ^.*$
+        display_name:
+          description: The display name. This may be used as a more human-readable name.
+          type: string
+          maxLength: 63
+          minLength: 2
+          pattern: ^[ ,-.0-9A-Za-z]+$
+        id:
+          description: The queue identifier. This is automatically generated and assigned
+            when the queue is created.
+          type: string
+          format: uuid
+        name:
+          description: The queue name. This must be unique within the project.
+          type: string
+          maxLength: 63
+          minLength: 2
+          pattern: ^[a-z][a-z0-9-]{0,61}[a-z0-9]$
+        update_time:
+          description: The date and time the queue was last updated.
+          type: string
+          format: date-time
       required:
         - id
         - name
@@ -8567,6 +8543,17 @@ components:
       description: Represents a queue job
       type: object
       properties:
+        create_time:
+          description: The job creation time
+          type: string
+          format: date-time
+        events:
+          description: The job events
+          type: array
+          items:
+            $ref: "#/components/schemas/QueueJobEvent"
+          maxItems: 1000
+          minItems: 0
         id:
           description: The job identifier
           type: string
@@ -8575,13 +8562,8 @@ components:
           $ref: "#/components/schemas/QueueJobInput"
         metadata:
           $ref: "#/components/schemas/QueueJobMetadata"
-        webhook:
-          description: The webhook URL to notify when the job completes
-          type: string
-          format: url
-          maxLength: 27
-          minLength: 20
-          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$
+        output:
+          $ref: "#/components/schemas/QueueJobOutput"
         status:
           description: The job status
           type: string
@@ -8591,23 +8573,17 @@ components:
             - succeeded
             - cancelled
             - failed
-        events:
-          description: The job events
-          type: array
-          items:
-            $ref: "#/components/schemas/QueueJobEvent"
-          maxItems: 1000
-          minItems: 0
-        output:
-          $ref: "#/components/schemas/QueueJobOutput"
-        create_time:
-          description: The job creation time
-          type: string
-          format: date-time
         update_time:
           description: The job update time
           type: string
           format: date-time
+        webhook:
+          description: The webhook URL to notify when the job completes
+          type: string
+          format: url
+          maxLength: 27
+          minLength: 20
+          pattern: ^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$
       required:
         - id
         - input
@@ -8677,14 +8653,6 @@ components:
       description: Represents a request to update an existing queue.
       type: object
       properties:
-        display_name:
-          description: The display name. This may be used as a more human-readable name.
-          type:
-            - string
-            - "null"
-          maxLength: 63
-          minLength: 2
-          pattern: ^[ ,-.0-9A-Za-z]+$
         description:
           description: The description. This may be used as a space for notes or other
             information about the queue.
@@ -8694,29 +8662,37 @@ components:
           maxLength: 500
           minLength: 0
           pattern: ^.*$
+        display_name:
+          description: The display name. This may be used as a more human-readable name.
+          type:
+            - string
+            - "null"
+          maxLength: 63
+          minLength: 2
+          pattern: ^[ ,-.0-9A-Za-z]+$
     QueuePrototype:
       description: Represents a request to create a new queue.
       type: object
       properties:
+        description:
+          description: The description. This may be used as a space for notes or other
+            information about the queue.
+          type: string
+          maxLength: 500
+          minLength: 0
+          pattern: ^.*$
+        display_name:
+          description: The display name. This may be used as a more human-readable name.
+          type: string
+          maxLength: 63
+          minLength: 2
+          pattern: ^[ ,-.0-9A-Za-z]+$
         name:
           description: The queue name. This must be unique within the project.
           type: string
           maxLength: 63
           minLength: 2
           pattern: ^[a-z][a-z0-9-]{0,61}[a-z0-9]$
-        display_name:
-          description: The display name. This may be used as a more human-readable name.
-          type: string
-          maxLength: 63
-          minLength: 2
-          pattern: ^[ ,-.0-9A-Za-z]+$
-        description:
-          description: The description. This may be used as a space for notes or other
-            information about the queue.
-          type: string
-          maxLength: 500
-          minLength: 0
-          pattern: ^.*$
       required:
         - name
     Quotas:
@@ -8906,14 +8882,6 @@ components:
             - "null"
           maximum: 1024
           minimum: 1
-        memory:
-          description: The amount of memory to allocate to the container in megabytes
-            (between 1024 and 1073741824).
-          type:
-            - integer
-            - "null"
-          maximum: 1073741824
-          minimum: 1024
         gpu_classes:
           description: List of GPU class identifiers that the container can use, specified
             as UUIDs.
@@ -8925,15 +8893,14 @@ components:
             format: uuid
           maxItems: 100
           minItems: 0
-        storage_amount:
-          description: The amount of storage to allocate to the container in bytes
-            (between 1 GB and 1 PB).
+        memory:
+          description: The amount of memory to allocate to the container in megabytes
+            (between 1024 and 1073741824).
           type:
             - integer
             - "null"
-          format: int64
-          maximum: 1125899906842624
-          minimum: 1073741824
+          maximum: 1073741824
+          minimum: 1024
         shm_size:
           description: The amount of shared memory to allocate to the container via
             `/dev/shm` in megabytes (between 64 and 1073741824). If not
@@ -8945,6 +8912,15 @@ components:
           default: 64
           maximum: 1073741824
           minimum: 64
+        storage_amount:
+          description: The amount of storage to allocate to the container in bytes
+            (between 1 GB and 1 PB).
+          type:
+            - integer
+            - "null"
+          format: int64
+          maximum: 1125899906842624
+          minimum: 1073741824
       title: Container Resource Update Schema
     WebhookSecretKey:
       description: Represents a webhook secret key
@@ -9388,3 +9364,5 @@ tags:
     description: Webhook Secret Key
   - name: logs
     description: Platform and Application Log Entries
+  - name: Availability
+    description: Sce Node Availability
