@@ -6,28 +6,28 @@ description:
   SaladCloud.'
 ---
 
-_Last Updated: March 31, 2026_
+_Last Updated: April 3, 2026_
 
 ## Introduction
 
 [Hermes Agent](https://github.com/NousResearch/hermes-agent) is an open-source AI agent by
 [Nous Research](https://nousresearch.com) with persistent memory, 40+ built-in tools, MCP integration, and a
 self-improvement loop that learns from every task it completes. It supports custom OpenAI-compatible endpoints, making
-it straightforward to point at a self-hosted model on SaladCloud.
+it straightforward to point at a model on SaladCloud.
 
 Hermes Agent pairs especially well with SaladCloud because:
 
 - **OpenAI-compatible endpoint support** - connects to any SaladCloud deployment via the built-in setup wizard
 - **Rich MCP integration** - connect GitHub, Webflow, Playwright, and any other MCP server
-- **Per-hour pricing** - no per-token costs during long agentic sessions with memory and multi-step tasks
 - **Self-improving** - the agent writes structured records of what worked and what didn't, improving future task
   performance automatically
 
-<Note>
-  Hermes Agent does not support custom HTTP headers for the main LLM provider. SaladCloud uses a `Salad-Api-Key` header
-  for authentication, which Hermes Agent cannot pass yet. **Deploy your SaladCloud container group with authentication
-  disabled** when using Hermes Agent or create a custom proxy to handle authentication.
-</Note>
+Hermes Agent works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  use your Salad API key with standard authentication. Currently in closed beta, available via monthly subscription.
+- **Self-hosted model** - deploy your own LLM recipe on SaladCloud Container Engine, billed per hour. Note: Hermes Agent
+  cannot pass custom headers, so authentication must be disabled on self-hosted deployments.
 
 ## Prerequisites
 
@@ -39,33 +39,60 @@ Before getting started, make sure you have:
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud (Without Authentication)
+### Step 1: Choose Your Backend
 
-Deploy an OpenAI-compatible LLM server on SaladCloud with the **Authentication** toggle disabled.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the recommended option for Hermes Agent - it uses standard Bearer token authentication, which
+    Hermes Agent supports natively.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. For the best experience with Hermes Agent's tool-calling capabilities, use
-  [vLLM](/container-engine/reference/recipes/vllm) with a Hermes-format model, or the
-  [Qwen3.5-35B-A3B (llama.cpp)](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) recipe.
-- **Leave Authentication disabled** - Hermes Agent cannot pass a `Salad-Api-Key` header at the moment.
-- Once deployed, note your **API endpoint URL** from SaladCloud (e.g., `https://your-endpoint.salad.cloud`). The
-  OpenAI-compatible API will be available at `{endpoint}/v1`.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - Mixture of Experts model optimized
-  for instruction-following and tool-calling tasks.
-- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Deploy an OpenAI-compatible LLM server on SaladCloud with the **Authentication** toggle disabled.
 
-Recipes for custom deployments (best for advanced users):
+    <Note>
+      Hermes Agent does not support custom HTTP headers for the main LLM provider. SaladCloud uses a `Salad-Api-Key`
+      header for authentication, which Hermes Agent cannot pass yet. **Deploy your SaladCloud container group with
+      authentication disabled** when using Hermes Agent or create a custom proxy to handle authentication.
+    </Note>
 
-- [vllm](/container-engine/reference/recipes/vllm) - Recommended; enable Hermes tool calling with
-  `--enable-auto-tool-choice --tool-call-parser hermes`
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
-- [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. For the best experience with Hermes Agent's tool-calling capabilities, use
+      [vLLM](/container-engine/reference/recipes/vllm) with a Hermes-format model, or the
+      [Qwen3.5-35B-A3B (llama.cpp)](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) recipe.
+    - **Leave Authentication disabled** - Hermes Agent cannot pass a `Salad-Api-Key` header at the moment.
+    - Once deployed, note your **API endpoint URL** from SaladCloud (e.g., `https://your-endpoint.salad.cloud`). The
+      OpenAI-compatible API will be available at `{endpoint}/v1`.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - Mixture of Experts model
+      optimized for instruction-following and tool-calling tasks.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [vllm](/container-engine/reference/recipes/vllm) - Recommended; enable Hermes tool calling with
+      `--enable-auto-tool-choice --tool-call-parser hermes`
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install Hermes Agent
 
@@ -92,13 +119,28 @@ hermes setup
 
 When the wizard asks for a model provider, select **Custom OpenAI-compatible endpoint** and fill in:
 
-- **Base URL**: `https://your-endpoint.salad.cloud/v1`
-- **API key**: `dummy` (any non-empty string - the endpoint has no auth)
-- **Context length**: `262144`
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    - **Base URL**: `https://ai.salad.cloud:40404/v1`
+    - **API key**: your Salad API key
+    - **Context length**: `131072`
 
-The wizard will auto-detect the available models from your endpoint, so you do not need to specify a model name
-manually. It also configures memory, tools, terminal backend, and optional messaging channels - you can accept defaults
-for everything and adjust later via `hermes config edit`, which opens `~/.hermes/config.yaml`.
+    The wizard will auto-detect the available models from your endpoint.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    - **Base URL**: `https://your-endpoint.salad.cloud/v1`
+    - **API key**: `dummy` (any non-empty string - the endpoint has no auth)
+    - **Context length**: `262144`
+
+    The wizard will auto-detect the available models from your endpoint, so you do not need to specify a model name
+    manually.
+
+  </Tab>
+</Tabs>
+
+It also configures memory, tools, terminal backend, and optional messaging channels - you can accept defaults for
+everything and adjust later via `hermes config edit`, which opens `~/.hermes/config.yaml`.
 
 <Tip>Hermes Agent can import existing OpenClaw settings automatically if you have previously configured it.</Tip>
 
@@ -112,8 +154,8 @@ hermes config show
 
 Verify that:
 
-- `model.base_url` points to your SaladCloud endpoint with `/v1` appended
-- `model.api_key` is set to any non-empty value (e.g., `dummy`)
+- `model.base_url` points to your endpoint with `/v1` appended
+- `model.api_key` is set to your Salad API key (AI Gateway) or any non-empty value (self-hosted)
 - `model.default` is detected correctly from your endpoint
 
 If anything looks incorrect, edit the config:

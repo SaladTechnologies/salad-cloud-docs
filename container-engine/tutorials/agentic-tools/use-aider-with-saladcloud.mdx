@@ -4,20 +4,22 @@ sidebarTitle: 'Aider'
 description: 'Learn how to use the Aider AI coding agent from the command line with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: March 27, 2026_
+_Last Updated: April 3, 2026_
 
 ## Introduction
 
 [Aider](https://aider.chat) is an open-source AI pair programmer that runs in your terminal. It integrates with your
 local git repository, can create and edit files across multiple languages, and commits changes automatically as you
 work. Aider is designed from the ground up to support OpenAI-compatible endpoints, making it one of the simplest tools
-to connect to a self-hosted model on SaladCloud.
+to connect to a model on SaladCloud.
 
-Aider pairs well with SaladCloud because:
+Aider works with SaladCloud in two ways:
 
-- **Per-hour pricing** means no per-token cost during long coding sessions
-- **OpenAI-compatible API** works natively - no plugins or proxies required
-- **Self-hosted models** keep your code on infrastructure you control
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point Aider at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available via
+  monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group, billed per hour, for full control over the model,
+  hardware, and configuration. Still very easy to set up and use.
 
 ## Prerequisites
 
@@ -29,35 +31,55 @@ Before getting started, make sure you have:
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud
+### Step 1: Choose Your Backend
 
-First, deploy an OpenAI-compatible LLM server on SaladCloud.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe page,
-  provide a name and deploy — the rest is preconfigured with recommended settings.
-- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) — A powerful Mixture of Experts model
-  optimized for instruction-following tasks, ideal for agentic use cases.
-- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) — Optimized for Qwen3.5 9B model.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
 
-Recipes for custom deployments (best for advanced users):
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe
+      page, provide a name and deploy — the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
-- [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
-- [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
-- [ollama](/container-engine/reference/recipes/ollama) — Simple model management
-- [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+    Available recipes:
 
-After deployment, note your:
+    Ready-to-deploy recipes (best for less technical users):
 
-- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) — A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) — Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install Aider on your local machine
 
@@ -75,32 +97,48 @@ aider --version
 
 ### Step 3: Configure Aider to Use Your SaladCloud Endpoint
 
-Set the required environment variables before running Aider:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Set the required environment variables before running Aider:
 
-```bash
-export OPENAI_API_BASE=https://your-endpoint.salad.cloud/v1
-export OPENAI_API_KEY=dummy
-```
+    ```bash
+    export OPENAI_API_BASE=https://ai.salad.cloud:40404/v1
+    export OPENAI_API_KEY=your-salad-api-key
+    ```
 
-`OPENAI_API_KEY` is required, but can be set to any non-empty string (e.g., `dummy`).
+    No custom headers are needed - your Salad API key in `OPENAI_API_KEY` is all that's required.
 
-Alternatively, create a `.aider.conf.yml` file in your project root to persist the configuration:
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Set the required environment variables before running Aider:
 
-```yaml
-model: openai/qwen3.5-35b-a3b
-openai-api-base: https://your-endpoint.salad.cloud/
-openai-api-key: your-salad-api-key
-```
+    ```bash
+    export OPENAI_API_BASE=https://your-endpoint.salad.cloud/v1
+    export OPENAI_API_KEY=dummy
+    ```
 
-If your SaladCloud deployment requires authentication, create .aider.model.settings.yml file and add the following
-header configuration:
+    `OPENAI_API_KEY` is required, but can be set to any non-empty string (e.g., `dummy`).
 
-```yaml
-- name: openai/qwen3.5-35b-a3b
-  extra_params:
-    extra_headers:
-      Salad-Api-Key: your-salad-api-key
-```
+    Alternatively, create a `.aider.conf.yml` file in your project root to persist the configuration:
+
+    ```yaml
+    model: openai/qwen3.5-35b-a3b
+    openai-api-base: https://your-endpoint.salad.cloud/
+    openai-api-key: your-salad-api-key
+    ```
+
+    If your SaladCloud deployment requires authentication, create .aider.model.settings.yml file and add the following
+    header configuration:
+
+    ```yaml
+    - name: openai/qwen3.5-35b-a3b
+      extra_params:
+        extra_headers:
+          Salad-Api-Key: your-salad-api-key
+    ```
+
+  </Tab>
+</Tabs>
 
 ### Step 4: Start Aider and Test the Connection
 
