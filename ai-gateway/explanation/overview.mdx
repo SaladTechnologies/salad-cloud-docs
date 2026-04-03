@@ -62,10 +62,10 @@ Make sure to replace `<your-salad-api-key>` with your actual Salad API key.
 Because Salad AI Gateway exposes a standard OpenAI-compatible endpoint, you can use it with any tool that supports a
 custom base URL.
 
-We have integration guides for many popular agentic tools - Cline, Aider, OpenCode, OpenClaw, Kilo Code, Goose, Hermes
-Agent, and more. All of those guides apply here with one difference: **use standard authentication instead of the
-`Salad-Api-Key` custom header**. Set your Salad API key as the API key in whichever field the tool provides (the
-`Authorization: Bearer` header), and point the base URL to `https://ai.salad.cloud:40404/v1`.
+We have integration guides for many popular agentic tools - Cline, Aider, OpenCode, OpenClaw, Kilo Code, Roo Code,
+Continue, Goose, Hermes Agent, and more. All of those guides apply here with one difference: **use standard
+authentication instead of the `Salad-Api-Key` custom header**. Set your Salad API key as the API key in whichever field
+the tool provides (the `Authorization: Bearer` header), and point the base URL to `https://ai.salad.cloud:40404/v1`.
 
 <CardGroup cols={2}>
   <Card title="Cline" icon="code" href="/container-engine/tutorials/agentic-tools/use-cline-with-saladcloud">
@@ -83,12 +83,18 @@ Agent, and more. All of those guides apply here with one difference: **use stand
   <Card title="Kilo Code" icon="code" href="/container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud">
     VS Code coding agent
   </Card>
+  <Card title="Roo Code" icon="code" href="/container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud">
+    VS Code AI coding agent
+  </Card>
+  <Card title="Continue" icon="code" href="/container-engine/tutorials/agentic-tools/use-continue-with-saladcloud">
+    VS Code + JetBrains coding assistant
+  </Card>
   <Card
     title="Vercel AI SDK"
     icon="code"
     href="/container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"
   >
-    VS Code multi-agent coding
+    TypeScript AI app framework
   </Card>
   <Card title="Goose" icon="robot" href="/container-engine/tutorials/agentic-tools/use-goose-with-saladcloud">
     CLI + desktop AI agent

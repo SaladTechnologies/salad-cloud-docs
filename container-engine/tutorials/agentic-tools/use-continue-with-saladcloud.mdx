@@ -1,0 +1,162 @@
+---
+title: 'Use Continue with SaladCloud'
+sidebarTitle: 'Continue'
+description:
+  'Learn how to use the Continue AI coding assistant in VS Code or JetBrains with a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[Continue](https://continue.dev) is an open-source AI coding assistant for VS Code and JetBrains. Unlike pure agentic
+tools, Continue focuses on the full coding workflow: autocomplete, inline chat, codebase-aware Q&A, and multi-file
+edits. Supports any OpenAI-compatible endpoint with custom headers.
+
+Continue pairs well with SaladCloud because:
+
+- **Custom header support** - the `requestOptions.headers` config field passes `Salad-Api-Key` for authenticated
+  deployments
+- **Config-file driven** - version-control your model config alongside your project
+- **VS Code and JetBrains** - works in both IDEs with the same config
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- VS Code or JetBrains IDE installed
+
+## Step-by-Step Setup
+
+### Step 1: Deploy an LLM Recipe on SaladCloud
+
+First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+- Create an organization or choose an existing one, then click "Deploy a container group".
+- Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe works well for coding assistance. On the recipe page,
+  provide a name and deploy - the rest is preconfigured with recommended settings.
+- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+Available recipes:
+
+Ready-to-deploy recipes (best for less technical users):
+
+- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts model
+  optimized for instruction-following tasks.
+- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+Recipes for custom deployments (best for advanced users):
+
+- [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+- [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+- [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+- [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+- [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+After deployment, note your:
+
+- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+- **API key** (from your SaladCloud organization settings, if you enabled authentication)
+
+### Step 2: Install Continue
+
+**VS Code:**
+
+1. Open the Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X`)
+2. Search for **Continue**
+3. Click **Install** on the Continue extension by Continue Dev
+4. Once installed, click the Continue icon in the sidebar
+
+**JetBrains:**
+
+Install the Continue plugin from the JetBrains Marketplace via **Settings → Plugins → Marketplace**.
+
+### Step 3: Configure Continue to Use Your SaladCloud Endpoint
+
+Continue is configured via `~/.continue/config.yaml`. Open it from the Continue panel by clicking the gear icon, or edit
+it directly. The configuration UI does not currently support all necessary fields, so you will need to add the model
+config manually in the YAML file.
+
+Add your SaladCloud deployment as a model:
+
+```yaml
+models:
+  - name: SaladCloud Qwen 3.5
+    provider: openai
+    model: qwen3.5-35b-a3b
+    apiBase: https://your-endpoint.salad.cloud/v1
+    apiKey: dummy
+    requestOptions:
+      headers:
+        Salad-Api-Key: your-salad-api-key
+```
+
+Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+
+If your deployment does not require authentication, omit the `requestOptions` section entirely and set `apiKey` to any
+non-empty string.
+
+To also use your SaladCloud model for **autocomplete**, add :
+
+```yaml
+roles:
+  - autocomplete
+```
+
+### Step 4: Test the Connection
+
+Reload VS Code (`Ctrl+Shift+P` → **Reload Window**), then open the Continue chat panel and ask:
+
+> "Summarize what this project does in one sentence."
+
+If Continue responds, your setup is complete.
+
+## Tips for Best Results
+
+### Set Context Window
+
+Add `contextLength` to your model config to help Continue manage prompt sizes correctly:
+
+```yaml
+models:
+  - name: SaladCloud Qwen 3.5
+    provider: openai
+    model: qwen3.5-35b-a3b
+    apiBase: https://your-endpoint.salad.cloud/v1
+    apiKey: dummy
+    roles:
+      - chat
+      - autocomplete
+    contextLength: 32768
+    requestOptions:
+      headers:
+        Salad-Api-Key: your-salad-api-key
+```
+
+The Qwen 3.5-35B-A3B recipe supports up to 262,144 tokens.
+
+### Handle Autocomplete Timeouts
+
+SaladCloud has a 100-second request timeout. Autocomplete requests are short and typically complete well within this
+limit, but for large context windows, consider setting a shorter `maxTokens` for autocomplete to reduce latency:
+
+```yaml
+tabAutocompleteModel:
+  name: SaladCloud Qwen 3.5
+  provider: openai
+  model: qwen3.5-35b-a3b
+  apiBase: https://your-endpoint.salad.cloud/v1
+  apiKey: dummy
+  defaultCompletionOptions:
+    maxTokens: 512
+  requestOptions:
+    headers:
+      Salad-Api-Key: your-salad-api-key
+```
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Best for chat, codebase Q&A, and multi-file edits
+- **Qwen 3.5-9B**: Fast enough for autocomplete; good balance of latency and quality
