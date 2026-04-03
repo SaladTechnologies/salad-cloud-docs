@@ -6,7 +6,7 @@ description:
   SaladCloud.'
 ---
 
-_Last Updated: March 27, 2026_
+_Last Updated: April 3, 2026_
 
 ## Introduction
 
@@ -14,47 +14,69 @@ The [Vercel AI SDK](https://sdk.vercel.ai) is a popular framework for building A
 TypeScript. It provides a unified interface for text generation, streaming, structured output, and tool calling - and
 includes an `@ai-sdk/openai-compatible` package for connecting to any OpenAI-compatible endpoint, including SaladCloud.
 
-Using the Vercel AI SDK with SaladCloud lets you:
+The Vercel AI SDK works with SaladCloud in two ways:
 
-- **Build production apps** powered by self-hosted models at SaladCloud's per-hour pricing
-- **Stream responses** to chat interfaces with built-in streaming support
-- **Use any framework** - Next.js, Express, Hono, plain Node.js, or any other JavaScript runtime
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point your app at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
 
 ## Prerequisites
 
 Before getting started, make sure you have:
 
-- A [SaladCloud account](https://portal.salad.com) with an active LLM deployment
+- A [SaladCloud account](https://portal.salad.com)
 - Node.js 18+ installed
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud
+### Step 1: Choose Your Backend
 
-First, deploy an OpenAI-compatible LLM server on SaladCloud.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe is a strong choice for general-purpose app development.
-  On the recipe page, provide a name and deploy - the rest is preconfigured with recommended settings.
-- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts model
-  optimized for instruction-following tasks.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
 
-Recipes for custom deployments (best for advanced users):
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe is a strong choice for general-purpose app
+      development. On the recipe page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
-- [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
-- [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
-- [ollama](/container-engine/reference/recipes/ollama) - Simple model management
-- [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+    Available recipes:
 
-After deployment, note your **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`).
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+    After deployment, note your **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`).
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install the Dependencies
 
@@ -78,29 +100,58 @@ npm install dotenv
 
 ### Step 3: Configure the SaladCloud Provider
 
-Create a provider instance pointing to your SaladCloud endpoint. If you set SaladCloud to authenticate, you need to do
-that via the `Salad-Api-Key` request header - pass it through the `headers` option rather than `apiKey`:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Store your credentials in a `.env` file:
 
-```javascript
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import dotenv from 'dotenv'
-dotenv.config()
+    ```bash
+    SALAD_API_KEY=your-salad-api-key
+    ```
 
-const saladcloud = createOpenAICompatible({
-  name: 'saladcloud',
-  baseURL: process.env.SALAD_BASE_URL,
-  headers: {
-    'Salad-Api-Key': process.env.SALAD_API_KEY,
-  },
-})
-```
+    Create a provider instance pointing to the AI Gateway endpoint:
 
-Store your credentials in a `.env` file (never hardcode secrets):
+    ```javascript
+    import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+    import dotenv from 'dotenv'
+    dotenv.config()
 
-```bash
-SALAD_API_KEY=your-salad-api-key
-SALAD_BASE_URL=https://your-endpoint.salad.cloud/v1
-```
+    const saladcloud = createOpenAICompatible({
+      name: 'saladcloud',
+      baseURL: 'https://ai.salad.cloud:40404/v1',
+      apiKey: process.env.SALAD_API_KEY,
+    })
+    ```
+
+    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Create a provider instance pointing to your SaladCloud endpoint. If you set SaladCloud to authenticate, you need to
+    do that via the `Salad-Api-Key` request header - pass it through the `headers` option rather than `apiKey`:
+
+    ```javascript
+    import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+    import dotenv from 'dotenv'
+    dotenv.config()
+
+    const saladcloud = createOpenAICompatible({
+      name: 'saladcloud',
+      baseURL: process.env.SALAD_BASE_URL,
+      headers: {
+        'Salad-Api-Key': process.env.SALAD_API_KEY,
+      },
+    })
+    ```
+
+    Store your credentials in a `.env` file (never hardcode secrets):
+
+    ```bash
+    SALAD_API_KEY=your-salad-api-key
+    SALAD_BASE_URL=https://your-endpoint.salad.cloud/v1
+    ```
+
+  </Tab>
+</Tabs>
 
 ### Step 4: Generate Text and Test the Connection
 

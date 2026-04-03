@@ -13,12 +13,13 @@ _Last Updated: April 3, 2026_
 tools, Continue focuses on the full coding workflow: autocomplete, inline chat, codebase-aware Q&A, and multi-file
 edits. Supports any OpenAI-compatible endpoint with custom headers.
 
-Continue pairs well with SaladCloud because:
+Continue works with SaladCloud in two ways:
 
-- **Custom header support** - the `requestOptions.headers` config field passes `Salad-Api-Key` for authenticated
-  deployments
-- **Config-file driven** - version-control your model config alongside your project
-- **VS Code and JetBrains** - works in both IDEs with the same config
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point Continue at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group, billed per hour, for full control over the model,
+  hardware, and configuration. Still very easy to set up and use.
 
 ## Prerequisites
 
@@ -29,36 +30,56 @@ Before getting started, make sure you have:
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud
+### Step 1: Choose Your Backend
 
-First, deploy an OpenAI-compatible LLM server on SaladCloud.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe works well for coding assistance. On the recipe page,
-  provide a name and deploy - the rest is preconfigured with recommended settings.
-- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts model
-  optimized for instruction-following tasks.
-- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
 
-Recipes for custom deployments (best for advanced users):
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe works well for coding assistance. On the recipe
+      page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
-- [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
-- [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
-- [ollama](/container-engine/reference/recipes/ollama) - Simple model management
-- [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+    Available recipes:
 
-After deployment, note your:
+    Ready-to-deploy recipes (best for less technical users):
 
-- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
-- **API key** (from your SaladCloud organization settings, if you enabled authentication)
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+    - **API key** (from your SaladCloud organization settings, if you enabled authentication)
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install Continue
 
@@ -79,31 +100,51 @@ Continue is configured via `~/.continue/config.yaml`. Open it from the Continue 
 it directly. The configuration UI does not currently support all necessary fields, so you will need to add the model
 config manually in the YAML file.
 
-Add your SaladCloud deployment as a model:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Add your AI Gateway model:
 
-```yaml
-models:
-  - name: SaladCloud Qwen 3.5
-    provider: openai
-    model: qwen3.5-35b-a3b
-    apiBase: https://your-endpoint.salad.cloud/v1
-    apiKey: dummy
-    requestOptions:
-      headers:
-        Salad-Api-Key: your-salad-api-key
-```
+    ```yaml
+    models:
+      - name: Salad AI Gateway
+        provider: openai
+        model: qwen3.5-35b-a3b
+        apiBase: https://ai.salad.cloud:40404/v1
+        apiKey: your-salad-api-key
+    ```
 
-Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
 
-If your deployment does not require authentication, omit the `requestOptions` section entirely and set `apiKey` to any
-non-empty string.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Add your SaladCloud deployment as a model:
 
-To also use your SaladCloud model for **autocomplete**, add :
+    ```yaml
+    models:
+      - name: SaladCloud Qwen 3.5
+        provider: openai
+        model: qwen3.5-35b-a3b
+        apiBase: https://your-endpoint.salad.cloud/v1
+        apiKey: dummy
+        requestOptions:
+          headers:
+            Salad-Api-Key: your-salad-api-key
+    ```
 
-```yaml
-roles:
-  - autocomplete
-```
+    Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+
+    If your deployment does not require authentication, omit the `requestOptions` section entirely and set `apiKey` to
+    any non-empty string.
+
+    To also use your SaladCloud model for **autocomplete**, add :
+
+    ```yaml
+    roles:
+      - autocomplete
+    ```
+
+  </Tab>
+</Tabs>
 
 ### Step 4: Test the Connection
 

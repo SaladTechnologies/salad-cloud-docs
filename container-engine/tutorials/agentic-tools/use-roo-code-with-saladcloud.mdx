@@ -13,12 +13,13 @@ agents in your editor. It supports multiple specialized modes (Code, Architect, 
 integrations, and boomerang tasks - breaking complex work into subtasks handled by specialized subagents.
 Model-agnostic, highly configurable, secure and transparent.
 
-Roo Code pairs well with SaladCloud because:
+Roo Code works with SaladCloud in two ways:
 
-- **Custom header support** - Roo Code supports custom request headers, so you can pass `Salad-Api-Key` for
-  authenticated SaladCloud deployments
-- **OpenAI-compatible API** - built-in "OpenAI Compatible" provider works directly with any SaladCloud endpoint
-- **Per-hour pricing** - no per-token cost during extended multi-agent coding sessions
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point Roo Code at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
 
 ## Prerequisites
 
@@ -29,36 +30,56 @@ Before getting started, make sure you have:
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud
+### Step 1: Choose Your Backend
 
-First, deploy an OpenAI-compatible LLM server on SaladCloud.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe page,
-  provide a name and deploy - the rest is preconfigured with recommended settings.
-- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts model
-  optimized for instruction-following tasks, ideal for agentic use cases.
-- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
 
-Recipes for custom deployments (best for advanced users):
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe
+      page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
-- [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
-- [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
-- [ollama](/container-engine/reference/recipes/ollama) — Simple model management
-- [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+    Available recipes:
 
-After deployment, note your:
+    Ready-to-deploy recipes (best for less technical users):
 
-- **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
-- **API key** (from your SaladCloud organization settings, if you enabled authentication)
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+    - **API key** (from your SaladCloud organization settings, if you enabled authentication)
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install Roo Code in VS Code
 
@@ -72,12 +93,28 @@ After deployment, note your:
 1. In the Roo Code panel, click the **settings icon** or on the first run, you'll be prompted to configure your API
    provider
 2. Choose 3rd-party Provider and set **API Provider** to `OpenAI Compatible`
-3. Set **Base URL** to your SaladCloud endpoint: `https://your-endpoint.salad.cloud/v1`
-4. Set **API Key** to any non-empty string (e.g., `dummy`) - authentication is handled via a custom header below
-5. Set **Model ID** to the model name from your deployment (e.g., `qwen3.5-35b-a3b`)
-6. If your deployment has authentication enabled, expand **Custom Headers** and add:
-   - Header name: `Salad-Api-Key`
-   - Header value: your SaladCloud API key
+3. Fill in the fields based on your chosen backend:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    - **Base URL**: `https://ai.salad.cloud:40404/v1`
+    - **API Key**: your Salad API key
+    - **Model ID**: e.g. `qwen3.5-35b-a3b`
+
+    No custom headers are needed - your Salad API key in the API Key field is all that's required.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    - **Base URL**: your SaladCloud endpoint URL (e.g., `https://your-endpoint.salad.cloud/v1`)
+    - **API Key**: any non-empty string (e.g., `dummy`) - authentication is handled via a custom header below
+    - **Model ID**: the model name from your deployment (e.g., `qwen3.5-35b-a3b`)
+
+    If your deployment has authentication enabled, expand **Custom Headers** and add:
+    - Header name: `Salad-Api-Key`
+    - Header value: your SaladCloud API key
+
+  </Tab>
+</Tabs>
 
 ### Step 4: Test the Connection
 

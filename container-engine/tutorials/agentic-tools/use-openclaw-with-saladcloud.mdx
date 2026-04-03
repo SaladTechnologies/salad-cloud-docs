@@ -4,7 +4,7 @@ sidebarTitle: 'OpenClaw'
 description: 'Learn how to set up OpenClaw as a personal AI assistant connected to a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: March 30, 2026_
+_Last Updated: April 3, 2026_
 
 ## Introduction
 
@@ -13,11 +13,13 @@ connects to messaging platforms including WhatsApp, Telegram, Slack, Discord, Si
 model providers via OpenAI-compatible endpoints. Using OpenClaw with SaladCloud gives you a fully self-hosted AI
 assistant stack - your model runs on distributed GPUs, your conversations stay locally and your messaging apps if used.
 
-OpenClaw pairs well with SaladCloud because:
+OpenClaw works with SaladCloud in two ways:
 
-- **Custom provider support** - configure your SaladCloud endpoint as an OpenAI-compatible provider via the config file
-- **Easy messaging integration** - connect to WhatsApp, Telegram, Slack, Discord, and more from one assistant
-- **Per-hour pricing** - no per-message costs for running your personal assistant
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point OpenClaw at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
 
 <Note>
   For a step-by-step guide using OpenClaw with an Ollama deployment specifically, see the [OpenClaw + Ollama (Salad
@@ -33,34 +35,54 @@ Before getting started, make sure you have:
 
 ## Step-by-Step Setup
 
-### Step 1: Deploy an LLM Recipe on SaladCloud
+### Step 1: Choose Your Backend
 
-First, deploy an OpenAI-compatible LLM server on SaladCloud.
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-- Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
-- Create an organization or choose an existing one, then click "Deploy a container group".
-- Select an LLM recipe. The llama.cpp [Qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp)
-  recipe is well-suited for conversational assistant use cases. On the recipe page, provide a name and deploy - the rest
-  is preconfigured with recommended settings.
-- Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
 
-Available recipes:
+    Available models:
 
-Ready-to-deploy recipes (best for less technical users):
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
-- [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts model
-  optimized for instruction-following tasks, ideal for agentic use cases.
-- [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
 
-Recipes for custom deployments (best for advanced users):
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The llama.cpp [Qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp)
+      recipe is well-suited for conversational assistant use cases. On the recipe page, provide a name and deploy - the
+      rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
-- [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
-- [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
-- [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
-- [ollama](/container-engine/reference/recipes/ollama) - Simple model management
-- [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+    Available recipes:
 
-After deployment, note your **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`).
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+    After deployment, note your **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`).
+
+  </Tab>
+</Tabs>
 
 ### Step 2: Install OpenClaw
 
@@ -129,60 +151,104 @@ If you skipped Telegram during onboarding, add it manually to `~/.openclaw/openc
 ### Step 5: Configure the SaladCloud Model Provider
 
 OpenClaw does not support adding arbitrary custom providers through the onboarding wizard. Instead, configure your
-SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly. You can use any name for the provider key - in this
-example we use `saladcloud`.
+SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
 
-Add the following config, merging with any existing content:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Add the following config, merging with any existing content:
 
-```json5
-{
-  models: {
-    providers: {
-      saladcloud: {
-        baseUrl: 'https://your-endpoint.salad.cloud/v1',
-        apiKey: 'dummy',
-        api: 'openai-completions',
-        headers: {
-          'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
-        },
-        models: [
-          {
-            id: 'qwen3.5-35b-a3b',
-            name: 'qwen3.5-35b-a3b',
-            reasoning: false,
-            input: ['text'],
-            cost: {
-              input: 0,
-              output: 0,
-              cacheRead: 0,
-              cacheWrite: 0,
-            },
-            contextWindow: 128000,
-            maxTokens: 16384,
+    ```json5
+    {
+      models: {
+        providers: {
+          saladcloud: {
+            baseUrl: 'https://ai.salad.cloud:40404/v1',
+            apiKey: 'your-salad-api-key',
+            api: 'openai-completions',
+            models: [
+              {
+                id: 'qwen3.5-35b-a3b',
+                name: 'qwen3.5-35b-a3b',
+                reasoning: false,
+                input: ['text'],
+                cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+                contextWindow: 131072,
+                maxTokens: 16384,
+              },
+            ],
           },
-        ],
+        },
       },
-    },
-  },
-  agents: {
-    defaults: {
-      model: {
-        primary: 'saladcloud/qwen3.5-35b-a3b',
+      agents: {
+        defaults: {
+          model: {
+            primary: 'saladcloud/qwen3.5-35b-a3b',
+          },
+        },
       },
-    },
-  },
-}
-```
+    }
+    ```
 
-Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
 
-<Note>
-  Use `apiKey: 'dummy'` - not `'ollama-local'`. The string `'ollama-local'` is only recognized by OpenClaw for providers
-  with an `ollama`-prefixed name. For any other provider name, use `'dummy'` or any non-empty string.
-</Note>
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    You can use any name for the provider key - in this example we use `saladcloud`.
 
-If your SaladCloud deployment does not require authentication, remove the `headers` section, but if it does - make sure
-to set the `Salad-Api-Key` header with your actual API key.
+    Add the following config, merging with any existing content:
+
+    ```json5
+    {
+      models: {
+        providers: {
+          saladcloud: {
+            baseUrl: 'https://your-endpoint.salad.cloud/v1',
+            apiKey: 'dummy',
+            api: 'openai-completions',
+            headers: {
+              'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
+            },
+            models: [
+              {
+                id: 'qwen3.5-35b-a3b',
+                name: 'qwen3.5-35b-a3b',
+                reasoning: false,
+                input: ['text'],
+                cost: {
+                  input: 0,
+                  output: 0,
+                  cacheRead: 0,
+                  cacheWrite: 0,
+                },
+                contextWindow: 128000,
+                maxTokens: 16384,
+              },
+            ],
+          },
+        },
+      },
+      agents: {
+        defaults: {
+          model: {
+            primary: 'saladcloud/qwen3.5-35b-a3b',
+          },
+        },
+      },
+    }
+    ```
+
+    Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+
+    <Note>
+      Use `apiKey: 'dummy'` - not `'ollama-local'`. The string `'ollama-local'` is only recognized by OpenClaw for
+      providers with an `ollama`-prefixed name. For any other provider name, use `'dummy'` or any non-empty string.
+    </Note>
+
+    If your SaladCloud deployment does not require authentication, remove the `headers` section, but if it does - make
+    sure to set the `Salad-Api-Key` header with your actual API key.
+
+  </Tab>
+</Tabs>
 
 ### Step 6: Restart and Test
 
