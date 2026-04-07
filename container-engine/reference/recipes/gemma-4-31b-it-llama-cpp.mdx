@@ -1,0 +1,153 @@
+---
+title: Gemma 4 31B with llama.cpp
+sidebarTitle: Gemma 4 31B (llama.cpp)
+description: Serve Gemma 4 31B with llama.cpp as an OpenAI-compatible API for OpenClaw, OpenCode, and other tools.
+---
+
+_Last Updated: April 7, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs `Gemma 4 31B IT` with the official [llama.cpp](https://github.com/ggml-org/llama.cpp) CUDA server. The
+model downloads automatically on first startup, the built-in llama.cpp web UI is available at your deployment URL, and
+the container exposes an OpenAI-compatible API for tools such as OpenClaw, OpenCode, and other compatible clients.
+
+This recipe is designed to be easy for nontechnical users:
+
+- the model is already chosen for you
+- it is public by default, so you can test it immediately after deployment
+- it includes the built-in llama.cpp web UI
+- it works with OpenAI-compatible apps and agent tools
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **Gemma 4 31B IT (llama.cpp)** recipe.
+3. Enter a **Container Group Name**.
+4. Decide whether to enable **Require Container Gateway Authentication**:
+   - Disabled: public access.
+   - Enabled: requests must include your SaladCloud API key.
+5. Deploy and wait for the first startup to finish.
+
+<Callout variation="note">
+  The model is downloaded from Hugging Face at startup, so it can take several minutes before the deployment becomes
+  ready.
+</Callout>
+
+Once the container is ready, you can either open the built-in UI in a browser or connect an OpenAI-compatible client to
+it.
+
+## Use With Agentic Tools
+
+This recipe exposes an OpenAI-compatible API, so you can connect tools such as OpenClaw, OpenCode, Cline, Cursor, and
+other compatible clients.
+
+Useful setup guides:
+
+- [Use OpenClaw with SaladCloud](/container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud)
+- [Use OpenCode with SaladCloud](/container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud)
+
+## Defaults
+
+The recipe comes preconfigured with these defaults:
+
+- Model source: `unsloth/gemma-4-31B-it-GGUF`
+- Model file: `gemma-4-31B-it-UD-Q4_K_XL.gguf`
+- Model alias: `gemma-4-31b-it`
+- Context size: `262144`
+- GPU offload: `auto`
+- Parallel slots: `1`
+- KV cache types: `q8_0 / q8_0`
+- Sampling defaults: `temperature 1.0`, `top_p 0.95`, `min_p 0.0`, `top_k 64`
+- Authentication: disabled by default
+
+`temperature`, `top_p`, and `min_p` are startup defaults. You can still override them per request in your inference
+payload.
+
+## Thinking Mode
+
+Reasoning is controlled per request.
+
+To turn reasoning on, start the system prompt with `<|think|>`:
+
+```json
+{ "role": "system", "content": "<|think|> You are a careful reasoning assistant." }
+```
+
+To leave reasoning off, do not include that token.
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is unchecked by default.
+
+- Disabled: anyone with the URL can call the API.
+- Enabled: every request must include the `Salad-Api-Key` header.
+
+## Example Request
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "gemma-4-31b-it",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Write one short paragraph explaining why long context is useful for coding agents."}
+    ],
+    "temperature": 1.0,
+    "top_p": 0.95,
+    "max_tokens": 512
+  }'
+```
+
+If you enabled authentication during deployment, add:
+
+```bash
+-H 'Salad-Api-Key: <api-key>'
+```
+
+## Reasoning Request
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "gemma-4-31b-it",
+    "messages": [
+      {"role": "system", "content": "<|think|> You are a careful reasoning assistant."},
+      {"role": "user", "content": "Solve this carefully: A train travels 120 miles in 2 hours. What is its average speed?"}
+    ],
+    "temperature": 1.0,
+    "top_p": 0.95,
+    "max_tokens": 512
+  }'
+```
+
+## For Technical Users
+
+If you want to tune llama.cpp later, open the container group in the SaladCloud Portal and edit **Advanced
+Configuration**.
+
+Useful environment variables include:
+
+- `LLAMA_ARG_HF_REPO` to use a different Hugging Face GGUF repo
+- `LLAMA_ARG_HF_FILE` to select a specific file from that repo
+- `LLAMA_ARG_CTX_SIZE` to change the context window
+- `LLAMA_ARG_CACHE_TYPE_K` and `LLAMA_ARG_CACHE_TYPE_V` to tune KV cache memory use
+- `LLAMA_ARG_N_GPU_LAYERS` to control GPU offload
+- `LLAMA_ARG_N_PARALLEL` to change concurrency
+
+For full llama.cpp server options, see:
+
+- [llama.cpp server docs](https://github.com/ggml-org/llama.cpp/tree/master/tools/server)
+- [Server args and environment variable mapping](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md#usage)
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/gemma-4-31b-it-llama-cpp)
+- [Unsloth Gemma 4 31B GGUF repo](https://huggingface.co/unsloth/gemma-4-31B-it-GGUF)
+- [llama.cpp Project](https://github.com/ggml-org/llama.cpp)
