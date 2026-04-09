@@ -1,0 +1,146 @@
+---
+title: 'Use Roo Code with SaladCloud'
+sidebarTitle: 'Roo Code'
+description: 'Learn how to use the Roo Code AI coding agent in VS Code with a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[Roo Code](https://roocode.com) is an open-source AI coding agent for VS Code that gives you a whole dev team of AI
+agents in your editor. It supports multiple specialized modes (Code, Architect, Ask, Debug, Test), MCP server
+integrations, and boomerang tasks - breaking complex work into subtasks handled by specialized subagents.
+Model-agnostic, highly configurable, secure and transparent.
+
+Roo Code works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point Roo Code at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- VS Code installed on your machine
+
+## Step-by-Step Setup
+
+### Step 1: Choose Your Backend
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
+
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+
+    Available models:
+
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe
+      page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+    - **API key** (from your SaladCloud organization settings, if you enabled authentication)
+
+  </Tab>
+</Tabs>
+
+### Step 2: Install Roo Code in VS Code
+
+1. Open VS Code and go to the Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS)
+2. Search for **Roo Code**
+3. Click **Install** on the Roo Code extension by roocode.com
+4. Once installed, click the Roo Code icon in the sidebar to open the panel
+
+### Step 3: Configure Roo Code to Use Your SaladCloud Endpoint
+
+1. In the Roo Code panel, click the **settings icon** or on the first run, you'll be prompted to configure your API
+   provider
+2. Choose 3rd-party Provider and set **API Provider** to `OpenAI Compatible`
+3. Fill in the fields based on your chosen backend:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    - **Base URL**: `https://ai.salad.cloud:40404/v1`
+    - **API Key**: your Salad API key
+    - **Model ID**: e.g. `qwen3.5-35b-a3b`
+
+    No custom headers are needed - your Salad API key in the API Key field is all that's required.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    - **Base URL**: your SaladCloud endpoint URL (e.g., `https://your-endpoint.salad.cloud/v1`)
+    - **API Key**: any non-empty string (e.g., `dummy`) - authentication is handled via a custom header below
+    - **Model ID**: the model name from your deployment (e.g., `qwen3.5-35b-a3b`)
+
+    If your deployment has authentication enabled, expand **Custom Headers** and add:
+    - Header name: `Salad-Api-Key`
+    - Header value: your SaladCloud API key
+
+  </Tab>
+</Tabs>
+
+### Step 4: Test the Connection
+
+Start with a simple task to verify everything is working:
+
+> "Create a hello world Python script that prints 'Hello from SaladCloud!'"
+
+If Roo Code successfully creates the file, your setup is complete.
+
+## Tips for Best Results
+
+### Use Incremental Prompting for Complex Tasks
+
+SaladCloud has a 100-second request timeout. For large multi-file tasks, instruct Roo Code to work incrementally:
+
+> "Important: work incrementally. Create and save each file one at a time before moving on to the next."
+
+### Choose the Right Mode
+
+- **Code** - general code generation and editing
+- **Architect** - high-level design and planning
+- **Ask** - questions and explanations without file modifications
+- **Debug** - focused on diagnosing and fixing bugs
+- **Test** - generating and running tests
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Best balance of capability and cost for agentic coding tasks
+- **Qwen 3.5-9B**: Suitable for simpler tasks; may struggle with complex multi-file edits

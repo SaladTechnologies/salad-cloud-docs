@@ -130,6 +130,7 @@ libxrender1
 listdir
 LIUM
 llava
+lmsysorg
 loftq
 LoRA
 LoRAs
@@ -145,8 +146,13 @@ metavoiceio
 mintlify
 mlabonne
 myregistry
+ai-gateway
+hermes-agent
+NemoClaw
+nemoclaw
 Nemotron
 neofetch
+nikolaik
 nflx
 noappend
 NOARP
@@ -224,6 +230,8 @@ s3parcp
 s6-overlay-noarch
 SABAF
 safetensors
+sglang
+SGLANG
 SaladCloud
 saladcloudimdssdk
 saladcloudimdssdkconfig
@@ -248,6 +256,7 @@ subseed
 subseeds
 supervisord
 svix
+saoudrizwan
 tedlium
 threadpoolctl
 timeframe
@@ -257,6 +266,7 @@ tmin
 tojson
 TPOT
 tpslimit
+trtllm
 TTFT
 txqueuelen
 ULSPEED

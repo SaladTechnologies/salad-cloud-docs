@@ -1,0 +1,223 @@
+---
+title: 'Use OpenCode with SaladCloud'
+sidebarTitle: 'OpenCode'
+description: 'Learn how to use the OpenCode terminal coding agent with a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[OpenCode](https://opencode.ai) is an open-source AI coding agent that runs as a terminal UI. Built in Go, it provides a
+rich interactive interface for coding, planning, reviewing, and debugging directly from your terminal. OpenCode was
+built with custom model providers in mind and includes first-class support for OpenAI-compatible endpoints.
+
+OpenCode works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point OpenCode at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- Node.js 18+ installed (for the `@ai-sdk/openai-compatible` package used internally by OpenCode)
+- A terminal environment (Linux, macOS, or WSL on Windows)
+
+## Step-by-Step Setup
+
+### Step 1: Choose Your Backend
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
+
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+
+    Available models:
+
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe
+      page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) — A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) — Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) — High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) — Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) — Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) — Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+
+  </Tab>
+</Tabs>
+
+### Step 2: Install OpenCode
+
+Install OpenCode using the official install script:
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+Or install via npm:
+
+```bash
+npm install -g opencode-ai
+```
+
+Verify the installation:
+
+```bash
+opencode --version
+```
+
+### Step 3: Configure OpenCode to Use Your SaladCloud Endpoint
+
+Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.json`:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    ```json
+    {
+      "$schema": "https://opencode.ai/config.json",
+      "model": "saladcloud/qwen3.5-35b-a3b",
+      "provider": {
+        "saladcloud": {
+          "npm": "@ai-sdk/openai-compatible",
+          "name": "SaladCloud AI Gateway",
+          "options": {
+            "baseURL": "https://ai.salad.cloud:40404/v1",
+            "apiKey": "your-salad-api-key"
+          },
+          "models": {
+            "qwen3.5-35b-a3b": {
+              "name": "Qwen 3.5-35B-A3B",
+              "limit": { "context": 131072, "output": 8192 }
+            },
+            "qwen3.5-27b": {
+              "name": "Qwen 3.5-27B",
+              "limit": { "context": 131072, "output": 8192 }
+            },
+            "qwen3.5-9b": {
+              "name": "Qwen 3.5-9B",
+              "limit": { "context": 131072, "output": 8192 }
+            }
+          }
+        }
+      }
+    }
+    ```
+
+    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    ```json
+    {
+      "$schema": "https://opencode.ai/config.json",
+      "model": "saladcloud/qwen3.5-35b",
+      "provider": {
+        "saladcloud": {
+          "npm": "@ai-sdk/openai-compatible",
+          "name": "SaladCloud",
+          "options": {
+            "baseURL": "https://your-endpoint.salad.cloud/v1",
+            "apiKey": "dummy",
+            "headers": {
+              "Salad-Api-Key": "{env:SALAD_API_KEY}"
+            }
+          },
+          "models": {
+            "qwen3.5-35b": {
+              "name": "Qwen 3.5-35B-A3B",
+              "limit": {
+                "context": 262144,
+                "output": 8192
+              }
+            }
+          }
+        }
+      }
+    }
+    ```
+
+    Replace `https://your-endpoint.salad.cloud/v1` with your actual SaladCloud endpoint URL.
+
+    If your SaladCloud deployment requires authentication, set your API key as an environment variable or hardcode it in
+    the config (not recommended for security reasons):
+
+    ```bash
+    export SALAD_API_KEY=your-salad-api-key
+    ```
+
+    OpenCode will inject this as the `Salad-Api-Key` request header on every API call. The `apiKey` field in the config
+    must be set to a non-empty string but is otherwise unused - authentication is handled entirely by the header.
+
+  </Tab>
+</Tabs>
+
+### Step 4: Launch OpenCode and Test the Connection
+
+Navigate to your project directory and start OpenCode:
+
+```bash
+cd /path/to/your/project
+opencode
+```
+
+OpenCode will open a TUI in your terminal. Test with a simple task:
+
+> "Create a hello world Python script that prints 'Hello from SaladCloud!'"
+
+If OpenCode successfully creates the file, your setup is complete.
+
+## Tips for Best Results
+
+### Use the Build Agent
+
+OpenCode's built-in `build` agent handles code generation and editing with all tools enabled. It uses whichever model is
+set as the default in your config. You can also switch to the built-in `plan` agent (Tab key) for read-only analysis and
+planning without the risk of unintended file modifications.
+
+### Context Window
+
+The Qwen 3.5-35B-A3B recipe supports a 262,144 token context window. The `context` value in the config lets OpenCode
+track how much context is remaining and manage prompt sizes accordingly, so make sure it reflects your actual deployment
+configuration.
+
+### Persist Your API Key
+
+To avoid re-exporting `SALAD_API_KEY` in every terminal session, add it to your shell profile:
+
+```bash
+echo 'export SALAD_API_KEY=your-salad-api-key' >> ~/.bashrc
+source ~/.bashrc
+```

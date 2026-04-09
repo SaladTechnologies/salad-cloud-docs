@@ -1,0 +1,310 @@
+---
+title: 'Use OpenClaw with SaladCloud'
+sidebarTitle: 'OpenClaw'
+description: 'Learn how to set up OpenClaw as a personal AI assistant connected to a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[OpenClaw](https://openclaw.ai) is an open-source personal AI assistant with a massive ecosystem of integrations. It
+connects to messaging platforms including WhatsApp, Telegram, Slack, Discord, Signal, and iMessage, and supports custom
+model providers via OpenAI-compatible endpoints. Using OpenClaw with SaladCloud gives you a fully self-hosted AI
+assistant stack - your model runs on distributed GPUs, your conversations stay locally and your messaging apps if used.
+
+OpenClaw works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point OpenClaw at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available
+  via monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
+
+<Note>
+  For a step-by-step guide using OpenClaw with an Ollama deployment specifically, see the [OpenClaw + Ollama (Salad
+  Hosted) + Telegram](/container-engine/how-to-guides/openclaw/openclaw-ollama-salad-hosted-telegram) how-to guide.
+</Note>
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- A messaging account for OpenClaw (a Telegram bot is the simplest starting point)
+
+## Step-by-Step Setup
+
+### Step 1: Choose Your Backend
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
+
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+
+    Available models:
+
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The llama.cpp [Qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp)
+      recipe is well-suited for conversational assistant use cases. On the recipe page, provide a name and deploy - the
+      rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks, ideal for agentic use cases.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+    After deployment, note your **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`).
+
+  </Tab>
+</Tabs>
+
+### Step 2: Install OpenClaw
+
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+```
+
+Optional [Docker path](https://docs.openclaw.ai/install/docker) (if you prefer containerized local OpenClaw for
+additional security/isolation):
+
+```bash
+git clone https://github.com/openclaw/openclaw
+cd openclaw
+./docker-setup.sh
+```
+
+For full installation details, see the [OpenClaw docs](https://docs.openclaw.ai/install).
+
+### Step 3: Run the Onboarding Wizard
+
+Start the onboarding flow:
+
+```bash
+openclaw onboard --install-daemon
+```
+
+During onboarding:
+
+1. Accept the local-agent security warning (choose `Yes` only if you understand the agent can execute actions with your
+   local user permissions).
+2. Select the quick start path.
+3. **Skip model setup** - you will configure the SaladCloud provider manually in the next step.
+4. Select **Telegram** when OpenClaw asks you to choose channels (see Step 4 below).
+5. Complete or skip the remaining optional steps.
+
+### Step 4: Connect Telegram
+
+Telegram is the easiest channel to connect because it uses a bot token with no phone number required:
+
+1. Open Telegram and search for `@BotFather`
+2. Start a chat and send `/newbot`
+3. Set a display name and a username ending in `_bot` (e.g., `salad_assistant_bot`)
+4. Copy the bot token from BotFather's confirmation message
+5. Paste the token when OpenClaw prompts for it during onboarding
+6. After onboarding, open your Telegram bot - it will send a pairing code. Run the command it provides:
+
+```bash
+openclaw pairing approve telegram <CODE>
+```
+
+If you skipped Telegram during onboarding, add it manually to `~/.openclaw/openclaw.json`:
+
+```json5
+{
+  channels: {
+    telegram: {
+      enabled: true,
+      botToken: '<YOUR_BOT_TOKEN>',
+      dmPolicy: 'pairing',
+      groups: { '*': { requireMention: true } },
+    },
+  },
+}
+```
+
+### Step 5: Configure the SaladCloud Model Provider
+
+OpenClaw does not support adding arbitrary custom providers through the onboarding wizard. Instead, configure your
+SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Add the following config, merging with any existing content:
+
+    ```json5
+    {
+      models: {
+        providers: {
+          saladcloud: {
+            baseUrl: 'https://ai.salad.cloud:40404/v1',
+            apiKey: 'your-salad-api-key',
+            api: 'openai-completions',
+            models: [
+              {
+                id: 'qwen3.5-35b-a3b',
+                name: 'qwen3.5-35b-a3b',
+                reasoning: false,
+                input: ['text'],
+                cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+                contextWindow: 131072,
+                maxTokens: 16384,
+              },
+            ],
+          },
+        },
+      },
+      agents: {
+        defaults: {
+          model: {
+            primary: 'saladcloud/qwen3.5-35b-a3b',
+          },
+        },
+      },
+    }
+    ```
+
+    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    You can use any name for the provider key - in this example we use `saladcloud`.
+
+    Add the following config, merging with any existing content:
+
+    ```json5
+    {
+      models: {
+        providers: {
+          saladcloud: {
+            baseUrl: 'https://your-endpoint.salad.cloud/v1',
+            apiKey: 'dummy',
+            api: 'openai-completions',
+            headers: {
+              'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
+            },
+            models: [
+              {
+                id: 'qwen3.5-35b-a3b',
+                name: 'qwen3.5-35b-a3b',
+                reasoning: false,
+                input: ['text'],
+                cost: {
+                  input: 0,
+                  output: 0,
+                  cacheRead: 0,
+                  cacheWrite: 0,
+                },
+                contextWindow: 128000,
+                maxTokens: 16384,
+              },
+            ],
+          },
+        },
+      },
+      agents: {
+        defaults: {
+          model: {
+            primary: 'saladcloud/qwen3.5-35b-a3b',
+          },
+        },
+      },
+    }
+    ```
+
+    Replace `https://your-endpoint.salad.cloud/v1` with your actual endpoint URL.
+
+    <Note>
+      Use `apiKey: 'dummy'` - not `'ollama-local'`. The string `'ollama-local'` is only recognized by OpenClaw for
+      providers with an `ollama`-prefixed name. For any other provider name, use `'dummy'` or any non-empty string.
+    </Note>
+
+    If your SaladCloud deployment does not require authentication, remove the `headers` section, but if it does - make
+    sure to set the `Salad-Api-Key` header with your actual API key.
+
+  </Tab>
+</Tabs>
+
+### Step 6: Restart and Test
+
+Apply the config changes:
+
+```bash
+openclaw doctor --fix
+openclaw gateway restart
+```
+
+Then open your Telegram bot, or local tui and send a message:
+
+> "Hello! Summarize what SaladCloud is in two sentences."
+
+If the bot responds, your setup is complete. You can also access the local OpenClaw UI at `http://127.0.0.1:18789/`.
+
+## Troubleshooting
+
+### OpenClaw cannot reach the SaladCloud endpoint
+
+- Confirm the container group is **Running** in the SaladCloud portal.
+- Verify the `baseUrl` in your config ends with `/v1`.
+- If auth is enabled, confirm the `Salad-Api-Key` header is set correctly.
+- Test the endpoint directly with curl:
+
+```bash
+curl https://your-endpoint.salad.cloud/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <YOUR_SALAD_API_KEY>' \
+  -d '{"model": "qwen3.5-35b-a3b", "messages": [{"role": "user", "content": "Hello"}]}'
+```
+
+### Telegram bot is not responding
+
+- Verify the `botToken` is correct in your config.
+- Re-run pairing approval if needed: `openclaw pairing approve telegram <CODE>`
+- Check logs:
+
+```bash
+openclaw logs --follow
+```
+
+## Tips for Best Results
+
+### Use the 35B Model for Complex Tasks
+
+For tasks that require complex instruction following and multi-step reasoning the Qwen 3.5-35B-A3B model provides
+significantly better results than the 9B model.
+
+### Provider Rotation
+
+OpenClaw supports configuring multiple model providers. If you have multiple endpoints configured, you can specify which
+provider to use on a per-agent basis in the config file. This allows you to route different tasks to different models or
+endpoints as needed.
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Best for complex assistant tasks
+- **Qwen 3.5-9B**: Suitable for simple Q&A and quick responses

@@ -165,6 +165,22 @@
                 ]
               },
               {
+                "group": "Agentic Tools",
+                "pages": [
+                  "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-continue-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-goose-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-hermes-agent-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-nemoclaw-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"
+                ]
+              },
+              {
                 "group": "Security",
                 "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
@@ -304,6 +320,10 @@
             ]
           },
           {
+            "group": "Storage",
+            "pages": ["storage/explanation/overview", "storage/reference/api"]
+          },
+          {
             "group": "Reference",
             "pages": [
               "container-engine/reference/api",
@@ -317,11 +337,16 @@
                   "container-engine/reference/recipes/gromacs-srcg",
                   "container-engine/reference/recipes/kuzco",
                   "container-engine/reference/recipes/llama-cpp",
+                  "container-engine/reference/recipes/gemma-4-31b-it-llama-cpp",
                   "container-engine/reference/recipes/lolminer",
                   "container-engine/reference/recipes/mcproxy",
                   "container-engine/reference/recipes/ollama",
                   "container-engine/reference/recipes/openmm-srcg",
                   "container-engine/reference/recipes/quai",
+                  "container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp",
+                  "container-engine/reference/recipes/qwen3.5-9b-llama-cpp",
+                  "container-engine/reference/recipes/qwen3.5-9b-sglang",
+                  "container-engine/reference/recipes/sglang",
                   "container-engine/reference/recipes/nockpool-miner",
                   "container-engine/reference/recipes/risc0",
                   "container-engine/reference/recipes/sam3",
@@ -447,7 +472,16 @@
         ]
       },
       {
-        "tab": "Gateway Service",
+        "tab": "AI Gateway",
+        "groups": [
+          {
+            "group": "Explanation",
+            "pages": ["ai-gateway/explanation/overview"]
+          }
+        ]
+      },
+      {
+        "tab": "Gateway Service (SGS)",
         "groups": [
           {
             "group": "Explanation",
@@ -467,19 +501,6 @@
           {
             "group": "Reference",
             "pages": ["gateway-service/reference/sgs-api"]
-          }
-        ]
-      },
-      {
-        "tab": "Storage",
-        "groups": [
-          {
-            "group": "Explanation",
-            "pages": ["storage/explanation/overview"]
-          },
-          {
-            "group": "Reference",
-            "pages": ["storage/reference/api"]
           }
         ]
       },

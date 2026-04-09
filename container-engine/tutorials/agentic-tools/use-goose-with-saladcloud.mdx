@@ -1,0 +1,247 @@
+---
+title: 'Use Goose with SaladCloud'
+sidebarTitle: 'Goose'
+description:
+  'Learn how to use Goose, an open-source extensible AI agent by Block, with a self-hosted model on SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[Goose](https://github.com/block/goose) is an open-source, extensible AI agent by Block (the company behind Square and
+Cash App). It goes beyond code suggestions - Goose can install packages, execute commands, edit files, run tests, and
+interact with external services via MCP. It is available as both a CLI and a desktop app, and supports fully custom
+OpenAI-compatible providers via a JSON config file.
+
+Goose works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  point Goose at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available via
+  monthly subscription.
+- **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
+  configuration. Still very easy to set up and use.
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com) with an active LLM deployment
+- Linux, macOS, or Windows (WSL2)
+
+## Step-by-Step Setup
+
+### Step 1: Choose Your Backend
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
+
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+
+    Available models:
+
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    First, deploy an OpenAI-compatible LLM server on SaladCloud.
+
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe is a strong choice for general-purpose agentic
+      tasks. On the recipe page, provide a name and deploy - the rest is preconfigured with recommended settings.
+    - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+      model optimized for instruction-following tasks.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [sglang](/container-engine/reference/recipes/sglang) - High-performance inference
+    - [vllm](/container-engine/reference/recipes/vllm) - Popular LLM serving framework
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+    - [tgi](/container-engine/reference/recipes/tgi) - Hugging Face Text Generation Inference server
+
+    After deployment, note your:
+
+    - **API endpoint URL** (e.g., `https://your-endpoint.salad.cloud`)
+    - **API key** (from your SaladCloud organization settings, if you enabled authentication)
+
+  </Tab>
+</Tabs>
+
+### Step 2: Install Goose
+
+For Desktop App instructions scroll to the bottom of this page.
+
+**Linux / macOS / WSL2:**
+
+```bash
+curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | bash
+```
+
+Or install via Homebrew on macOS:
+
+```bash
+brew install block-goose-cli
+```
+
+Verify the installation:
+
+```bash
+goose --version
+```
+
+### Step 3: Configure a Custom Provider
+
+The first time you run Goose it launches an onboarding wizard. When asked **"What would you like to configure?"**,
+follow these steps:
+
+1. Select **Custom Provider** → **Add a custom provider** → **OpenAI Compatible**
+2. Enter a name for the provider (e.g., `saladcloud`)
+3. Fill in the endpoint and credentials based on your chosen backend:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    - **API URL**: `https://ai.salad.cloud:40404/v1/chat/completions`
+    - **API key**: your Salad API key
+    - **Available models**: e.g. `qwen3.5-35b-a3b`
+    - When asked **"Does this provider require custom headers?"**, select **No**
+
+    After adding the provider, run `goose configure` and under **Configure Providers** select your new custom provider.
+
+    **Alternatively**, create or edit `~/.config/goose/custom_providers/saladcloud.json`:
+
+    ```json
+    {
+      "name": "custom_saladcloud_gateway",
+      "engine": "openai",
+      "display_name": "SaladCloud AI Gateway",
+      "description": "Salad AI Gateway",
+      "api_key_env": "SALAD_API_KEY",
+      "base_url": "https://ai.salad.cloud:40404/v1",
+      "models": [
+        { "name": "qwen3.5-35b-a3b", "context_limit": 131072 },
+        { "name": "qwen3.5-27b", "context_limit": 131072 },
+        { "name": "qwen3.5-9b", "context_limit": 131072 }
+      ],
+      "supports_streaming": true,
+      "requires_auth": true
+    }
+    ```
+
+    Then set the environment variable:
+
+    ```bash
+    export SALAD_API_KEY=your-salad-api-key
+    ```
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    - **API URL**: `https://your-endpoint.salad.cloud/v1/chat/completions`
+    - When prompted for an API key, enter any non-empty string (e.g., `dummy`), or indicate that authentication is not
+      required (if it is, you will add the real key in the custom headers step)
+    - Enter the available models separated by commas (e.g., `qwen3.5-35b-a3b`)
+    - Set your streaming and other preferences
+    - When asked **"Does this provider require custom headers?"**, select **Yes** if your deployment requires
+      authentication and add:
+      - Header name: `Salad-Api-Key`
+      - Header value: your SaladCloud API key
+
+    If your deployment does not require authentication, skip the custom headers step.
+
+    After adding the provider, run `goose configure` and under **Configure Providers** select your new custom provider.
+
+    **Alternatively**, you can create or edit the provider config file directly at
+    `~/.config/goose/custom_providers/saladcloud.json`:
+
+    ```json
+    {
+      "name": "custom_saladcloud",
+      "engine": "openai",
+      "display_name": "SaladCloud",
+      "description": "Custom SaladCloud provider",
+      "api_key_env": "CUSTOM_SALADCLOUD_API_KEY",
+      "base_url": "https://your-endpoint.salad.cloud/v1",
+      "models": [
+        {
+          "name": "qwen3.5-35b-a3b",
+          "context_limit": 128000
+        }
+      ],
+      "headers": {
+        "Salad-Api-Key": "your-salad-api-key"
+      },
+      "supports_streaming": true,
+      "requires_auth": false
+    }
+    ```
+
+  </Tab>
+</Tabs>
+
+### Step 4: Start Goose and Test the Connection
+
+Start a Goose session:
+
+```bash
+goose
+```
+
+Test with a simple task:
+
+> "Create a hello world Python script and run it."
+
+If Goose creates and executes the file, your setup is complete.
+
+## Goose Desktop App
+
+Goose also has a desktop app with the same capabilities as the CLI. See the
+[Quick Start instructions](https://block.github.io/goose/docs/quickstart/) for download links for your OS.
+
+Download and run the app, then on the startup page:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    1. Click **Connect to a Provider**
+    2. Click **Add Custom Provider**
+    3. Click **Configure Manually** and fill in:
+       - **Provider Type**: OpenAI Compatible
+       - **Display Name**: `SaladCloud AI Gateway`
+       - **API URL**: `https://ai.salad.cloud:40404/v1/`
+       - **API Base Path**: leave blank
+       - Under **Authentication**, select **This provider requires API Key** and enter your Salad API key
+       - **Available Models**: e.g. `qwen3.5-35b-a3b, qwen3.5-27b, qwen3.5-9b`
+    4. Click **Create Provider** and start using Goose
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    1. Click **Connect to a Provider**
+    2. Click **Add Custom Provider**
+    3. Click **Configure Manually** and fill in:
+       - **Provider Type**: OpenAI Compatible
+       - **Display Name**: a name for the provider (e.g., `SaladCloud`)
+       - **API URL**: your endpoint URL (e.g., `https://your-endpoint.salad.cloud/v1/`)
+       - **API Base Path**: leave blank
+       - **Available Models**: your model name (e.g., `qwen3.5-35b-a3b`)
+       - **Custom Headers**: add `Salad-Api-Key` with your SaladCloud API key as the value (only if your deployment
+         has authentication enabled)
+    4. Click **Create Provider** and start using Goose with your SaladCloud deployment
+  </Tab>
+</Tabs>
+
+## Model Recommendations
+
+- **Qwen 3.5-35B-A3B**: Best for complex agentic tasks - install, execute, edit, and test workflows
+- **Qwen 3.5-9B**: Suitable for lighter tasks and faster response times

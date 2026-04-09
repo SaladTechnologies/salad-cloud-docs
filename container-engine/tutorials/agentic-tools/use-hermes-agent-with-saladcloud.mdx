@@ -1,0 +1,337 @@
+---
+title: 'Use Hermes Agent with SaladCloud'
+sidebarTitle: 'Hermes Agent'
+description:
+  'Learn how to use Hermes Agent, a self-improving open-source AI agent with MCP support, with a self-hosted model on
+  SaladCloud.'
+---
+
+_Last Updated: April 3, 2026_
+
+## Introduction
+
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) is an open-source AI agent by
+[Nous Research](https://nousresearch.com) with persistent memory, 40+ built-in tools, MCP integration, and a
+self-improvement loop that learns from every task it completes. It supports custom OpenAI-compatible endpoints, making
+it straightforward to point at a model on SaladCloud.
+
+Hermes Agent pairs especially well with SaladCloud because:
+
+- **OpenAI-compatible endpoint support** - connects to any SaladCloud deployment via the built-in setup wizard
+- **Rich MCP integration** - connect GitHub, Webflow, Playwright, and any other MCP server
+- **Self-improving** - the agent writes structured records of what worked and what didn't, improving future task
+  performance automatically
+
+Hermes Agent works with SaladCloud in two ways:
+
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
+  use your Salad API key with standard authentication. Currently in closed beta, available via monthly subscription.
+- **Self-hosted model** - deploy your own LLM recipe on SaladCloud Container Engine, billed per hour. Note: Hermes Agent
+  cannot pass custom headers, so authentication must be disabled on self-hosted deployments.
+
+## Prerequisites
+
+Before getting started, make sure you have:
+
+- A [SaladCloud account](https://portal.salad.com)
+- Linux, macOS, or Windows (WSL2)
+- Python 3.10+ and Node.js 18+ (the installer handles these automatically)
+
+## Step-by-Step Setup
+
+### Step 1: Choose Your Backend
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Salad AI Gateway is the recommended option for Hermes Agent - it uses standard Bearer token authentication, which
+    Hermes Agent supports natively.
+
+    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
+    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+
+    Available models:
+
+    | Model             | Description                                                                    |
+    | :---------------- | :----------------------------------------------------------------------------- |
+    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Deploy an OpenAI-compatible LLM server on SaladCloud with the **Authentication** toggle disabled.
+
+    <Note>
+      Hermes Agent does not support custom HTTP headers for the main LLM provider. SaladCloud uses a `Salad-Api-Key`
+      header for authentication, which Hermes Agent cannot pass yet. **Deploy your SaladCloud container group with
+      authentication disabled** when using Hermes Agent or create a custom proxy to handle authentication.
+    </Note>
+
+    - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
+    - Create an organization or choose an existing one, then click "Deploy a container group".
+    - Select an LLM recipe. For the best experience with Hermes Agent's tool-calling capabilities, use
+      [vLLM](/container-engine/reference/recipes/vllm) with a Hermes-format model, or the
+      [Qwen3.5-35B-A3B (llama.cpp)](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) recipe.
+    - **Leave Authentication disabled** - Hermes Agent cannot pass a `Salad-Api-Key` header at the moment.
+    - Once deployed, note your **API endpoint URL** from SaladCloud (e.g., `https://your-endpoint.salad.cloud`). The
+      OpenAI-compatible API will be available at `{endpoint}/v1`.
+
+    Available recipes:
+
+    Ready-to-deploy recipes (best for less technical users):
+
+    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - Mixture of Experts model
+      optimized for instruction-following and tool-calling tasks.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
+
+    Recipes for custom deployments (best for advanced users):
+
+    - [vllm](/container-engine/reference/recipes/vllm) - Recommended; enable Hermes tool calling with
+      `--enable-auto-tool-choice --tool-call-parser hermes`
+    - [llama.cpp](/container-engine/reference/recipes/llama-cpp) - Supports GGUF models
+    - [ollama](/container-engine/reference/recipes/ollama) - Simple model management
+
+  </Tab>
+</Tabs>
+
+### Step 2: Install Hermes Agent
+
+Run the official installer - it handles Python, Node.js, dependencies, and the `hermes` command automatically:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+```
+
+Reload your shell, then verify:
+
+```bash
+source ~/.bashrc   # or ~/.zshrc on macOS
+hermes --version
+```
+
+### Step 3: Run the Setup Wizard
+
+Run the interactive setup wizard, which handles all model configuration:
+
+```bash
+hermes setup
+```
+
+When the wizard asks for a model provider, select **Custom OpenAI-compatible endpoint** and fill in:
+
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    - **Base URL**: `https://ai.salad.cloud:40404/v1`
+    - **API key**: your Salad API key
+    - **Context length**: `131072`
+
+    The wizard will auto-detect the available models from your endpoint.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    - **Base URL**: `https://your-endpoint.salad.cloud/v1`
+    - **API key**: `dummy` (any non-empty string - the endpoint has no auth)
+    - **Context length**: `262144`
+
+    The wizard will auto-detect the available models from your endpoint, so you do not need to specify a model name
+    manually.
+
+  </Tab>
+</Tabs>
+
+It also configures memory, tools, terminal backend, and optional messaging channels - you can accept defaults for
+everything and adjust later via `hermes config edit`, which opens `~/.hermes/config.yaml`.
+
+<Tip>Hermes Agent can import existing OpenClaw settings automatically if you have previously configured it.</Tip>
+
+### Step 4: Verify Your Configuration
+
+Before testing, confirm your setup by checking the configuration file:
+
+```bash
+hermes config show
+```
+
+Verify that:
+
+- `model.base_url` points to your endpoint with `/v1` appended
+- `model.api_key` is set to your Salad API key (AI Gateway) or any non-empty value (self-hosted)
+- `model.default` is detected correctly from your endpoint
+
+If anything looks incorrect, edit the config:
+
+```bash
+hermes config edit
+```
+
+### Step 5: Test the Connection
+
+Launch Hermes Agent:
+
+```bash
+hermes chat
+```
+
+Test with a simple task:
+
+> "Summarize what SaladCloud is in two sentences."
+
+If Hermes Agent responds, your setup is complete.
+
+## Built-in Tools
+
+Hermes Agent ships with 40+ built-in tools out of the box - no MCP servers or plugins required for most common tasks.
+
+### Web & Search
+
+| Tool               | What it does                                         |
+| :----------------- | :--------------------------------------------------- |
+| `web_search`       | Search the web and return results                    |
+| `web_extract`      | Extract and parse content from any URL               |
+| `browser_navigate` | Control a real browser to navigate pages             |
+| `browser_snapshot` | Capture the current state of a browser page          |
+| `browser_vision`   | Interact with pages using vision (click, read, etc.) |
+
+### Files & Terminal
+
+| Tool           | What it does                          |
+| :------------- | :------------------------------------ |
+| `terminal`     | Execute shell commands                |
+| `process`      | Start and manage background processes |
+| `read_file`    | Read file contents                    |
+| `patch`        | Modify files with targeted edits      |
+| `execute_code` | Run code in an isolated environment   |
+
+### Media & Voice
+
+| Tool             | What it does                                |
+| :--------------- | :------------------------------------------ |
+| `text_to_speech` | Convert text to spoken audio                |
+| `vision_analyze` | Analyze and describe images                 |
+| `image_generate` | Create images via an image generation model |
+
+### Memory & Tasks
+
+| Tool             | What it does                                         |
+| :--------------- | :--------------------------------------------------- |
+| `memory`         | Read and write persistent memory across sessions     |
+| `session_search` | Search past conversation sessions                    |
+| `todo`           | Create and manage task lists                         |
+| `cronjob`        | Schedule recurring tasks                             |
+| `clarify`        | Ask the user a clarifying question before proceeding |
+
+### Agent Orchestration
+
+| Tool            | What it does                                       |
+| :-------------- | :------------------------------------------------- |
+| `delegate_task` | Spin up a subagent to handle a subtask in parallel |
+| `send_message`  | Send a message to a connected messaging channel    |
+
+Most tools are enabled by default. You can enable or disable individual tools with:
+
+```bash
+hermes tools
+```
+
+## MCP Server Integration
+
+Hermes Agent has first-class MCP support. Add any MCP server to `~/.hermes/config.yaml` under `mcp_servers`. More
+details can be found in the official
+[MCP documentation](https://hermes-agent.nousresearch.com/docs/guides/use-mcp-with-hermes/)
+
+### Filesystem MCP
+
+```yaml
+mcp_servers:
+  filesystem:
+    command: 'npx'
+    args: ['-y', '@modelcontextprotocol/server-filesystem', '/path/to/your/project']
+```
+
+### GitHub MCP
+
+```yaml
+mcp_servers:
+  github:
+    command: 'npx'
+    args: ['-y', '@modelcontextprotocol/server-github']
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: your-github-token
+```
+
+### Playwright MCP (Browser Automation)
+
+```yaml
+mcp_servers:
+  playwright:
+    command: 'npx'
+    args: ['-y', '@playwright/mcp@latest']
+```
+
+### Webflow MCP
+
+```yaml
+mcp_servers:
+  webflow:
+    command: 'npx'
+    args: ['-y', 'webflow-mcp-server@latest']
+    env:
+      WEBFLOW_TOKEN: your-webflow-token
+```
+
+### Remote HTTP MCP Server
+
+```yaml
+mcp_servers:
+  remote_api:
+    url: 'https://mcp.example.com/mcp'
+    headers:
+      Authorization: 'Bearer your-token'
+```
+
+After editing the config, reload MCP servers without restarting:
+
+```bash
+/reload-mcp
+```
+
+You can also filter which tools each server exposes:
+
+```yaml
+mcp_servers:
+  github:
+    command: 'npx'
+    args: ['-y', '@modelcontextprotocol/server-github']
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: your-token
+    tools:
+      include: [create_issue, list_issues, get_file_contents]
+```
+
+### Configure Memory
+
+Hermes Agent's persistent memory is one of its strongest features. It works out of the box but can be tuned:
+
+```yaml
+memory:
+  memory_enabled: true
+  memory_char_limit: 2200 # ~800 tokens
+```
+
+Increase `memory_char_limit` if the agent is working on large projects and needs to retain more context between
+sessions.
+
+### Use Docker for Tool Execution
+
+For safer code execution and better isolation, set the terminal backend to Docker:
+
+```yaml
+terminal:
+  backend: docker
+  docker_image: 'nikolaik/python-nodejs:python3.11-nodejs20'
+```
+
+### Model Recommendations
+
+- **Qwen 3.5-35B-A3B with llama.cpp**: Good for conversational tasks and simpler agentic workflows
+- **Qwen 3.5-9B**: Suitable for lightweight tasks; less reliable for complex multi-step tool chains

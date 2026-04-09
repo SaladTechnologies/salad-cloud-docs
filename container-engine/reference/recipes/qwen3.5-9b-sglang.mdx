@@ -1,0 +1,134 @@
+---
+title: Qwen3.5-9B with SGLang
+sidebarTitle: Qwen3.5-9B (SGLang)
+description: Serve Qwen3.5-9B with SGLang as an OpenAI-compatible API for OpenClaw, OpenCode, and other tools.
+---
+
+_Last Updated: March 24, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs `Qwen3.5-9B` with the official [SGLang](https://docs.sglang.io/) runtime on a Salad GPU. The model is
+downloaded automatically on first startup, and the container exposes an OpenAI-compatible API for tools such as
+OpenClaw, OpenCode, and other compatible clients.
+
+This recipe is designed to be easy to use:
+
+- the model is already chosen for you
+- it is public by default, so you can test it immediately after deployment
+- it is preconfigured for Qwen reasoning and tool-calling
+- you can connect it to OpenClaw or any other OpenAI-compatible client
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Open your Organization and click "Deploy Container Group"
+3. Pick **Qwen3.5-9B (SGLang)** from the recipe list.
+4. Enter a **Container Group Name**.
+5. Decide whether to enable **Require Container Gateway Authentication**:
+   - Disabled: public access.
+   - Enabled: requests must include your SaladCloud API key.
+6. Deploy and wait for the first startup to finish.
+
+<Callout variation="note">
+  The model is downloaded from Hugging Face at startup, so it can take several minutes before the deployment becomes
+  ready.
+</Callout>
+
+Once the container is ready, connect your client to `https://<your-dns>.salad.cloud/v1/chat/completions`.
+
+## Use With OpenClaw
+
+If you want to connect this recipe to OpenClaw, follow this guide:
+
+- [Use OpenClaw with a Salad-hosted LLM](/container-engine/how-to-guides/openclaw/openclaw-ollama-salad-hosted-telegram)
+
+## Current Defaults
+
+The recipe currently defaults to:
+
+- Model source: `Qwen/Qwen3.5-9B`
+- Served model name: `qwen3.5-9b`
+- Host bind: `::`
+- Runtime image: `lmsysorg/sglang:latest-runtime`
+- Context length: `131072`
+- Tensor parallel size: `1`
+- Memory fraction: `0.8`
+- Attention backend: `triton`
+- Reasoning parser: `qwen3`
+- Tool call parser: `qwen3_coder`
+- Authentication: disabled by default
+
+This follows the official Qwen SGLang launch pattern for `Qwen/Qwen3.5-9B`, with a `triton` attention backend selected
+for better compatibility on Salad GPU nodes.
+
+## Thinking Mode
+
+Qwen thinking is enabled by default.
+
+If you want a direct response for a specific request, include this field in the JSON body:
+
+```json
+"chat_template_kwargs": {"enable_thinking": false}
+```
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is unchecked by default.
+
+- Disabled: anyone with the URL can call the API.
+- Enabled: every request must include the `Salad-Api-Key` header.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "qwen3.5-9b",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Write a short explanation of mixture-of-experts models."}
+    ],
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "max_tokens": 512
+  }'
+```
+
+If you enabled authentication during deployment, add:
+
+```bash
+-H 'Salad-Api-Key: <api-key>'
+```
+
+## For Technical Users
+
+If you want to change the model or runtime settings later, open the container group in the SaladCloud Portal and edit
+**Advanced Configuration**.
+
+Useful environment variables include:
+
+- `SGLANG_MODEL_PATH`
+- `SGLANG_SERVED_MODEL_NAME`
+- `SGLANG_CONTEXT_LENGTH`
+- `SGLANG_MEM_FRACTION_STATIC`
+- `SGLANG_TP_SIZE`
+
+For more detail, see:
+
+- [Qwen SGLang deployment docs](https://qwen.readthedocs.io/en/v3.0/deployment/sglang.html)
+- [SGLang server arguments](https://docs.sglang.io/advanced_features/server_arguments.html)
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/qwen3.5-9b-sglang)
+- [Qwen3.5-9B model card](https://huggingface.co/Qwen/Qwen3.5-9B)
+- [SGLang Project](https://github.com/sgl-project/sglang)
