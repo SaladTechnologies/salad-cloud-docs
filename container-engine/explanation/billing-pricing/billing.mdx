@@ -1,61 +1,40 @@
 ---
-title: 'Billing'
+title: 'SCE Billing'
+sidebarTitle: 'Billing'
+description:
+  'Understand how Salad Container Engine billing works, including per-second usage tracking, priority pricing, and cost
+  examples.'
 ---
 
-_Last Updated: November 06, 2025_
+_Last Updated: April 09, 2026_
 
-# Prepaid Billing
+# Salad Container Engine (SCE) Billing
 
-SaladCloud used prepaid billing. In order to keep your organization's workloads active, you must maintain a positive
-credit balance. There are two options to do this on SaladCloud: Auto Recharge and Manual Recharge.
+Salad Container Engine (SCE) is billed based on the time container group instances are running on one of our machines.
+No charges are incurred while your container group is allocating or downloading. The price per hour is based on the
+hardware resources and [priority level](/container-engine/explanation/billing-pricing/priority-pricing#priority-levels)
+you select. Prices are available on our [pricing page](https://salad.com/pricing) and listed in the SaladCloud Portal
+when creating a container group. Usage is tracked per second.
 
-## Auto Recharge
+For information on options for purchasing SaladCloud credits visit our
+[SaladCloud billing documentation](/general/explanation/billing).
 
-SaladCloud recommends enabling auto recharge for organizations serving production workloads to ensure uninterrupted
-service. With auto recharge, you configure a threshold and recharge amount, allowing SaladCloud to automatically
-replenish your organization’s credit balance when needed.
+<Tip>
+  **Never Pay for Cold Boot Time Again**
 
-    •	Recharge Threshold: The balance level that triggers an auto recharge ("when my balance falls below").
+You only pay for the time that the hardware is available to be used by your application, you will never pay for Cold
+Boot time.
 
-    •	Recharge Amount: The predefined amount SaladCloud charges to your payment method when the threshold is reached ("bring credit balance back up to").
+</Tip>
 
-You can update these settings anytime through the Billing & Usage page in your organization’s portal. If you set the
-recharge threshold to an amount higher than your current credit balance, an auto recharge will be triggered immediately
-upon saving the updated settings.
+## Running Time
 
-<img src="/container-engine/images/auto-recharge.png" width="600" />
-
-If an auto recharge encounters an error with the payment method, SaladCloud sends an email notification, and the
-organization’s workloads are given a grace period to resolve the issue. If the issue is not resolved promptly,
-SaladCloud reserves the right to stop all active workloads and API usage.
-
-## Manual Recharge
-
-Manual credit recharges provide an alternative way to maintain a positive credit balance for your organization. At any
-time, you can add up to $10,000 in credits to your account by clicking the “Add to Credit Balance” button on the Billing
-& Usage page.
-
-<img src="/container-engine/images/manual-recharge.png" width="600" />
-
-For amounts exceeding $10,000, please refer to our volume discount instructions below.
-
-If your organization is not enrolled in auto recharge and the account balance reaches $0.00, all active workloads and
-API usage will stop immediately until a positive credit balance is restored. For organizations running production
-workloads, SaladCloud strongly recommends enabling auto recharge to prevent service interruptions.
-
-# How Are Charges Calculated?
-
-SaladCloud only charges for the hardware resources that are dedicated to your application while your container is
-Running on one of our machines. Our flexible billing model allows you to customize each machine to your exact hardware
-requirements, no more selecting an instance type from an endlessly long pricing sheet.
-
-## Hardware Resources
+<img src="/container-engine/images/deployment-map.png" />
 
 When creating a Container Group in SCE, you select the required hardware that will be dedicated to your application when
-it runs on SaladCloud. The current rate for each type of hardware can be found on our
-[pricing page](https://salad.com/pricing). For GPU container groups, there are no additional charges for RAM and vCPU.
+it runs on SaladCloud. For GPU container groups, there are no additional charges for RAM and vCPU.
 
-### Example 1
+### Example 1 - CPU only Container Group
 
 You create a Container Group with 1 vCPU, 2 GB RAM, no GPU, and 10 replicas
 
@@ -63,59 +42,11 @@ Per Instance Cost = 1 vCPU x $0.004 per vCPU + 2 GB x $0.001 per GB = $0.006/hr
 
 **Total Cost** = $0.006/hr (per Instance) x 10 replicas = $0.06/hr
 
-### Example 2
+### Example 2 - GPU Container Group
 
-You create a Container Group with 4 vCPU, 6 GB RAM, RTX 3060 GPU at "Low" priority, and 5 replicas
+You create a Container Group with 4 vCPU, 6 GB RAM, RTX 3060 GPU at "Low" priority, and 5 replicas. GPU rates include
+vCPUs and RAM.
 
 Per Instance Cost = 1 RTX 3060 at "Low" Priority x $0.047 = $0.047/hr
 
-**Total Cost** = $0.047/hr (per Instance) x 5 replicas = $0.235 /hr
-
-## Running Time
-
-SaladCloud bills for the time that the selected hardware resources are dedicated to your application, although it is
-common to see hourly rates listed on Salad, usage is tracked per second.
-
-> 🎉 Never Pay for Cold Boot Time Again
->
-> You only pay for the time that the hardware is available to used by your application, you will never pay for Cold Boot
-> time.
-
-<img src="/container-engine/images/deployment-map.png" />
-
-# Monitoring Usage
-
-You can monitor the current month's usage and view previous invoices directly in the SaladCloud Portal.
-
-<img src="/container-engine/images/usage-monitoring.png" />
-
-## Volume Discounts
-
-SaladCloud offers volume pricing through prepaid credit purchases. You can bulk purchase SaladCloud usage credits at the
-following discounted rates:
-
-| Pre-Paid Amount     | Discount      |
-| ------------------- | ------------- |
-| $10,000 - $24,999   | 2%            |
-| $25,000 - $49,999   | 4%            |
-| $50,000 - $74,999   | 6%            |
-| $75,000 - $99,999   | 8%            |
-| $100,000 - $150,000 | 10%           |
-| Above $150,000      | Talk to Sales |
-
-For purchases above $150,000 or to complete a volume credit purchase, contact us at
-[sales@salad.com](mailto:sales@salad.com).
-
-# Preauthorization Requests
-
-We may send a preauthorization request to the issuing bank to verify a bank will authorize charges. Some credit card
-companies present these as real charges, which may surprise you.
-
-A preauth is really just a hold on a credit card. We'll typically preauthorize a small amount (usually $10) when a new
-payment method is added to your Organization, then cancel the authorization immediately. Banks may show the preauth for
-up to 7 days, even though we have not collected any money.
-
-# Accepted Payment Types
-
-SaladCloud only accepts valid credit and debit cards as a payment method through the SaladCloud portal. Prepaid cards
-are not accepted. For additional payment methods, please reach out to [sales@salad.com](mailto:sales@salad.com).
+**Total Cost** = $0.047/hr (per Instance) x 5 replicas = $0.235/hr

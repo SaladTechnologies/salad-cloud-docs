@@ -1,17 +1,24 @@
 ---
-title: 'Billing'
-description: 'A clear and transparent explanation of our billing process for transcription services.'
+title: 'Transcription API Billing'
+description: 'SaladCloud Transcription API billing explanation.'
 ---
 
-_Last Updated: January 21, 2025_
+_Last Updated: April 09, 2026_
 
 # How We Charge for Salad Transcription API
 
-This page explains how our billing process works. Our goal is to ensure clarity and fairness so you understand exactly
-how charges are calculated for the transcription services you use. With the lowest rates on the market, Salad
-Transcription API provides cost-effective solutions without compromising on quality.
+You are charged a rate based on the duration of your audio file, calculated as a fraction of an hour to two decimal
+places. Here’s how it works:
 
----
+1. **Convert Audio Duration to Hours** Each audio file's length is measured in seconds and divided by 3,600 to calculate
+   the duration in hours.
+
+2. **Round to the Nearest Hundredth** The resulting duration is rounded to two decimal places for clarity and precision.
+
+3. **Minimum Billing Unit** The smallest unit we charge for is 0.01 hours, equivalent to 36 seconds of audio. This
+   ensures even very short files are fairly billed.
+
+4. **Risk-Free Billing** If a transcription fails for any reason, you will not be charged.
 
 ## Pricing Tiers
 
@@ -31,25 +38,6 @@ audio hours processed **per month**:
 
 ---
 
-## How We Calculate the Charge
-
-You are charged based on the duration of your audio file, calculated as a fraction of an hour with two decimal places
-for precision. Here’s how it works:
-
-1. **Convert Audio Duration to Hours** Each audio file's length is measured in seconds and divided by 3,600 to calculate
-   the duration in hours.
-
-2. **Round to the Nearest Hundredth** The resulting duration is rounded to two decimal places for clarity and precision.
-
-3. **Minimum Billing Unit** The smallest unit we charge for is 0.01 hours, equivalent to 36 seconds of audio. This
-   ensures even very short files are fairly billed.
-
-4. **Risk-Free Billing** If a transcription fails for any reason, you will not be charged.
-
----
-
-_Last Updated: January 21, 2025_
-
 ## Examples of Charges
 
 Here are examples to illustrate how charges are calculated based on rate of $0.20 per audio hour for Salad Transcription
@@ -60,9 +48,6 @@ API and $0.08 for the Lite version. Please [reach out](mailto:cloud@salad.com) t
 
 - **5 minutes**: `5 minutes = 0.0833 hours → rounded to 0.08 hours` **Cost**: `0.08 hours × $0.20/hour = $0.016`
   **Lite**: `0.08 hours × $0.08/hour = $0.006`
-
-- **2 minutes**: `2 minutes = 0.0333 hours → rounded to 0.03 hours` **Cost**: `0.03 hours × $0.20/hour = $0.006`
-  **Lite**: `0.03 hours × $0.08/hour = $0.002`
 
 - **30 seconds**: `30 seconds = 0.0083 hours → rounded to 0.01 hours` **Cost**: `0.01 hours × $0.20/hour = $0.002`
   **Lite**: `0.01 hours × $0.08/hour = $0.0008`
@@ -84,14 +69,17 @@ Our billing process is designed to ensure clarity and value for all our customer
 
 ---
 
-_Last Updated: January 21, 2025_
+## Customers With a Prior AppSumo Lifetime Deal
 
-## Get Started Today
+If you've previously purchased a lifetime deal from AppSumo, no action is required on your account. Each month, your
+account will automatically receive the transcription audio hours included in your purchase. If you use all your credits
+before the next monthly renewal, SaladCloud will restrict your access until the new credits are available. To prevent
+any interruption in service, you can add Auto Recharge or make a one-time Manual Recharge to purchase additional credits
+for your organization; however, this is optional.
 
-- **Free Credits for New Users** [Sign up](https://portal.salad.com/) and receive up to 10 free audio hours ($1) to
-  explore our services.
+# Get Started Today
+
+- **Free Credits for New Users** [Sign up](https://portal.salad.com/) with a payment cards and receive up to 10 free
+  audio hours ($1) to explore our services.
 - **Integrate the API**: Use our flexible [instructions](/transcription/tutorials/transcription-quick-start) to
   integrate transcription services into your platform.
-
-Salad Transcription API provides a clear, transparent, and reliable billing process that makes high-quality
-transcription services accessible to everyone at the most competitive prices.
