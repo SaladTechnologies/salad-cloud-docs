@@ -15,7 +15,7 @@
         "groups": [
           {
             "group": "Explanation",
-            "pages": ["index", "general/explanation/account-security"]
+            "pages": ["index", "general/explanation/account-security", "general/explanation/billing"]
           },
           {
             "group": "Tutorials",
