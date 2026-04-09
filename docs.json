@@ -72,8 +72,7 @@
                 "group": "Billing & Pricing",
                 "pages": [
                   "container-engine/explanation/billing-pricing/billing",
-                  "container-engine/explanation/billing-pricing/priority-pricing",
-                  "container-engine/explanation/billing-pricing/prepaid-billing-faqs"
+                  "container-engine/explanation/billing-pricing/priority-pricing"
                 ]
               },
               {
@@ -1101,7 +1100,7 @@
     },
     {
       "source": "/products/sce/container-groups/billing-and-pricing/prepaid-billing-faqs",
-      "destination": "/container-engine/explanation/billing-pricing/prepaid-billing-faqs"
+      "destination": "/general/explanation/billing"
     },
     {
       "source": "/products/sce/autoscaling/autoscaling",
