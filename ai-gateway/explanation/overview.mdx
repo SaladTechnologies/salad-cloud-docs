@@ -23,7 +23,7 @@ and more - works with Salad AI Gateway out of the box.
 ## API Endpoint
 
 ```
-https://ai.salad.cloud:40404/v1
+https://ai.salad.cloud/v1
 ```
 
 ## Available Models
@@ -44,7 +44,7 @@ The API follows the OpenAI `v1/chat/completions` format. Once you have access, s
 the `Authorization` header:
 
 ```bash
-curl https://ai.salad.cloud:40404/v1/chat/completions \
+curl https://ai.salad.cloud/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <your-salad-api-key>" \
   -d '{
@@ -65,7 +65,7 @@ custom base URL.
 We have integration guides for many popular agentic tools - Cline, Aider, OpenCode, OpenClaw, Kilo Code, Roo Code,
 Continue, Goose, Hermes Agent, and more. All of those guides apply here with one difference: **use standard
 authentication instead of the `Salad-Api-Key` custom header**. Set your Salad API key as the API key in whichever field
-the tool provides (the `Authorization: Bearer` header), and point the base URL to `https://ai.salad.cloud:40404/v1`.
+the tool provides (the `Authorization: Bearer` header), and point the base URL to `https://ai.salad.cloud/v1`.
 
 <CardGroup cols={2}>
   <Card title="Cline" icon="code" href="/container-engine/tutorials/agentic-tools/use-cline-with-saladcloud">
@@ -114,7 +114,7 @@ the tool provides (the `Authorization: Bearer` header), and point the base URL t
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://ai.salad.cloud:40404/v1",
+    base_url="https://ai.salad.cloud/v1",
     api_key="your-salad-api-key",
 )
 
@@ -128,7 +128,7 @@ print(response.choices[0].message.content)
 **Environment variables (for tools like Aider, etc.):**
 
 ```bash
-export OPENAI_BASE_URL=https://ai.salad.cloud:40404/v1
+export OPENAI_BASE_URL=https://ai.salad.cloud/v1
 export OPENAI_API_KEY=your-salad-api-key
 ```
 
