@@ -1,0 +1,137 @@
+---
+title: Qwen3.6-35B-A3B with llama.cpp Recipe
+sidebarTitle: Qwen3.6-35B-A3B
+description: Serve Qwen3.6-35B-A3B with llama.cpp as an OpenAI-compatible API for OpenClaw, OpenCode, and other tools.
+---
+
+_Last Updated: April 16, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs `Qwen3.6-35B-A3B` with the official [llama.cpp](https://github.com/ggml-org/llama.cpp) CUDA server on a
+Salad GPU. The model downloads automatically on startup, the built-in llama.cpp web UI is available at your deployment
+URL, and the container exposes an OpenAI-compatible API for tools such as OpenClaw, OpenCode, and other compatible
+clients.
+
+This recipe is designed to be easy for nontechnical users:
+
+- the model is already chosen for you
+- it is public by default, so you can test it immediately after deployment
+- thinking is enabled by default
+- you can start with the built-in web UI, then connect other tools later
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **Qwen3.6-35B-A3B (llama.cpp)** recipe.
+3. Enter a **Container Group Name**.
+4. Decide whether to enable **Require Container Gateway Authentication**:
+   - Disabled: public access.
+   - Enabled: requests must include your SaladCloud API key.
+5. Choose whether to keep **Enable Thinking / Reasoning** turned on.
+6. Deploy and wait for the first startup to finish.
+
+<Callout variation="note">
+  Model is downloaded at startup, so it can take up to about 20 minutes before the deployment becomes ready.
+</Callout>
+
+Once the container is ready, you can either open the built-in UI in a browser or connect an OpenAI-compatible client to
+`/v1/chat/completions`.
+
+## Use With OpenClaw
+
+If you want to connect this recipe to OpenClaw or other agentic tools, follow these guides:
+
+- [Use OpenClaw with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud)
+- [Use OpenCode with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud)
+- [Use Cline with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-cline-with-saladcloud)
+- [Use Aider with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-aider-with-saladcloud)
+- [Use Kilo Code with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud)
+- [Use Roo Code with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud)
+- [Use Continue with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-continue-with-saladcloud)
+- [Use Versel AI with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud)
+- [Use Goose with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-goose-with-saladcloud)
+- [Use Hermes with a Salad-hosted LLM](/container-engine/tutorials/agentic-tools/use-hermes-agent-with-saladcloud)
+
+## Defaults
+
+The recipe comes preconfigured with these defaults:
+
+- Model source: `unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL`
+- Model alias: `qwen3.6-35b-a3b`
+- Context size: `262144`
+- Parallel slots: `1`
+- Thinking: enabled by default
+- Sampling defaults: `temperature 0.6`, `top_p 0.95`, `min_p 0.0`, `top_k 20`
+- Authentication: disabled by default
+
+`temperature`, `top_p`, and `min_p` are startup defaults. You can still override them per request in your inference
+payload.
+
+## Thinking Mode
+
+When thinking is enabled, you can control it per request:
+
+- Add `/think` to explicitly enable reasoning for that turn.
+- Add `/no_think` to disable reasoning for that turn.
+
+If you disable thinking in the deployment form, the recipe sets Qwen's hard switch and `/think` will no longer override
+it.
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is unchecked by default.
+
+- Disabled: anyone with the URL can call the API.
+- Enabled: every request must include the `Salad-Api-Key` header.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/chat/completions \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "qwen3.6-35b-a3b",
+    "messages": [
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Write a short explanation of mixture-of-experts models."}
+    ],
+    "max_tokens": 256
+  }'
+```
+
+If you enabled authentication during deployment, add:
+
+```bash
+-H 'Salad-Api-Key: <api-key>'
+```
+
+## For Technical Users
+
+If you want to tune llama.cpp later, open the container group in the SaladCloud Portal and edit **Advanced
+Configuration**.
+
+Useful environment variables include:
+
+- `LLAMA_ARG_HF_REPO` to change the Hugging Face GGUF repo
+- `LLAMA_ARG_MODEL_URL` to point directly to a `.gguf` file
+- `LLAMA_ARG_CTX_SIZE` to change the context window
+- `LLAMA_ARG_N_GPU_LAYERS` to control GPU offload
+- `LLAMA_ARG_N_PARALLEL` to change concurrency
+
+For full llama.cpp server options, see:
+
+- [llama.cpp server docs](https://github.com/ggml-org/llama.cpp/tree/master/tools/server)
+- [Server args and environment variable mapping](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md#usage)
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/qwen3.6-35b-a3b-llama-cpp)
+- [Unsloth Qwen3.6 model notes](https://unsloth.ai/docs/models/qwen3.6#qwen3.6-35b-a3b)
+- [llama.cpp Project](https://github.com/ggml-org/llama.cpp)

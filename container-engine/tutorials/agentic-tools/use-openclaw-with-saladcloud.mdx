@@ -135,16 +135,16 @@ openclaw pairing approve telegram <CODE>
 
 If you skipped Telegram during onboarding, add it manually to `~/.openclaw/openclaw.json`:
 
-```json5
+```json
 {
-  channels: {
-    telegram: {
-      enabled: true,
-      botToken: '<YOUR_BOT_TOKEN>',
-      dmPolicy: 'pairing',
-      groups: { '*': { requireMention: true } },
-    },
-  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "<YOUR_BOT_TOKEN>",
+      "dmPolicy": "pairing",
+      "groups": { "*": { "requireMention": true } }
+    }
+  }
 }
 ```
 
@@ -157,35 +157,35 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
   <Tab title="Salad AI Gateway">
     Add the following config, merging with any existing content:
 
-    ```json5
+    ```json
     {
-      models: {
-        providers: {
-          saladcloud: {
-            baseUrl: 'https://ai.salad.cloud/v1',
-            apiKey: 'your-salad-api-key',
-            api: 'openai-completions',
-            models: [
+      "models": {
+        "providers": {
+          "saladcloud": {
+            "baseUrl": "https://ai.salad.cloud/v1",
+            "apiKey": "your-salad-api-key",
+            "api": "openai-completions",
+            "models": [
               {
-                id: 'qwen3.5-35b-a3b',
-                name: 'qwen3.5-35b-a3b',
-                reasoning: false,
-                input: ['text'],
-                cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-                contextWindow: 131072,
-                maxTokens: 16384,
-              },
-            ],
-          },
-        },
+                "id": "qwen3.5-35b-a3b",
+                "name": "qwen3.5-35b-a3b",
+                "reasoning": false,
+                "input": ["text"],
+                "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+                "contextWindow": 131072,
+                "maxTokens": 16384
+              }
+            ]
+          }
+        }
       },
-      agents: {
-        defaults: {
-          model: {
-            primary: 'saladcloud/qwen3.5-35b-a3b',
-          },
-        },
-      },
+      "agents": {
+        "defaults": {
+          "model": {
+            "primary": "saladcloud/qwen3.5-35b-a3b"
+          }
+        }
+      }
     }
     ```
 
@@ -197,43 +197,43 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
 
     Add the following config, merging with any existing content:
 
-    ```json5
+    ```json
     {
-      models: {
-        providers: {
-          saladcloud: {
-            baseUrl: 'https://your-endpoint.salad.cloud/v1',
-            apiKey: 'dummy',
-            api: 'openai-completions',
-            headers: {
-              'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
+      "models": {
+        "providers": {
+          "saladcloud": {
+            "baseUrl": "https://your-endpoint.salad.cloud/v1",
+            "apiKey": "dummy",
+            "api": "openai-completions",
+            "headers": {
+              "Salad-Api-Key": "<YOUR_SALAD_API_KEY>"
             },
-            models: [
+            "models": [
               {
-                id: 'qwen3.5-35b-a3b',
-                name: 'qwen3.5-35b-a3b',
-                reasoning: false,
-                input: ['text'],
-                cost: {
-                  input: 0,
-                  output: 0,
-                  cacheRead: 0,
-                  cacheWrite: 0,
+                "id": "qwen3.5-35b-a3b",
+                "name": "qwen3.5-35b-a3b",
+                "reasoning": false,
+                "input": ["text"],
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0
                 },
-                contextWindow: 128000,
-                maxTokens: 16384,
-              },
-            ],
-          },
-        },
+                "contextWindow": 128000,
+                "maxTokens": 16384
+              }
+            ]
+          }
+        }
       },
-      agents: {
-        defaults: {
-          model: {
-            primary: 'saladcloud/qwen3.5-35b-a3b',
-          },
-        },
-      },
+      "agents": {
+        "defaults": {
+          "model": {
+            "primary": "saladcloud/qwen3.5-35b-a3b"
+          }
+        }
+      }
     }
     ```
 

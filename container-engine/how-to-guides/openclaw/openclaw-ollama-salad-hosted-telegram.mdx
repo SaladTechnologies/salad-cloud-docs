@@ -152,16 +152,16 @@ openclaw pairing approve telegram <CODE>
 If you skipped Telegram during onboarding, you can still configure it manually later by running "openclaw onboard
 --install-daemon" or adding this in `~/.openclaw/openclaw.json`:
 
-```json5
+```json
 {
-  channels: {
-    telegram: {
-      enabled: true,
-      botToken: '<YOUR_BOT_TOKEN>',
-      dmPolicy: 'pairing',
-      groups: { '*': { requireMention: true } },
-    },
-  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "<YOUR_BOT_TOKEN>",
+      "dmPolicy": "pairing",
+      "groups": { "*": { "requireMention": true } }
+    }
+  }
 }
 ```
 
@@ -175,59 +175,59 @@ model before testing in Telegram.
 
 Edit `~/.openclaw/openclaw.json` and add/merge:
 
-```json5
+```json
 {
-  models: {
-    providers: {
-      ollama: {
-        baseUrl: 'https://<your-deployment>.salad.cloud/v1',
-        apiKey: 'ollama-local',
-        api: 'openai-completions',
-        headers: {
-          'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
+  "models": {
+    "providers": {
+      "ollama": {
+        "baseUrl": "https://<your-deployment>.salad.cloud/v1",
+        "apiKey": "ollama-local",
+        "api": "openai-completions",
+        "headers": {
+          "Salad-Api-Key": "<YOUR_SALAD_API_KEY>"
         },
-        models: [
+        "models": [
           {
-            id: '<your-model-name>',
-            name: '<your-model-name>',
-            reasoning: false,
-            input: ['text'],
-            cost: {
-              input: 0,
-              output: 0,
-              cacheRead: 0,
-              cacheWrite: 0,
+            "id": "<your-model-name>",
+            "name": "<your-model-name>",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
             },
-            contextWindow: 128000,
-            maxTokens: 8192,
-          },
-        ],
-      },
-    },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
   },
-  agents: {
-    defaults: {
-      model: {
-        primary: 'ollama/<your-model-name>',
-      },
-    },
-  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "ollama/<your-model-name>"
+      }
+    }
+  }
 }
 ```
 
 If Salad gateway auth is enabled, make sure to add a custom header, if not, remove the `headers` section:
 
-```json5
+```json
 {
-  models: {
-    providers: {
-      ollama: {
-        headers: {
-          'Salad-Api-Key': '<YOUR_SALAD_API_KEY>',
-        },
-      },
-    },
-  },
+  "models": {
+    "providers": {
+      "ollama": {
+        "headers": {
+          "Salad-Api-Key": "<YOUR_SALAD_API_KEY>"
+        }
+      }
+    }
+  }
 }
 ```
 

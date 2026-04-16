@@ -343,6 +343,7 @@
                   "container-engine/reference/recipes/openmm-srcg",
                   "container-engine/reference/recipes/quai",
                   "container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp",
+                  "container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp",
                   "container-engine/reference/recipes/qwen3.5-9b-llama-cpp",
                   "container-engine/reference/recipes/qwen3.5-9b-sglang",
                   "container-engine/reference/recipes/sglang",
