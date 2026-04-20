@@ -164,22 +164,6 @@
                 ]
               },
               {
-                "group": "Agentic Tools",
-                "pages": [
-                  "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-continue-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-goose-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-hermes-agent-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-nemoclaw-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"
-                ]
-              },
-              {
                 "group": "Security",
                 "pages": ["container-engine/tutorials/security/jwt-authentication"]
               },
@@ -475,8 +459,47 @@
         "tab": "AI Gateway",
         "groups": [
           {
-            "group": "Explanation",
+            "group": "AI Gateway",
             "pages": ["ai-gateway/explanation/overview"]
+          },
+          {
+            "group": "Getting Started",
+            "pages": ["ai-gateway/tutorials/getting-started"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["ai-gateway/reference/models"]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "ai-gateway/integrations/overview",
+              {
+                "group": "Coding Agents & IDEs",
+                "pages": [
+                  "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-continue-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-cursor-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud"
+                ]
+              },
+              {
+                "group": "AI Assistants & Agents",
+                "pages": [
+                  "container-engine/tutorials/agentic-tools/use-goose-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-hermes-agent-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-nemoclaw-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-openclaw-with-saladcloud"
+                ]
+              },
+              {
+                "group": "Developer Frameworks & SDKs",
+                "pages": ["container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"]
+              }
+            ]
           }
         ]
       },
