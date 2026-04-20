@@ -460,11 +460,7 @@
         "groups": [
           {
             "group": "AI Gateway",
-            "pages": ["ai-gateway/explanation/overview"]
-          },
-          {
-            "group": "Getting Started",
-            "pages": ["ai-gateway/tutorials/getting-started"]
+            "pages": ["ai-gateway/explanation/overview", "ai-gateway/tutorials/getting-started"]
           },
           {
             "group": "Reference",
@@ -480,7 +476,6 @@
                   "container-engine/tutorials/agentic-tools/use-aider-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-cline-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-continue-with-saladcloud",
-                  "container-engine/tutorials/agentic-tools/use-cursor-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-kilo-code-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-opencode-with-saladcloud",
                   "container-engine/tutorials/agentic-tools/use-roo-code-with-saladcloud"

@@ -1,7 +1,9 @@
 ---
 title: 'AI Gateway Models'
 sidebarTitle: 'Models'
-description: 'Reference for all models available through Salad AI Gateway, including context windows, capabilities, and recommended use cases.'
+description:
+  'Reference for all models available through Salad AI Gateway, including context windows, capabilities, and recommended
+  use cases.'
 ---
 
 _Last Updated: April 20, 2026_
@@ -15,13 +17,13 @@ _Last Updated: April 20, 2026_
 
 ### qwen3.5-35b-a3b
 
-| Property       | Value          |
-| :------------- | :------------- |
-| Model ID       | `qwen3.5-35b-a3b` |
+| Property       | Value                    |
+| :------------- | :----------------------- |
+| Model ID       | `qwen3.5-35b-a3b`        |
 | Architecture   | Mixture of Experts (MoE) |
-| Active params  | ~3.5B (35B total) |
-| Context window | 131,072 tokens |
-| Max output     | 16,384 tokens  |
+| Active params  | ~3.5B (35B total)        |
+| Context window | 131,072 tokens           |
+| Max output     | 16,384 tokens            |
 
 **Best for**: Agentic tasks, complex multi-step reasoning, code generation, instruction following.
 
@@ -58,20 +60,20 @@ quality. A good choice when you need consistent performance across a range of ta
 
 **Best for**: High-volume queries, simple Q&A, fast responses where latency matters.
 
-The fastest model in the lineup. Well-suited for applications that need quick turnaround on straightforward prompts.
-May struggle with complex multi-step reasoning or large codebases compared to the larger models.
+The fastest model in the lineup. Well-suited for applications that need quick turnaround on straightforward prompts. May
+struggle with complex multi-step reasoning or large codebases compared to the larger models.
 
 ---
 
 ## Choosing a Model
 
-| Use Case                         | Recommended Model  |
-| :------------------------------- | :----------------- |
-| Agentic coding (Cline, Roo Code) | `qwen3.5-35b-a3b`  |
-| Complex reasoning / planning     | `qwen3.5-35b-a3b`  |
-| General chat / assistant         | `qwen3.5-27b`      |
-| Simple Q&A / high volume         | `qwen3.5-9b`       |
-| Fast autocomplete                | `qwen3.5-9b`       |
+| Use Case                         | Recommended Model |
+| :------------------------------- | :---------------- |
+| Agentic coding (Cline, Roo Code) | `qwen3.5-35b-a3b` |
+| Complex reasoning / planning     | `qwen3.5-35b-a3b` |
+| General chat / assistant         | `qwen3.5-27b`     |
+| Simple Q&A / high volume         | `qwen3.5-9b`      |
+| Fast autocomplete                | `qwen3.5-9b`      |
 
 ## API Usage
 
