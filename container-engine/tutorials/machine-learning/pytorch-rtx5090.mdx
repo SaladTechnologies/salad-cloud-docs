@@ -1,22 +1,47 @@
 ---
 title: Running PyTorch on RTX 5090 and 5080 GPUs
 sidebarTitle: 'PyTorch RTX 5090/5080'
-description: Use pytorch 2.7 with CUDA 12.8 on RTX 5090 and 5080 GPUs
+description: Use PyTorch with CUDA 12.8 on RTX 5090 and 5080 GPUs
 ---
 
-_Last Updated: April 24, 2025_
+_Last Updated: April 20, 2026_
 
 ## Overview
 
-Nvidia's new RTX 5090 and RTX 5080 GPUs require CUDA 12.8. As of April 24, 2025, the latest stable release of PyTorch
-(2.7.0) supports this, and you should find success with the
-[official pytorch docker images](https://hub.docker.com/r/pytorch/pytorch) for CUDA 12.8.
+Nvidia's RTX 5090 and RTX 5080 GPUs (Blackwell architecture) require CUDA 12.8. PyTorch 2.7.0 was the first stable
+release to add native sm_120 support - shipping pre-built CUDA 12.8 wheels with updated cuDNN, NCCL, and Triton 3.3. The
+current recommended version is **2.11.0**.
 
-- [pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime](https://hub.docker.com/layers/pytorch/pytorch/2.7.0-cuda12.8-cudnn9-runtime/images/sha256-7db0e1bf4b1ac274ea09cf6358ab516f8a5c7d3d0e02311bed445f7e236a5d80)
-- [pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel](https://hub.docker.com/layers/pytorch/pytorch/2.7.0-cuda12.8-cudnn9-devel/images/sha256-e97058f7b9b583517643477cc9a0433e54594038efd85ec4abd7836233d626f3)
+Any PyTorch image with the `-cuda12.8-` tag on version 2.7.0 or later will work with RTX 50-series GPUs.
+
+## Recommended Images
+
+Use the latest images from the [official PyTorch Docker Hub](https://hub.docker.com/r/pytorch/pytorch):
+
+- `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime`
+- `pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel`
+
+Earlier versions with CUDA 12.8 support (2.7.0 minimum):
+
+- `pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime`
+- `pytorch/pytorch:2.9.1-cuda12.8-cudnn9-devel`
+- `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime`
+- `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime`
+
+## Example Dockerfile
+
+```dockerfile
+FROM pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+CMD ["python", "train.py"]
+```
 
 <Info>
-  If you intend to run a workload both on 50-series gpus and older 40- or 30-series gpus, you will need to maintain
-  separate docker images. As of the time of this writing, older GPUs and their drivers do not have cuda 12.8 support, so
-  the image you have to build for the 50-series will not work on older GPUs.
+  If you intend to run a workload both on 50-series GPUs and older 40- or 30-series GPUs, you might need to maintain
+  separate Docker images. Older GPUs might not support CUDA 12.8, so a 50-series image will not work on older hardware.
 </Info>

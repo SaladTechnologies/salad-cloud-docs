@@ -169,6 +169,7 @@ ntomp
 numpy
 nvcc
 NVCC
+NCCL
 nvcr
 nvtop
 ollama
