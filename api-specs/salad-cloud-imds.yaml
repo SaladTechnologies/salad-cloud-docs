@@ -11,7 +11,7 @@ info:
     email: cloud@salad.com
   license:
     name: MIT
-  version: 0.9.0-alpha.2
+  version: 0.9.0-alpha.3
 servers:
   - url: http://169.254.169.254
 paths:
@@ -24,13 +24,7 @@ paths:
       summary: Get Container Instance Deletion Cost
       description: Gets the deletion cost of the current container instance
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       responses:
         "200":
           $ref: "#/components/responses/GetDeletionCost"
@@ -47,18 +41,12 @@ paths:
       summary: Replace Container Instance Deletion Cost
       description: Replaces the deletion cost of the current container instance
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       requestBody:
         $ref: "#/components/requestBodies/ReplaceDeletionCost"
       responses:
-        "200":
-          $ref: "#/components/responses/ReplaceDeletionCost"
+        "204":
+          $ref: "#/components/responses/204"
         "400":
           $ref: "#/components/responses/400"
         "403":
@@ -78,13 +66,7 @@ paths:
       summary: Reallocate Container Instance
       description: Reallocates the current container instance to another SaladCloud node
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       requestBody:
         $ref: "#/components/requestBodies/Reallocate"
       responses:
@@ -101,24 +83,113 @@ paths:
       tags:
         - metadata
       x-codeSamples:
+        - source: >-
+            import { Metadata, ReallocatePrototype, SaladCloudImdsSdk } from
+            '@saladtechnologies-oss/salad-cloud-imds-sdk';
+
+
+            (async () => {
+              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
+
+              const metadata = Metadata.TRUE_;
+
+              const reallocatePrototype: ReallocatePrototype = {
+                reason: 'Insufficient VRAM',
+              };
+
+              const { data } = await saladCloudImdsSdk.metadata.reallocate(reallocatePrototype, {
+                metadata: metadata,
+              });
+
+              console.log(data);
+            })();
+          lang: TypeScript
         - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Salad.Cloud.IMDS.SDK.Models;
+
+            var config = new SaladCloudImdsSdkConfig{};
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            var input = new ReallocatePrototype("Insufficient VRAM");
+
+            await client.Metadata.ReallocateAsync(input, Metadata1.True_);
+          lang: C#
+        - source: >-
+            import (
+              "fmt"
+              "encoding/json"
+              "context"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
+            )
+
+
+            config := saladcloudimdssdkconfig.NewConfig()
+
+
+            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
+
+
+            metadata := metadata.METADATA_TRUE
+
+
+            params := metadata.ReallocateRequestParams{
+              Metadata: &metadata,
+            }
+
+
+
+            request := metadata.ReallocatePrototype{
+              Reason: util.ToPointer("Insufficient VRAM"),
+            }
+
+
+            response, err := client.Metadata.Reallocate(context.Background(),
+            request, params)
+
+            if err != nil {
+              panic(err)
+            }
+
+
+            fmt.Println(response)
+          lang: Go
+        - source: >-
             from salad_cloud_imds_sdk import SaladCloudImdsSdk
-            from salad_cloud_imds_sdk.models import ReallocatePrototype
+
+            from salad_cloud_imds_sdk.models import ReallocatePrototype,
+            Metadata
+
 
             sdk = SaladCloudImdsSdk(
                 timeout=10000
             )
 
+
             request_body = ReallocatePrototype(
                 reason="Insufficient VRAM"
             )
 
-            result = sdk.metadata.reallocate(request_body=request_body)
+
+            result = sdk.metadata.reallocate(
+                request_body=request_body,
+                metadata="true"
+            )
+
 
             print(result)
           lang: Python
         - source: >-
             import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.Metadata;
+
+            import com.salad.cloud.imdssdk.models.ReallocateParameters;
 
             import com.salad.cloud.imdssdk.models.ReallocatePrototype;
 
@@ -130,75 +201,15 @@ paths:
 
                 ReallocatePrototype reallocatePrototype = ReallocatePrototype.builder().reason("Insufficient VRAM").build();
 
-                saladCloudImdsSdk.metadata.reallocate(reallocatePrototype);
+                ReallocateParameters requestParameters = ReallocateParameters.builder()
+                  .metadata(Metadata.TRUE)
+                  .reallocatePrototype(reallocatePrototype)
+                  .build();
+
+                saladCloudImdsSdk.metadata.reallocate(requestParameters);
               }
             }
           lang: Java
-        - source: |-
-            using Salad.Cloud.IMDS.SDK;
-            using Salad.Cloud.IMDS.SDK.Config;
-            using Salad.Cloud.IMDS.SDK.Models;
-            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
-
-            var config = new SaladCloudImdsSdkConfig{
-                Environment = Environment.Default
-            };
-
-            var client = new SaladCloudImdsSdkClient(config);
-
-            var input = new ReallocatePrototype("Insufficient VRAM");
-
-            await client.Metadata.ReallocateAsync(input);
-          lang: C#
-        - source: >-
-            import { ReallocatePrototype, SaladCloudImdsSdk } from
-            '@saladtechnologies-oss/salad-cloud-imds-sdk';
-
-
-            (async () => {
-              const saladCloudImdsSdk = new SaladCloudImdsSdk({});
-
-              const reallocatePrototype: ReallocatePrototype = {
-                reason: 'Insufficient VRAM',
-              };
-
-              const { data } = await saladCloudImdsSdk.metadata.reallocate(reallocatePrototype);
-
-              console.log(data);
-            })();
-          lang: TypeScript
-        - source: >-
-            import (
-              "fmt"
-              "encoding/json"
-              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
-              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
-              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
-            )
-
-
-            config := saladcloudimdssdkconfig.NewConfig()
-
-            client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
-
-
-
-            request := metadata.ReallocatePrototype{
-              Reason: util.ToPointer("Reason"),
-            }
-
-
-            response, err := client.Metadata.Reallocate(context.Background(),
-            request)
-
-            if err != nil {
-              panic(err)
-            }
-
-
-            fmt.Println(response)
-          lang: Go
   /v1/recreate:
     summary: Recreate Container Instance
     description: Operations to recreate the current container instance on the same
@@ -208,13 +219,7 @@ paths:
       summary: Recreate Container Instance
       description: Recreates the current container instance on the same SaladCloud node
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       responses:
         "204":
           $ref: "#/components/responses/204"
@@ -229,71 +234,62 @@ paths:
       tags:
         - metadata
       x-codeSamples:
-        - source: |-
-            from salad_cloud_imds_sdk import SaladCloudImdsSdk
-
-            sdk = SaladCloudImdsSdk(
-                timeout=10000
-            )
-
-            result = sdk.metadata.recreate()
-
-            print(result)
-          lang: Python
-        - source: |-
-            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
-
-            public class Main {
-
-              public static void main(String[] args) {
-                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
-
-                saladCloudImdsSdk.metadata.recreate();
-              }
-            }
-          lang: Java
-        - source: |-
-            using Salad.Cloud.IMDS.SDK;
-            using Salad.Cloud.IMDS.SDK.Config;
-            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
-
-            var config = new SaladCloudImdsSdkConfig{
-                Environment = Environment.Default
-            };
-
-            var client = new SaladCloudImdsSdkClient(config);
-
-            await client.Metadata.RecreateAsync();
-          lang: C#
         - source: >-
-            import { SaladCloudImdsSdk } from
+            import { Metadata, SaladCloudImdsSdk } from
             '@saladtechnologies-oss/salad-cloud-imds-sdk';
 
 
             (async () => {
               const saladCloudImdsSdk = new SaladCloudImdsSdk({});
 
-              const { data } = await saladCloudImdsSdk.metadata.recreate();
+              const metadata = Metadata.TRUE_;
+
+              const { data } = await saladCloudImdsSdk.metadata.recreate({
+                metadata: metadata,
+              });
 
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Salad.Cloud.IMDS.SDK.Models;
+
+            var config = new SaladCloudImdsSdkConfig{};
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            await client.Metadata.RecreateAsync(Metadata1.True_);
+          lang: C#
         - source: >-
             import (
               "fmt"
               "encoding/json"
+              "context"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
             )
 
 
             config := saladcloudimdssdkconfig.NewConfig()
 
+
             client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
 
 
-            response, err := client.Metadata.Recreate(context.Background())
+            metadata := metadata.METADATA_TRUE
+
+
+            params := metadata.RecreateRequestParams{
+              Metadata: &metadata,
+            }
+
+
+            response, err := client.Metadata.Recreate(context.Background(),
+            params)
 
             if err != nil {
               panic(err)
@@ -302,6 +298,37 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+            from salad_cloud_imds_sdk.models import Metadata
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.recreate(metadata="true")
+
+            print(result)
+          lang: Python
+        - source: >-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.Metadata;
+
+            import com.salad.cloud.imdssdk.models.RecreateParameters;
+
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                RecreateParameters requestParameters = RecreateParameters.builder().metadata(Metadata.TRUE).build();
+
+                saladCloudImdsSdk.metadata.recreate(requestParameters);
+              }
+            }
+          lang: Java
   /v1/restart:
     summary: Restart Container Instance
     description: Operations to restart the current container instance on the same
@@ -311,13 +338,7 @@ paths:
       summary: Restart Container Instance
       description: Restarts the current container instance on the same SaladCloud node
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       responses:
         "204":
           $ref: "#/components/responses/204"
@@ -332,71 +353,62 @@ paths:
       tags:
         - metadata
       x-codeSamples:
-        - source: |-
-            from salad_cloud_imds_sdk import SaladCloudImdsSdk
-
-            sdk = SaladCloudImdsSdk(
-                timeout=10000
-            )
-
-            result = sdk.metadata.restart()
-
-            print(result)
-          lang: Python
-        - source: |-
-            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
-
-            public class Main {
-
-              public static void main(String[] args) {
-                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
-
-                saladCloudImdsSdk.metadata.restart();
-              }
-            }
-          lang: Java
-        - source: |-
-            using Salad.Cloud.IMDS.SDK;
-            using Salad.Cloud.IMDS.SDK.Config;
-            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
-
-            var config = new SaladCloudImdsSdkConfig{
-                Environment = Environment.Default
-            };
-
-            var client = new SaladCloudImdsSdkClient(config);
-
-            await client.Metadata.RestartAsync();
-          lang: C#
         - source: >-
-            import { SaladCloudImdsSdk } from
+            import { Metadata, SaladCloudImdsSdk } from
             '@saladtechnologies-oss/salad-cloud-imds-sdk';
 
 
             (async () => {
               const saladCloudImdsSdk = new SaladCloudImdsSdk({});
 
-              const { data } = await saladCloudImdsSdk.metadata.restart();
+              const metadata = Metadata.TRUE_;
+
+              const { data } = await saladCloudImdsSdk.metadata.restart({
+                metadata: metadata,
+              });
 
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Salad.Cloud.IMDS.SDK.Models;
+
+            var config = new SaladCloudImdsSdkConfig{};
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            await client.Metadata.RestartAsync(Metadata1.True_);
+          lang: C#
         - source: >-
             import (
               "fmt"
               "encoding/json"
+              "context"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
             )
 
 
             config := saladcloudimdssdkconfig.NewConfig()
 
+
             client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
 
 
-            response, err := client.Metadata.Restart(context.Background())
+            metadata := metadata.METADATA_TRUE
+
+
+            params := metadata.RestartRequestParams{
+              Metadata: &metadata,
+            }
+
+
+            response, err := client.Metadata.Restart(context.Background(),
+            params)
 
             if err != nil {
               panic(err)
@@ -405,6 +417,37 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+            from salad_cloud_imds_sdk.models import Metadata
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.restart(metadata="true")
+
+            print(result)
+          lang: Python
+        - source: >-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.Metadata;
+
+            import com.salad.cloud.imdssdk.models.RestartParameters;
+
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                RestartParameters requestParameters = RestartParameters.builder().metadata(Metadata.TRUE).build();
+
+                saladCloudImdsSdk.metadata.restart(requestParameters);
+              }
+            }
+          lang: Java
   /v1/status:
     summary: Container Instance Status
     description: Operations to get the health statuses of the current container instance
@@ -413,13 +456,7 @@ paths:
       summary: Get Container Instance Status
       description: Gets the health statuses of the current container instance
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       responses:
         "200":
           $ref: "#/components/responses/GetStatus"
@@ -432,76 +469,71 @@ paths:
       tags:
         - metadata
       x-codeSamples:
-        - source: |-
-            from salad_cloud_imds_sdk import SaladCloudImdsSdk
-
-            sdk = SaladCloudImdsSdk(
-                timeout=10000
-            )
-
-            result = sdk.metadata.get_status()
-
-            print(result)
-          lang: Python
-        - source: |-
-            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
-            import com.salad.cloud.imdssdk.models.Status;
-
-            public class Main {
-
-              public static void main(String[] args) {
-                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
-
-                Status response = saladCloudImdsSdk.metadata.getStatus();
-
-                System.out.println(response);
-              }
-            }
-          lang: Java
-        - source: |-
-            using Salad.Cloud.IMDS.SDK;
-            using Salad.Cloud.IMDS.SDK.Config;
-            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
-
-            var config = new SaladCloudImdsSdkConfig{
-                Environment = Environment.Default
-            };
-
-            var client = new SaladCloudImdsSdkClient(config);
-
-            var response = await client.Metadata.GetStatusAsync();
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
-            import { SaladCloudImdsSdk } from
+            import { Metadata, SaladCloudImdsSdk } from
             '@saladtechnologies-oss/salad-cloud-imds-sdk';
 
 
             (async () => {
               const saladCloudImdsSdk = new SaladCloudImdsSdk({});
 
-              const { data } = await saladCloudImdsSdk.metadata.getStatus();
+              const metadata = Metadata.TRUE_;
+
+              const { data } = await saladCloudImdsSdk.metadata.getStatus({
+                metadata: metadata,
+              });
 
               console.log(data);
             })();
           lang: TypeScript
         - source: >-
+            using Salad.Cloud.IMDS.SDK;
+
+            using Salad.Cloud.IMDS.SDK.Config;
+
+            using Salad.Cloud.IMDS.SDK.Models;
+
+
+            var config = new SaladCloudImdsSdkConfig{};
+
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+
+            var response = await
+            client.Metadata.GetStatusAsync(Metadata1.True_);
+
+
+            Console.WriteLine(response);
+          lang: C#
+        - source: >-
             import (
               "fmt"
               "encoding/json"
+              "context"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
             )
 
 
             config := saladcloudimdssdkconfig.NewConfig()
 
+
             client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
 
 
-            response, err := client.Metadata.GetStatus(context.Background())
+            metadata := metadata.METADATA_TRUE
+
+
+            params := metadata.GetStatusRequestParams{
+              Metadata: &metadata,
+            }
+
+
+            response, err := client.Metadata.GetStatus(context.Background(),
+            params)
 
             if err != nil {
               panic(err)
@@ -510,6 +542,41 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+            from salad_cloud_imds_sdk.models import Metadata
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.get_status(metadata="true")
+
+            print(result)
+          lang: Python
+        - source: >-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.GetStatusParameters;
+
+            import com.salad.cloud.imdssdk.models.Metadata;
+
+            import com.salad.cloud.imdssdk.models.Status;
+
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                GetStatusParameters requestParameters = GetStatusParameters.builder().metadata(Metadata.TRUE).build();
+
+                Status response = saladCloudImdsSdk.metadata.getStatus(requestParameters);
+
+                System.out.println(response);
+              }
+            }
+          lang: Java
   /v1/token:
     summary: Container Instance Token
     description: Operations to get the identity token of the current container instance
@@ -518,13 +585,7 @@ paths:
       summary: Get Container Instance Token
       description: Gets the identity token of the current container instance
       parameters:
-        - name: Metadata
-          in: header
-          required: true
-          schema:
-            type: string
-            enum: ["true"]
-          description: Required header to indicate metadata request
+        - $ref: "#/components/parameters/Metadata"
       responses:
         "200":
           $ref: "#/components/responses/GetToken"
@@ -537,76 +598,64 @@ paths:
       tags:
         - metadata
       x-codeSamples:
-        - source: |-
-            from salad_cloud_imds_sdk import SaladCloudImdsSdk
-
-            sdk = SaladCloudImdsSdk(
-                timeout=10000
-            )
-
-            result = sdk.metadata.get_token()
-
-            print(result)
-          lang: Python
-        - source: |-
-            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
-            import com.salad.cloud.imdssdk.models.Token;
-
-            public class Main {
-
-              public static void main(String[] args) {
-                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
-
-                Token response = saladCloudImdsSdk.metadata.getToken();
-
-                System.out.println(response);
-              }
-            }
-          lang: Java
-        - source: |-
-            using Salad.Cloud.IMDS.SDK;
-            using Salad.Cloud.IMDS.SDK.Config;
-            using Environment = Salad.Cloud.IMDS.SDK.Http.Environment;
-
-            var config = new SaladCloudImdsSdkConfig{
-                Environment = Environment.Default
-            };
-
-            var client = new SaladCloudImdsSdkClient(config);
-
-            var response = await client.Metadata.GetTokenAsync();
-
-            Console.WriteLine(response);
-          lang: C#
         - source: >-
-            import { SaladCloudImdsSdk } from
+            import { Metadata, SaladCloudImdsSdk } from
             '@saladtechnologies-oss/salad-cloud-imds-sdk';
 
 
             (async () => {
               const saladCloudImdsSdk = new SaladCloudImdsSdk({});
 
-              const { data } = await saladCloudImdsSdk.metadata.getToken();
+              const metadata = Metadata.TRUE_;
+
+              const { data } = await saladCloudImdsSdk.metadata.getToken({
+                metadata: metadata,
+              });
 
               console.log(data);
             })();
           lang: TypeScript
+        - source: |-
+            using Salad.Cloud.IMDS.SDK;
+            using Salad.Cloud.IMDS.SDK.Config;
+            using Salad.Cloud.IMDS.SDK.Models;
+
+            var config = new SaladCloudImdsSdkConfig{};
+
+            var client = new SaladCloudImdsSdkClient(config);
+
+            var response = await client.Metadata.GetTokenAsync(Metadata1.True_);
+
+            Console.WriteLine(response);
+          lang: C#
         - source: >-
             import (
               "fmt"
               "encoding/json"
+              "context"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdkconfig"
               "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/saladcloudimdssdk"
-
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/util"
+              "github.com/saladtechnologies/salad-cloud-imds-sdk-go/pkg/metadata"
             )
 
 
             config := saladcloudimdssdkconfig.NewConfig()
 
+
             client := saladcloudimdssdk.NewSaladCloudImdsSdk(config)
 
 
-            response, err := client.Metadata.GetToken(context.Background())
+            metadata := metadata.METADATA_TRUE
+
+
+            params := metadata.GetTokenRequestParams{
+              Metadata: &metadata,
+            }
+
+
+            response, err := client.Metadata.GetToken(context.Background(),
+            params)
 
             if err != nil {
               panic(err)
@@ -615,7 +664,51 @@ paths:
 
             fmt.Println(response)
           lang: Go
+        - source: |-
+            from salad_cloud_imds_sdk import SaladCloudImdsSdk
+            from salad_cloud_imds_sdk.models import Metadata
+
+            sdk = SaladCloudImdsSdk(
+                timeout=10000
+            )
+
+            result = sdk.metadata.get_token(metadata="true")
+
+            print(result)
+          lang: Python
+        - source: >-
+            import com.salad.cloud.imdssdk.SaladCloudImdsSdk;
+
+            import com.salad.cloud.imdssdk.models.GetTokenParameters;
+
+            import com.salad.cloud.imdssdk.models.Metadata;
+
+            import com.salad.cloud.imdssdk.models.Token;
+
+
+            public class Main {
+
+              public static void main(String[] args) {
+                SaladCloudImdsSdk saladCloudImdsSdk = new SaladCloudImdsSdk();
+
+                GetTokenParameters requestParameters = GetTokenParameters.builder().metadata(Metadata.TRUE).build();
+
+                Token response = saladCloudImdsSdk.metadata.getToken(requestParameters);
+
+                System.out.println(response);
+              }
+            }
+          lang: Java
 components:
+  parameters:
+    Metadata:
+      name: Metadata
+      in: header
+      description: A custom request header required by all operations.
+      required: true
+      schema:
+        type: string
+        const: "true"
   schemas:
     DeletionCost:
       description: The deletion cost of the current container instance.
@@ -827,12 +920,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Token"
-    ReplaceDeletionCost:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/DeletionCost"
     UnknownError:
       description: Unknown Error
       content:
