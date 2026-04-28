@@ -43,8 +43,8 @@ Before getting started, make sure you have:
 
     | Model             | Description                                                                    |
     | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
     | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
   </Tab>
@@ -53,7 +53,7 @@ Before getting started, make sure you have:
 
     - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
     - Create an organization or choose an existing one, then click "Deploy a container group".
-    - Select an LLM recipe. The Qwen3.5-35B-A3B (llama.cpp) recipe works well for coding assistance. On the recipe
+    - Select an LLM recipe. The Qwen3.6-35B-A3B (llama.cpp) recipe works well for coding assistance. On the recipe
       page, provide a name and deploy - the rest is preconfigured with recommended settings.
     - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
@@ -61,7 +61,7 @@ Before getting started, make sure you have:
 
     Ready-to-deploy recipes (best for less technical users):
 
-    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+    - [qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) - A powerful Mixture of Experts
       model optimized for instruction-following tasks.
     - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
 
@@ -108,7 +108,7 @@ config manually in the YAML file.
     models:
       - name: Salad AI Gateway
         provider: openai
-        model: qwen3.5-35b-a3b
+        model: qwen3.6-35b-a3b
         apiBase: https://ai.salad.cloud/v1
         apiKey: your-salad-api-key
     ```
@@ -121,9 +121,9 @@ config manually in the YAML file.
 
     ```yaml
     models:
-      - name: SaladCloud Qwen 3.5
+      - name: SaladCloud Qwen 3.6
         provider: openai
-        model: qwen3.5-35b-a3b
+        model: qwen3.6-35b-a3b
         apiBase: https://your-endpoint.salad.cloud/v1
         apiKey: dummy
         requestOptions:
@@ -162,9 +162,9 @@ Add `contextLength` to your model config to help Continue manage prompt sizes co
 
 ```yaml
 models:
-  - name: SaladCloud Qwen 3.5
+  - name: SaladCloud Qwen 3.6
     provider: openai
-    model: qwen3.5-35b-a3b
+    model: qwen3.6-35b-a3b
     apiBase: https://your-endpoint.salad.cloud/v1
     apiKey: dummy
     roles:
@@ -176,7 +176,7 @@ models:
         Salad-Api-Key: your-salad-api-key
 ```
 
-The Qwen 3.5-35B-A3B recipe supports up to 262,144 tokens.
+The Qwen 3.6-35B-A3B recipe supports up to 262,144 tokens.
 
 ### Handle Autocomplete Timeouts
 
@@ -185,9 +185,9 @@ limit, but for large context windows, consider setting a shorter `maxTokens` for
 
 ```yaml
 tabAutocompleteModel:
-  name: SaladCloud Qwen 3.5
+  name: SaladCloud Qwen 3.6
   provider: openai
-  model: qwen3.5-35b-a3b
+  model: qwen3.6-35b-a3b
   apiBase: https://your-endpoint.salad.cloud/v1
   apiKey: dummy
   defaultCompletionOptions:
@@ -199,5 +199,5 @@ tabAutocompleteModel:
 
 ### Model Recommendations
 
-- **Qwen 3.5-35B-A3B**: Best for chat, codebase Q&A, and multi-file edits
+- **Qwen 3.6-35B-A3B**: Best for chat, codebase Q&A, and multi-file edits
 - **Qwen 3.5-9B**: Fast enough for autocomplete; good balance of latency and quality

@@ -53,8 +53,8 @@ Before getting started, make sure you have:
 
     | Model             | Description                                                                    |
     | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
     | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
   </Tab>
@@ -71,7 +71,7 @@ Before getting started, make sure you have:
     - Create an organization or choose an existing one, then click "Deploy a container group".
     - Select an LLM recipe. For the best experience with Hermes Agent's tool-calling capabilities, use
       [vLLM](/container-engine/reference/recipes/vllm) with a Hermes-format model, or the
-      [Qwen3.5-35B-A3B (llama.cpp)](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) recipe.
+      [Qwen3.6-35B-A3B (llama.cpp)](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) recipe.
     - **Leave Authentication disabled** - Hermes Agent cannot pass a `Salad-Api-Key` header at the moment.
     - Once deployed, note your **API endpoint URL** from SaladCloud (e.g., `https://your-endpoint.salad.cloud`). The
       OpenAI-compatible API will be available at `{endpoint}/v1`.
@@ -80,7 +80,7 @@ Before getting started, make sure you have:
 
     Ready-to-deploy recipes (best for less technical users):
 
-    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - Mixture of Experts model
+    - [qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) - Mixture of Experts model
       optimized for instruction-following and tool-calling tasks.
     - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model.
 
@@ -333,5 +333,5 @@ terminal:
 
 ### Model Recommendations
 
-- **Qwen 3.5-35B-A3B with llama.cpp**: Good for conversational tasks and simpler agentic workflows
+- **Qwen 3.6-35B-A3B with llama.cpp**: Good for conversational tasks and simpler agentic workflows
 - **Qwen 3.5-9B**: Suitable for lightweight tasks; less reliable for complex multi-step tool chains

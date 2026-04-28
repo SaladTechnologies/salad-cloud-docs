@@ -48,8 +48,8 @@ Before getting started, make sure you have:
 
     | Model             | Description                                                                    |
     | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
     | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
   </Tab>
@@ -58,7 +58,7 @@ Before getting started, make sure you have:
 
     - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
     - Create an organization or choose an existing one, then click "Deploy a container group".
-    - Select an LLM recipe. The llama.cpp [Qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp)
+    - Select an LLM recipe. The llama.cpp [Qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp)
       recipe is well-suited for conversational assistant use cases. On the recipe page, provide a name and deploy - the
       rest is preconfigured with recommended settings.
     - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
@@ -67,7 +67,7 @@ Before getting started, make sure you have:
 
     Ready-to-deploy recipes (best for less technical users):
 
-    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) - A powerful Mixture of Experts
+    - [qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) - A powerful Mixture of Experts
       model optimized for instruction-following tasks, ideal for agentic use cases.
     - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) - Optimized for Qwen3.5 9B model
 
@@ -167,8 +167,8 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
             "api": "openai-completions",
             "models": [
               {
-                "id": "qwen3.5-35b-a3b",
-                "name": "qwen3.5-35b-a3b",
+                "id": "qwen3.6-35b-a3b",
+                "name": "qwen3.6-35b-a3b",
                 "reasoning": false,
                 "input": ["text"],
                 "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
@@ -182,7 +182,7 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
       "agents": {
         "defaults": {
           "model": {
-            "primary": "saladcloud/qwen3.5-35b-a3b"
+            "primary": "saladcloud/qwen3.6-35b-a3b"
           }
         }
       }
@@ -210,8 +210,8 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
             },
             "models": [
               {
-                "id": "qwen3.5-35b-a3b",
-                "name": "qwen3.5-35b-a3b",
+                "id": "qwen3.6-35b-a3b",
+                "name": "qwen3.6-35b-a3b",
                 "reasoning": false,
                 "input": ["text"],
                 "cost": {
@@ -230,7 +230,7 @@ SaladCloud endpoint by editing `~/.openclaw/openclaw.json` directly.
       "agents": {
         "defaults": {
           "model": {
-            "primary": "saladcloud/qwen3.5-35b-a3b"
+            "primary": "saladcloud/qwen3.6-35b-a3b"
           }
         }
       }
@@ -278,7 +278,7 @@ If the bot responds, your setup is complete. You can also access the local OpenC
 curl https://your-endpoint.salad.cloud/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -H 'Salad-Api-Key: <YOUR_SALAD_API_KEY>' \
-  -d '{"model": "qwen3.5-35b-a3b", "messages": [{"role": "user", "content": "Hello"}]}'
+  -d '{"model": "qwen3.6-35b-a3b", "messages": [{"role": "user", "content": "Hello"}]}'
 ```
 
 ### Telegram bot is not responding
@@ -295,7 +295,7 @@ openclaw logs --follow
 
 ### Use the 35B Model for Complex Tasks
 
-For tasks that require complex instruction following and multi-step reasoning the Qwen 3.5-35B-A3B model provides
+For tasks that require complex instruction following and multi-step reasoning the Qwen 3.6-35B-A3B model provides
 significantly better results than the 9B model.
 
 ### Provider Rotation
@@ -306,5 +306,5 @@ endpoints as needed.
 
 ### Model Recommendations
 
-- **Qwen 3.5-35B-A3B**: Best for complex assistant tasks
+- **Qwen 3.6-35B-A3B**: Best for complex assistant tasks
 - **Qwen 3.5-9B**: Suitable for simple Q&A and quick responses

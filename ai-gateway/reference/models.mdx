@@ -15,11 +15,11 @@ _Last Updated: April 20, 2026_
 
 ## Available Models
 
-### qwen3.5-35b-a3b
+### qwen3.6-35b-a3b
 
 | Property       | Value                    |
 | :------------- | :----------------------- |
-| Model ID       | `qwen3.5-35b-a3b`        |
+| Model ID       | `qwen3.6-35b-a3b`        |
 | Architecture   | Mixture of Experts (MoE) |
 | Active params  | ~3.5B (35B total)        |
 | Context window | 131,072 tokens           |
@@ -33,18 +33,18 @@ calling reliably and performs well in long agentic sessions.
 
 ---
 
-### qwen3.5-27b
+### qwen3.6-27b
 
 | Property       | Value          |
 | :------------- | :------------- |
-| Model ID       | `qwen3.5-27b`  |
+| Model ID       | `qwen3.6-27b`  |
 | Architecture   | Dense          |
 | Context window | 131,072 tokens |
 | Max output     | 16,384 tokens  |
 
 **Best for**: General-purpose tasks requiring a balance of capability and speed.
 
-A strong all-around model. Slightly faster than qwen3.5-35b-a3b on simpler tasks, with comparable instruction-following
+A strong all-around model. Slightly faster than qwen3.6-35b-a3b on simpler tasks, with comparable instruction-following
 quality. A good choice when you need consistent performance across a range of task types.
 
 ---
@@ -69,9 +69,9 @@ struggle with complex multi-step reasoning or large codebases compared to the la
 
 | Use Case                         | Recommended Model |
 | :------------------------------- | :---------------- |
-| Agentic coding (Cline, Roo Code) | `qwen3.5-35b-a3b` |
-| Complex reasoning / planning     | `qwen3.5-35b-a3b` |
-| General chat / assistant         | `qwen3.5-27b`     |
+| Agentic coding (Cline, Roo Code) | `qwen3.6-35b-a3b` |
+| Complex reasoning / planning     | `qwen3.6-35b-a3b` |
+| General chat / assistant         | `qwen3.6-27b`     |
 | Simple Q&A / high volume         | `qwen3.5-9b`      |
 | Fast autocomplete                | `qwen3.5-9b`      |
 
@@ -84,7 +84,7 @@ curl https://ai.salad.cloud/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $SALAD_API_KEY" \
   -d '{
-    "model": "qwen3.5-35b-a3b",
+    "model": "qwen3.6-35b-a3b",
     "messages": [{"role": "user", "content": "Hello"}]
   }'
 ```

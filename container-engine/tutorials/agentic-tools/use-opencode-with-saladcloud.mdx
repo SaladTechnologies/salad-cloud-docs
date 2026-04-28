@@ -43,8 +43,8 @@ Before getting started, make sure you have:
 
     | Model             | Description                                                                    |
     | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.5-27b`     | Qwen 3.5 27B - strong balance of capability and speed                          |
+    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
+    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
     | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
 
   </Tab>
@@ -53,7 +53,7 @@ Before getting started, make sure you have:
 
     - Go to the [SaladCloud portal](https://portal.salad.com) and create an account if you do not already have one.
     - Create an organization or choose an existing one, then click "Deploy a container group".
-    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.5-35B-A3B (llama.cpp) recipe. On the recipe
+    - Select an LLM recipe. The best fit for agentic coding is the Qwen3.6-35B-A3B (llama.cpp) recipe. On the recipe
       page, provide a name and deploy - the rest is preconfigured with recommended settings.
     - Once deployed, your endpoint will be live and serving an OpenAI-compatible API.
 
@@ -61,7 +61,7 @@ Before getting started, make sure you have:
 
     Ready-to-deploy recipes (best for less technical users):
 
-    - [qwen3.5-35B-A3B](/container-engine/reference/recipes/qwen3.5-35b-a3b-llama-cpp) — A powerful Mixture of Experts
+    - [qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) — A powerful Mixture of Experts
       model optimized for instruction-following tasks, ideal for agentic use cases.
 
     Recipes for custom deployments (best for advanced users):
@@ -108,7 +108,7 @@ Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.j
     ```json
     {
       "$schema": "https://opencode.ai/config.json",
-      "model": "saladcloud/qwen3.5-35b-a3b",
+      "model": "saladcloud/qwen3.6-35b-a3b",
       "provider": {
         "saladcloud": {
           "npm": "@ai-sdk/openai-compatible",
@@ -118,17 +118,17 @@ Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.j
             "apiKey": "your-salad-api-key"
           },
           "models": {
-            "qwen3.5-35b-a3b": {
-              "name": "Qwen 3.5-35B-A3B",
-              "limit": { "context": 131072, "output": 8192 }
+            "qwen3.6-35b-a3b": {
+              "name": "Qwen 3.6-35B-A3B",
+              "limit": { "context": 262144, "output": 8192 }
             },
-            "qwen3.5-27b": {
-              "name": "Qwen 3.5-27B",
-              "limit": { "context": 131072, "output": 8192 }
+            "qwen3.6-27b": {
+              "name": "Qwen 3.6-27B",
+              "limit": { "context": 262144, "output": 8192 }
             },
             "qwen3.5-9b": {
               "name": "Qwen 3.5-9B",
-              "limit": { "context": 131072, "output": 8192 }
+              "limit": { "context": 262144, "output": 8192 }
             }
           }
         }
@@ -143,7 +143,7 @@ Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.j
     ```json
     {
       "$schema": "https://opencode.ai/config.json",
-      "model": "saladcloud/qwen3.5-35b",
+      "model": "saladcloud/qwen3.6-35b",
       "provider": {
         "saladcloud": {
           "npm": "@ai-sdk/openai-compatible",
@@ -156,8 +156,8 @@ Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.j
             }
           },
           "models": {
-            "qwen3.5-35b": {
-              "name": "Qwen 3.5-35B-A3B",
+            "qwen3.6-35b": {
+              "name": "Qwen 3.6-35B-A3B",
               "limit": {
                 "context": 262144,
                 "output": 8192
@@ -209,7 +209,7 @@ planning without the risk of unintended file modifications.
 
 ### Context Window
 
-The Qwen 3.5-35B-A3B recipe supports a 262,144 token context window. The `context` value in the config lets OpenCode
+The Qwen 3.6-35B-A3B recipe supports a 262,144 token context window. The `context` value in the config lets OpenCode
 track how much context is remaining and manage prompt sizes accordingly, so make sure it reflects your actual deployment
 configuration.
 
