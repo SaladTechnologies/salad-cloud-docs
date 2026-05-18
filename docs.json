@@ -465,7 +465,7 @@
           },
           {
             "group": "Reference",
-            "pages": ["ai-gateway/reference/models"]
+            "pages": ["ai-gateway/reference/pricing", "ai-gateway/reference/models"]
           },
           {
             "group": "Integrations",
