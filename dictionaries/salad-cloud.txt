@@ -60,6 +60,7 @@ dsnp
 dtype
 DTYPE
 dubinsky
+EURC
 EMEA
 encodedimage
 esports

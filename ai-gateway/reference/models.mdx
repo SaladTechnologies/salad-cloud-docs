@@ -6,7 +6,7 @@ description:
   use cases.'
 ---
 
-_Last Updated: April 20, 2026_
+_Last Updated: May 18, 2026_
 
 <Warning>
   Salad AI Gateway is currently in **closed beta**. The model catalog will expand as the service moves toward general
@@ -17,19 +17,20 @@ _Last Updated: April 20, 2026_
 
 ### qwen3.6-35b-a3b
 
-| Property       | Value                    |
-| :------------- | :----------------------- |
-| Model ID       | `qwen3.6-35b-a3b`        |
-| Architecture   | Mixture of Experts (MoE) |
-| Active params  | ~3.5B (35B total)        |
-| Context window | 131,072 tokens           |
-| Max output     | 16,384 tokens            |
+| Property       | Value             |
+| :------------- | :---------------- |
+| Model ID       | `qwen3.6-35b-a3b` |
+| Model name     | Qwen3.6 35B-A3B   |
+| Context window | 262,144 tokens    |
+| Max input      | 262,144 tokens    |
+| Max output     | 262,144 tokens    |
+| Input          | Text, image       |
+| Output         | Text              |
 
 **Best for**: Agentic tasks, complex multi-step reasoning, code generation, instruction following.
 
-This is the recommended model for most use cases. The Mixture of Experts architecture activates only a subset of
-parameters per token, giving it strong reasoning capability at lower latency than a dense 35B model. It handles tool
-calling reliably and performs well in long agentic sessions.
+This is the recommended model for most agentic and coding use cases. It handles tool calling reliably, supports
+structured output, and performs well in long agentic sessions.
 
 ---
 
@@ -38,9 +39,12 @@ calling reliably and performs well in long agentic sessions.
 | Property       | Value          |
 | :------------- | :------------- |
 | Model ID       | `qwen3.6-27b`  |
-| Architecture   | Dense          |
-| Context window | 131,072 tokens |
-| Max output     | 16,384 tokens  |
+| Model name     | Qwen3.6 27B    |
+| Context window | 262,144 tokens |
+| Max input      | 262,144 tokens |
+| Max output     | 262,144 tokens |
+| Input          | Text, image    |
+| Output         | Text           |
 
 **Best for**: General-purpose tasks requiring a balance of capability and speed.
 
@@ -54,9 +58,12 @@ quality. A good choice when you need consistent performance across a range of ta
 | Property       | Value          |
 | :------------- | :------------- |
 | Model ID       | `qwen3.5-9b`   |
-| Architecture   | Dense          |
-| Context window | 131,072 tokens |
-| Max output     | 8,192 tokens   |
+| Model name     | Qwen3.5 9B     |
+| Context window | 262,144 tokens |
+| Max input      | 262,144 tokens |
+| Max output     | 262,144 tokens |
+| Input          | Text, image    |
+| Output         | Text           |
 
 **Best for**: High-volume queries, simple Q&A, fast responses where latency matters.
 
@@ -99,5 +106,6 @@ curl https://ai.salad.cloud/v1/models \
 ## Notes
 
 - All models support the `/v1/chat/completions` endpoint with streaming (`"stream": true`).
+- All models support text and image inputs, text outputs, tool calling, structured outputs, and reasoning.
 - Context window limits are enforced server-side. If your input exceeds the limit, the request will return an error.
 - Additional models will be added during the beta period and at general availability.

@@ -4,7 +4,7 @@ sidebarTitle: 'Aider'
 description: 'Learn how to use the Aider AI coding agent from the command line with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: April 3, 2026_
+_Last Updated: May 18, 2026_
 
 ## Introduction
 
@@ -16,8 +16,8 @@ to connect to a model on SaladCloud.
 Aider works with SaladCloud in two ways:
 
 - **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  point Aider at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available via
-  monthly subscription.
+  point Aider at a single shared endpoint, and use your Salad API key directly. Currently in closed beta with monthly
+  flat-rate access.
 - **Self-hosted model** - deploy your own SaladCloud container group, billed per hour, for full control over the model,
   hardware, and configuration. Still very easy to set up and use.
 
@@ -42,11 +42,11 @@ Before getting started, make sure you have:
 
     Available models:
 
-    | Model             | Description                                                                    |
-    | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
-    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+    | Model                         | Description                                                                      |
+    | :---------------------------- | :------------------------------------------------------------------------------- |
+    | `qwen3.6-35b-a3b`          | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
+    | `qwen3.6-27b`              | Qwen 3.6 27B - strong balance of capability and speed                           |
+    | `qwen3.5-9b`               | Qwen 3.5 9B - fastest response times, suited for lighter tasks                  |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -64,7 +64,7 @@ Before getting started, make sure you have:
 
     - [qwen3.6-35B-A3B](/container-engine/reference/recipes/qwen3.6-35b-a3b-llama-cpp) — A powerful Mixture of Experts
       model optimized for instruction-following tasks, ideal for agentic use cases.
-    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.6-9b-llama-cpp) — Optimized for Qwen3.5 9B model.
+    - [qwen3.5-9b-llama-cpp](/container-engine/reference/recipes/qwen3.5-9b-llama-cpp) — Optimized for Qwen3.5 9B model.
 
     Recipes for custom deployments (best for advanced users):
 
@@ -184,9 +184,9 @@ git init
 
 ### Set a Context Window
 
-When using a custom deployment, ensure your model server is configured with a sufficient context window. Aider works
-best with at least **16384 tokens**, ideally **32768** or higher. Our preconfigured Qwen 3.6-35B-A3B recipe already has
-optimal settings.
+When using a custom deployment, set the context window to the maximum value your model can use so Aider can send as much
+repository context as possible. For the Qwen models listed on the
+[AI Gateway models page](/ai-gateway/reference/models), that maximum is **262,144 tokens**.
 
 ### Model Recommendations
 

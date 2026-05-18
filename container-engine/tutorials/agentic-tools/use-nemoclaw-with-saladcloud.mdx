@@ -5,7 +5,7 @@ description:
   'Learn how to use NVIDIA NemoClaw - a secure, sandboxed OpenClaw runtime with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: April 3, 2026_
+_Last Updated: May 18, 2026_
 
 ## Introduction
 
@@ -18,7 +18,7 @@ NemoClaw works with SaladCloud in two ways:
 
 - **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
   point NemoClaw at a single shared endpoint, and use your Salad API key with standard authentication. Currently in
-  closed beta, available via monthly subscription.
+  closed beta with monthly flat-rate access.
 - **Self-hosted model** - deploy your own LLM recipe on SaladCloud Container Engine, billed per hour. Note: NemoClaw
   cannot pass custom headers, so authentication must be disabled on self-hosted deployments.
 
@@ -49,11 +49,11 @@ Before getting started, make sure you have:
 
     Available models:
 
-    | Model             | Description                                                                    |
-    | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
-    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+    | Model                         | Description                                                                      |
+    | :---------------------------- | :------------------------------------------------------------------------------- |
+    | `qwen3.6-35b-a3b`          | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
+    | `qwen3.6-27b`              | Qwen 3.6 27B - strong balance of capability and speed                           |
+    | `qwen3.5-9b`               | Qwen 3.5 9B - fastest response times, suited for lighter tasks                  |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">

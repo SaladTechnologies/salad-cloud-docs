@@ -5,7 +5,7 @@ description:
   'Learn how to use Goose, an open-source extensible AI agent by Block, with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: April 3, 2026_
+_Last Updated: May 18, 2026_
 
 ## Introduction
 
@@ -17,8 +17,8 @@ OpenAI-compatible providers via a JSON config file.
 Goose works with SaladCloud in two ways:
 
 - **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  point Goose at a single shared endpoint, and use your Salad API key directly. Currently in closed beta, available via
-  monthly subscription.
+  point Goose at a single shared endpoint, and use your Salad API key directly. Currently in closed beta with monthly
+  flat-rate access.
 - **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
   configuration. Still very easy to set up and use.
 
@@ -42,11 +42,11 @@ Before getting started, make sure you have:
 
     Available models:
 
-    | Model             | Description                                                                    |
-    | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
-    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+    | Model                         | Description                                                                      |
+    | :---------------------------- | :------------------------------------------------------------------------------- |
+    | `qwen3.6-35b-a3b`          | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
+    | `qwen3.6-27b`              | Qwen 3.6 27B - strong balance of capability and speed                           |
+    | `qwen3.5-9b`               | Qwen 3.5 9B - fastest response times, suited for lighter tasks                  |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -133,9 +133,9 @@ follow these steps:
       "api_key_env": "SALAD_API_KEY",
       "base_url": "https://ai.salad.cloud/v1",
       "models": [
-        { "name": "qwen3.6-35b-a3b", "context_limit": 131072 },
-        { "name": "qwen3.6-27b", "context_limit": 131072 },
-        { "name": "qwen3.5-9b", "context_limit": 131072 }
+        { "name": "qwen3.6-35b-a3b", "context_limit": 262144 },
+        { "name": "qwen3.6-27b", "context_limit": 262144 },
+        { "name": "qwen3.5-9b", "context_limit": 262144 }
       ],
       "supports_streaming": true,
       "requires_auth": true
@@ -178,7 +178,7 @@ follow these steps:
       "models": [
         {
           "name": "qwen3.6-35b-a3b",
-          "context_limit": 128000
+          "context_limit": 262144
         }
       ],
       "headers": {
