@@ -4,7 +4,7 @@ sidebarTitle: 'Cline'
 description: 'Learn how to use the Cline AI coding agent with SaladCloud for AI-powered development.'
 ---
 
-_Last Updated: April 3, 2026_
+_Last Updated: May 18, 2026_
 
 ## Introduction
 
@@ -19,7 +19,8 @@ Cline works with SaladCloud in two ways:
 - **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
   configuration. Still very easy to set up and use.
 
-Self-hosted models are billed per hour. Salad AI Gateway is available via monthly subscription.
+Self-hosted models are billed per hour. Salad AI Gateway is available via monthly flat-rate access during the closed
+beta period.
 
 For real-world examples of building applications with Cline and SaladCloud, check out our blog post:
 [Use Cline with SaladCloud: Building Real Apps for Under $0.01](https://blog.salad.com/use-cline-with-saladcloud-building-real-apps-for-under-1-cent/)
@@ -44,11 +45,11 @@ Before getting started, make sure you have:
 
     Available models:
 
-    | Model             | Description                                                                    |
-    | :---------------- | :----------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B Mixture of Experts - best for agentic tasks and complex reasoning |
-    | `qwen3.6-27b`     | Qwen 3.6 27B - strong balance of capability and speed                          |
-    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest response times, suited for lighter tasks                 |
+    | Model                         | Description                                                                      |
+    | :---------------------------- | :------------------------------------------------------------------------------- |
+    | `qwen3.6-35b-a3b`          | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
+    | `qwen3.6-27b`              | Qwen 3.6 27B - strong balance of capability and speed                           |
+    | `qwen3.5-9b`               | Qwen 3.5 9B - fastest response times, suited for lighter tasks                  |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -144,7 +145,7 @@ across multiple interactions.
 
 For self-hosted deployments, configure your LLM server with a context window of at least **16384 tokens**, ideally
 **32768** or higher. The preconfigured recipes (e.g., Qwen 3.6-35B-A3B) already have optimal context window settings. AI
-Gateway models support up to 128K tokens.
+Gateway models support up to 262,144 tokens.
 
 ### Model Recommendations
 
