@@ -43,17 +43,16 @@ The following factors should be taken into account when selecting or designing a
   [enabling region-specific I/O](/container-engine/tutorials/performance/high-performance-apps#enable-region-specific-i%2Fo)
   to reduce round-trip time (**RTT**) by minimizing network distance and latency to target locations. Additionally,
   optimize performance by
-  [selecting nodes](/container-engine/tutorials/performance/high-performance-apps#perform-initial-checks-to-filter-nodes)
-  with higher physical bandwidth and lower RTT to a specific location and utilizing multiple connections to maximize
-  data transfer efficiency.
+  [checking node network performance](/container-engine/tutorials/performance/network-bandwidth-checks) against the
+  locations your workload actually uses and utilizing multiple connections to maximize data transfer efficiency.
 
 - Transmission efficiency generally improves with larger data volumes. In certain scenarios, compressing a large number
   of small files into a single large file can help increase throughput.
 
 - **Many Salad nodes are located in residential networks with asymmetric bandwidth**, where the upload speed is lower
-  than the download speed. For applications generating substantial outputs that require cloud storage, consider
-  selecting nodes with higher upload bandwidth and implementing an asynchronous upload architecture. This ensures that
-  data uploads do not interfere with GPU computation or overall application performance.
+  than the download speed. For applications generating substantial outputs that require cloud storage, consider a
+  startup bandwidth check and an asynchronous upload architecture. This ensures that data uploads do not interfere with
+  GPU computation or overall application performance.
 
 - **Salad nodes are not evenly distributed across regions and countries, with nodes in the US and Canada accounting for
   50~60% of the total**. Deploying workloads that require specific resource types in a limited number of countries may
@@ -119,8 +118,8 @@ backlogs. **This design ensures that data uploads run independently, avoiding in
 maintaining overall application performance.**
 
 The [config.py](https://github.com/SaladTechnologies/mds/blob/main/demo-app3/image/config.py) file includes example code
-to perform initial checks and filter nodes based on custom rules, such as evaluating latency and throughput to specific
-locations, ensuring nodes are properly prepared to run your applications.
+to perform initial checks, such as evaluating latency and throughput to specific locations, ensuring nodes are properly
+prepared to run your applications.
 
 For integrating TypeScript with Rclone, refer to
 [this example code](https://github.com/SaladTechnologies/storage-test/blob/main/src/test_rclone.ts). It demonstrates the
@@ -151,8 +150,8 @@ configurations or set appropriate AWS-related environment variables to ensure co
 ### Test Configuration
 
 Over 200 Salad nodes worldwide participated in the test, with approximately 60% located in North America, 25% in Europe,
-and 8% in South America. Nodes were filtered to ensure a minimum upload bandwidth of 20 Mbps and a download bandwidth of
-at least 50 Mbps.
+and 8% in South America. Each node completed an initial bandwidth check requiring a minimum upload bandwidth of 20 Mbps
+and a download bandwidth of at least 50 Mbps.
 
 Each node transferred 300 MB of random data—both uploads and downloads—using three tools separately: Rclone, Python, and
 TypeScript. Transfers were performed across 8 buckets from various S3-compatible storage providers, distributed across
@@ -207,8 +206,8 @@ certain ISPs.
 SaladCloud exhibits notable asymmetric bandwidth, as many nodes operate on residential networks that typically offer
 high download speeds—often in the hundreds of Mbps—but lower upload speeds, sometimes only tens of Mbps. Despite this, a
 considerable number of Salad nodes still provide symmetric bandwidth with strong performance. If your applications
-require symmetric bandwidth or higher upload throughput, it’s recommended to perform initial checks and apply custom
-filters to select nodes that meet your specific bandwidth requirements.
+require symmetric bandwidth or higher upload throughput, perform startup checks from inside the container and request
+reallocation only when a node does not meet a real workload requirement.
 
 <img src="/container-engine/images/hps_asymmetry.png" />
 

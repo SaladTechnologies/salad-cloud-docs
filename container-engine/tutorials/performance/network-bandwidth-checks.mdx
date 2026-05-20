@@ -1,0 +1,131 @@
+---
+title: 'Checking Network Bandwidth Before Startup'
+sidebarTitle: 'Network Bandwidth Checks'
+description:
+  'How to validate node network bandwidth at startup and request reallocation when a workload truly requires it.'
+---
+
+_Last Updated: May 20, 2026_
+
+## Overview
+
+SaladCloud runs workloads on distributed household PCs and workstations. Network speed can vary by node location,
+internet service provider, local network conditions, routing path, Wi-Fi or Ethernet quality, and other activity on the
+same network. A node's available bandwidth can also change while your workload is running.
+
+SaladCloud does not provide a container group setting or node filter for minimum network bandwidth. If your application
+requires a specific minimum download or upload speed, check that requirement from inside the container after the replica
+starts. If the node does not meet the requirement, the application can request reallocation through
+[IMDS reallocation](/reference/imds/reallocate).
+
+Use this pattern only when a minimum network speed is required for your workload to function correctly. Reallocating too
+aggressively can reduce your own available capacity.
+
+## Reallocation Tradeoffs
+
+When you reallocate away from a node, SaladCloud temporarily excludes that node from your allocation pool for 48 hours.
+This prevents the same workload from immediately returning to a node it rejected.
+
+Set conservative thresholds and use a small number of attempts before requesting reallocation. If your threshold is too
+high, or if your test endpoint is temporarily slow, your replicas can cycle through available nodes and eventually fail
+to allocate until capacity changes or the 48-hour exclusions expire.
+
+Good candidates for this pattern include workloads that must stream large inputs, download models at startup, upload
+large outputs, or maintain a minimum transfer rate to a known endpoint. For workloads that can tolerate slower
+transfers, prefer retry logic, asynchronous upload/download, or multiple transfer connections instead of immediate
+reallocation.
+
+## Example Startup Check
+
+The following bash script measures download speed from Cloudflare's speed test endpoint. If any attempt meets the
+minimum speed, the script starts your application by executing the command passed to it. If all attempts fail, it
+requests reallocation and exits.
+
+This is only an example. You can use other speed test tools, cloud storage CLIs, SDKs, or application-level probes. For
+the most useful result, test against an endpoint that reflects your real workload path, such as the object storage
+region or API that your application uses.
+
+```bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+MIN_MBPS="${MIN_MBPS:-10}"
+SPEED_TEST_BYTES="${SPEED_TEST_BYTES:-25000000}"
+SPEED_TEST_ATTEMPTS="${SPEED_TEST_ATTEMPTS:-5}"
+SPEED_TEST_URL="https://speed.cloudflare.com/__down?bytes=${SPEED_TEST_BYTES}"
+
+echo "Running internet speed check..."
+echo "Minimum required download speed: ${MIN_MBPS} Mbps"
+
+best_mbps="0"
+
+for attempt in $(seq 1 "$SPEED_TEST_ATTEMPTS"); do
+  echo "Speed test attempt ${attempt}/${SPEED_TEST_ATTEMPTS}..."
+
+  if speed_bps=$(curl -L -o /dev/null -sS \
+      --connect-timeout 5 \
+      --max-time 30 \
+      -w "%{speed_download}" \
+      "$SPEED_TEST_URL"); then
+
+    mbps=$(awk -v s="$speed_bps" 'BEGIN {printf "%.2f", s * 8 / 1000000}')
+    echo "Measured download speed: ${mbps} Mbps"
+
+    best_mbps=$(awk -v best="$best_mbps" -v current="$mbps" \
+      'BEGIN {printf "%.2f", (current > best ? current : best)}')
+
+    if awk -v current="$mbps" -v min="$MIN_MBPS" \
+      'BEGIN {exit !(current >= min)}'; then
+      echo "Speed check passed. Starting application..."
+      exec "$@"
+    fi
+  else
+    echo "Speed test attempt failed."
+  fi
+
+  sleep 20
+done
+
+reason="Insufficient download bandwidth: best measured ${best_mbps} Mbps, required ${MIN_MBPS} Mbps"
+
+echo "Speed check failed. Requesting Salad replica reallocation..."
+echo "$reason"
+
+curl -sS \
+  --request POST \
+  --url "http://169.254.169.254/v1/reallocate" \
+  --header "Content-Type: application/json" \
+  --header "Metadata: true" \
+  --data "{\"reason\":\"${reason}\"}" || true
+
+echo "Reallocation requested. Exiting."
+exit 1
+```
+
+You can make this script your container entrypoint and pass your normal application command as its arguments. For
+example:
+
+```dockerfile
+COPY bandwidth-check.sh /usr/local/bin/bandwidth-check
+RUN chmod +x /usr/local/bin/bandwidth-check
+
+ENTRYPOINT ["/usr/local/bin/bandwidth-check"]
+CMD ["python", "app.py"]
+```
+
+## Tuning the Check
+
+Use environment variables to tune the example without rebuilding the image:
+
+- `MIN_MBPS`: Minimum accepted download speed in Mbps. Default: `10`.
+- `SPEED_TEST_BYTES`: Number of bytes to download per attempt. Default: `25000000`.
+- `SPEED_TEST_ATTEMPTS`: Number of attempts before requesting reallocation. Default: `5`.
+
+Choose thresholds based on measured application requirements, not peak expectations. A startup check should reject only
+nodes that cannot run the workload acceptably.
+
+For upload-heavy workloads, replace the download check with an upload test to your actual storage provider or ingestion
+endpoint. For latency-sensitive workloads, combine bandwidth checks with latency checks to the same region or service.
+
+See [Using IMDS to reallocate a replica](/container-engine/how-to-guides/imds/imds-reallocate) and the
+[IMDS reallocation API reference](/reference/imds/reallocate) for more details about the reallocation endpoint.

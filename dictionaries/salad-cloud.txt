@@ -60,6 +60,7 @@ dsnp
 dtype
 DTYPE
 dubinsky
+Eeuo
 EURC
 EMEA
 encodedimage
@@ -140,6 +141,7 @@ Luxembourgish
 Lykon
 makedirs
 maxh
+mbps
 mcproxy
 mdev
 mdrun
@@ -172,6 +174,7 @@ nvcc
 NVCC
 NCCL
 nvcr
+nvidia
 nvtop
 ollama
 Ollama
@@ -188,6 +191,7 @@ pafy
 Pafy
 pbtxt
 Pelagus
+percpu
 Plonkish
 Plonky
 POINTOPOINT

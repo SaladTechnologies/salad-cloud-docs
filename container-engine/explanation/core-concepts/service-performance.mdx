@@ -4,13 +4,12 @@ sidebarTitle: 'Performance and Reliability'
 description: 'To develop high-performance, reliable applications on SaladCloud'
 ---
 
-_Last Updated: Oct 2, 2025_
+_Last Updated: May 20, 2026_
 
 SaladCloud consists of tens of thousands of globally distributed nodes, primarily high-performance desktop computers and
-servers running the SaladCloud agent. Each node is equipped with either consumer-grade or data center GPUs, along with
-varying CPU and memory configurations. Node distribution is uneven across regions and countries: consumer GPU nodes in
-the US and Canada account for 50–60% of the total, while nearly all data center GPU nodes are currently located in the
-US.
+servers running the SaladCloud agent. Each node is equipped with consumer-grade GPUs, along with varying CPU and memory
+configurations. Node distribution is uneven across regions and countries: nodes in the US and Canada account for 50–60%
+of the total.
 
 When these devices are idle, SaladCloud leverages them to run workloads by dynamically pulling and executing container
 images. Once a container group is stopped, the image and any associated runtime data are removed from the allocated
@@ -43,17 +42,14 @@ Key observations are:
 - The count of online instances then briefly dropped by one, indicating one instance was just reallocated.
 - By around `80 minutes`, nearly all 100 instances were online, with minor fluctuations afterward due to reallocations.
 
-**SaladCloud’s data center nodes are typically deployed near the Internet backbone and offer higher bandwidth and
-processing capacity, enabling faster startup.**
-
 ## Interruptions and Reallocations
 
 An instance may go offline after coming online for several reasons. In such cases, a new instance is allocated to
 continue processing:
 
-- **Voluntary Interruptions**: Node owners (individuals or data center providers) may temporarily reclaim their
-  resources for their own use, pausing sharing. However, high-priority workloads that run reliably over long periods
-  generate higher earnings, giving owners less incentive to interrupt.
+- **Voluntary Interruptions**: Node owners may temporarily reclaim their resources for their own use, pausing sharing.
+  However, high-priority workloads that run reliably over long periods generate higher earnings, giving owners less
+  incentive to interrupt.
 
 - **External Interruptions**: Factors such as power outages, network issues, or hardware failures can also take nodes
   offline.
@@ -77,9 +73,6 @@ Key observations are:
   fluctuations along the way. **This trend shows that as applications run stably for longer periods on nodes, the
   likelihood of interruption by node owners decreases.**
 
-**SaladCloud’s data center nodes are generally more stable when running workloads at high priority and are less likely
-to be interrupted by their owners.**
-
 ## Uptimes
 
 Additionally, the 2025 test measured the uptime distributions of instances over the same period, which are primarily
@@ -97,16 +90,13 @@ Key observations are:
 - The average uptime across all instance runs (interrupted and uninterrupted) was `60 hours`.
 - The average uptime of interrupted instance runs was `35 hours`.
 
-**High-priority applications on SaladCloud’s data center nodes generally run uninterrupted for extended periods, though
-this cannot be fully guaranteed.**
-
 ## Run-to-Request Ratio
 
 The instance run-to-request ratio measures the actual compute capacity available compared to what is requested. For
 example, if 100 instances are requested and 99 are running, the run-to-request ratio is 99%. When a node goes offline
 and a replacement is allocated, additional time is required to download and decompress the image before the new instance
 becomes operational. Because of variations in startup times and uptimes, a 100% run-to-request ratio cannot be
-consistently guaranteed on SaladCloud’s consumer GPU nodes.
+consistently guaranteed on SaladCloud’s GPU nodes.
 
 Large image sizes can increase startup times, which in turn lowers the run-to-request ratio. To mitigate this, it is
 often necessary to provision additional instances (5~10%) beyond the initial plan, particularly for real-time inference
@@ -124,10 +114,6 @@ Key observations are:
   connection to SaladCloud (not charged in this case), applications may continue running briefly before the nodes are
   fully shut down. During this overlap, as new nodes are allocated and start running, the number of active instances can
   temporarily exceed the original request.
-
-**SaladCloud’s data center nodes provide 8 GPUs per node. While these nodes are generally more stable and less likely to
-be interrupted, any node going offline removes all 8 GPUs from the resource pool, so you should consider this impact
-when deploying workloads.**
 
 ## Processing Performance
 
@@ -151,8 +137,6 @@ initial check and real-time performance monitoring to select suitable nodes and 
 for application execution. For more details, please refer to
 [this guide](/container-engine/tutorials/performance/high-performance-apps#build-high-performance-applications).
 
-**Based on our tests, SaladCloud’s data center nodes can always deliver stable and consistent performance.**
-
 ## Network Performance
 
 Salad nodes with consumer GPUs often exhibit asymmetric bandwidth, as many operate on residential networks with high
@@ -164,16 +148,13 @@ and strong overall performance.
 
 <img src="/container-engine/images/sp4.png" />
 
-**Most SaladCloud’s data center nodes offer symmetric bandwidth, delivering several gigabytes per second in both
-directions.**
-
 Round-trip time (RTT) is primarily determined by the geographical distance and underlying network latency between two
 endpoints, and it plays a critical role in data transfer throughput. Since Salad nodes are globally distributed, nodes
 with identical network speeds in different regions can exhibit varying throughput to a specific endpoint, such as a
 cloud storage bucket in a particular location. Transfer tools and algorithms also matter—using chunked and parallel data
 transfers can better utilize the available end-to-end bandwidth.
 
-If your applications require higher throughput with lower latency, it is recommended to perform initial checks and apply
-custom filters to select nodes that meet your specific network requirements and adopt advanced tools and algorithms .
-Please check [this guide](/container-engine/tutorials/performance/high-performance-storage-solutions) for more
-information.
+If your applications require higher throughput with lower latency, perform startup checks from inside the container and
+request reallocation only when a node does not meet a real workload requirement. SaladCloud does not provide a container
+group setting or node filter for minimum network bandwidth. Please check
+[this guide](/container-engine/tutorials/performance/network-bandwidth-checks) for more information.
