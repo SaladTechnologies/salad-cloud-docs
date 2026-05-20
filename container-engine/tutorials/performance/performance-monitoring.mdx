@@ -379,6 +379,12 @@ done by checking the stats and if they exceed certain thresholds, we can realloc
 [IMDS Reallocation Endpoint](/reference/imds/reallocate). You must provide a reason to the reallocation endpoint. We use
 this data to continuously improve the quality of our network.
 
+Use reallocation for requirements that matter to your workload, and set conservative thresholds. When you reallocate
+away from a node, SaladCloud temporarily excludes that node from your allocation pool for 48 hours. Aggressive
+reallocation logic can cycle through available nodes and leave replicas unable to allocate until capacity changes or
+exclusions expire. For network-specific startup checks, see
+[Checking Network Bandwidth Before Startup](/container-engine/tutorials/performance/network-bandwidth-checks).
+
 Here's an example of how to do this:
 
 ```python

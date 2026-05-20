@@ -21,9 +21,9 @@ upload completed artifacts to cloud storage.
 
 We will be using [Google Cloud Pub/Sub](https://cloud.google.com/pubsub) as our job queue, and
 [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage service, as
-our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge for egress data, and
-SaladCloud's distributed nodes are not in datacenters, and therefore may incur egress fees from other providers.
-Instrumenting your code to use S3-compatible storage will make it easier to switch storage providers in the future if
+our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge for egress data,
+which helps reduce costs when distributed workers fetch inputs and upload results. Instrumenting your code to use
+S3-compatible storage will make it easier to switch storage providers in the future if
 you choose to do so.
 
 For this guide, we will build an application that slowly calculates a sum for _n_ steps, sleeping for 30 seconds between
@@ -115,8 +115,8 @@ repository.
 ## Cloud Storage: R2
 
 R2 is a cloud storage service from Cloudflare that is compatible with the S3 API. It is a great choice for SaladCloud
-workloads because it does not charge egress fees, and SaladCloud's distributed nodes are mostly not in datacenters, and
-therefore may incur egress fees from other providers.
+workloads because it does not charge egress fees, which helps reduce costs when distributed workers fetch inputs and
+upload results.
 
 From the [R2 console](https://dash.cloudflare.com/), navigate to "R2 Object Storage", and click "Create Bucket".
 
