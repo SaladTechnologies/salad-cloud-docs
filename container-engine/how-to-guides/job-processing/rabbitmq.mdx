@@ -23,8 +23,7 @@ We will be using [RabbitMQ](https://www.rabbitmq.com/) hosted on [CloudAMQP](htt
 queue, and [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), an S3-compatible object storage
 service, as our cloud storage. We prefer R2 to AWS S3 for many SaladCloud workloads, because R2 does not charge for
 egress data, which helps reduce costs when distributed workers fetch inputs and upload results. Instrumenting your code
-to use S3-compatible storage will make it easier to switch storage providers in the
-future if you choose to do so.
+to use S3-compatible storage will make it easier to switch storage providers in the future if you choose to do so.
 
 For this guide, we will build an application that slowly calculates a sum for _n_ steps, sleeping for 30 seconds between
 steps to simulate work. We will set up a job queue and related resources, a storage bucket, a checkpoint saving system,
