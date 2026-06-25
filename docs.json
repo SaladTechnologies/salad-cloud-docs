@@ -333,7 +333,6 @@
                   "container-engine/reference/recipes/qwen3.5-9b-llama-cpp",
                   "container-engine/reference/recipes/qwen3.5-9b-sglang",
                   "container-engine/reference/recipes/sglang",
-                  "container-engine/reference/recipes/nockpool-miner",
                   "container-engine/reference/recipes/risc0",
                   "container-engine/reference/recipes/sam3",
                   "container-engine/reference/recipes/sogni-fast-worker",
