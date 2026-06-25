@@ -2,7 +2,7 @@
 title: 'System Events'
 ---
 
-_Last Updated: January 17, 2025_
+_Last Updated: June 25, 2026_
 
 System Events include useful Container Group and Instance events for overall understanding and troubleshooting of your
 deployment on SaladCloud. You can access System Events for your container group through the System Events tab in the
@@ -36,6 +36,8 @@ These events describe phases of the
   the [priority](/container-engine/explanation/billing-pricing/priority-pricing#priority-levels) of your workload.
 - `Instance Interrupted (Node Offline)`: The node running the instance has gone offline. This is expected to occur with
   our [infrastructure](/container-engine/explanation/billing-pricing/priority-pricing#saladcloud-infrastructure).
+- `Instance Interrupted (Requested Disk Space Exceeded)`: Your workload exceeded the requested disk space. Request more
+  or reduce disk usage.
 
 ### Instance Exit System Events
 
