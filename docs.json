@@ -336,6 +336,7 @@
                   "container-engine/reference/recipes/risc0",
                   "container-engine/reference/recipes/sam3",
                   "container-engine/reference/recipes/sogni-fast-worker",
+                  "container-engine/reference/recipes/tei-bge-m3",
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/unsloth-finetune",

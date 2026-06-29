@@ -1,0 +1,163 @@
+---
+title: BGE-M3 Embeddings with Text Embeddings Inference
+sidebarTitle: BGE-M3 Embeddings
+description:
+  Serve BAAI/bge-m3 embeddings with Hugging Face Text Embeddings Inference for RAG, semantic search, document retrieval,
+  and similarity search.
+---
+
+_Last Updated: June 29, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs [`BAAI/bge-m3`](https://huggingface.co/BAAI/bge-m3) with
+[Hugging Face Text Embeddings Inference](https://github.com/huggingface/text-embeddings-inference) on a Salad GPU. It
+serves dense embeddings for RAG, semantic search, document retrieval, and similarity search workloads.
+
+BGE-M3 is useful when you need one embedding model that handles multilingual content, short queries, and longer
+documents. The model supports more than 100 languages, accepts inputs up to 8192 tokens, and returns 1024-dimensional
+dense vectors that can be stored in a vector database.
+
+The BGE-M3 model family also supports sparse and ColBERT-style retrieval modes through FlagEmbedding. This Salad recipe
+is focused on the dense embedding endpoint exposed by TEI because that is the interface most RAG frameworks and vector
+search systems expect.
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **BGE-M3 Embeddings** recipe.
+3. Enter a **Container Group Name**.
+4. Decide whether to enable **Require Container Gateway Authentication**:
+   - Enabled: requests must include your SaladCloud API key.
+   - Disabled: anyone with the URL can call the embedding service.
+5. Deploy and wait for the first startup to finish.
+
+<Callout variation="note">
+  The model is downloaded from Hugging Face at startup, so it can take several minutes before the deployment becomes
+  ready.
+</Callout>
+
+Once the container is ready, call `/embed` for TEI's native embedding API or `/v1/embeddings` for the OpenAI-compatible
+API.
+
+## Defaults
+
+The recipe comes preconfigured with these defaults:
+
+- Server: Hugging Face Text Embeddings Inference
+- Model ID: `BAAI/bge-m3`
+- Container image: `ghcr.io/huggingface/text-embeddings-inference:89-1.9`
+- Command equivalent: `text-embeddings-router --model-id BAAI/bge-m3 --port 3000`
+- Container port: `3000`
+- Host bind: `::`
+- Data type: `float16`
+- Max batch tokens: `16384`
+- Max client batch size: `32`
+- Readiness probe: `GET /health`
+- Authentication: enabled by default
+
+## API Endpoints
+
+Useful TEI endpoints include:
+
+- `GET /health` - readiness probe and health check
+- `GET /info` - model and server metadata
+- `GET /docs` - Swagger documentation
+- `POST /embed` - TEI native dense embedding endpoint
+- `POST /v1/embeddings` - OpenAI-compatible embeddings endpoint
+- `POST /similarity` - TEI similarity endpoint
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is enabled by default.
+
+- Enabled: every request must include the `Salad-Api-Key` header.
+- Disabled: anyone with the deployment URL can call the API.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+Use `/embed` to generate dense vectors with TEI's native API:
+
+```bash
+curl https://<your-dns>.salad.cloud/embed \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "inputs": [
+      "BGE-M3 is useful for multilingual semantic search.",
+      "Text embeddings help retrieve documents for RAG applications."
+    ],
+    "normalize": true
+  }'
+```
+
+If you disabled authentication during deployment, omit the `Salad-Api-Key` header.
+
+Each returned vector should contain 1024 floating-point values.
+
+## OpenAI-Compatible Request
+
+Use `/v1/embeddings` if your client expects an OpenAI-compatible embeddings API:
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/embeddings \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "model": "BAAI/bge-m3",
+    "input": [
+      "What is BGE-M3 good for?",
+      "Use embeddings for document retrieval and similarity search."
+    ],
+    "encoding_format": "float"
+  }'
+```
+
+If you disabled authentication during deployment, omit the `Salad-Api-Key` header.
+
+## Test A Deployment
+
+Check health:
+
+```bash
+curl https://<your-dns>.salad.cloud/health
+```
+
+Check model metadata:
+
+```bash
+curl https://<your-dns>.salad.cloud/info
+```
+
+Confirm the embedding dimension:
+
+```bash
+curl -s https://<your-dns>.salad.cloud/embed \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs":["hello world"],"normalize":true}' \
+  | jq '.[0] | length'
+```
+
+The expected result is `1024`.
+
+## Tuning Notes
+
+- Keep `MODEL_ID` set to `BAAI/bge-m3` unless you intentionally want to repurpose the recipe.
+- BGE-M3 supports long inputs, but long batches use more VRAM. Lower `MAX_BATCH_TOKENS` if replicas run out of memory.
+- Increase `MAX_CLIENT_BATCH_SIZE` only after load testing your expected request shape.
+- If you want private or gated Hugging Face models in a customized deployment, add `HF_TOKEN` in Advanced Configuration.
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/tei-bge-m3)
+- [Hugging Face Text Embeddings Inference](https://github.com/huggingface/text-embeddings-inference)
+- [BAAI/bge-m3 model card](https://huggingface.co/BAAI/bge-m3)
+- [FlagEmbedding](https://github.com/FlagOpen/FlagEmbedding)
