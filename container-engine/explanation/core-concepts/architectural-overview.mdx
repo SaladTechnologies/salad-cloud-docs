@@ -4,7 +4,7 @@ description: The world's largest distributed GPU cloud at the most competitive p
 sidebarTitle: 'Distributed Architecture'
 ---
 
-_Last Updated: May 29, 2025_
+_Last Updated: July 13, 2026_
 
 <iframe
   src="https://player.vimeo.com/video/1088518526?transparent=0"
@@ -33,10 +33,11 @@ with distribution roughly following population density patterns.
 
 **Hardware Diversity:**
 
-- GPU types range from older GTX series GPUs to mid-range RTX 3060s (available in 98 countries) to high-end RTX 4090s
-  (concentrated in 63 countries, primarily US, Canada, and UK)
-- Each node is equipped with consumer GPUs and varying CPU and memory configurations
-- Maximum node configuration: 16 vCPUs, 60 GB RAM, RTX 5090 with 32 GB VRAM
+- SaladCloud offers selected NVIDIA and AMD GPU classes. Retrieve the current inventory with the
+  [List GPU Classes API](/reference/saladcloud-api/organizations/list-gpu-classes).
+- Nodes have varying GPU, CPU, and memory configurations.
+- GPU availability varies by class, region, priority, and the nodes currently participating in the network. Check the
+  [GPU Availability API](/reference/saladcloud-api/organizations/get-gpu-availability) before large deployments.
 - Up to 250 GB of ephemeral storage available while instances are running
 
 **Network Characteristics:**

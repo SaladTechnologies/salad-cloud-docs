@@ -4,7 +4,7 @@ sidebarTitle: Troubleshooting
 description: Troubleshooting common issues with Salad Container Engine workloads.
 ---
 
-_Last Updated: February 5, 2026_
+_Last Updated: July 13, 2026_
 
 The following guide addresses common issues encountered when running container workloads on Salad. These solutions will
 help resolve frequent problems with downloads, container failures, networking, and access. If issues persist after
@@ -76,7 +76,7 @@ repeated start failures typically indicate a problem with the container image or
 
 - Invalid or missing container entrypoint
 - Image built for an incompatible architecture
-- GPU images with missing or incompatible CUDA libraries
+- GPU images with missing or incompatible CUDA or ROCm/HIP libraries
 
 #### Command and Argument Errors
 
@@ -88,7 +88,9 @@ repeated start failures typically indicate a problem with the container image or
 
 - Using a non-GPU container image with a GPU container group
 - Using a GPU-dependent image in a CPU-only container group
-- CUDA version incompatibility between the image and host drivers
+- Using a CUDA image with an AMD GPU class
+- Using a ROCm image with an NVIDIA GPU class
+- An incompatibility between the image's GPU runtime, the host driver, the GPU architecture, and the application build
 
 ### Debugging Start Failures
 
@@ -99,6 +101,21 @@ To systematically debug start failures:
 3. Start the container with a minimal long-running command such as `sleep infinity` and connect via the terminal in the
    Portal or with SSH. Once connected, manually verify that the expected files, binaries, and environment variables are
    present and correct. Also verify that the intended entrypoint or command run successfully.
+
+### GPU Compatibility Checks
+
+First, confirm the vendor of every GPU class selected for the container group. A vendor-specific image should select
+classes from only that vendor:
+
+- NVIDIA workloads need a compatible CUDA image.
+- AMD workloads need a compatible ROCm image built for the selected GPU architecture. See
+  [AMD GPUs and ROCm](/container-engine/reference/amd-gpus).
+
+Inside a running replica, use diagnostics supplied by the image:
+
+- **NVIDIA:** Run `nvidia-smi` and inspect the application logs for CUDA, cuDNN, NCCL, or kernel compatibility errors.
+- **AMD:** If the image includes them, run `rocminfo` and `amd-smi list`, and inspect the application logs for ROCm,
+  HIP, or `gfx` compatibility errors.
 
 ## My Container Group Is Stuck Downloading / Stuck at Downloading 99%
 

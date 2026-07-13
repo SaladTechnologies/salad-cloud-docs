@@ -4,7 +4,7 @@ description: 'Performing Long-Running Tasks on SaladCloud'
 sidebarTitle: 'Long-Running Tasks'
 ---
 
-_Last Updated: January 20, 2025_
+_Last Updated: July 13, 2026_
 
 There are
 [two primary methods](/container-engine/explanation/core-concepts/architectural-overview#provide-input-to-applications)
@@ -53,7 +53,7 @@ throughput and optimize resource utilization for these types of jobs.
 While leveraging CPU and I/O capacity effectively, multiprocessing or multithreading-based concurrent inference over a
 single GPU might limit optimal GPU cache utilization and degrade performance, due to each inference running in isolation
 at its own layer or stage. Additionally, the multiprocessing approach can increase VRAM consumption, as each process
-requires a separate CUDA context and loads its own model into the GPU VRAM.
+creates a separate GPU runtime context and loads its own model into GPU VRAM.
 
 The recommendation is to use a multi-pipeline, staged architecture, where GPU inference remains sequential or batched by
 a separated process or thread, while other tasks run in parallel or asynchronously across one or more processes or

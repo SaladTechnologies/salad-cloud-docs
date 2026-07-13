@@ -1,0 +1,271 @@
+---
+title: AMD GPUs and ROCm
+sidebarTitle: AMD GPUs
+description: Select AMD GPU classes and run ROCm-compatible containers on SaladCloud.
+---
+
+_Last Updated: July 13, 2026_
+
+## Overview
+
+SaladCloud supports selected AMD GPU classes in addition to NVIDIA GPU classes. AMD compute workloads generally use
+[ROCm](https://rocm.docs.amd.com/) and HIP, while NVIDIA compute workloads generally use CUDA.
+
+Running successfully on an AMD GPU requires a compatible combination of:
+
+1. The AMD GPU class selected in SaladCloud.
+2. The ROCm user-space libraries and framework in the container image.
+3. The compiled kernels, model features, precision, and quantization used by the application.
+
+GPU access alone does not make an image portable between vendors. A CUDA-only image is for NVIDIA GPUs, and a
+ROCm-specific image is for AMD GPUs unless that exact image has been built and tested for both.
+
+## SaladCloud and ROCm Responsibilities
+
+The boundary between SaladCloud and the container image is important when adapting instructions written for a local AMD
+machine.
+
+| Area                   | SaladCloud-specific                                                                             | AMD/ROCm-specific                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| GPU selection          | You select GPU class IDs and priority in the Portal or through API.                             | The image and application must support the selected GPU's `gfx` architecture.                                              |
+| Host and device access | SaladCloud allocates the node and GPU. You do not configure the host from inside the container. | ROCm depends on an AMD host driver and compatible user-space libraries. Your image supplies the user-space stack.          |
+| Container image        | SaladCloud pulls and runs the image you configure.                                              | The image must contain ROCm-enabled frameworks, libraries, compiled extensions, and any diagnostic utilities you need.     |
+| Diagnostics            | Use the web terminal, Container Logs, and System Events to inspect a replica.                   | Tools such as `rocminfo` and `amd-smi` report AMD runtime and device information only when they are included in the image. |
+| Resilience             | Nodes are distributed and instances can be reallocated.                                         | Validate the exact software stack on every AMD class you select and repeat validation after reallocation.                  |
+
+## Recommended Deployment Path
+
+Use this progression for a new AMD workload:
+
+1. Retrieve the AMD classes available from the Portal or
+   [List GPU Classes API](/reference/saladcloud-api/organizations/list-gpu-classes).
+2. Check estimated capacity with the
+   [GPU Availability API](/reference/saladcloud-api/organizations/get-gpu-availability).
+3. Start with one AMD class and one replica to keep the first test easy to diagnose.
+4. Use a versioned ROCm image tag or image digest that is compatible with that class. Do not use `latest` as a
+   production pin.
+5. Verify device discovery, the framework backend, and a real GPU operation.
+6. Test the actual model and feature path, including its precision, quantization, and compiled extensions.
+7. Record the class, image digest, `gfx` target, software versions, configuration, and results.
+8. Test multiple separately allocated replicas and a reallocation before scaling the workload.
+9. Add another AMD class only after the same image and workload pass on that class too.
+
+Treat the selected Salad class, pinned image, and application configuration as one tested unit. Changing any one of them
+requires revalidation.
+
+## Choose AMD GPU Classes
+
+Use the SaladCloud Portal or the [List GPU Classes API](/reference/saladcloud-api/organizations/list-gpu-classes) to
+find the classes available. Use the returned class IDs rather than copying a UUID from an unrelated example.
+
+Inventory, pricing, priority options, organization access, and capacity can change. Use the Portal and APIs for the
+values currently available to your organization instead of relying on a static table in this page.
+
+Before a large deployment, query the
+[GPU Availability API](/reference/saladcloud-api/organizations/get-gpu-availability) with the class IDs and CPU, memory,
+storage, and country requirements you intend to deploy. Availability is an estimate and can change as nodes enter and
+leave the distributed network.
+
+### Start with a Narrow Hardware Selection
+
+For initial validation, select a single AMD class. When a container group includes multiple classes, an instance can be
+allocated from any selected class, so the image must support the `gfx` target and application features required on all
+of them.
+
+Use separate container groups when classes require different images, build targets, or application settings. Separate
+groups also make capacity planning, canary deployments, and rollback easier to reason about.
+
+Do not combine AMD and NVIDIA classes for a vendor-specific image. Even when an application has both CUDA and ROCm
+builds, keep the vendor-specific artifacts and validation records separate unless the exact multi-vendor image has
+passed on every selected class.
+
+## Choose or Build a Compatible Image
+
+ROCm compatibility is a chain:
+
+`Salad GPU class` → `host driver and device access` → `ROCm user space` → `framework and libraries` →
+`application kernels and features`
+
+A mismatch at any layer can allow the container to start while a framework import, kernel launch, or specific model
+feature still fails.
+
+### Image Best Practices
+
+- Prefer a versioned, AMD-published framework image as a starting point when one fits the workload. AMD validation is
+  useful upstream evidence, but it does not prove that the image and application have passed on a Salad GPU class.
+- Pin the tested image by digest where practical. Otherwise, use a version-specific tag and record the resolved digest.
+- Check AMD's current
+  [ROCm compatibility matrix](https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html) and the
+  framework's compatibility documentation.
+- Confirm that the framework and every compiled extension contain code for the selected `gfx` target. If one image will
+  serve multiple AMD classes, build and test every required target.
+- Include `rocminfo`, AMD SMI, and profiling tools in a diagnostic image or production image when you need them. GPU
+  selection does not add missing executables to the container.
+- Provide ROCm user-space libraries in the image. Do not attempt to install or replace the host kernel driver from the
+  container.
+- Install application dependencies and compile extensions while building the image instead of at replica startup.
+  Smaller, reproducible runtime images reduce download and initialization work on newly allocated nodes.
+- Test the real workload. Successful device enumeration or a framework import is only a smoke test.
+
+AMD publishes a separate
+[user-space and AMD GPU driver compatibility matrix](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/user-kernel-space-compat-matrix.html).
+Use it when diagnosing compatibility.
+
+## Local Docker Instructions Versus SaladCloud
+
+AMD's local Docker documentation shows host options such as `--device /dev/kfd`, `--device /dev/dri`,
+`--group-add video`, and `--security-opt`. Those options configure a Docker host that you administer. They are not
+container-group settings to copy into SaladCloud.
+
+On SaladCloud, select an AMD class in the container's
+[resource requirements](/container-engine/explanation/container-groups/container-groups#container-group-components).
+SaladCloud handles the host and GPU allocation. Configure only the container-level resources and settings exposed by the
+Portal or API.
+
+## Validate the Deployed Combination
+
+Validate in layers so a failure identifies the boundary that needs attention:
+
+1. **Allocation:** Confirm that the replica reaches `Running` on the intended AMD class. Review
+   [System Events](/container-engine/explanation/container-groups/system-events) if it repeatedly exits or reallocates.
+2. **Device discovery:** If the image includes them, use the read-only `rocminfo` and `amd-smi list` diagnostics to
+   confirm that the expected AMD device is visible.
+3. **Framework backend:** Confirm that the installed framework is a ROCm build and reports a usable GPU.
+4. **GPU execution:** Run a real tensor or kernel operation and synchronize it so asynchronous errors surface.
+5. **Application path:** Exercise the actual model, precision, quantization, attention backend, custom operators, and
+   input sizes used in production.
+6. **Distributed operation:** Repeat the checks on separately allocated replicas and after reallocation.
+
+## PyTorch on ROCm
+
+PyTorch intentionally reuses its `torch.cuda` API namespace on ROCm. A ROCm build therefore still uses device strings
+such as `cuda` and calls such as `torch.cuda.is_available()`.
+
+`torch.cuda.is_available()` alone does not distinguish ROCm from CUDA. Check `torch.version.hip` and
+`torch.version.cuda` together:
+
+```python
+import torch
+
+print("PyTorch:", torch.__version__)
+print("ROCm/HIP:", torch.version.hip)
+print("CUDA:", torch.version.cuda)
+print("GPU available:", torch.cuda.is_available())
+print("GPU count:", torch.cuda.device_count())
+
+if torch.cuda.is_available():
+    print("GPU:", torch.cuda.get_device_name(0))
+```
+
+For a ROCm build, `torch.version.hip` is populated and `torch.version.cuda` is normally `None`. After this backend
+check, run a real tensor operation and call `torch.cuda.synchronize()`; see the
+[PyTorch AMD/ROCm tutorial](/container-engine/tutorials/machine-learning/pytorch-amd-rocm) for an example.
+
+## Production Best Practices
+
+### Make GPU Readiness Part of Application Readiness
+
+Do not mark a replica ready merely because its process has started. Load the model, initialize the ROCm-backed
+framework, and complete a representative GPU operation before the startup or readiness check succeeds. See
+[Startup Probes](/container-engine/explanation/infrastructure-platform/startup-probes) and
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes).
+
+### Design for Reallocation
+
+Run multiple replicas for services that need continuous coverage. Keep model and state data outside ephemeral container
+storage, make initialization repeatable, and rerun the compatibility check when a replica is allocated to a replacement
+node.
+
+### Leave Resource Headroom
+
+Test with production input sizes and leave headroom in GPU memory, system memory, and storage. Framework initialization,
+compiled kernels, model caches, and peak input sizes can consume more memory than a small smoke test. Treat
+out-of-memory behavior and sustained throughput as application-level acceptance criteria.
+
+### Profile Before Tuning
+
+Establish a latency, throughput, and memory baseline before changing ROCm or framework settings. Use application-level
+profiling or AMD tools such as `rocprofv3` when they are included in the image, then re-profile to confirm that a change
+actually improves the workload.
+
+### Use Read-Only Telemetry
+
+Use `amd-smi` for interactive, read-only inspection when it is available in the image. For a production telemetry
+integration, prefer the AMD SMI Python or C++ library over parsing CLI output, and record the AMD SMI version used by
+the collector. Do not design a Salad workload around host-management operations such as GPU reset, clock, or power
+changes.
+
+### Roll Out Changes as New Compatibility Sets
+
+Canary a new image, framework, model build, or AMD class before expanding replicas. Keep the previous digest and
+configuration available for rollback, and store the new validation result alongside the image source.
+
+## Troubleshooting
+
+### The Replica Repeatedly Exits or Reallocates
+
+Check Container Logs and System Events before changing the ROCm stack. Confirm the image entrypoint, required CPU and
+memory, selected GPU vendor, and application exit code. A failure before ROCm initializes may be an ordinary container
+configuration problem.
+
+### The Image and GPU Vendors Do Not Match
+
+A CUDA-only image cannot use an AMD GPU through ROCm, and a ROCm-only image is not a CUDA image. Select only AMD classes
+for the ROCm artifact and only NVIDIA classes for the CUDA artifact.
+
+### No AMD Device Is Visible
+
+Confirm that the replica received the intended AMD class. Also inspect `ROCR_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`,
+and `CUDA_VISIBLE_DEVICES`; each can restrict which AMD devices a HIP application sees. If the device is still
+unavailable, collect the class ID/name, image digest, diagnostic output, Container Logs, and System Events for Salad
+support.
+
+### `torch.cuda.is_available()` Is `False`
+
+Check `torch.version.hip`. If it is `None`, the installed PyTorch build is not ROCm-enabled. If it is populated, check
+device visibility, the selected class, ROCm user-space compatibility, and compiled architecture support.
+
+### `hipErrorNoBinaryForGPU`
+
+This error means no compatible kernel image is available for the device. A dependency or custom extension might have
+been compiled for a different `gfx` target. Identify the target with `rocminfo`, rebuild all affected code for that
+target, and repeat the real-workload test on the same Salad class.
+
+### A Model Feature, Precision, or Quantization Fails
+
+Upstream ROCm support does not prove that every application feature works with every image and GPU architecture. Check
+the application's ROCm support and known issues, then validate the exact feature and configuration on the selected Salad
+class.
+
+### Performance Is Lower Than Expected
+
+Confirm that the application is using the GPU, run a warm-up, and measure the real workload. Inspect GPU utilization,
+memory use, CPU and I/O bottlenecks, input batching, and any runtime compilation. Compare results only after the same
+image and workload configuration have been tested across more than one allocation.
+
+### `AMD64` Appears in an Image or Binary Name
+
+`AMD64` is another name for the x86-64 CPU architecture. It does not indicate that an image includes ROCm or supports
+AMD GPUs.
+
+## Related SaladCloud Documentation
+
+- [List GPU Classes API](/reference/saladcloud-api/organizations/list-gpu-classes)
+- [GPU Availability API](/reference/saladcloud-api/organizations/get-gpu-availability)
+- [Container group resource selection](/container-engine/explanation/container-groups/container-groups#container-group-components)
+- [System Events](/container-engine/explanation/container-groups/system-events)
+- [Troubleshooting Salad Container Engine workloads](/container-engine/how-to-guides/troubleshooting)
+- [Run PyTorch on AMD GPUs with ROCm](/container-engine/tutorials/machine-learning/pytorch-amd-rocm)
+- [Build high-performance applications](/container-engine/tutorials/performance/high-performance-apps)
+
+## Related AMD and Framework Documentation
+
+- [AMD: Run ROCm Docker containers](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html)
+- [AMD: ROCm compatibility matrix](https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html)
+- [AMD: User-space and AMD GPU driver compatibility](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/user-kernel-space-compat-matrix.html)
+- [AMD: PyTorch on ROCm installation](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/3rd-party/pytorch-install.html)
+- [AMD: PyTorch compatibility](https://rocm.docs.amd.com/en/latest/compatibility/ml-compatibility/pytorch-compatibility.html)
+- [AMD: AMD SMI CLI](https://rocm.docs.amd.com/projects/amdsmi/en/latest/how-to/amdsmi-cli-tool.html)
+- [AMD: HIP environment variables](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/env_variables.html)
+- [AMD: HIP performance guidelines](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/performance_guidelines.html)
+- [PyTorch: HIP semantics](https://docs.pytorch.org/docs/stable/notes/hip.html)
