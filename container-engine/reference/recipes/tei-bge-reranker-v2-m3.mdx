@@ -1,0 +1,170 @@
+---
+title: BGE Reranker with Text Embeddings Inference
+sidebarTitle: BGE Reranker
+description:
+  Serve BAAI/bge-reranker-v2-m3 with Hugging Face Text Embeddings Inference to score and rerank candidate documents for
+  search and RAG.
+---
+
+_Last Updated: July 13, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs [`BAAI/bge-reranker-v2-m3`](https://huggingface.co/BAAI/bge-reranker-v2-m3) with
+[Hugging Face Text Embeddings Inference](https://github.com/huggingface/text-embeddings-inference) on a Salad GPU. It
+accepts a query and candidate passages, scores each query-passage pair, and returns the candidates in descending order
+of relevance.
+
+A reranker complements embedding and vector search. Vector search efficiently retrieves a broad candidate set, while a
+reranker evaluates each candidate together with the original query to improve the final ordering. In a RAG pipeline,
+this helps select the most relevant passages before sending context to an LLM.
+
+`BAAI/bge-reranker-v2-m3` is a multilingual reranker based on XLM-RoBERTa. It supports inputs up to 8192 tokens and is a
+good fit for multilingual search, document retrieval, and RAG result refinement.
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **BGE Reranker API** recipe.
+3. Enter a **Container Group Name**.
+4. Decide whether to enable **Require Container Gateway Authentication**:
+   - Enabled: requests must include your SaladCloud API key.
+   - Disabled: anyone with the URL can call the reranking service.
+5. Deploy and wait for the model to download and the replica to become ready.
+
+<Callout variation="note">
+  The model is downloaded from Hugging Face at startup, so it can take several minutes before the deployment becomes
+  ready.
+</Callout>
+
+## Defaults
+
+The recipe comes preconfigured with these defaults:
+
+- Server: Hugging Face Text Embeddings Inference
+- Model ID: `BAAI/bge-reranker-v2-m3`
+- Container image: `ghcr.io/huggingface/text-embeddings-inference:89-1.9`
+- Command equivalent: `text-embeddings-router --model-id BAAI/bge-reranker-v2-m3 --port 3000`
+- Container port: `3000`
+- Host bind: `::`
+- Data type: `float16`
+- Max batch tokens: `16384`
+- Max client batch size: `32`
+- Readiness probe: `GET /health`
+- Authentication: enabled by default
+
+## API Endpoints
+
+Useful TEI endpoints include:
+
+- `GET /health` - readiness probe and health check
+- `GET /info` - model and server metadata
+- `GET /docs` - Swagger documentation
+- `POST /rerank` - score and rank one query against candidate texts
+- `POST /predict` - score query-text pairs using TEI's prediction interface
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is enabled by default.
+
+- Enabled: every request must include the `Salad-Api-Key` header.
+- Disabled: anyone with the deployment URL can call the API.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+Send one query and multiple candidate passages to `/rerank`:
+
+```bash
+curl https://<your-dns>.salad.cloud/rerank \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "query": "What is a reranker used for in RAG?",
+    "texts": [
+      "A reranker scores retrieved passages against the query and improves the final ordering before generation.",
+      "Embeddings convert text into vectors for approximate nearest neighbor search.",
+      "Container images package an application and its runtime dependencies."
+    ],
+    "raw_scores": false,
+    "return_text": true
+  }'
+```
+
+If you disabled authentication during deployment, omit the `Salad-Api-Key` header.
+
+The response is sorted by descending relevance. Scores depend on the input and model version, but the response shape is:
+
+```json
+[
+  {
+    "index": 0,
+    "text": "A reranker scores retrieved passages against the query and improves the final ordering before generation.",
+    "score": 0.9971
+  },
+  {
+    "index": 1,
+    "text": "Embeddings convert text into vectors for approximate nearest neighbor search.",
+    "score": 0.2164
+  },
+  {
+    "index": 2,
+    "text": "Container images package an application and its runtime dependencies.",
+    "score": 0.0048
+  }
+]
+```
+
+Each `index` refers to the candidate's position in the original `texts` array. Set `return_text` to `false` if your
+application already tracks documents by index and does not need passage text repeated in the response. Set `raw_scores`
+to `true` only if you need raw model logits instead of normalized relevance scores.
+
+## Test A Deployment
+
+Check health:
+
+```bash
+curl https://<your-dns>.salad.cloud/health
+```
+
+Check model metadata:
+
+```bash
+curl https://<your-dns>.salad.cloud/info
+```
+
+Confirm that the endpoint ranks the relevant passage first:
+
+```bash
+curl -s https://<your-dns>.salad.cloud/rerank \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query":"Where is the Eiffel Tower?",
+    "texts":["The Eiffel Tower is in Paris.","Whales are marine mammals."],
+    "return_text":true
+  }' \
+  | jq '.[0]'
+```
+
+The first result should have `index` equal to `0`. Add the `Salad-Api-Key` header if gateway authentication is enabled.
+
+## Tuning Notes
+
+- Keep `MODEL_ID` set to `BAAI/bge-reranker-v2-m3` unless you intentionally want to repurpose the recipe.
+- The default `MAX_CLIENT_BATCH_SIZE` allows up to 32 candidate texts in one `/rerank` request. Increase it only after
+  testing memory usage and latency with your expected passage lengths.
+- Long passages and large candidate lists consume more VRAM. Lower `MAX_BATCH_TOKENS` if replicas run out of memory.
+- For larger retrieval sets, retrieve broadly with vector search and rerank a smaller top-k candidate set rather than
+  sending the full corpus to the reranker.
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/tei-bge-reranker-v2-m3)
+- [BAAI/bge-reranker-v2-m3 model card](https://huggingface.co/BAAI/bge-reranker-v2-m3)
+- [Hugging Face Text Embeddings Inference](https://huggingface.co/docs/text-embeddings-inference)
+- [FlagEmbedding](https://github.com/FlagOpen/FlagEmbedding)

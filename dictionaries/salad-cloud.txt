@@ -96,6 +96,7 @@ healthz
 heun
 heygordian
 httpie
+hwdsl
 imds
 IMDS
 imdssdk
@@ -117,6 +118,8 @@ Kaspa
 KAWPOW
 kimi
 konieshadow
+kokoro
+Kokoro
 Kryptex
 kubeconfig
 kubelet
@@ -173,9 +176,11 @@ ntomp
 numpy
 nvcc
 NVCC
+nccl
 NCCL
 nvcr
 nvidia
+nvml
 nvtop
 ollama
 Ollama
@@ -211,13 +216,18 @@ Pytube
 quantizations
 Quickstart
 qwen
+randn
 rclone
 Rclone
 reauthentication
+rerank
+reranker
 REVAI
 risc
 risczero
 Roboflow
+rocm
+rocminfo
 routable
 rpsj
 rqns
@@ -265,6 +275,7 @@ supervisord
 svix
 saoudrizwan
 tedlium
+tensorrt
 threadpoolctl
 timeframe
 tlsv
@@ -289,6 +300,7 @@ Unsloth
 UNSLOTH
 unspec
 UNSPEC
+unvalidated
 upscaler
 upscalers
 uvicorn

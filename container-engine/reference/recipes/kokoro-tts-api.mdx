@@ -1,0 +1,143 @@
+---
+title: Kokoro TTS API
+sidebarTitle: Kokoro TTS API
+description:
+  Deploy hexgrad/Kokoro-82M as an OpenAI-compatible text-to-speech API for narration, voice agents, accessibility, and
+  audio generation.
+---
+
+_Last Updated: July 13, 2026_
+
+<Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
+
+## Overview
+
+This recipe runs [`hexgrad/Kokoro-82M`](https://huggingface.co/hexgrad/Kokoro-82M) behind an OpenAI-compatible
+text-to-speech API. Send text to the deployment and receive generated audio in formats including MP3, WAV, FLAC, Opus,
+AAC, and PCM.
+
+Kokoro is an 82 million parameter open-weight TTS model. Its small size makes it useful for cost-conscious speech
+generation such as product narration, voice agents, accessibility features, audio previews, and batch audio workflows.
+The server supports more than 50 Kokoro voices and produces 24 kHz audio.
+
+## Quick Start
+
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **Kokoro TTS API** recipe.
+3. Enter a **Container Group Name**.
+4. Decide whether to enable **Require Container Gateway Authentication**:
+   - Enabled: requests must include your SaladCloud API key.
+   - Disabled: anyone with the URL can call the TTS service.
+5. Deploy and wait until the replica is ready.
+
+<Callout variation="note">
+  Startup downloads and initializes the model. It can take several minutes before the health check passes.
+</Callout>
+
+## Defaults
+
+The recipe comes preconfigured with these defaults:
+
+- Model ID: `hexgrad/Kokoro-82M`
+- Container image: `hwdsl2/kokoro-server:latest`
+- Command equivalent: `python3 -m uvicorn api_server:app --host :: --port 8880`
+- Container port: `8880`
+- Default voice: `af_heart`
+- Default speed: `1.0`
+- Default sample rate: 24 kHz
+- Model cache: `/var/lib/kokoro`
+- Readiness and liveness probe: `GET /health`
+- Authentication: enabled by default through the Salad Container Gateway
+
+The recipe overrides the image's startup command so Uvicorn binds to IPv6 host `::`, which allows Salad ingress to reach
+the API. The container's own bearer-token authentication is disabled with an empty `KOKORO_API_KEY`; use the Salad
+Container Gateway authentication setting to control public access.
+
+## API Endpoints
+
+Useful endpoints include:
+
+- `GET /health` - readiness probe and health check
+- `GET /v1/models` - model information
+- `GET /v1/voices` - available voices
+- `GET /docs` - Swagger documentation
+- `POST /v1/audio/speech` - generate speech audio from text
+
+## Authentication
+
+**Require Container Gateway Authentication** is available in the deployment form and is enabled by default.
+
+- Enabled: every request must include the `Salad-Api-Key` header.
+- Disabled: anyone with the deployment URL can call the API.
+
+If you enable authentication, see [Sending Requests](/container-engine/how-to-guides/gateway/sending-requests) for the
+header format.
+
+## Example Request
+
+This request generates a WAV file named `kokoro.wav`:
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/audio/speech \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Salad-Api-Key: <api-key>' \
+  -d '{
+    "model": "kokoro",
+    "input": "Kokoro is now running on SaladCloud.",
+    "voice": "af_heart",
+    "response_format": "wav",
+    "speed": 1.0
+  }' \
+  --output kokoro.wav
+```
+
+If you disabled authentication during deployment, omit the `Salad-Api-Key` header.
+
+The endpoint returns binary audio rather than JSON. For this request, the response has `Content-Type: audio/wav`. If you
+omit `response_format`, the server returns MP3 audio by default.
+
+The API accepts `kokoro`, `tts-1`, or `tts-1-hd` in the `model` field. All three values use `hexgrad/Kokoro-82M` on this
+server.
+
+## Test A Deployment
+
+Check health:
+
+```bash
+curl https://<your-dns>.salad.cloud/health
+```
+
+List available voices:
+
+```bash
+curl https://<your-dns>.salad.cloud/v1/voices
+```
+
+Generate a short WAV file, then inspect its format:
+
+```bash
+curl -sS https://<your-dns>.salad.cloud/v1/audio/speech \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"kokoro","input":"SaladCloud text to speech test.","voice":"af_heart","response_format":"wav"}' \
+  --output kokoro-test.wav
+
+file kokoro-test.wav
+```
+
+The `file` command should identify `kokoro-test.wav` as WAV audio. Add the `Salad-Api-Key` header to each request if
+gateway authentication is enabled.
+
+## Configuration Notes
+
+- Supported response formats are `mp3`, `wav`, `flac`, `opus`, `aac`, and `pcm`.
+- Language codes include `a` for American English, `b` for British English, `e` for Spanish, `f` for French, `h` for
+  Hindi, `i` for Italian, `j` for Japanese, `p` for Brazilian Portuguese, and `z` for Mandarin Chinese. Leave the
+  language code blank to infer the pipeline from the selected voice.
+
+## Source Code
+
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/kokoro-tts-api)
+- [Kokoro GitHub repository](https://github.com/hexgrad/kokoro)
+- [hexgrad/Kokoro-82M model card](https://huggingface.co/hexgrad/Kokoro-82M)
+- [Kokoro Docker server](https://github.com/hwdsl2/docker-kokoro)
