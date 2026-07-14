@@ -3,6 +3,7 @@
 adamw
 AKIAIOSFODNN
 alwayson
+amdgpu
 amqps
 amzn
 APAC
@@ -128,6 +129,7 @@ Kuzco
 LAVIS
 Letzeburgesch
 lib-dynload
+libdrm
 libgl1
 libgl1-mesa-dev
 libsm6
@@ -228,6 +230,9 @@ risczero
 Roboflow
 rocm
 rocminfo
+rocprofv
+ROCR
+rocr
 routable
 rpsj
 rqns
@@ -309,6 +314,7 @@ vaeapp
 Valencian
 vCPU
 VCPU
+vcpu
 vcpus
 vimeo
 vkapp
