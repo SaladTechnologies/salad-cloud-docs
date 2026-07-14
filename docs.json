@@ -141,6 +141,7 @@
                 "group": "Machine Learning",
                 "pages": [
                   "container-engine/tutorials/machine-learning/pytorch-rtx5090",
+                  "container-engine/tutorials/machine-learning/pytorch-amd-rocm",
                   "container-engine/tutorials/machine-learning/run-triton-server",
                   "container-engine/tutorials/machine-learning/run-cog",
                   "container-engine/tutorials/machine-learning/jupyterlab",
@@ -311,6 +312,7 @@
             "group": "Reference",
             "pages": [
               "container-engine/reference/api",
+              "container-engine/reference/amd-gpus",
               {
                 "group": "Recipes",
                 "pages": [
@@ -319,6 +321,7 @@
                   "container-engine/reference/recipes/comfyui",
                   "container-engine/reference/recipes/gromacs-kelpie",
                   "container-engine/reference/recipes/gromacs-srcg",
+                  "container-engine/reference/recipes/kokoro-tts-api",
                   "container-engine/reference/recipes/kuzco",
                   "container-engine/reference/recipes/llama-cpp",
                   "container-engine/reference/recipes/gemma-4-31b-it-llama-cpp",
@@ -337,6 +340,7 @@
                   "container-engine/reference/recipes/sam3",
                   "container-engine/reference/recipes/sogni-fast-worker",
                   "container-engine/reference/recipes/tei-bge-m3",
+                  "container-engine/reference/recipes/tei-bge-reranker-v2-m3",
                   "container-engine/reference/recipes/tgi",
                   "container-engine/reference/recipes/ubuntu",
                   "container-engine/reference/recipes/unsloth-finetune",
