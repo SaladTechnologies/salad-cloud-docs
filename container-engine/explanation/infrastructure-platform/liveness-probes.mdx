@@ -2,14 +2,15 @@
 title: 'Liveness Probes'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: July 13, 2026_
 
 # Overview
 
 Liveness probes are similar to startup probes, except that they run after the startup probe has completed successfully.
 Typically, Liveness probes are used to evaluate whether the application running in your container is in a healthy state.
 If a container's liveness probe reaches the failure state, the container will be reallocated to a different node.
-Liveness probes are a good place to put logic that checks for CUDA errors, and other unrecoverable states.
+Liveness probes are a good place to check for unrecoverable application and GPU runtime errors, including CUDA errors in
+NVIDIA workloads or ROCm/HIP errors in AMD workloads.
 
 ## Successful Liveness Probe
 

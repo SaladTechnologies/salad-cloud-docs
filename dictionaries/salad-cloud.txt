@@ -3,6 +3,7 @@
 adamw
 AKIAIOSFODNN
 alwayson
+amdgpu
 amqps
 amzn
 APAC
@@ -96,6 +97,7 @@ healthz
 heun
 heygordian
 httpie
+hwdsl
 imds
 IMDS
 imdssdk
@@ -117,6 +119,8 @@ Kaspa
 KAWPOW
 kimi
 konieshadow
+kokoro
+Kokoro
 Kryptex
 kubeconfig
 kubelet
@@ -125,6 +129,7 @@ Kuzco
 LAVIS
 Letzeburgesch
 lib-dynload
+libdrm
 libgl1
 libgl1-mesa-dev
 libsm6
@@ -173,9 +178,11 @@ ntomp
 numpy
 nvcc
 NVCC
+nccl
 NCCL
 nvcr
 nvidia
+nvml
 nvtop
 ollama
 Ollama
@@ -211,13 +218,21 @@ Pytube
 quantizations
 Quickstart
 qwen
+randn
 rclone
 Rclone
 reauthentication
+rerank
+reranker
 REVAI
 risc
 risczero
 Roboflow
+rocm
+rocminfo
+rocprofv
+ROCR
+rocr
 routable
 rpsj
 rqns
@@ -265,6 +280,7 @@ supervisord
 svix
 saoudrizwan
 tedlium
+tensorrt
 threadpoolctl
 timeframe
 tlsv
@@ -289,6 +305,7 @@ Unsloth
 UNSLOTH
 unspec
 UNSPEC
+unvalidated
 upscaler
 upscalers
 uvicorn
@@ -297,6 +314,7 @@ vaeapp
 Valencian
 vCPU
 VCPU
+vcpu
 vcpus
 vimeo
 vkapp

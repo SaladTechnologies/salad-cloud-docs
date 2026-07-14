@@ -1,0 +1,392 @@
+---
+title: Run PyTorch on AMD GPUs with ROCm
+sidebarTitle: PyTorch on AMD GPUs
+description: Select, deploy, and validate a ROCm-enabled PyTorch container on an AMD GPU in SaladCloud.
+---
+
+_Last Updated: July 14, 2026_
+
+Use this tutorial to deploy and verify a ROCm-enabled PyTorch image on an AMD GPU class available to your SaladCloud
+organization.
+
+Salad Container Engine runs container instances inside WSL2. The image selection, device checks, and troubleshooting in
+this tutorial therefore focus only on the ROCm-on-WSL2 path used by SaladCloud.
+
+<Warning>
+  A passing PyTorch check validates basic ROCm access for the selected GPU class and image. It does not establish
+  support for a particular model, compiled extension, precision mode, quantization format, or production workload.
+</Warning>
+
+## What You Will Do
+
+You will:
+
+1. Select an AMD GPU class and a compatible, versioned ROCm-enabled PyTorch image.
+2. Deploy one SaladCloud replica for an initial diagnostic test.
+3. Confirm the GPU device and PyTorch ROCm backend, then complete a deterministic matrix multiplication on the GPU.
+4. Record the combination and test the real workload across multiple allocations.
+
+## Prerequisites
+
+- A SaladCloud organization and project.
+- Portal access, or a SaladCloud API key for the optional API workflow.
+- Access to an AMD GPU class in that organization. Current inventory and capacity can vary.
+- A versioned `rocm/pytorch` image compatible with the AMD architecture you intend to use.
+- Enough credits to run the validation and any multi-replica follow-up.
+- For the API workflow, `curl` and `jq` on your local machine.
+
+Read [AMD GPUs and ROCm](/container-engine/reference/amd-gpus) before adapting a CUDA application or selecting more than
+one AMD class.
+
+## 1. Select a GPU and Image
+
+Use the Portal or [List GPU Classes API](/reference/saladcloud-api/organizations/list-gpu-classes) to find the AMD
+classes available to your organization and retrieve the current class ID. Do not reuse a class UUID from an unrelated
+example.
+
+After choosing the class and container resources, use the
+[GPU Availability API](/reference/saladcloud-api/organizations/get-gpu-availability) before a multi-replica test. The
+result is an estimate, so plan for capacity to change as nodes enter and leave the network.
+
+Use the class's GPU model to review AMD's current
+[PyTorch compatibility documentation](https://rocm.docs.amd.com/en/latest/compatibility/ml-compatibility/pytorch-compatibility.html)
+and
+[PyTorch on ROCm for WSL instructions](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/install/installrad/wsl/legacywsl/install-pytorch.html).
+Choose a versioned `rocm/pytorch` tag whose ROCm, PyTorch, Python, operating system, and compiled architectures fit your
+application. If you cannot match the Salad class to AMD's compatibility information, confirm the combination with Salad
+support rather than assuming compatibility.
+
+[WSL compatibility matrix](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/wsl/wsl_compatibility.html)
+describes AMD's upstream WSL support. Treat upstream compatibility as a starting point and validate the selected image
+and workload on SaladCloud before deploying it to production.
+
+Do not use the mutable `latest` tag as a production pin. Preserve the exact versioned tag and, when your image workflow
+exposes it, the resolved image digest.
+
+Treat these values as one compatibility set:
+
+| Component           | Value to preserve                                                         |
+| ------------------- | ------------------------------------------------------------------------- |
+| Salad GPU selection | Class name and ID returned for your organization                          |
+| Container image     | Full versioned tag and resolved digest, when available                    |
+| Framework stack     | ROCm/HIP, PyTorch, Python, and application versions                       |
+| Application path    | Model, precision, quantization, custom operators, and relevant parameters |
+| Container resources | CPU, RAM, storage, command, environment variables, and replica settings   |
+
+Changing one of these values creates a new combination that needs to be validated again.
+
+## 2. Deploy Through the Portal
+
+1. Open the [SaladCloud Portal](https://portal.salad.com) and select your organization and project.
+2. Click **Deploy a Container Group**, then choose **Custom**.
+3. Enter a name for the validation group and set **Image Source** to the versioned `rocm/pytorch` image you selected.
+4. Set **Replicas** to `1` for the initial diagnostic test.
+5. Under **Hardware**, select only the AMD GPU class you are validating.
+6. Select CPU, RAM, and storage for the image and workload you intend to test. A small matrix test does not establish
+   production resource requirements.
+7. If the image's default process exits, configure a keepalive command. For a PyTorch image with `python3`, enter
+   `python3` as the command, `-c` as the first argument, and `import time; time.sleep(2147483647)` as the second
+   argument. Do not include quotes around the arguments. See
+   [Specifying a command](/container-engine/how-to-guides/specifying-a-command).
+8. No Container Gateway is required for this terminal-based test.
+9. Deploy the group and wait for its instance to reach **Running**. If it repeatedly exits or reallocates, inspect
+   [System Events](/container-engine/explanation/container-groups/system-events) before changing the ROCm stack.
+10. Open the running instance and select the **Terminal** tab. See
+    [SSH and terminal access](/container-engine/explanation/container-groups/ssh-and-terminal).
+
+SaladCloud handles the GPU device and runtime-library integration after you select the GPU class. Do not copy local WSL2
+Docker device or library-mount options into the container group. See
+[SaladCloud's WSL2 GPU Runtime](/container-engine/reference/amd-gpus#saladclouds-wsl2-gpu-runtime).
+
+## 3. Verify PyTorch ROCm
+
+Confirm that the GPU device is present:
+
+```bash
+test -c /dev/dxg && echo "PASS: /dev/dxg present" || echo "FAIL: /dev/dxg missing"
+```
+
+SaladCloud AMD instances use the WSL2 GPU path, so stop and collect diagnostic information for Salad support if
+`/dev/dxg` is missing.
+
+Next, show whether the container configuration explicitly restricts GPU visibility:
+
+```bash
+env | grep -E '^(ROCR_VISIBLE_DEVICES|HIP_VISIBLE_DEVICES|CUDA_VISIBLE_DEVICES)=' || true
+```
+
+An empty result means that none of these variables is explicitly set. Unexpected values can hide devices from the
+application; compare them with the container group configuration before changing them.
+
+Run the deterministic GPU test:
+
+```bash
+python3 - <<'PY'
+import torch
+
+print("PyTorch:", torch.__version__)
+print("ROCm/HIP:", torch.version.hip)
+print("CUDA build:", torch.version.cuda)
+print("GPU available:", torch.cuda.is_available())
+print("GPU count:", torch.cuda.device_count())
+
+if not torch.version.hip:
+    raise SystemExit("This is not a ROCm-enabled PyTorch build")
+
+if not torch.cuda.is_available() or torch.cuda.device_count() < 1:
+    raise SystemExit("PyTorch cannot access an AMD GPU")
+
+device = torch.device("cuda:0")
+properties = torch.cuda.get_device_properties(0)
+
+print("GPU:", torch.cuda.get_device_name(0))
+print("GPU memory bytes:", properties.total_memory)
+print("GPU memory GiB:", round(properties.total_memory / (1024**3), 2))
+
+a = torch.ones((1024, 1024), device=device)
+b = torch.ones((1024, 1024), device=device)
+c = a @ b
+torch.cuda.synchronize(device)
+
+if c.device != device:
+    raise SystemExit(f"Result ran on unexpected device: {c.device}")
+
+actual = c[0, 0].item()
+if actual != 1024.0:
+    raise SystemExit(f"Unexpected result: {actual}")
+
+print("Result device:", c.device)
+print("Result shape:", tuple(c.shape))
+print("Result check:", actual)
+print("PASS: ROCm-enabled PyTorch completed the GPU operation")
+PY
+```
+
+PyTorch on ROCm deliberately uses the `torch.cuda` namespace and `cuda` device strings. The separate `torch.version.hip`
+check prevents a CUDA build on an NVIDIA GPU from passing this ROCm test. See
+[PyTorch HIP semantics](https://docs.pytorch.org/docs/stable/notes/hip.html).
+
+## Interpret the Result
+
+The test passes when:
+
+- `ROCm/HIP` contains a version and `CUDA build` is normally `None`.
+- `GPU available` is `True` and `GPU count` is at least `1`.
+- The reported GPU matches the AMD class selected for the container group.
+- The result device is `cuda:0`, the shape is `(1024, 1024)`, and the result check is `1024.0`.
+
+This test allocates its inputs on the GPU, waits for asynchronous GPU work to finish, verifies the output device, and
+checks a known result. It is stronger than device enumeration, but it is not a substitute for running the real
+application.
+
+## Optional `rocminfo` Diagnostics
+
+When the image includes `rocminfo`, use it to identify the GPU's `gfx` target:
+
+```bash
+if command -v rocminfo >/dev/null 2>&1; then
+  rocminfo | grep -m 1 -E 'Name:[[:space:]]+gfx'
+else
+  echo "rocminfo is not installed in this image"
+fi
+```
+
+Do not make AMD SMI success an acceptance requirement. SaladCloud's WSL2 environment does not expose the native Linux
+`amdgpu` kernel module expected by AMD SMI. Do not run a suggested `modprobe` command inside SaladCloud; use `rocminfo`
+and the PyTorch operation as the device checks.
+
+Diagnostic executables are supplied by the image, not added automatically by GPU selection. A missing utility identifies
+an image-inventory issue; it does not by itself override a passing PyTorch GPU test.
+
+## 4. Validate the Real Workload
+
+After the smoke test passes, run the exact production path. Include:
+
+- The real model and representative input sizes.
+- Every precision, quantization format, attention backend, and custom operator you will enable.
+- Model loading, warm-up, and peak GPU and system-memory use.
+- Any compiled PyTorch extension, checked for the detected `gfx` target.
+- Application startup and readiness behavior after a fresh allocation.
+- Sustained latency and throughput under the expected concurrency.
+
+For production qualification, repeat the checks on at least three separately allocated replicas when capacity permits,
+then repeat them after a reallocation. If you add another AMD class, validate the same image and workload independently
+on that class.
+
+## Record the Result and Clean Up
+
+Save enough information to reproduce the result:
+
+| Field                     | What to record                                                   |
+| ------------------------- | ---------------------------------------------------------------- |
+| Test identity             | Date, operator, organization, project, and container group       |
+| Salad hardware            | GPU class name and ID                                            |
+| Immutable image identity  | Versioned image tag and resolved digest, when available          |
+| Salad runtime             | `/dev/dxg`, container OS, glibc, and relevant library paths      |
+| Reported stack            | ROCm/HIP, PyTorch, Python, and application versions              |
+| Detected device           | PyTorch device name and `gfx` target, when `rocminfo` is present |
+| Container configuration   | CPU, RAM, storage, command, environment variables, and replicas  |
+| Application configuration | Model, precision, quantization, custom operators, and input size |
+| Evidence                  | PyTorch output, application output, logs, and System Events      |
+| Allocation coverage       | Replica IDs, reallocation result, and pass or fail               |
+
+When validation is complete, stop or delete the test container group in the Portal so it does not continue consuming
+credits.
+
+## Optional API Deployment
+
+The Portal's **Copy Configuration** action is the simplest way to obtain an API payload that matches a configuration you
+have already reviewed. The following path performs class discovery and creates the same one-replica validation group
+without embedding a sample GPU UUID.
+
+Set the SaladCloud identifiers first:
+
+```bash
+export SALAD_ORGANIZATION='<organization-name>'
+export SALAD_PROJECT='<project-name>'
+export SALAD_API_KEY='<api-key>'
+```
+
+Retrieve the current classes and their resource limits:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request GET \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/gpu-classes" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'accept: application/json' \
+  | jq '.items[] | {name, id, min_vcpu, max_vcpu, min_ram, max_ram, min_storage, max_storage}'
+```
+
+The response does not include a separate vendor field. Match the AMD class name with the class shown in the Portal, then
+copy its returned ID. Set the remaining values from the versioned image and resource configuration you intend to
+validate:
+
+```bash
+export CONTAINER_GROUP_NAME='pytorch-amd-rocm-check'
+export AMD_GPU_CLASS_ID='<id-returned-by-list-gpu-classes>'
+export ROCM_PYTORCH_IMAGE='rocm/pytorch:<versioned-tag>'
+export CONTAINER_CPU='<cpu-count>'
+export CONTAINER_MEMORY_MB='<memory-in-mb>'
+export CONTAINER_STORAGE_BYTES='<storage-in-bytes>'
+```
+
+The payload uses the Python keepalive command from the Portal workflow. Confirm that `python3` exists in the selected
+image before deploying it:
+
+```bash
+jq -n \
+  --arg name "$CONTAINER_GROUP_NAME" \
+  --arg image "$ROCM_PYTORCH_IMAGE" \
+  --arg gpu_class "$AMD_GPU_CLASS_ID" \
+  --argjson cpu "$CONTAINER_CPU" \
+  --argjson memory "$CONTAINER_MEMORY_MB" \
+  --argjson storage "$CONTAINER_STORAGE_BYTES" \
+  '{
+    name: $name,
+    display_name: "PyTorch AMD ROCm Check",
+    container: {
+      image: $image,
+      resources: {
+        cpu: $cpu,
+        memory: $memory,
+        storage_amount: $storage,
+        gpu_classes: [$gpu_class]
+      },
+      command: ["python3", "-c", "import time; time.sleep(2147483647)"]
+    },
+    autostart_policy: false,
+    restart_policy: "always",
+    replicas: 1
+  }' \
+  | curl --fail-with-body --silent --show-error \
+      --request POST \
+      --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers" \
+      --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+      --header 'accept: application/json' \
+      --header 'content-type: application/json' \
+      --data @- \
+  | jq
+```
+
+The group is created in a stopped state so you can review it. Start it with:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers/${CONTAINER_GROUP_NAME}/start" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'accept: application/json' \
+  | jq
+```
+
+Use the Portal to watch the instance and open its terminal, or use the
+[Get Container Group API](/reference/saladcloud-api/container-groups/get-container-group) to inspect status. After the
+test, delete the group through the Portal or the
+[Delete Container Group API](/reference/saladcloud-api/container-groups/delete-container-group).
+
+## Troubleshooting
+
+### The Instance Does Not Stay Running
+
+Review Container Logs and System Events. Check the selected GPU vendor, the image's default process or command override,
+and the configured CPU, RAM, and storage before changing ROCm or PyTorch versions. Confirm that any keepalive command
+exists in the selected image.
+
+### PyTorch Fails to Import
+
+An import-time shared-library or glibc error can indicate that the image's operating-system ABI is incompatible with the
+SaladCloud runtime libraries. Choose a compatible base image or rebuild the application image; do not replace the
+SaladCloud runtime libraries from inside the container.
+
+### `/dev/dxg` Is Missing
+
+SaladCloud AMD instances use the WSL2 GPU path. If `/dev/dxg` is missing, collect the class name and ID, image tag,
+Container Logs, and System Events for Salad support. Do not try to create or mount the device from inside the container,
+and do not substitute native Linux ROCm device nodes.
+
+### `ROCm/HIP` Is Empty
+
+The installed PyTorch build is not ROCm-enabled. Confirm the image reference and inspect any dependency-install step
+that might have replaced the image's ROCm build of PyTorch. Rebuild from a PyTorch version listed for the selected ROCm
+release in AMD's compatibility documentation.
+
+### PyTorch Cannot Access an AMD GPU
+
+Confirm that the instance received the intended AMD class. Inspect `ROCR_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, and
+`CUDA_VISIBLE_DEVICES` for unexpected restrictions. If `torch.version.hip` is populated but no device is available,
+collect the class name and ID, image tag and digest, PyTorch output, Container Logs, and System Events for Salad
+support.
+
+### `rocminfo` Is Missing
+
+The utility is not included in the image or is not on `PATH`. Add the required user-space diagnostic package while
+building the image. SaladCloud manages the GPU runtime; do not try to replace it from the container.
+
+### AMD SMI Reports That `amdgpu` Is Not Loaded
+
+SaladCloud's environment does not expose the native Linux `amdgpu` kernel module expected by AMD SMI. Do not run
+`sudo modprobe amdgpu` inside the container. Use `rocminfo` and the PyTorch GPU operation as the acceptance checks.
+
+### `hipErrorNoBinaryForGPU`
+
+A PyTorch dependency or custom extension lacks compatible code for the current GPU. Identify the `gfx` target with
+`rocminfo` when it is available, check the compiled targets as described in AMD's PyTorch installation guide, rebuild
+the affected code, and retest. Do not use an architecture override as a generic workaround.
+
+### The Smoke Test Passes but the Application Fails
+
+Isolate the failing model feature, precision, quantization format, or compiled extension. Confirm upstream ROCm support
+for that exact feature, then validate it on the same Salad class and image. A generic PyTorch operation cannot establish
+application compatibility.
+
+For additional diagnosis, see [AMD GPU troubleshooting](/container-engine/reference/amd-gpus#troubleshooting) and
+[Salad Container Engine troubleshooting](/container-engine/how-to-guides/troubleshooting).
+
+## Next Steps
+
+- Build a custom image from the versioned ROCm base and install dependencies at image-build time.
+- Add application readiness checks that load the model and complete a representative GPU operation.
+- Preserve the validation record with the image source and deployment configuration.
+- Review the [AMD GPU production best practices](/container-engine/reference/amd-gpus#production-best-practices) before
+  increasing replicas or adding another AMD class.
