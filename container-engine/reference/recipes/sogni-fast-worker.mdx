@@ -1,89 +1,118 @@
 ---
-title: Sogni Fast Worker API Recipes
+title: Sogni Fast Worker Recipe
 sidebarTitle: Sogni Fast Worker
-description: Deploy Sogni on-chain workers for decentralized AI inference on Salad Container Engine.
+description:
+  Deploy Sogni Comfy and Stable Diffusion workers on SaladCloud to contribute GPU capacity for image and video
+  inference.
 ---
 
-_Last Updated: July 9, 2025_
+_Last Updated: July 13, 2026_
 
 <Tip>Deploy from the [SaladCloud Portal](https://portal.salad.com).</Tip>
 
 ## Overview
 
-This recipe streamlines the process of deploying Sogni Fast Workers on SaladCloud. Sogni is a decentralized AI inference
-network that enables you to contribute compute power and earn rewards by running on-chain workers.
+The Sogni Fast Worker recipe deploys a GPU worker that connects to the
+[Sogni decentralized inference network](https://sogni.ai). The worker processes image or video inference jobs and may
+earn rewards for successfully completed work under Sogni's current eligibility requirements and terms.
 
-You will need a Sogni API Key and NFT Token ID to use this recipe. For more information about Sogni's decentralized
-network and how to obtain these credentials, visit [Sogni.ai](https://sogni.ai) and read the
-[Sogni Documentation](https://docs.sogni.ai/sogni-fast-worker/running-sogni-fast-worker-remotely).
+The recipe offers two worker types:
 
-Two worker variants are available:
+- **Comfy Worker** - Optimized for inference with the latest open-weight image and video models on the Sogni network. It
+  uses `sogni/comfy-worker:latest` and is the default option.
+- **Stable Diffusion Worker** - Supports Stable Diffusion community models and ControlNet workflows. It uses
+  `sogni/sogni-stable-diffusion-worker:latest`.
 
-- **FLUX Worker** - Optimized for FLUX model inference on the Sogni network
-- **Stable Diffusion Worker** - Optimized for Stable Diffusion model inference on the Sogni network
+<Warning>
+  The former Sogni FLUX Worker is retired. Comfy Worker replaces it for FLUX-family workflows and newer image and video
+  models. Do not deploy new workers with `sogni/sogni-flux-worker:latest`.
+</Warning>
 
-Both workers connect to the Sogni decentralized network and process inference requests from users worldwide, earning
-rewards for successful completions.
+See [About Sogni Fast Worker](https://docs.sogni.ai/run-a-worker/fast-worker/about-sogni-fast-worker/) for the current
+model support, GPU requirements, and worker policies.
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+Before deploying the recipe, you need:
 
-Before deploying a Sogni worker, you'll need:
+1. A [Sogni account](https://app.sogni.ai).
+2. A Sogni API key.
+3. A unique Sogni Fast Worker NFT Token ID for this GPU worker.
+4. A SaladCloud account with access to the configured GPU class.
 
-1. **Sogni API Key** - Obtain from the Sogni platform
-2. **NFT Token ID** - Required for worker authentication on the network
-3. **SaladCloud Account** - For deploying the worker infrastructure
+Follow Sogni's [remote worker guide](https://docs.sogni.ai/sogni-fast-worker/running-sogni-fast-worker-remotely/) to
+create the required Sogni credentials.
 
-Visit [Sogni.ai](https://sogni.ai) to learn more about their platform and obtain the necessary credentials.
+## Quick Start
 
-### Worker Configuration
+1. Open the [SaladCloud Portal](https://portal.salad.com).
+2. Deploy the **Sogni Fast Worker** recipe.
+3. Enter a **Container Group Name**.
+4. Choose **Comfy** or **Stable Diffusion** as the worker type.
+5. Enter your **Sogni API Key** and **Sogni NFT Token ID**.
+6. Keep the replica count at `1`, then deploy the container group.
+7. Monitor the container logs until the worker authenticates and connects to the Sogni network.
 
-When deploying this recipe, you'll configure:
+## Recipe Defaults
 
-- Your Sogni API credentials
-- The specific worker variant (FLUX or Stable Diffusion)
-- Resource allocation for optimal performance
+The recipe preserves the established Sogni worker configuration:
 
-## How To Use This Recipe
+- Replicas: `1`
+- vCPUs: `8`
+- Memory: 38 GB
+- Storage: 250 GB
+- Shared memory: 2 GB
+- Priority: high
+- Image caching: enabled
+- Startup probe: `GET /startup` on port `8000`
+- Liveness probe: `GET /liveness` on port `8000`
 
-### Replica Count
+The recipe maps the form credentials to these container environment variables:
 
-The recipe must use only one replica per deployment. Each worker represents a single node on the Sogni decentralized
-network.
+- `API_KEY` - your Sogni account API key
+- `NFT_TOKEN_ID` - the unique NFT Token ID assigned to this worker
 
-### Authentication
+The Stable Diffusion option also sets `AUTO_DOWNLOAD_TO_MIN_MODEL_COUNT` from the **Models to Download at Start** field.
+Comfy Worker downloads compatible workflow assets as jobs require them and does not use that Stable Diffusion setting.
 
-This recipe uses Sogni's authentication system with your API key and NFT Token ID. No additional SaladCloud gateway
-authentication is required for the worker itself.
+## Replica Count And Credentials
 
-### Logging
+Use exactly one replica per deployment. SaladCloud sets environment variables at the container group level, while each
+Sogni GPU worker requires its own NFT Token ID. To run multiple workers, create a separate container group with a unique
+NFT Token ID for each worker.
 
-SaladCloud offers a simple built-in method to view logs from the portal, to facilitate monitoring your worker's
-performance. For production workloads, we highly recommend connecting an external logging source, such as Axiom, to
-track earnings and inference statistics.
+The worker connects outbound to Sogni and does not expose a public inference API through the Salad Container Gateway.
+Authentication is handled by the Sogni API key and NFT Token ID.
 
-### Deploy It And Wait
+## Sogni Unlimited
 
-When you deploy the recipe, SaladCloud will find a qualified node and begin the process of downloading the container
-image to the host machine. It may take up to tens of minutes to download to some machines, depending on the network
-conditions of that particular node. Remember, these are residential PCs with residential internet connections, and
-performance will vary across different nodes.
+Sogni is rolling out its Sogni Unlimited fair-use subscription program. Eligible Fast Workers can participate in
+subscription-covered jobs after the associated Sogni account accepts the current terms and enables participation.
+Eligibility, job allocation, and revenue sharing are controlled by Sogni and may change independently of this SaladCloud
+recipe.
 
-Eventually, you will see your instance enter the running state and show a green checkmark in the "Ready" column. At this
-time, your worker will connect to the Sogni network and begin processing inference requests, earning rewards for
-successful completions.
+Review the [Sogni Fast Worker FAQ](https://docs.sogni.ai/run-a-worker/fast-worker/fast-worker-faq/) for current program
+requirements and worker revenue information.
 
-You will find helpful links and information in the readme on the container group page once deployed.
+## Startup And Monitoring
 
-## Learn More
+The container image and model or workflow assets can take tens of minutes to download, depending on the selected worker,
+node bandwidth, and which assets are already cached. The startup probe allows up to approximately ten minutes after its
+initial delay before SaladCloud considers startup unsuccessful.
 
-For detailed information about Sogni's decentralized AI network, earnings potential, and worker management:
+After deployment:
 
-- [Sogni Website](https://sogni.ai)
-- [Sogni Documentation](https://docs.sogni.ai)
-- [Running Sogni Fast Worker Remotely](https://docs.sogni.ai/sogni-fast-worker/running-sogni-fast-worker-remotely)
+1. Wait for the instance to show a green checkmark in the **Ready** column.
+2. Inspect container logs for successful Sogni authentication and network connection messages.
+3. Use Sogni's worker dashboard and analytics to confirm that the NFT Token ID appears online and receives jobs.
+
+Sogni publishes worker updates under the `latest` image tags. If Sogni reports that a worker version is no longer
+supported, edit the container group and resubmit the image path to force the platform to refresh the image, then restart
+the worker.
 
 ## Source Code
 
-[<Icon icon="github" size="24" /> Github Repository](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/sogni)
+- [<Icon icon="github" size="24" /> Recipe Source](https://github.com/SaladTechnologies/salad-recipes/tree/master/recipes/sogni-fast-workers)
+- [Sogni Fast Worker documentation](https://docs.sogni.ai/run-a-worker/fast-worker/about-sogni-fast-worker/)
+- [Running Sogni Fast Worker remotely](https://docs.sogni.ai/sogni-fast-worker/running-sogni-fast-worker-remotely/)
+- [Sogni Fast Worker FAQ](https://docs.sogni.ai/run-a-worker/fast-worker/fast-worker-faq/)
