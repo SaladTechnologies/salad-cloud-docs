@@ -6,7 +6,7 @@ description:
   savings while maintaining job orchestration capabilities.'
 ---
 
-_Last Updated: November 6, 2025_
+_Last Updated: July 21, 2026_
 
 # Overview
 
@@ -52,11 +52,11 @@ GPU-intensive workloads. SaladCloud offers a compelling alternative that address
 
 **Cost Advantages:**
 
-- **90% Lower Compute Costs**: GPU + CPU + RAM combined cost a fraction of EC2 instances
-  - RTX 4090 setup: \$0.30/hr at high priority vs P3.2xlarge: \$3.06/hr
+- **Lower Compute Costs**: GPU + CPU + RAM combined cost a fraction of comparable EC2 GPU instances
+  - RTX 4090 setup: \$0.364/hr at high priority vs AWS g5.xlarge: \$1.006/hr
 - **Transparent Component Pricing**:
-  - **GPU Containers:**GPU hourly rate
-  - **CPU-only Containers:** - \$0.004/vCPU/hour + \$0.001/GB RAM/hour
+  - **GPU Containers:** GPU hourly rate
+  - **CPU-only Containers:** \$0.004/vCPU/hour + \$0.001/GB RAM/hour
 - **Per-Second Billing**: Hourly rates tracked per second for running containers
 - **No Hidden Costs**: No charges for VPC endpoints, NAT gateways, or data transfer between AZs
 
@@ -72,7 +72,7 @@ GPU-intensive workloads. SaladCloud offers a compelling alternative that address
 - Long-running batch jobs where startup time is less critical
 - GPU-intensive workloads (ML training, rendering, simulations)
 - Cost-sensitive batch processing
-- Non-time-critical workloads (batch priority adds 40-50% savings on top of base 90% savings)
+- Non-time-critical workloads (Lowest/Batch priority can add 40-50% GPU-rate savings compared with High priority)
 - Globally distributed data processing
 - Development and testing environments
 
@@ -808,44 +808,45 @@ async def process_job(job: dict):
 
 ## Cost Optimization Strategies
 
-### 1. Use Batch Priority for Non-Time-Sensitive Workloads
+### 1. Use Lowest/Batch Priority for Non-Time-Sensitive Workloads
 
 SaladCloud offers four priority tiers, with each tier offering additional savings on top of our already competitive base
-pricing (which is typically 80-90% less than AWS). For batch processing that isn't time-critical, the "batch" priority
-tier offers the deepest discounts:
+pricing. For batch processing that isn't time-critical, the "Lowest" priority tier, formerly called "Batch," offers the
+deepest discounts:
 
-| Priority   | Use Case                  | Additional Savings vs Salad High Priority | Availability |
-| ---------- | ------------------------- | ----------------------------------------- | ------------ |
-| **High**   | Production, time-critical | Baseline (already ~90% less than AWS)     | Highest      |
-| **Medium** | Standard workloads        | ~15-20% additional savings                | Very Good    |
-| **Low**    | Flexible deadlines        | ~25-35% additional savings                | Good         |
-| **Batch**  | Non-urgent processing     | **~40-50% additional savings**            | Variable     |
+| Priority   | Use Case                  | Additional GPU-Rate Savings vs Salad High Priority | Availability |
+| ---------- | ------------------------- | -------------------------------------------------- | ------------ |
+| **High**   | Production, time-critical | Baseline                                           | Highest      |
+| **Medium** | Standard workloads        | ~15-20% additional savings                         | Very Good    |
+| **Low**    | Flexible deadlines        | ~25-35% additional savings                         | Good         |
+| **Lowest** | Non-urgent processing     | **~40-50% additional savings**                     | Variable     |
 
-Example pricing for comparable GPU workload (24 GB VRAM, 8 vCPU, 32 GB RAM):
+Example pricing for GPU batch workloads. AWS examples use Linux On-Demand prices in US East (N. Virginia); the
+SaladCloud example requests 24 GB VRAM, 8 vCPU, and 32 GB RAM.
 
 **AWS P4d.24xlarge (8x A100 40GB):**
 
-- Total: ~\$32.77/hour
-- Per GPU: ~\$4.10/hour
+- Total: ~\$21.96/hour
+- Per GPU: ~\$2.75/hour
 - Includes: 96 vCPUs, 1152 GB RAM (massive overkill for most batch jobs)
 
-**AWS P3.2xlarge (1x V100 16GB):**
+**AWS g5.xlarge (1x A10G 24GB):**
 
-- Total: ~\$3.06/hour
-- Per GPU: \$3.06/hour
-- Includes: 8 vCPUs, 61 GB RAM
+- Total: ~\$1.006/hour
+- Per GPU: ~\$1.006/hour
+- Includes: 4 vCPUs, 16 GB RAM
 
 **SaladCloud RTX 4090 (24 GB):**
 
-- High Priority: \$0.30/hour GPU + \$0.032/hour (8 vCPU) + \$0.032/hour (32 GB RAM) = **\$0.364/hour total** (88% less
-  than P3.2xlarge)
+- High Priority: \$0.30/hour GPU + \$0.032/hour (8 vCPU) + \$0.032/hour (32 GB RAM) = **\$0.364/hour total** (64% less
+  than g5.xlarge)
 - Medium: \$0.26 + \$0.032 + \$0.032 = **\$0.324/hour**
 - Low: \$0.22 + \$0.032 + \$0.032 = **\$0.284/hour**
-- **Batch: \$0.18 + \$0.032 + \$0.032 = \$0.244/hour** (92% less than P3.2xlarge!)
+- **Lowest/Batch: \$0.18 + \$0.032 + \$0.032 = \$0.244/hour** (76% less than g5.xlarge and 91% less than P4d per GPU)
 
 ```python
-# Configure container group with batch priority for maximum savings
-# This gives you an additional 40% off SaladCloud's already low prices
+# Configure container group with Lowest/Batch priority for maximum savings
+# This gives you an additional 40% off the high-priority GPU rate
 container_group = sdk.container_groups.create_container_group(
     organization_name="your-org",
     project_name="your-project",
