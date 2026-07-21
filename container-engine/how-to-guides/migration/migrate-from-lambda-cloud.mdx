@@ -6,7 +6,7 @@ description:
   up to 90% while keeping your existing code and workflows.'
 ---
 
-_Last Updated: February 20, 2026_
+_Last Updated: July 21, 2026_
 
 # Overview
 
@@ -21,7 +21,8 @@ deploy it as a **container group**. Your code stays the same, only the runtime e
 ## What Stays Exactly the Same
 
 - Your application code, models, and algorithms remain unchanged
-- Same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations
+- The same Python libraries, PyTorch/TensorFlow frameworks, and CUDA operations when you select compatible NVIDIA GPU
+  classes and a compatible CUDA image
 - Identical API patterns, data processing workflows, and model inference logic
 - Same Docker containers if you're already containerized
 
@@ -97,24 +98,25 @@ fit.
 
 # Cost Comparison
 
-SaladCloud pricing shown below is for the **Batch** priority tier (lowest cost). Higher priority tiers cost more but
-provide greater availability guarantees.
+SaladCloud pricing shown below uses current **Batch** priority rates for the listed GPU instance configuration. Higher
+priority tiers cost more but provide greater availability guarantees.
 
 | Use Case                       | Lambda GPU              | Lambda $/hr | SaladCloud GPU   | SaladCloud $/hr | Savings |
 | ------------------------------ | ----------------------- | ----------- | ---------------- | --------------- | ------- |
-| LLM Inference (7–13B)          | A10 (24 GB)             | ~$0.86      | RTX 4090 (24 GB) | ~$0.16          | ~81%    |
-| Image Generation (SD/FLUX)     | A10 (24 GB)             | ~$0.86      | RTX 3090 (24 GB) | ~$0.09          | ~90%    |
-| Transcription (Whisper)        | Quadro RTX 6000 (24 GB) | ~$0.58      | RTX 3090 (24 GB) | ~$0.09          | ~84%    |
-| Batch Embeddings               | A100 PCIe (40 GB)       | ~$1.48      | RTX 4090 (24 GB) | ~$0.16          | ~89%    |
-| LLM Inference (34B–70B quant.) | A6000 (48 GB)           | ~$0.92      | RTX 5090 (32 GB) | ~$0.25          | ~73%    |
+| LLM Inference (7–13B)          | A10 (24 GB)             | ~$1.29      | RTX 4090 (24 GB) | ~$0.204         | ~84%    |
+| Image Generation (SD/FLUX)     | A10 (24 GB)             | ~$1.29      | RTX 3090 (24 GB) | ~$0.124         | ~90%    |
+| Transcription (Whisper)        | Quadro RTX 6000 (24 GB) | ~$0.69      | RTX 3090 (24 GB) | ~$0.124         | ~82%    |
+| Batch Embeddings               | A100 PCIe (40 GB)       | ~$1.99      | RTX 4090 (24 GB) | ~$0.204         | ~90%    |
+| LLM Inference (34B–70B quant.) | A6000 (48 GB)           | ~$1.09      | RTX 5090 (32 GB) | ~$0.294         | ~73%    |
 
 **Example: 100 GPU-hours of inference per day**
 
-- **Lambda (A10):** 100 × $0.86/hr = ~$2,580/month
-- **SaladCloud (RTX 4090, batch):** 100 × $0.16/hr = ~$480/month
+- **Lambda (A10):** 100 × $1.29/hr = ~$3,870/month
+- **SaladCloud (RTX 4090, batch):** 100 × $0.204/hr = ~$612/month
 
 <Note>
-  Prices are approximate and subject to change. Check [salad.com/pricing](https://salad.com/pricing) and
+  Prices are approximate, exclude applicable taxes, and are subject to change. Available instance types can vary by
+  region and account. Check [salad.com/pricing](https://salad.com/pricing) and
   [lambda.ai/pricing](https://lambda.ai/pricing) for current rates.
 </Note>
 
