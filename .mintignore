@@ -3,3 +3,5 @@ CLAUDE.md
 .github/
 .vscode/
 README.md
+AGENTS.md
+agent-evals/

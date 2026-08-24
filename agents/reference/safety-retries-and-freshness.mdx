@@ -1,0 +1,123 @@
+---
+title: 'Safety, Retries, and Freshness'
+sidebarTitle: 'Safety and Retries'
+description: 'Global safety, retry, verification, freshness, and stop rules for autonomous SaladCloud operations.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Apply these rules to every autonomous Salad Container Engine read, create, update, start, stop, scale, queue, instance,
+log, or IMDS workflow.
+
+## When not to use it
+
+Do not use these generic rules to infer an endpoint-specific request body or success state. Use the current OpenAPI
+operation and the applicable task runbook for those details.
+
+## Required inputs
+
+- A caller-provided time budget and operational objective.
+- `SALAD_API_KEY` for the public API; never print or persist its value.
+- Trusted resource scope and explicit user intent for destructive or capacity-reducing actions.
+- A safe location for redacted pre-change evidence when rollback may be required.
+
+## Authoritative sources
+
+- [Using the API](/reference/api-usage)
+- [Agent Operations Overview](/agents/overview)
+- The current public API and IMDS OpenAPI specifications linked from the
+  [Container Engine API reference](/container-engine/reference/api)
+
+## Dynamic values to retrieve
+
+Treat resource state, resource versions, instances, logs, events, queues, jobs, quotas, GPU classes, availability,
+prices, and capacity as dynamic. Retrieve them for the target scope immediately before they affect a decision and again
+after every mutation.
+
+## Preflight checks
+
+1. Verify the target names and authorization boundary.
+2. Classify the operation as a read, idempotent write, non-idempotent create, destructive action, or asynchronous
+   lifecycle request.
+3. Read the resource and save a redacted record of fields that may change.
+4. Define the success condition, verification read, maximum attempts, elapsed-time budget, and stop condition.
+5. Check that local instance data and job state are externalized before an operation that can replace an instance.
+
+## Procedure
+
+1. Retrieve live state and compare it with the requested state.
+2. Skip a write when the desired outcome is already true.
+3. Use the narrowest valid mutation. For merge patches, send only intended changes while preserving current nested
+   values that must remain.
+4. Record the response status and identifiers without credential-bearing headers or secret fields.
+5. Perform the specified verification read and bounded polling if the operation is asynchronous.
+6. Return the verified result or stop with the last observed state.
+
+## Decision rules
+
+| Response or operation                              | Agent behavior                                                                               |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET` or other read                                | Retry only plausible transient failures within the bounded budget.                           |
+| `PATCH` with a known desired state                 | Re-read first; retry only after proving the first request did not apply.                     |
+| `POST` create                                      | List by exact scope and name before retrying; never create again while outcome is uncertain. |
+| `POST` start/stop or instance lifecycle            | Re-read current state before any retry; acceptance may be asynchronous.                      |
+| `DELETE`, stop, scale-down, reallocate, or replace | Require explicit user intent; never infer authorization.                                     |
+| `400` or schema/configuration error                | Correct the request or stop; do not retry unchanged.                                         |
+| `401` or `403`                                     | Stop and request valid authorization; do not retry blindly.                                  |
+| `404`                                              | Recheck trusted scope once; do not enumerate or guess names.                                 |
+| `429`                                              | Honor `Retry-After` when supplied, then use bounded backoff.                                 |
+| `5xx` or transport failure                         | Retry only safe/idempotent work; reconcile uncertain writes with a read first.               |
+
+## Expected states and responses
+
+Creation may return `201`; lifecycle and deletion requests may return `202`; merge-patch updates may return `200`. These
+status codes come from the current operation definitions. Runtime convergence must still be established through resource
+and instance reads.
+
+Container Group status values are `pending`, `running`, `stopped`, `succeeded`, `failed`, and `deploying`. Instance
+state values are `allocating`, `downloading`, `creating`, `running`, and `stopping`. Do not invent a failed instance
+state: failures are diagnosed through group state, instance turnover, system events, and logs.
+
+## Retry behavior
+
+Use bounded exponential backoff with jitter as agent behavior, not as a SaladCloud API guarantee. The caller or task
+must set a maximum attempt count and elapsed-time budget. Respect a server-provided `Retry-After` value. Do not
+prescribe undocumented exact delays, and do not reset the overall budget after each response.
+
+Never blindly retry:
+
+- Authentication or authorization failures.
+- Schema validation, invalid enum, invalid configuration, or missing-field errors.
+- A create request whose outcome is unknown.
+- A destructive action or capacity reduction.
+- Reallocation as a generic response to application or configuration failures.
+
+## Verification
+
+Verification is a fresh read, not the mutation response. Compare the observed configuration, version, state, counts, and
+relevant instance fields with an explicit success predicate. For creates, list or get the exact name. For queue jobs,
+read the returned job ID. For asynchronous work, retain the last response and UTC observation time.
+
+## Rollback or recovery
+
+- Restore only fields changed by the failed update, using the saved pre-change values and a fresh read.
+- If a create succeeded but later deployment failed, keep the resource for diagnosis unless the user explicitly asks for
+  deletion.
+- If a write outcome is unknown, reconcile with a read before sending another write.
+- If an instance is replaced, recover from external storage or a durable queue; local instance state is ephemeral.
+
+## Stop and escalation conditions
+
+Stop when required scope, credentials, intent, current state, or rollback values are missing; when a non-transient error
+persists; when resources remain pending past the caller's polling budget; or when evidence suggests a service-side
+fault. Do not turn an unresolved operation into success. Escalate with the package defined in
+[Troubleshoot a Container Group](/agents/container-engine/troubleshoot-container-group).
+
+## Evidence to return to the user
+
+Return the target scope, operation IDs, redacted request field names, response classes, verification reads, UTC
+timestamps, attempt count, elapsed polling time, last observed state, success predicate, and any recovery or escalation
+required. Never return API keys, registry credentials, environment-variable secret values, webhook secrets, or full
+credential-bearing requests.

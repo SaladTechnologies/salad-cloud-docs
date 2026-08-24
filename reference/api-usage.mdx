@@ -3,7 +3,13 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
+  > accessible organizations or projects; require their names from trusted user/configuration context, validate them
+  > with scoped reads, and follow [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness).
+</Visibility>
 
 The SaladCloud API is organized around REST. Our API has predictable resource-oriented URLs, accepts JSON-encoded
 request bodies, returns JSON-encoded responses, and uses standard HTTP response codes, authentication, and verbs.

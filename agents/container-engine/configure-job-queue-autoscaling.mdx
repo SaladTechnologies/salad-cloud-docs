@@ -1,0 +1,235 @@
+---
+title: 'Configure Job Queue Autoscaling'
+sidebarTitle: 'Queue Autoscaling'
+description: 'Create or discover a SaladCloud Job Queue and configure a safely verified queue-autoscaled worker group.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use for discrete JSON jobs handled by an HTTP application through the SaladCloud Job Queue Worker, when worker capacity
+should follow managed queue depth.
+
+## When not to use it
+
+Do not use Job Queue autoscaling for direct gateway traffic, stateful jobs that cannot be retried, work that depends on
+instance-local durable state, or extremely long jobs that are incompatible with the documented interruption/retry model.
+Do not use it to attach a queue to an already-created group: `queue_connection` is absent from the current Container
+Group patch schema.
+
+## Required inputs
+
+- `SALAD_API_KEY`, `SALAD_ORGANIZATION`, `SALAD_PROJECT`, `SALAD_QUEUE`, and `SALAD_CONTAINER_GROUP`.
+- A unique queue name and group name, both resolved against live list operations.
+- Worker image containing the SaladCloud Job Queue Worker and application; application HTTP path and port.
+- Image/resources/priority, readiness behavior, `min_replicas`, `max_replicas`, and `desired_queue_length`.
+- Optional `polling_period`, `max_upscale_per_minute`, and `max_downscale_per_minute`.
+- Explicit user intent for test-job submission, job cancellation, scale-down, stop, group deletion, or queue deletion.
+
+## Authoritative sources
+
+| Purpose           | Operation and canonical reference                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Discover queues   | Operation: `list_queues` — [List Queues](/reference/saladcloud-api/queues/list-queues)                                                                    |
+| Read queue        | Operation: `get_queue` — [Get Queue](/reference/saladcloud-api/queues/get-queue)                                                                          |
+| Create queue      | Operation: `create_queue` — [Create Queue](/reference/saladcloud-api/queues/create-queue)                                                                 |
+| Read/create group | Operations: `get_container_group`, `create_container_group` — [Create Container Group](/reference/saladcloud-api/container-groups/create-container-group) |
+| Update autoscaler | Operation: `update_container_group` — [Update Container Group](/reference/saladcloud-api/container-groups/update-container-group)                         |
+| Submit/read jobs  | Operations: `create_queue_job`, `get_queue_job`, `list_queue_jobs` — [Create Job](/reference/saladcloud-api/queues/create-job)                            |
+| Cleanup           | Operations: `delete_queue_job`, `delete_queue`, `delete_container_group` — [Queue API](/reference/saladcloud-api/queues/delete-queue)                     |
+
+Use [Job Queues](/container-engine/explanation/job-processing/job-queues),
+[Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker),
+[Job Queue Autoscaling](/container-engine/explanation/infrastructure-platform/autoscaling), and
+[Autoscaling Settings](/container-engine/reference/autoscaling/settings) for canonical behavior.
+
+## Dynamic values to retrieve
+
+- Exact queues and groups already present in the project.
+- Queue `current_queue_length`, associated `container_groups`, and current job states/events.
+- Group `queue_connection`, `queue_autoscaler`, desired replicas, status/version, instances, and readiness.
+- Live quota headroom using the planned `max_replicas`, plus current hardware availability.
+- Worker and application logs for the relevant UTC window.
+
+## Preflight checks
+
+1. Complete [Discover Scope and Preflight](/agents/container-engine/discover-scope-and-preflight), reserving quota
+   headroom for `max_replicas` as required by canonical quota guidance.
+2. Call `list_queues` and `list_container_groups`; compare exact names to prevent duplicates.
+3. Confirm the application and worker are in the image, the application accepts/returns valid JSON, and the path/port
+   match `queue_connection`.
+4. Confirm jobs are idempotent and durable state/results are externalized before acknowledging success.
+5. Validate bounds: desired queue length 1–100; minimum replicas 0–100; maximum replicas 1–500; polling period 15–1800
+   seconds when supplied; optional up/down rates 1–100. Require `min_replicas <= max_replicas`.
+6. For scale from zero, accept cold-start latency and configure readiness so the worker does not receive jobs before the
+   application is ready.
+
+## Procedure
+
+### Create or discover the queue
+
+1. Operation: `list_queues`. If the exact queue name exists, call `get_queue` and reuse it only when that is the user's
+   intent.
+2. If absent, Operation: `create_queue`. The minimal request is:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/queues" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "name": "agent-example-queue",
+    "display_name": "Agent Example Queue",
+    "description": "Queue for an approved worker workload"
+  }'
+```
+
+Replace the example with the approved `SALAD_QUEUE`; never treat the example as a real resource. Verify with
+`get_queue`.
+
+### Associate a new worker group and enable autoscaling
+
+The actual association is `queue_connection` in Operation: `create_container_group`. The queue and group must be in the
+same supplied project. This schema-derived scale-from-zero template uses maximum replicas 2:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "name": "agent-example-workers",
+    "container": {
+      "image": "<registry>/<repository>:<immutable-tag-or-digest>",
+      "resources": {
+        "cpu": 4,
+        "memory": 8192
+      },
+      "environment_variables": {
+        "SALAD_QUEUE_WORKER_LOG_LEVEL": "info"
+      },
+      "priority": "batch"
+    },
+    "autostart_policy": true,
+    "restart_policy": "always",
+    "replicas": 0,
+    "queue_connection": {
+      "path": "/process",
+      "port": 8080,
+      "queue_name": "agent-example-queue"
+    },
+    "queue_autoscaler": {
+      "desired_queue_length": 1,
+      "min_replicas": 0,
+      "max_replicas": 2,
+      "polling_period": 30,
+      "max_upscale_per_minute": 2,
+      "max_downscale_per_minute": 1
+    },
+    "readiness_probe": {
+      "http": {
+        "headers": [],
+        "path": "/ready",
+        "port": 8080,
+        "scheme": "http"
+      },
+      "failure_threshold": 3,
+      "initial_delay_seconds": 10,
+      "period_seconds": 5,
+      "success_threshold": 1,
+      "timeout_seconds": 2
+    }
+  }'
+```
+
+Replace all examples with approved values and a live hardware plan. For an existing group that already has the correct
+`queue_connection`, read it, then patch only `queue_autoscaler` with Operation: `update_container_group` and verify.
+
+### Verify scaling behavior
+
+1. Read the group and queue; verify both sides of the association.
+2. Submit a test job only with explicit user intent. Operation: `create_queue_job` returns the job and generated ID.
+3. Poll `get_queue`, `get_container_group`, `list_container_group_instances`, and `get_queue_job` within a bounded
+   budget.
+4. Verify the queue grows, desired/observed worker capacity changes within the configured boundaries, a current-version
+   instance becomes ready, and the job reaches a terminal status.
+5. After the queue drains, verify the group returns no lower than `min_replicas`; with minimum 0, expect cold starts on
+   subsequent jobs.
+
+### Worker, retry, and webhook behavior
+
+The canonical queue documentation states that the worker forwards JSON to the configured HTTP application; `200`
+indicates job success and `500` indicates failure. A failed job can be retried up to three times (four total attempts),
+and an instance interruption counts as a failed attempt. Design handlers to be idempotent by job ID or application
+idempotency key, and commit output to external storage before returning success.
+
+The current local queue docs/OpenAPI do not define an agent-configurable acknowledgment timeout. Do not invent one.
+Observe job events and worker logs. When a job uses a webhook, validate the documented `webhook-signature`,
+`webhook-id`, and `webhook-timestamp` headers as described in
+[Webhook Signatures](/container-engine/how-to-guides/job-processing/webhook-signature). Never expose the webhook secret.
+
+## Decision rules
+
+| Situation                                                       | Action                                                                                                     |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Exact queue/group name already exists                           | Read and reconcile; do not create a duplicate.                                                             |
+| Existing group has correct `queue_connection`                   | Patch autoscaler only after a read.                                                                        |
+| Existing group lacks or has wrong `queue_connection`            | Stop; patch schema cannot attach/change it. Ask for an approved replacement strategy.                      |
+| Minimum replicas is 0                                           | Accept cold-start delay and require readiness before dispatch.                                             |
+| Maximum replicas exceeds live quota headroom                    | Stop or request an approved lower maximum/quota increase.                                                  |
+| Queue has jobs but no scaling                                   | Check association, autoscaler, quota/availability, group status, readiness, and worker logs in that order. |
+| Job retries repeat the same application error                   | Fix the worker/application; do not reallocate nodes blindly.                                               |
+| Cleanup would cancel jobs, reduce capacity, or delete resources | Require explicit user intent.                                                                              |
+
+## Expected states and responses
+
+Queue/group creation returns `201`; update returns `200`; job creation returns `201`; delete/cancel operations return
+`202`. Queue job statuses are `pending`, `running`, `succeeded`, `cancelled`, and `failed`. A queue response can include
+`current_queue_length` and associated `container_groups`; treat absent optional current length as unknown.
+
+Canonical autoscaling guidance uses `ceil(queue length / desired queue length)` bounded by minimum/maximum and rate
+settings. Verify actual live behavior rather than calculating success from the formula alone.
+
+## Retry behavior
+
+Reconcile any uncertain queue or group create by exact name before retrying. Reconcile a job create only by its returned
+job ID; if the outcome is unknown and no ID was returned, stop rather than submitting the job again. Retry reads within
+a bounded budget; honor `Retry-After` when present. Do not resubmit a failed job automatically: the handler may already
+have produced side effects. Use an application idempotency record and explicit retry intent.
+
+## Verification
+
+| Mutation                | Read before           | Read after                         | Success                                                                | Failure or unresolved                                                         |
+| ----------------------- | --------------------- | ---------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Create queue            | `list_queues`         | `get_queue`                        | Exact queue exists with intended metadata                              | Duplicate ambiguity, mismatch, or unresolved `404`                            |
+| Create associated group | Queue/group lists     | `get_container_group`, `get_queue` | Group has intended queue/autoscaler and queue lists the group          | Mismatch, group failure, or association absent past budget                    |
+| Update autoscaler       | `get_container_group` | Same plus queue/instances          | Values match and scaling stays within bounds                           | Mismatch, quota/availability block, or no response to queued work past budget |
+| Submit test job         | `get_queue`           | `get_queue_job` plus scaling reads | Job reaches intended terminal status and scaling predicate is observed | Failed/cancelled unexpectedly or pending/running past budget                  |
+
+## Rollback or recovery
+
+- Restore only the previous autoscaler object with a fresh merge patch when it is known and authorized.
+- Do not detach a queue through an undocumented field; the current patch schema has no `queue_connection`.
+- Preserve a failed job and logs for diagnosis. Resubmit only after the cause is corrected and idempotency is proven.
+- Safe cleanup begins with `get_queue`, `list_queue_jobs`, `get_container_group`, and instance reads. If the queue has
+  associated groups or active jobs, stop. Cancel jobs, reduce/stop/delete capacity, and delete the queue only with
+  explicit intent, then verify each deletion in the same trusted scope.
+
+## Stop and escalation conditions
+
+Stop for missing worker/image/path/port, non-idempotent state handling, duplicate ambiguity, unsupported association
+changes, insufficient quota/availability, missing destructive intent, repeated job failure, no scale response past the
+polling budget, or missing logs/events. Escalate with queue/group/job IDs, UTC times, association/autoscaler settings,
+queue length, instance readiness, worker logs, and dynamic quota/availability evidence.
+
+## Evidence to return to the user
+
+Return validated scope and exact names; operation IDs/status classes; queue ID/current length; group version/status;
+redacted association and autoscaler settings; quota headroom; observed min/max/ready capacity; test job
+ID/status/events; polling window; retries; idempotency/external-state confirmation; cleanup performed or skipped; and
+unresolved or escalation status. Never return API, registry, or webhook secrets.

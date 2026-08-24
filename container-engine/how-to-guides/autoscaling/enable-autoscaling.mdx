@@ -6,7 +6,14 @@ description:
   workload demand.'
 ---
 
-_Last Updated: July 21, 2025_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Validate all request fields against the current OpenAPI schema before execution; do not copy static hardware IDs or
+  > assume response fields from examples. Use the [agent autoscaling
+  > runbook](/agents/container-engine/configure-job-queue-autoscaling) for a schema-derived workflow and post-write
+  > verification.
+</Visibility>
 
 This guide walks you through setting up autoscaling for SaladCloud container groups using job queues. With autoscaling
 enabled, your container groups will automatically scale up when jobs are queued and scale down when demand decreases,

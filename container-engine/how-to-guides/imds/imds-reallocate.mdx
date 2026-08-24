@@ -3,7 +3,14 @@ title: 'Using IMDS to reallocate a replica'
 sidebarTitle: 'Reallocate Replica'
 ---
 
-_Last Updated: May 20, 2026_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Use the [Container Group troubleshooting
+  > runbook](/agents/container-engine/troubleshoot-container-group) before reallocation. Require an isolated,
+  > evidence-backed node condition and explicit user intent; preserve evidence, externalize state, then verify the
+  > replacement rather than retrying reallocation blindly.
+</Visibility>
 
 Using the IMDS, you can reallocate a replica from within the running container. This is often done in combination with
 [performance monitoring](/container-engine/tutorials/performance/performance-monitoring) to allow applications to

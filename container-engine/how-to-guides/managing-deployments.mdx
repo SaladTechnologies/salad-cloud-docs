@@ -2,7 +2,14 @@
 title: 'Managing Deployments'
 ---
 
-_Last Updated: October 9, 2025_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Before any update, call `get_container_group`, preserve unrelated configuration, and use only fields supported by
+  > `ContainerGroupPatch`. After the mutation, re-read the group and instances until the intended version/state is
+  > verified or the bounded polling budget expires. See the [deploy/update
+  > runbook](/agents/container-engine/deploy-or-update-container-group).
+</Visibility>
 
 ### Listing your Container Deployments
 

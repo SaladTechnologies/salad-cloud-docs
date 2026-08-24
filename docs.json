@@ -24,6 +24,31 @@
         ]
       },
       {
+        "tab": "Agent Operations",
+        "hidden": true,
+        "searchable": true,
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["agents/overview"]
+          },
+          {
+            "group": "Container Engine",
+            "pages": [
+              "agents/container-engine/discover-scope-and-preflight",
+              "agents/container-engine/deploy-or-update-container-group",
+              "agents/container-engine/monitor-and-operate-container-group",
+              "agents/container-engine/troubleshoot-container-group",
+              "agents/container-engine/configure-job-queue-autoscaling"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": ["agents/reference/safety-retries-and-freshness"]
+          }
+        ]
+      },
+      {
         "tab": "Container Engine",
         "groups": [
           {
@@ -675,6 +700,9 @@
   },
   "search": {
     "prompt": "Search..."
+  },
+  "markdown": {
+    "instructions": "For autonomous tasks, use live SaladCloud API responses for current resource state, availability, quotas, and other dynamic values. Use the current OpenAPI specifications for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, or state. Prefer API workflows over Portal steps. Read resources before changing them; preserve unrelated settings and never expose credentials. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Do not retry validation or authorization failures blindly. Verify every write with a read. Do not delete resources, stop workloads, or reduce capacity without explicit user intent. SaladCloud instances are interruptible; treat local instance state as ephemeral unless the application externalizes it."
   },
   "footer": {
     "socials": {

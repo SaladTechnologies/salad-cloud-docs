@@ -1,0 +1,134 @@
+---
+title: 'Agent Operations Overview'
+sidebarTitle: 'Overview'
+description:
+  'Source precedence, authorization boundaries, and evidence requirements for autonomous SaladCloud operations.'
+---
+
+_Last Updated: August 24, 2026_
+
+This section is an execution layer for AI agents operating Salad Container Engine through the public API. It adds
+workflow and safety rules to the canonical product documentation; it does not replace the OpenAPI specifications.
+
+## When to use this runbook
+
+Use this page before any autonomous Container Engine task and whenever sources disagree, identifiers are missing, or a
+requested action could stop work, reduce capacity, replace an instance, or delete a resource.
+
+## When not to use it
+
+Do not use these runbooks for Transcription, AI Gateway, Gateway Service, S4, general account administration, or as a
+substitute for live account data.
+
+## Required inputs
+
+- `SALAD_API_KEY`, supplied through a secret environment variable and sent only in the `Salad-Api-Key` header.
+- `SALAD_ORGANIZATION` and `SALAD_PROJECT`, obtained from the user, a trusted deployment configuration, or the Portal.
+- The intended outcome, target resource name, and authorization boundary.
+- Explicit user intent before stopping or deleting a workload, scaling down, replacing or reallocating an instance, or
+  changing a setting that can interrupt running replicas.
+
+The public OpenAPI specification addresses organizations and projects by **name**. It does not define operations to list
+the organizations or projects accessible to an API key. Never guess or enumerate names.
+
+## Authoritative sources
+
+Use this precedence order:
+
+1. A live API response for current account, availability, quota, or resource state.
+2. The current
+   [`salad-cloud.yaml`](https://github.com/SaladTechnologies/salad-cloud-docs/blob/main/api-specs/salad-cloud.yaml) or
+   [`salad-cloud-imds.yaml`](https://github.com/SaladTechnologies/salad-cloud-docs/blob/main/api-specs/salad-cloud-imds.yaml)
+   for API paths, operation IDs, schemas, required fields, and enums.
+3. The applicable agent runbook for procedure, safety boundaries, and decision rules.
+4. Canonical explanatory documentation, such as the
+   [Container Engine overview](/container-engine/explanation/core-concepts/overview), for product behavior and context.
+5. Examples only as illustrations. Never treat example identifiers, prices, counts, or states as current facts.
+
+Authentication behavior is documented in [Using the API](/reference/api-usage). Canonical operation pages are under the
+[Container Engine API reference](/container-engine/reference/api).
+
+## Dynamic values to retrieve
+
+Retrieve immediately before a decision:
+
+- The current Container Group or queue representation and version.
+- Current instances and their `state`, `ready`, `started`, and version values.
+- Current quotas, GPU classes, CPU/GPU availability, country constraints, and priority-specific capacity estimates.
+- Current queue length, job status, system events, and application logs for the relevant UTC window.
+
+Do not cache these values as permanent facts. Prices and example hardware identifiers are also not account state.
+
+## Preflight checks
+
+1. Confirm no credential value will be printed, logged, committed, or included in returned evidence.
+2. Confirm the user supplied or approved the organization and project names.
+3. Validate organization access with `get_quotas` and project access with a scoped read such as `list_container_groups`.
+4. Read the target before any mutation and compare its current state with the requested outcome.
+5. Run the task-specific checks in
+   [Discover Scope and Preflight](/agents/container-engine/discover-scope-and-preflight).
+6. Establish a polling limit and a stop condition before sending a write.
+
+## Procedure
+
+1. Select the narrowest task-specific runbook and its corresponding skill.
+2. Resolve names from trusted input; resolve generated IDs from live list or get responses.
+3. Retrieve all dynamic values required for the decision.
+4. Present or record the planned mutation and any interruption or capacity impact.
+5. Obtain explicit intent when the action is destructive, capacity-reducing, or instance-replacing.
+6. Perform one mutation, then verify it with the documented read operation.
+7. Return the requested outcome, verification evidence, and any unresolved state without secrets.
+
+## Decision rules
+
+| Situation                                           | Action                                                               |
+| --------------------------------------------------- | -------------------------------------------------------------------- |
+| Required name is absent                             | Stop; request it instead of guessing.                                |
+| Read and requested state already match              | Report no change; do not repeat the mutation.                        |
+| Target name matches one existing resource           | Update that resource only after a fresh read.                        |
+| Multiple candidates or ambiguous intent             | Stop and ask the user to identify the target.                        |
+| Mutation reduces capacity or interrupts work        | Require explicit user intent.                                        |
+| Documentation conflicts with request/response shape | Use OpenAPI for shape and report the discrepancy.                    |
+| Live response conflicts with an example             | Use the live response and identify the example as non-authoritative. |
+
+## Expected states and responses
+
+Successful create operations return a resource, while start, stop, delete, and instance lifecycle operations may return
+`202 Accepted` and continue asynchronously. A `2xx` response confirms acceptance or immediate response handling; it is
+not, by itself, proof that the desired runtime state has been reached.
+
+## Retry behavior
+
+Follow [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness). Retry reads and other safe or
+idempotent requests only within a caller-defined attempt and elapsed-time budget. Honor `Retry-After` when present. Do
+not blindly retry authentication, authorization, validation, conflict, or invalid-configuration failures.
+
+## Verification
+
+Every mutation requires a verification read from the same organization and project. Success means the live resource
+reflects the requested configuration or terminal state, and any relevant instances reflect the expected version and
+readiness. Report partial success when only some instances converge.
+
+## Rollback or recovery
+
+Capture a redacted pre-change representation before updating. Prefer a corrective merge patch that restores only the
+changed fields. Never delete or replace a resource as an implicit rollback. If the prior value is unavailable or
+redacted, stop and request it.
+
+## Stop and escalation conditions
+
+Stop when credentials, scope, required fields, destructive authorization, current state, or a reliable prior value are
+missing. Stop after the polling budget expires, on repeated non-transient errors, or when the evidence indicates a
+product-side issue. Use the [troubleshooting runbook](/agents/container-engine/troubleshoot-container-group) to build a
+support package before contacting [SaladCloud support](/support/contact).
+
+## Evidence to return to the user
+
+Return:
+
+- Organization, project, and resource names; instance or job IDs only when relevant.
+- Operation IDs and HTTP response classes used, with no credential-bearing headers.
+- A concise pre-change summary, the intended change, and the verification read result.
+- Current status, desired and observed instance counts, resource version, and UTC timestamps.
+- Partial, pending, failed, or skipped checks and the exact stop reason.
+- Recovery performed or the next safe action requiring user approval.

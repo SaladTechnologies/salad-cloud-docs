@@ -2,7 +2,14 @@
 title: 'Salad Job Queues'
 ---
 
-_Last Updated: February 14, 2025_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Use `salad-job-queue-autoscaling` and the [queue autoscaling
+  > runbook](/agents/container-engine/configure-job-queue-autoscaling). Discover the queue and group by exact name;
+  > associate `queue_connection` during group creation, design workers to be idempotent, and verify queue, group,
+  > instances, and jobs after writes.
+</Visibility>
 
 Job Queues provide a way to process discrete jobs without worrying about node capacity, load balancing, and retries.
 With Job Queues you configure a port on your container, deploy your container group, and then send requests to a static
