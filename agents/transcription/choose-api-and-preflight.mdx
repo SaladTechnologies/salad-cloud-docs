@@ -1,0 +1,137 @@
+---
+title: 'Choose a Transcription API and Preflight'
+sidebarTitle: 'Choose API and Preflight'
+description:
+  'Select Salad Transcription API or Transcription Lite from required features, then validate scope, media access, and
+  the exact request schema before submitting a job.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use before every Transcription or Transcription Lite job submission, especially when the requested features do not make
+the product choice obvious.
+
+## When not to use it
+
+Do not use this runbook to submit, cancel, or retry a job. Do not use static pricing, processing-time examples, or
+example media URLs as current account facts.
+
+## Required inputs
+
+- `SALAD_API_KEY` as a secret environment variable and a caller-supplied `SALAD_ORGANIZATION` name.
+- The intended product: `transcribe` or `transcription-lite`, or enough feature requirements to choose one.
+- A downloadable media URI supplied by the user or a trusted application. Treat signed query parameters as secrets.
+- Required language behavior and output features, including audio-stream selection, timestamps, multichannel
+  preservation, diarization, SRT, translation, enhanced accuracy, or primary-only LLM features.
+- Whether a webhook, caller metadata, or file-return behavior is required.
+
+These endpoints are organization-scoped; they do not use a SaladCloud project name.
+
+## Authoritative sources
+
+| Product                 | Endpoint read and specification                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Transcription API       | Operation: `get_inference_endpoint`; `GET /organizations/{organization_name}/inference-endpoints/transcribe` — [API reference](/transcription/reference/api)                |
+| Transcription Lite      | Operation: `get_inference_endpoint`; `GET /organizations/{organization_name}/inference-endpoints/transcription-lite` — [API reference](/transcription/reference/api)        |
+| Primary create schema   | `CreateSaladCloudTranscriptionAPIJob` in [`transcribe.json`](https://github.com/SaladTechnologies/salad-cloud-docs/blob/main/api-specs/transcribe.json)                     |
+| Lite create schema      | `CreateSaladCloudTranscriptionLiteAPIJob` in [`transcription-lite.json`](https://github.com/SaladTechnologies/salad-cloud-docs/blob/main/api-specs/transcription-lite.json) |
+| Product feature context | [Transcription APIs overview](/transcription/explanation/overview) and [Speech-to-text options](/transcription/how-to-guides/speech-to-text)                                |
+
+The two specifications reuse the same operation IDs. Always pair an operation ID with the selected product and exact
+path; the operation ID alone does not identify the API.
+
+## Dynamic values to retrieve
+
+- The live inference-endpoint representation, including its `name`, `endpoint_url`, `readme`, and `price_description`.
+- Current API response and rate-limit state for the supplied organization.
+- Current reachability and any known expiry of the exact media URI. The specifications define no minimum URL lifetime,
+  so do not claim that a particular expiry is sufficient.
+- Current job state, events, and output after submission.
+
+Do not cache endpoint pricing or processing-time estimates as permanent facts.
+
+## Preflight checks
+
+1. Require `SALAD_API_KEY` and a trusted organization name; neither Transcription specification lists accessible
+   organizations.
+2. Select one exact endpoint. Call its `get_inference_endpoint` path to validate both organization access and product.
+3. Confirm the media URI is externally downloadable. Do not print or return signed query parameters, embedded
+   credentials, or private storage headers.
+4. Validate the request only against the selected specification. Both products require `input.url`; top-level `metadata`
+   and `webhook` are optional, and metadata permits at most 20 properties.
+5. For the primary API, use only fields in `SaladCloudTranscriptionAPIInput`. Only `url` is required; omitting nullable
+   `language_code` uses automatic detection.
+6. For Lite, use only fields in `SaladCloudTranscriptionLiteAPIInput`. Its current `language_code` is a string without
+   an enum; that does not prove every value is supported.
+7. `audio_stream_index`, `multichannel`, and `enhanced_accuracy` are primary-only. Reject them on the Lite path.
+8. Do not assume a webhook is authenticated, retried, or delivered with a particular payload; those behaviors are not
+   defined by these OpenAPI specifications.
+
+## Procedure
+
+1. Translate the requested outcome into explicit input and output fields.
+2. Choose the primary API when the request requires `audio_stream_index`, `multichannel`, `enhanced_accuracy`,
+   `summarize`, `custom_prompt`, `llm_translation`, `srt_translation`, `custom_vocabulary`, `classification_labels`,
+   `overall_classification`, or `overall_sentiment_analysis`; these fields are absent from Lite.
+3. Choose Lite only when every requested field is present in the Lite input schema.
+4. Read the selected endpoint with `get_inference_endpoint` using `Salad-Api-Key`; record the product name and current
+   endpoint metadata without exposing the key.
+5. Validate the media URI and the complete proposed JSON body. Omit optional fields rather than supplying empty or
+   guessed values.
+6. Return a preflight decision before invoking the product-specific submission runbook.
+
+## Decision rules
+
+| Requirement or evidence                                                                                        | Decision                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Only transcription, timestamps, diarization, SRT, or translation-to-English is requested                       | Either schema may support the fields; choose the product explicitly rather than inferring from price or speed examples. |
+| Multichannel, stream selection, enhanced accuracy, LLM, insight, classification, or translated SRT is required | Use the primary Transcription API.                                                                                      |
+| A requested field is absent from the selected schema                                                           | Stop or choose the other product with user approval; never send the undocumented field.                                 |
+| Organization or product endpoint read returns `404`                                                            | Reconfirm the trusted organization and exact path; do not guess variants.                                               |
+| Media URI is inaccessible, expired, or requires undisclosed headers                                            | Stop and request a usable downloadable URI.                                                                             |
+| Primary language is omitted and automatic detection is acceptable                                              | Omit `language_code` or use `null`; do not insert an English default.                                                   |
+| Exact language or translation value is uncertain                                                               | Use automatic detection only with caller intent, otherwise stop for an approved value.                                  |
+| Current endpoint price differs from an example                                                                 | Use the live endpoint response and report the example as non-authoritative.                                             |
+
+Only `to_eng` has defined primary `translate` behavior. Do not normalize another value or represent `to_eng` as an
+enum-enforced constraint.
+
+## Expected states and responses
+
+A successful endpoint read returns `200`. Job states, once a job exists, are `pending`, `running`, `succeeded`,
+`cancelled`, and `failed`; event actions are `created`, `started`, `succeeded`, `cancelled`, and `failed`.
+
+The endpoint response describes the current service but does not reserve capacity or guarantee a completion time.
+
+## Retry behavior
+
+Retry endpoint and other read-only preflight requests only for plausible transient transport, `429`, or server failures
+within a caller-defined attempt and elapsed-time budget. Honor `Retry-After` when present. Do not retry an unchanged
+invalid schema, inaccessible source URI, or authentication/authorization failure.
+
+## Verification
+
+Preflight succeeds only when the exact product endpoint is readable in the trusted organization, every intended request
+field exists in that product's current input schema, required feature behavior is unambiguous, and the source is safe to
+submit for asynchronous download.
+
+## Rollback or recovery
+
+This runbook performs no SaladCloud mutation. If product choice, media URI, requested output, or endpoint metadata
+changes, discard the prior decision and repeat preflight.
+
+## Stop and escalation conditions
+
+Stop for missing credentials or organization, ambiguous product choice, an unsupported field, an unapproved language or
+translation value, inaccessible/expiring media, secret-bearing evidence that cannot be redacted, or repeated endpoint
+failure. Escalate persistent endpoint access or schema/product mismatch with the exact path, UTC time, redacted request
+field names, and returned problem details.
+
+## Evidence to return to the user
+
+Return the validated organization, selected product and exact path, endpoint name, current price description when
+requested, redacted media origin and accessibility result, proposed input field names, unsupported/omitted fields, UTC
+observation time, and a clear proceed/stop decision. Never return the API key, a complete signed URI, media contents,
+webhook secrets, or sensitive metadata values.

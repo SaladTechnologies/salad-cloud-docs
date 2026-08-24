@@ -43,13 +43,14 @@ resources without explicit user intent.
 - Operation IDs: `query_log_entries`, `get_system_logs` (canonical page marks the latter deprecated).
 - Operation IDs: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability`.
 - Operation ID: `reallocate_container_group_instance` for an authorized management-side reallocation.
+- Operation ID: `get_status` to read current in-instance IMDS health before an authorized IMDS lifecycle action.
 - Operation ID: `reallocate` for an authorized in-instance IMDS reallocation.
 
 Canonical pages: [Group](/reference/saladcloud-api/container-groups/get-container-group),
 [Instances](/reference/saladcloud-api/container-groups/list-container-group-instances),
 [Logs](/reference/saladcloud-api/logs/query-log-entries),
 [Management reallocation](/reference/saladcloud-api/container-groups/reallocate-container-group-instance), and
-[IMDS reallocation](/reference/imds/reallocate).
+[IMDS status](/reference/imds/get-status), and [IMDS reallocation](/reference/imds/reallocate).
 
 ## Procedure
 

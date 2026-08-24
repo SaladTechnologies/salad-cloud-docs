@@ -37,6 +37,7 @@ instance. Do not diagnose infrastructure failure solely from performance variati
 | Legacy system events        | Operation: `get_system_logs` — [Get Container Group Logs](/reference/saladcloud-api/container-groups/get-container-group-logs)                                    |
 | Availability/quota          | Operations: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability` — [Preflight](/agents/container-engine/discover-scope-and-preflight) |
 | Management reallocation     | Operation: `reallocate_container_group_instance` — [Reallocate Instance](/reference/saladcloud-api/container-groups/reallocate-container-group-instance)          |
+| In-instance health          | Operation: `get_status` — [IMDS Status](/reference/imds/get-status)                                                                                               |
 | In-instance reallocation    | Operation: `reallocate` — [IMDS Reallocate](/reference/imds/reallocate)                                                                                           |
 
 Use [Troubleshooting](/container-engine/how-to-guides/troubleshooting),
@@ -90,7 +91,8 @@ Follow this evidence order without skipping directly to reallocation:
 9. **Classify the failure** as application-level, configuration-level, allocation-level, or potentially node-level using
    the table below.
 10. **Reallocate only with evidence and intent.** Preserve logs/events first. Use the management operation for a known
-    instance ID or IMDS from inside that instance. Verify replacement allocation and readiness; do not repeat blindly.
+    instance ID. From inside the affected instance, read IMDS with `get_status` before using IMDS `reallocate`. Verify
+    replacement allocation and readiness; do not repeat blindly.
 11. **Collect the escalation package** if the issue cannot be resolved within the authorized action and polling budget.
 
 ## Decision rules

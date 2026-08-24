@@ -3100,81 +3100,106 @@
               "ba", "jw", "su", "yue"
             ]
           },
+          "multichannel": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to preserve audio channels for channel-based diarization."
+          },
           "return_as_file": {
             "type": "boolean",
             "default": false,
-            "description": "Whether to return the result as a file."
-          },
-          "sentence_level_timestamps": {
-            "type": "boolean",
-            "default": false,
-            "description": "Return sentence-level timestamps in the transcription."
+            "description": "Whether to return a temporary result URL instead of inline JSON."
           },
           "word_level_timestamps": {
             "type": "boolean",
             "default": false,
-            "description": "Return word-level timestamps in the transcription."
+            "description": "Whether to include word_segments in the output."
+          },
+          "sentence_level_timestamps": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to include sentence_level_timestamps in the output."
           },
           "diarization": {
             "type": "boolean",
             "default": false,
-            "description": "Perform speaker diarization (separate speakers in multi-speaker audio)."
+            "description": "Whether to add speaker labels and word segments."
           },
           "sentence_diarization": {
             "type": "boolean",
             "default": false,
-            "description": "Perform sentence-level speaker diarization."
+            "description": "Whether to add speaker-labelled sentence segments."
           },
           "srt": {
             "type": "boolean",
             "default": false,
-            "description": "Generate an SRT file (SubRip Subtitle format)."
+            "description": "Whether to include srt_content in the output."
           },
           "translate": {
             "type": "string",
-            "description": "Translate the transcription to English (set to 'to eng' to enable translation).",
+            "nullable": true,
+            "default": null,
+            "description": "Whisper translation mode. Only to_eng has defined behavior.",
             "example": "to_eng"
-          },
-          "custom_prompt": {
-            "type": "string",
-            "description": "Custom prompt for LLM-driven tasks such as summarization or classification.",
-            "example": "Summarize the main points of the conversation."
-          },
-          "summarize": {
-            "type": "integer",
-            "default": 0,
-            "description": "Summarize the transcription. Integer specifies the word limit.",
-            "example": 100
           },
           "llm_translation": {
             "type": "string",
-            "description": "List of languages for LLM-based translation, e.g., 'german, italian, french, english, portuguese, hindi, spanish, thai'.",
+            "nullable": true,
+            "default": null,
+            "description": "Comma-separated LLM translation languages. Supported values are english, french, german, italian, portuguese, hindi, spanish, and thai.",
             "example": "french, german"
           },
           "srt_translation": {
             "type": "string",
-            "description": "List of languages for SRT translation, e.g., 'german, italian, french, english, portuguese, hindi, spanish, thai'.",
+            "nullable": true,
+            "default": null,
+            "description": "Comma-separated SRT translation languages. Supported values are english, french, german, italian, portuguese, hindi, spanish, and thai.",
             "example": "spanish, hindi"
+          },
+          "custom_prompt": {
+            "type": "string",
+            "nullable": true,
+            "default": null,
+            "description": "Custom transcript-processing instruction.",
+            "example": "Summarize the main points of the conversation."
           },
           "custom_vocabulary": {
             "type": "string",
-            "description": "Custom vocabulary to improve transcription accuracy for specific terms.",
+            "nullable": true,
+            "default": null,
+            "description": "Comma-separated vocabulary terms.",
             "example": "AI, NLP, cloud computing"
           },
-          "classification_labels": {
-            "type": "string",
-            "description": "List of labels to use for sentence classification, e.g., 'INTERVIEW, MEETING, CALL'.",
-            "example": "INTERVIEW, MEETING, CALL"
+          "summarize": {
+            "type": "number",
+            "nullable": true,
+            "default": null,
+            "minimum": 0,
+            "maximum": 2000,
+            "description": "Summary word limit, currently from 0 through 2000.",
+            "example": 100
           },
           "overall_classification": {
             "type": "boolean",
             "default": false,
-            "description": "Perform overall classification of the transcription."
+            "description": "Whether to enable classification."
+          },
+          "classification_labels": {
+            "type": "string",
+            "nullable": true,
+            "default": null,
+            "description": "Comma-separated allowed classification labels.",
+            "example": "INTERVIEW, MEETING, CALL"
           },
           "overall_sentiment_analysis": {
             "type": "boolean",
             "default": false,
-            "description": "Perform overall sentiment analysis on the transcription."
+            "description": "Whether to enable sentiment classification."
+          },
+          "enhanced_accuracy": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to use a language-specific fine-tuned model when one is available."
           }
         },
         "required": [
@@ -3296,6 +3321,9 @@
                   "description": "Identified speaker label.",
                   "example": "SPEAKER_02"
                 },
+                "channel": {
+                  "description": "Channel identifier returned for channel-based diarization."
+                },
                 "sentiment": {
                   "type": "array",
                   "description": "Sentiment analysis results for the sentence.",
@@ -3389,6 +3417,9 @@
                   "type": "string",
                   "description": "Identified speaker label.",
                   "example": "SPEAKER_02"
+                },
+                "channel": {
+                  "description": "Channel identifier returned for channel-based diarization."
                 }
               },
               "required": [
@@ -3400,6 +3431,9 @@
               ]
             }
           },
+          "timestamp_source": {
+            "description": "Source metadata associated with timestamp output."
+          },
           "srt_content": {
             "type": "string",
             "description": "Generated SRT (SubRip Subtitle) content.",
@@ -3410,7 +3444,7 @@
             "description": "Summarized version of the transcription.",
             "example": "Silence oppressive voices, amplify your own."
           },
-          "llm_translations": {
+          "llm_translation": {
             "type": "object",
             "description": "LLM-generated translations of the transcription.",
             "additionalProperties": {
@@ -3418,6 +3452,10 @@
               "description": "Translation of the transcription in the specified language.",
               "example": "Vous savez cette petite voix dans votre tête ? Celle qui vous dit de passer outre un blague sans goût ? ..."
             }
+          },
+          "llm_custom_vocabulary": {
+            "type": "string",
+            "description": "Transcription text updated using the supplied custom vocabulary."
           },
           "srt_translation": {
             "type": "object",
@@ -3496,7 +3534,12 @@
         "type": "object",
         "properties": {
           "items": {
-            "$ref": "#/components/schemas/SaladCloudTranscriptionAPIJob"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaladCloudTranscriptionAPIJob"
+            },
+            "maxItems": 100,
+            "minItems": 0
           }
         },
         "additionalProperties": false,
@@ -3517,12 +3560,12 @@
               "jsonExample": {
                 "value": {
                   "input": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "url": "https://example.com/audiofile.mp3",
+                    "multichannel": true,
+                    "diarization": true
                   },
                   "metadata": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "client_request_id": "example-request"
                   },
                   "webhook": "https://webhooks.example.com:8080"
                 }
@@ -3629,7 +3672,7 @@
                 "value": {
                   "type": "about:blank",
                   "title": "Too Many Requests",
-                  "status": 409,
+                  "status": 429,
                   "detail": "Too Many Requests",
                   "instance": "cd6306ee"
                 }
@@ -3736,8 +3779,7 @@
                       "id": "123e4567-e89b-12d3-a456-426614174000",
                       "inference_endpoint_name": "transcribe",
                       "input": {
-                        "property1": "value1",
-                        "property2": "value2"
+                        "url": "https://example.com/audiofile.mp3"
                       },
                       "metadata": null,
                       "organization_name": "acme-corp",
@@ -3750,8 +3792,7 @@
                       "id": "123e4567-e89b-12d3-a456-426614174001",
                       "inference_endpoint_name": "transcribe",
                       "input": {
-                        "property1": "value1",
-                        "property2": "value2"
+                        "url": "https://example.com/audiofile.mp3"
                       },
                       "metadata": null,
                       "organization_name": "acme-corp",
@@ -3788,8 +3829,7 @@
                   "id": "123e4567-e89b-12d3-a456-426614174000",
                   "inference_endpoint_name": "transcribe",
                   "input": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "url": "https://example.com/audiofile.mp3"
                   },
                   "metadata": null,
                   "organization_name": "acme-corp",
@@ -3816,8 +3856,7 @@
                   "id": "123e4567-e89b-12d3-a456-426614174001",
                   "inference_endpoint_name": "transcribe",
                   "input": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "url": "https://example.com/audiofile.mp3"
                   },
                   "metadata": null,
                   "organization_name": "acme-corp",
@@ -3849,8 +3888,7 @@
                       "id": "123e4567-e89b-12d3-a456-426614174000",
                       "inference_endpoint_name": "transcribe",
                       "input": {
-                        "property1": "value1",
-                        "property2": "value2"
+                        "url": "https://example.com/audiofile.mp3"
                       },
                       "metadata": null,
                       "organization_name": "acme-corp",
@@ -3863,8 +3901,7 @@
                       "id": "123e4567-e89b-12d3-a456-426614174001",
                       "inference_endpoint_name": "transcribe",
                       "input": {
-                        "property1": "value1",
-                        "property2": "value2"
+                        "url": "https://example.com/audiofile.mp3"
                       },
                       "metadata": null,
                       "organization_name": "acme-corp",
@@ -3893,8 +3930,7 @@
                   "id": "123e4567-e89b-12d3-a456-426614174001",
                   "inference_endpoint_name": "transcribe",
                   "input": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "url": "https://example.com/audiofile.mp3"
                   },
                   "metadata": null,
                   "organization_name": "acme-corp",
@@ -3929,8 +3965,7 @@
                   "id": "123e4567-e89b-12d3-a456-426614174000",
                   "inference_endpoint_name": "transcribe",
                   "input": {
-                    "property1": "value1",
-                    "property2": "value2"
+                    "url": "https://example.com/audiofile.mp3"
                   },
                   "metadata": null,
                   "organization_name": "acme-corp",

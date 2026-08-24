@@ -27,16 +27,18 @@ delete, or replace anything without the task-specific evidence and explicit user
 
 ## Authoritative sources
 
-| Purpose                           | Operation and canonical reference                                                                                                         |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Read group                        | Operation: `get_container_group` — [Get Container Group](/reference/saladcloud-api/container-groups/get-container-group)                  |
-| Read instances                    | Operation: `list_container_group_instances` — [List Instances](/reference/saladcloud-api/container-groups/list-container-group-instances) |
-| Inspect one instance              | Operation: `get_container_group_instance` — [Get Instance](/reference/saladcloud-api/container-groups/get-container-group-instance)       |
-| Scale                             | Operation: `update_container_group` — [Update Container Group](/reference/saladcloud-api/container-groups/update-container-group)         |
-| Start                             | Operation: `start_container_group` — [Start Container Group](/reference/saladcloud-api/container-groups/start-container-group)            |
-| Stop                              | Operation: `stop_container_group` — [Stop Container Group](/reference/saladcloud-api/container-groups/stop-container-group)               |
-| Query application and system logs | Operation: `query_log_entries` — [Query Log Entries](/reference/saladcloud-api/logs/query-log-entries)                                    |
-| Legacy group system logs          | Operation: `get_system_logs` — [Get Container Group Logs](/reference/saladcloud-api/container-groups/get-container-group-logs)            |
+| Purpose                           | Operation and canonical reference                                                                                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Read group                        | Operation: `get_container_group` — [Get Container Group](/reference/saladcloud-api/container-groups/get-container-group)                                          |
+| Read instances                    | Operation: `list_container_group_instances` — [List Instances](/reference/saladcloud-api/container-groups/list-container-group-instances)                         |
+| Inspect one instance              | Operation: `get_container_group_instance` — [Get Instance](/reference/saladcloud-api/container-groups/get-container-group-instance)                               |
+| Scale                             | Operation: `update_container_group` — [Update Container Group](/reference/saladcloud-api/container-groups/update-container-group)                                 |
+| Start                             | Operation: `start_container_group` — [Start Container Group](/reference/saladcloud-api/container-groups/start-container-group)                                    |
+| Stop                              | Operation: `stop_container_group` — [Stop Container Group](/reference/saladcloud-api/container-groups/stop-container-group)                                       |
+| Query application and system logs | Operation: `query_log_entries` — [Query Log Entries](/reference/saladcloud-api/logs/query-log-entries)                                                            |
+| Legacy group system logs          | Operation: `get_system_logs` — [Get Container Group Logs](/reference/saladcloud-api/container-groups/get-container-group-logs)                                    |
+| Scale-up preflight                | Operations: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability` — [Preflight](/agents/container-engine/discover-scope-and-preflight) |
+| Queue drain evidence              | Operations: `get_queue`, `list_queue_jobs` — [Queue API](/reference/saladcloud-api/queues/get-queue)                                                              |
 
 The canonical `get_system_logs` page marks that endpoint deprecated and directs users to `query_log_entries`, although
 the current OpenAPI operation is not marked deprecated. Prefer `query_log_entries` and use
@@ -56,7 +58,9 @@ the current OpenAPI operation is not marked deprecated. Prefer `query_log_entrie
 1. Read the group, then list instances. Stop on `404` until the supplied scope/name is reconfirmed.
 2. Compare the current state with the requested state; avoid a no-op mutation.
 3. Before scale-up, run quota and availability preflight for the additional replicas.
-4. Before scale-down or stop, identify active jobs/requests, externalize state, and obtain explicit user intent.
+4. Before scale-down or stop, identify active jobs/requests, externalize state, and obtain explicit user intent. If
+   `queue_connection` is configured, read the exact queue with `get_queue` and jobs with `list_queue_jobs`. For direct
+   gateway traffic, stop if the caller cannot provide a safe drain predicate; no active-request read is documented.
 5. Record the current version, desired replicas, instance IDs/states, and a success predicate.
 6. For log queries, use explicit UTC `start_time`/`end_time`, project and group filters, and the smallest useful page
    size/window.

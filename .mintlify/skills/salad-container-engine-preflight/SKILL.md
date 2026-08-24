@@ -68,4 +68,5 @@ constraints, unavailable required capacity, or unknown VRAM mapping.
 
 Success means scope is validated, the duplicate decision is exact, quota is sufficient, and current availability was
 queried for the intended configuration. Return redacted inputs, live results, and proceed/stop status; never treat
-example resource names or identifiers as real.
+example resource names or identifiers as real. Escalate persistent quota/capacity or scoped-access issues with exact
+constraints, UTC observations, and redacted problem details.

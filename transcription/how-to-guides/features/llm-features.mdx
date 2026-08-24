@@ -7,7 +7,15 @@ description: >
   `overall_classification`, and `overall_sentiment_analysis` to extract deeper insights from your audio content.
 ---
 
-_Last Updated: November 18, 2024_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+
+> These fields are primary Transcription API inputs and are absent from the current Transcription Lite schema. Select
+> the `transcribe` path through [Transcription preflight](/agents/transcription/choose-api-and-preflight), preserve the
+> user's exact prompt/feature intent, and verify requested output fields from the terminal job response.
+
+</Visibility>
 
 ## Introduction
 
@@ -39,8 +47,9 @@ By properly utilizing these parameters, you can unlock the full potential of LLM
 The `summarize` parameter enables you to generate a concise summary of your transcription using an LLM. You can specify
 the maximum word count for the summary.
 
-- **Default**: `0` (No summarization)
-- **Type**: `integer`
+- **Default**: `null` (No summarization)
+- **Type**: `number` or `null`
+- **Range**: `0` through `2000`
 
 #### Usage
 
@@ -261,4 +270,4 @@ Set `"custom_vocabulary": "Term1, Term2"` to include custom terms in the transcr
 **Notes**
 
 - The custom vocabulary helps the LLM update domain-specific terms.
-- Result will have both the original transcrioption and updated under `llm_custom_vocabulary`.
+- The result includes the original transcription and the vocabulary-updated text under `llm_custom_vocabulary`.

@@ -3,11 +3,19 @@ title: 'Speech-to-Text Guide'
 sidebarTitle: 'Speech-to-Text'
 description:
   'Discover the core transcription features of Salad Transcription API. Learn how to utilize parameters like
-  `return_as_file`, `sentence_level_timestamps`, `word_level_timestamps`, `diarization`, `sentence_diarization`, and how
-  to specify `language_code` for optimal performance.'
+  `audio_stream_index`, `multichannel`, `return_as_file`, timestamps, diarization, `enhanced_accuracy`, and automatic or
+  explicit language selection.'
 ---
 
-_Last Updated: November 26, 2024_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+
+> Treat this page as product context and validate every request field against the selected current OpenAPI input schema.
+> `audio_stream_index`, `multichannel`, and `enhanced_accuracy` are supported on primary `transcribe` and are absent
+> from Transcription Lite. Use [Transcription preflight](/agents/transcription/choose-api-and-preflight).
+
+</Visibility>
 
 # Transcription API Features Guide
 
@@ -17,12 +25,16 @@ Salad Transcription API offers a suite of powerful features to help you get the 
 content. This guide covers the key transcription parameters you can use to customize your transcription outputs:
 
 - **Transcription Output Options**:
+  - `audio_stream_index`
   - `return_as_file`
   - `sentence_level_timestamps`
   - `word_level_timestamps`
 - **Speaker Identification**:
+  - `multichannel`
   - `diarization`
   - `sentence_diarization`
+- **Model Selection**:
+  - `enhanced_accuracy`
 - **Language Specification**:
   - `language_code`
 
@@ -235,22 +247,17 @@ Include speaker information at the sentence level.
 
 #### Description
 
-Enable multichannel transcription for audio files with separate speaker channels. Requires either `diarization` or
-`sentence_diarization` to return speaker/channel information.
+Preserve separate audio channels for channel-based diarization. This option is available on primary `transcribe` only.
 
 - **Default**: `false`
 - **Type**: `boolean`
 
-If you have a multichannel audio file with multiple speakers, you can transcribe each of them separately. Set
-`"multichannel": true` and pair it with either:
+If you have a multichannel audio file, set `"multichannel": true`. Enable the output behavior needed by your workflow:
 
-- `"diarization": true` → word-level speaker and channel labeling
-- `"sentence_diarization": true` → sentence-level speaker and channel labeling
+- `"diarization": true` for word-level speaker/channel results.
+- `"sentence_diarization": true` for sentence-level speaker/channel results.
 
-If the audio has only one channel, the system will automatically fall back to regular speaker diarization.
-
-Multichannel transcription is supported for **all languages**, has **no channel limit** and incurs **no additional
-cost**. It may increase transcription time by approximately **25%**.
+Do not send `multichannel` to Transcription Lite.
 
 #### Usage
 
@@ -258,6 +265,7 @@ cost**. It may increase transcription time by approximately **25%**.
 "input": {
   "url": "https://example.com/path/to/file.wav",
   "multichannel": true,
+  "word_level_timestamps": true,
   "diarization": true
 }
 
@@ -300,16 +308,13 @@ cost**. It may increase transcription time by approximately **25%**.
 
 #### Description
 
-The language_code parameter allows you to specify the language of the transcription to improve the accuracy of
-transcription, diarization and timestamps. This parameter supports both full language names and their short versions.
+The `language_code` parameter selects a Whisper language code. Omit it or set it to `null` to use automatic detection.
 
-- **Default**: `en` (English)
-- **Type**: `string`
+- **Default**: `null` (automatic detection)
+- **Type**: `string` or `null`
 
-If no language is specified or the provided language is not in the list, the system will automatically detect the
-language. However, specifying the language correctly enhances transcription accuracy. If the wrong language is
-specified, the system will return a **translation** to the specified language. For **multilingual audio** content, it is
-recommended not to specify a language to achieve optimal results.
+When a specific source language is intended, provide its Whisper code. Do not provide a guessed value; omit the field
+when automatic detection is the desired behavior.
 
 Accuracy varies by language. For tested results, see our
 [accuracy benchmarks](/transcription/reference/accuracy-benchmarks).
@@ -368,13 +373,26 @@ Set the `language_code` to the **ISO 639-1** code of the audio's language.
 
 ### Note
 
-- **Mandatory for Diarization**: When using diarization or sentence-level diarization, specifying `language_code` is
-  required for optimal performance.
-- **Automatic Detection**: If no language is specified or the provided language is not supported, the system will
-  automatically detect the language.
-- **Translation Option**: If the wrong language is specified, the system will provide a transcription translated into
-  the specified language.
+- **Automatic Detection**: Omit `language_code` or set it to `null` to enable automatic detection.
+- **Translation Option**: Use `"translate": "to_eng"` for the only currently defined Whisper translation behavior.
 - **Multilingual Content**: For multilingual audio, it is better not to specify a language to ensure the best results.
 
 By setting the correct `language_code` or leveraging the automatic detection feature, you ensure the best possible
 transcription quality tailored to your audio content.
+
+### 8. `audio_stream_index`
+
+Use this field for MP4 or other multitrack media when you need a specific audio stream. It is a zero-based integer; omit
+it or set it to `null` when no explicit stream selection is needed.
+
+```json
+"input": {
+  "url": "https://example.com/path/to/file.mp4",
+  "audio_stream_index": 1
+}
+```
+
+### 9. `enhanced_accuracy`
+
+Set this primary-only boolean to `true` to use a language-specific fine-tuned model when one is available. Its default
+is `false`; availability for a language must not be inferred from this setting alone.

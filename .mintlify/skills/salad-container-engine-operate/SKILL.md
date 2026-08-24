@@ -46,6 +46,8 @@ Never expose the API key or secret-bearing logs/environment values.
 - Operation ID: `stop_container_group`
 - Operation ID: `query_log_entries`
 - Operation ID: `get_system_logs` only when the deprecated canonical endpoint is specifically needed
+- Preflight Operation IDs: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability`
+- Queue-drain Operation IDs when the group uses a queue: `get_queue`, `list_queue_jobs`
 
 Canonical pages: [Get group](/reference/saladcloud-api/container-groups/get-container-group),
 [Instances](/reference/saladcloud-api/container-groups/list-container-group-instances),
