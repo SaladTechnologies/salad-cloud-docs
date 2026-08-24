@@ -24,6 +24,40 @@
         ]
       },
       {
+        "tab": "Agent Operations",
+        "hidden": true,
+        "searchable": true,
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["agents/overview"]
+          },
+          {
+            "group": "Container Engine",
+            "pages": [
+              "agents/container-engine/discover-scope-and-preflight",
+              "agents/container-engine/deploy-or-update-container-group",
+              "agents/container-engine/monitor-and-operate-container-group",
+              "agents/container-engine/troubleshoot-container-group",
+              "agents/container-engine/configure-job-queue-autoscaling"
+            ]
+          },
+          {
+            "group": "Transcription APIs",
+            "pages": [
+              "agents/transcription/choose-api-and-preflight",
+              "agents/transcription/submit-and-monitor-job",
+              "agents/transcription-lite/submit-and-monitor-job",
+              "agents/transcription/troubleshoot-job"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": ["agents/reference/safety-retries-and-freshness"]
+          }
+        ]
+      },
+      {
         "tab": "Container Engine",
         "groups": [
           {
@@ -675,6 +709,9 @@
   },
   "search": {
     "prompt": "Search..."
+  },
+  "markdown": {
+    "instructions": "For autonomous tasks, use live SaladCloud API responses for current resource or job state, availability, quotas, and other dynamic values. Use current OpenAPI specifications for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, or state. Prefer API workflows over Portal steps. Read before changing and never expose credentials, signed media URLs, or sensitive outputs. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Verify every write with a read. If a server-generated job ID was not returned and no idempotency guarantee exists, stop rather than resubmit. Do not delete, cancel, stop, or reduce capacity without explicit user intent. Bind shared operation IDs to the selected product path. Treat Container Engine instances as interruptible and local state as ephemeral."
   },
   "footer": {
     "socials": {

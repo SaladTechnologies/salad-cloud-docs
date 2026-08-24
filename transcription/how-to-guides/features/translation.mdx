@@ -6,7 +6,7 @@ description:
 between multiple languages, and translate SRT files for captions and subtitles."
 ---
 
-_Last Updated: October 30, 2024_
+_Last Updated: August 24, 2026_
 
 ## Introduction
 
@@ -143,21 +143,20 @@ the SRT captions translated into the specified languages.
 **Full Request Example:**
 
 ```json
-curl -X POST salad_url \
--H "Salad-Api-Key: {your-api-key}" \
--H "Content-Type: application/json" \
--d '{
+{
+  "input": {
     "url": "https://example.com/path/to/french_audio.mp3",
-      "language_code": "en",
-      "word_level_timestamps": true,
-      "return_as_file": false,
-      "diarization": true,
-      "sentence_diarization": true,
-      "srt": true,
-      "sentence_level_timestamps": true,
-      "llm_translation": "french, german, portuguese",
-      "srt_translation": "spanish"
-}'
+    "language_code": "fr",
+    "word_level_timestamps": true,
+    "return_as_file": false,
+    "diarization": true,
+    "sentence_diarization": true,
+    "srt": true,
+    "sentence_level_timestamps": true,
+    "llm_translation": "french, german, portuguese",
+    "srt_translation": "spanish"
+  }
+}
 ```
 
 **Example Response:**
@@ -167,7 +166,7 @@ curl -X POST salad_url \
   "id": "b4ed4d73-df5c-43fa-8d2b-b77e57ce5cfc",
   "input": {
     "url": "https://example.com/path/to/french_audio.mp3",
-    "language_code": "en",
+    "language_code": "fr",
     "return_as_file": false,
     "diarization": false,
     "sentence_diarization": true,
@@ -203,7 +202,7 @@ curl -X POST salad_url \
     ],
     "srt_content": "1\n00:00:29,980 --> 00:00:30,980\nIt always seems like time stands still when I'm with you.\n\n",
     "summary": "Time stands still in love.",
-    "llm_translations": {
+    "llm_translation": {
       "French": "Le temps semble s'arrêter chaque fois que je suis avec toi.",
       "German": "Es scheint immer so, als ob die Zeit stehen geblieben ist, wenn ich bei dir bin.",
       "Portuguese": "Sempre parece que o tempo se detém quando estou com você."

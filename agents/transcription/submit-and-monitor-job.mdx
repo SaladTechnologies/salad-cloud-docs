@@ -1,0 +1,171 @@
+---
+title: 'Submit and Monitor a Transcription Job'
+sidebarTitle: 'Primary Transcription Job'
+description:
+  'Submit, poll, verify, and optionally cancel one primary Salad Transcription API job without duplicate submission.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use after preflight selects the primary `transcribe` endpoint and the user intends to submit or inspect a primary Salad
+Transcription API job.
+
+## When not to use it
+
+Do not use it for `transcription-lite`, to resubmit an uncertain or failed job automatically, or to cancel a job without
+explicit user intent.
+
+## Required inputs
+
+- `SALAD_API_KEY` and `SALAD_ORGANIZATION`.
+- For a new submission, a downloadable `SALAD_MEDIA_URL` from trusted configuration and the exact approved
+  `SaladCloudTranscriptionAPIInput` fields.
+- An optional non-secret caller correlation value, webhook URI, and metadata object of at most 20 properties.
+- A caller-defined polling attempt and elapsed-time budget.
+- For an existing job, `SALAD_TRANSCRIPTION_JOB_ID`, taken only from a successful create response, `Location` header, or
+  trusted prior record.
+
+Treat the media URI, job input/output, metadata, and webhook URI as potentially sensitive.
+
+## Authoritative sources
+
+| Action        | Operation, exact path, and canonical reference                                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Read endpoint | Operation: `get_inference_endpoint`; `GET /organizations/{organization_name}/inference-endpoints/transcribe` — [Transcription API reference](/transcription/reference/api)                                                      |
+| List jobs     | Operation: `get_inference_endpoint_jobs`; `GET /organizations/{organization_name}/inference-endpoints/transcribe/jobs` — [Transcription API reference](/transcription/reference/api)                                            |
+| Create job    | Operation: `create_inference_endpoint_job`; `POST /organizations/{organization_name}/inference-endpoints/transcribe/jobs` — [Create job](/reference/transcribe/inference_endpoints/create-an-inference-endpoint-job)            |
+| Read job      | Operation: `get_inference_endpoint_job`; `GET /organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}` — [Get job](/reference/transcribe/inference_endpoints/get-an-inference-endpoint-job)             |
+| Cancel job    | Operation: `delete_inference_endpoint_job`; `DELETE /organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}` — [Delete job](/reference/transcribe/inference_endpoints/delete-an-inference-endpoint-job) |
+
+Request and response shape comes from `api-specs/transcribe.json`, not the similarly named operations in another spec.
+
+## Dynamic values to retrieve
+
+- Current endpoint metadata before submission.
+- The create response `id`, `Location`, status, events, and timestamps.
+- Current job `status`, `events`, `update_time`, and `output` on every verification read.
+- Current rate-limit response and `Retry-After` when supplied.
+
+Do not infer completion time from media duration or historical examples.
+
+## Preflight checks
+
+1. Complete [Choose a Transcription API and Preflight](/agents/transcription/choose-api-and-preflight).
+2. Confirm the chosen path contains `/transcribe/`, not `/transcription-lite/`.
+3. Validate the full body against `CreateSaladCloudTranscriptionAPIJob`; only `input` is required at the top level, and
+   `input.url` is required.
+4. Confirm any `audio_stream_index`, `multichannel`, or `enhanced_accuracy` setting is intentional. Do not send these
+   primary-only fields to Lite.
+5. If application state already records a job ID for this logical request, read that job instead of creating another.
+6. Treat caller metadata as correlation only. The API does not document an idempotency key or uniqueness guarantee.
+7. Define terminal success and failure predicates plus the polling budget before submitting.
+
+## Procedure
+
+### Submit once
+
+Read the endpoint immediately before submission. This schema-derived template includes only supported primary fields:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/inference-endpoints/transcribe/jobs" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "input": {
+      "url": "<downloadable-media-url>",
+      "multichannel": true,
+      "word_level_timestamps": true,
+      "diarization": true
+    },
+    "metadata": {
+      "client_request_id": "<caller-generated-non-secret-correlation-value>"
+    }
+  }'
+```
+
+This example preserves channels and requests word-level diarization. Omit `language_code` for automatic detection; add
+it only when the caller intends a specific Whisper language code. Replace placeholders locally without logging the
+complete media URI. Do not treat `client_request_id` as server-side idempotency. A successful create returns `201`, a
+job representation, and a `Location` header. Persist the returned ID before doing other work.
+
+### Poll and retrieve output
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/inference-endpoints/transcribe/jobs/${SALAD_TRANSCRIPTION_JOB_ID}" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Accept: application/json'
+```
+
+Poll the exact ID within the declared budget. On `succeeded`, verify the requested output properties against the live
+response. The schema supports text, duration, processing time, word/sentence timestamps, timestamp-source metadata, SRT,
+summary, translations, custom-vocabulary output, LLM result, classification, and sentiment when their corresponding
+features apply. For multichannel diarization, verify channel identifiers in the returned timestamp segments rather than
+assuming the input alone took effect.
+
+The schema does not define a file-URL output shape for `return_as_file`. If the live response returns one as described
+by canonical guides, treat that URI as sensitive and report the observed shape rather than inventing fields.
+
+### Cancel only when authorized
+
+Read the job immediately before cancellation. If it is already terminal, do not delete it. With explicit cancellation
+intent, call `delete_inference_endpoint_job`, then poll `get_inference_endpoint_job` within the budget.
+
+## Decision rules
+
+| Evidence or intent                               | Action                                                                                                    |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| A trusted record contains an existing job ID     | Read and continue that job; do not submit again.                                                          |
+| Create returns `201` and an ID                   | Persist the ID and verify with `get_inference_endpoint_job`.                                              |
+| Create outcome is unknown and no ID was returned | Stop. Listing jobs cannot prove identity because the API documents no idempotency key or metadata filter. |
+| Job is `pending` or `running`                    | Continue bounded polling; do not create a replacement.                                                    |
+| Job is `succeeded` with requested output         | Return verified success.                                                                                  |
+| Job is `succeeded` but required output is absent | Report an unresolved output mismatch and preserve evidence.                                               |
+| Job is `failed` or unexpectedly `cancelled`      | Stop and troubleshoot; resubmission is a new operation requiring user intent.                             |
+| User asks to change an existing job              | Stop: neither specification defines an update operation.                                                  |
+
+## Expected states and responses
+
+Create returns `201`; reads return `200`; cancellation returns `202`. Job states are `pending`, `running`, `succeeded`,
+`cancelled`, and `failed`. Event actions are `created`, `started`, `succeeded`, `cancelled`, and `failed`.
+
+A `201` proves job creation, not transcription completion. A `202` proves cancellation acceptance, not a verified
+cancelled state.
+
+## Retry behavior
+
+Retry reads for transient transport, `429`, or server failures using bounded backoff and `Retry-After` when present.
+Never retry a create whose result is uncertain and lacks a returned ID. Do not resubmit failed/cancelled jobs or retry
+cancellation without a fresh read and the original explicit intent.
+
+## Verification
+
+| Mutation                        | Read before                                     | Read after                   | Success                                                                     | Failure or unresolved                                                                |
+| ------------------------------- | ----------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `create_inference_endpoint_job` | `get_inference_endpoint`; trusted job-ID lookup | `get_inference_endpoint_job` | Exact returned ID exists and later reaches `succeeded` with required output | Unknown create outcome, `failed`/`cancelled`, missing output, or pending past budget |
+| `delete_inference_endpoint_job` | `get_inference_endpoint_job`                    | Same operation               | Live state becomes `cancelled`                                              | Still active past budget; `404` after acceptance is unresolved, not proof            |
+
+## Rollback or recovery
+
+A submitted job cannot be edited. Cancellation is destructive and requires explicit intent; it is not an automatic
+rollback. Preserve the job ID and events after failure. Submit a corrected replacement only after diagnosing the cause,
+confirming media access and inputs, and obtaining new submission intent.
+
+## Stop and escalation conditions
+
+Stop on missing scope/source/feature values, invalid schema, an uncertain create without ID, exhausted polling,
+unexpected terminal state, missing required output, or repeated read failure. Escalate with the exact product/path,
+organization, job ID, UTC timestamps, events, redacted input field names, response problem instance, and expected versus
+observed output.
+
+## Evidence to return to the user
+
+Return product/path, organization, job ID, response classes, requested input/output field names, redacted source origin,
+status/events/timestamps, polling attempts and elapsed time, verified output property names, cancellation state, and any
+unresolved or escalation result. Do not return the API key, complete signed/webhook URIs, media, transcript contents, or
+sensitive metadata unless the user explicitly requested that content through an authorized channel.

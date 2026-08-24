@@ -1,0 +1,165 @@
+---
+title: 'Discover Scope and Preflight'
+sidebarTitle: 'Scope and Preflight'
+description:
+  'Validate SaladCloud scope, quotas, hardware constraints, and live CPU or GPU availability before deployment.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use before creating, updating, starting, or scaling a Container Group, and before configuring Job Queue autoscaling.
+
+## When not to use it
+
+Do not use static examples to answer whether a GPU, quota, country, or priority is currently available. Do not use this
+runbook to create resources.
+
+## Required inputs
+
+- `SALAD_API_KEY` as a secret environment variable.
+- Candidate `SALAD_ORGANIZATION` and `SALAD_PROJECT` names from the user, a trusted deployment file, or the Portal.
+- Required CPU cores, RAM in MB, storage in bytes, replica count, country constraints, and priority.
+- For GPU workloads, a required GPU model/class or workload requirement. If minimum VRAM is mandatory, obtain a trusted
+  mapping to an API-returned GPU class; the current public schema does not expose a VRAM field.
+
+## Authoritative sources
+
+| Purpose                                     | Operation and canonical reference                                                                                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Validate organization and read quota        | Operation: `get_quotas` — [Get Quotas](/reference/saladcloud-api/organizations/get-quotas)                                     |
+| Validate project and list existing groups   | Operation: `list_container_groups` — [List Container Groups](/reference/saladcloud-api/container-groups/list-container-groups) |
+| Discover live GPU class IDs and constraints | Operation: `list_gpu_classes` — [List GPU Classes](/reference/saladcloud-api/organizations/list-gpu-classes)                   |
+| Estimate GPU availability                   | Operation: `get_gpu_availability` — [Get GPU Availability](/reference/saladcloud-api/organizations/get-gpu-availability)       |
+| Estimate CPU availability                   | Operation: `get_cpu_availability` — [Get CPU Availability](/reference/saladcloud-api/organizations/get-cpu-availability)       |
+
+Also read [Availability](/container-engine/explanation/infrastructure-platform/availability),
+[Priority Pricing](/container-engine/explanation/billing-pricing/priority-pricing), and
+[Quotas](/container-engine/reference/quotas) for product context.
+
+## Dynamic values to retrieve
+
+- `container_replicas_quota` and `container_replicas_used` from the live quota response.
+- GPU class UUIDs, names, priority prices, and current minimum/maximum vCPU, RAM, and storage values.
+- Priority-specific GPU counts or CPU counts for the exact resource and `country_codes` filter.
+- Existing Container Group names in the project and the target's current representation, if present.
+
+Availability is an estimate of currently online capacity, not a reservation or allocation guarantee. Re-query after a
+meaningful delay or immediately before a later mutation; do not cache it as permanent inventory.
+
+## Preflight checks
+
+1. Require candidate organization and project **names**. The public spec has no operation to enumerate accessible
+   organizations or projects.
+2. Call `get_quotas`. A successful response validates the candidate organization in the caller's current access scope.
+3. Call `list_container_groups`. A successful response validates the candidate project and returns the exact existing
+   Container Group names in its `items` collection. The current operation defines no pagination parameters.
+4. Confirm `requested replicas <= quota - used`, accounting for current target capacity and autoscaler maximum where
+   relevant.
+5. For GPU work, call `list_gpu_classes`; select UUIDs only from that response, then call `get_gpu_availability` with
+   those UUIDs and exact CPU, memory, storage, and country constraints.
+6. For CPU-only work, call `get_cpu_availability` with the exact constraints.
+7. Confirm requested values meet current schema bounds. `replicas` is 0–500; GPU class IDs are UUIDs; memory is MB;
+   storage is bytes; priority enum values are `high`, `medium`, `low`, and `batch`.
+8. Confirm any country restriction uses the `country_codes` field. The current Container Group schema has no separate
+   region field.
+
+## Procedure
+
+Set the non-secret scope variables without echoing `SALAD_API_KEY`:
+
+```bash
+export SALAD_ORGANIZATION='<organization-name-from-user>'
+export SALAD_PROJECT='<project-name-from-user>'
+```
+
+Validate the organization and quota:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/quotas" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Accept: application/json'
+```
+
+Validate the project and retrieve existing groups:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Accept: application/json'
+```
+
+For a GPU workload, first call `list_gpu_classes`, choose only UUIDs returned for this organization, and submit the
+exact planned requirements to `get_gpu_availability`:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/availability/sce-gpu-availability" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "gpu_classes": ["<gpu-class-uuid-from-list-gpu-classes>"],
+    "cpu": 4,
+    "memory": 8192,
+    "storage_amount": 10737418240
+  }'
+```
+
+Use the equivalent CPU availability operation for CPU-only work. Add `country_codes` only when the user requires a
+location constraint.
+
+## Decision rules
+
+| Evidence                                                             | Decision                                                                                             |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Organization or project name not supplied by a trusted source        | Stop; do not guess or enumerate.                                                                     |
+| `401` or `403`                                                       | Stop and request valid authorization.                                                                |
+| Scoped `404`                                                         | Reconfirm the supplied name; do not search by invented variants.                                     |
+| Existing group has the intended name                                 | Read it and use the update decision path; do not create a duplicate.                                 |
+| Quota headroom is insufficient                                       | Stop before mutation and report required versus available headroom.                                  |
+| Selected priority availability is below requested replicas           | Report the shortfall; ask whether to change constraints or proceed with expected pending allocation. |
+| Required VRAM cannot be mapped to a live GPU class from trusted data | Stop and request an approved GPU class; do not infer from a model name.                              |
+| Country, RAM, CPU, storage, or GPU filters produce no capacity       | Relax only constraints explicitly approved by the user.                                              |
+
+The CPU-only product documentation describes CPU groups as Lowest priority, whose API enum is `batch`. Do not translate
+human labels into other enum values.
+
+## Expected states and responses
+
+Successful reads return `200`. GPU availability exposes `available_gpu_high`, `available_gpu_medium`,
+`available_gpu_low`, `available_gpu_batch`, and `on_call_gpu` when present. CPU availability exposes
+`available_cpu_batch` and `on_call_cpu` when present. Treat absent optional properties as unknown, not zero.
+
+## Retry behavior
+
+Reads and availability checks may be retried for transient transport, `429`, or `5xx` failures within a bounded
+attempt/time budget. Honor `Retry-After` when present. Do not retry an unchanged invalid request or authorization error.
+
+## Verification
+
+Preflight succeeds only when the supplied names are validated by successful scoped reads, the intended resource name is
+checked for duplicates, quota headroom is sufficient, selected hardware satisfies schema and live class constraints, and
+current availability has been queried for the exact plan.
+
+## Rollback or recovery
+
+This runbook performs reads only, so no API rollback is required. Discard cached availability and re-run preflight after
+the deployment plan, priority, hardware, countries, replica count, or scope changes.
+
+## Stop and escalation conditions
+
+Stop on missing scope, missing credentials, insufficient access, insufficient quota, unknown GPU/VRAM mapping, ambiguous
+existing resources, invalid constraints, or unavailable required capacity. Escalate quota or sustained capacity needs
+with the exact requested constraints and UTC query time; never include the API key.
+
+## Evidence to return to the user
+
+Return the validated organization/project names, exact target name, quota/usage/headroom, requested replica count,
+selected GPU class UUIDs and names or CPU-only selection, RAM/CPU/storage/country/priority constraints,
+priority-specific availability response, duplicate check result, UTC observation time, and a clear proceed/stop
+recommendation.

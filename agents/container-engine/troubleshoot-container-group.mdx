@@ -1,0 +1,183 @@
+---
+title: 'Troubleshoot a Container Group'
+sidebarTitle: 'Troubleshoot'
+description:
+  'Deterministic Container Engine troubleshooting for allocation, image, startup, probes, networking, and application
+  failures.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use when a Container Group fails preparation, remains allocating/downloading/creating, runs without becoming ready,
+returns application/gateway errors, repeatedly exits, or shows inconsistent performance.
+
+## When not to use it
+
+Do not use troubleshooting as authorization to change configuration, stop capacity, delete a group, or reallocate an
+instance. Do not diagnose infrastructure failure solely from performance variation.
+
+## Required inputs
+
+- `SALAD_API_KEY`, `SALAD_ORGANIZATION`, `SALAD_PROJECT`, and exact `SALAD_CONTAINER_GROUP`.
+- Incident start/end timestamps in UTC and the expected healthy behavior.
+- The affected request/job/instance identifiers when available.
+- Recent configuration changes, reproduction steps, and a comparison baseline for performance incidents.
+- Explicit user intent before any corrective mutation that interrupts work or changes capacity/configuration.
+
+## Authoritative sources
+
+| Evidence                    | Operation and canonical reference                                                                                                                                 |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Group configuration/status  | Operation: `get_container_group` — [Get Container Group](/reference/saladcloud-api/container-groups/get-container-group)                                          |
+| Instance inventory          | Operation: `list_container_group_instances` — [List Instances](/reference/saladcloud-api/container-groups/list-container-group-instances)                         |
+| One instance                | Operation: `get_container_group_instance` — [Get Instance](/reference/saladcloud-api/container-groups/get-container-group-instance)                               |
+| System/application evidence | Operation: `query_log_entries` — [Query Log Entries](/reference/saladcloud-api/logs/query-log-entries)                                                            |
+| Legacy system events        | Operation: `get_system_logs` — [Get Container Group Logs](/reference/saladcloud-api/container-groups/get-container-group-logs)                                    |
+| Availability/quota          | Operations: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability` — [Preflight](/agents/container-engine/discover-scope-and-preflight) |
+| Management reallocation     | Operation: `reallocate_container_group_instance` — [Reallocate Instance](/reference/saladcloud-api/container-groups/reallocate-container-group-instance)          |
+| In-instance health          | Operation: `get_status` — [IMDS Status](/reference/imds/get-status)                                                                                               |
+| In-instance reallocation    | Operation: `reallocate` — [IMDS Reallocate](/reference/imds/reallocate)                                                                                           |
+
+Use [Troubleshooting](/container-engine/how-to-guides/troubleshooting),
+[Deployment Lifecycle](/container-engine/explanation/container-groups/deployment-lifecycle),
+[System Events](/container-engine/explanation/container-groups/system-events), and
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) to interpret evidence.
+
+## Dynamic values to retrieve
+
+- Current group representation, status, pending-change flag, desired replicas, version, priority, countries, image,
+  resources, command, networking, and probe configuration.
+- Every current instance state, `started`, `ready`, version, pulling progress, machine/instance ID, and update time.
+- Controller events and container logs for the incident UTC window.
+- Current quota, GPU class constraints, availability for exact resources/countries, and queue length when applicable.
+- Equivalent-instance performance measurements using the same image/version, hardware class, CPU/RAM/storage, countries,
+  priority, application settings, input, and observation method.
+
+## Preflight checks
+
+1. Preserve current evidence before changing anything.
+2. Confirm the incident window is within available log retention and all timestamps are UTC.
+3. Confirm the expected behavior is compatible with the configured image, command, resources, probes, networking, and
+   queue connection.
+4. Identify whether the impact is group-wide, version-wide, hardware-class-wide, or isolated to one instance.
+5. Define a falsifiable success condition and obtain authorization before a corrective mutation.
+
+## Procedure
+
+Follow this evidence order without skipping directly to reallocation:
+
+1. **Read Container Group configuration and status.** Operation: `get_container_group`. Record version,
+   `pending_change`, desired replicas, `current_state`, image, command, environment-variable names only, resources,
+   priority, countries, probes, networking, queue connection, and autoscaler.
+2. **Read instance state.** Operation: `list_container_group_instances`; use `get_container_group_instance` for an exact
+   live ID. Separate `allocating`, `downloading`, `creating`, `running`, and `stopping`; record `started`, `ready`, and
+   version.
+3. **Read system events.** Prefer Operation: `query_log_entries` for `deployment_controller` and `instance_controller`.
+   `get_system_logs` exists but its canonical page marks it deprecated.
+4. **Read application logs.** Query `resource.type = "container"` with project/group labels and, when known, the
+   instance ID. Capture only relevant redacted excerpts.
+5. **Check current constraints.** Re-run quota, GPU class, GPU/CPU availability, countries, priority, CPU, RAM, storage,
+   and replica preflight for the exact current configuration.
+6. **Check image-pull conditions.** Confirm image spelling/tag/digest, AMD64 Docker/OCI compatibility, documented image
+   size limit, registry reachability/rate limits, and valid private-registry permissions. Never print credentials.
+7. **Check startup and probes.** Confirm the image has a long-running process; command paths exist; GPU runtime/vendor
+   matches selected GPU classes; probe handler/port/path and all thresholds match actual startup/readiness/liveness
+   behavior.
+8. **Check networking and queue/gateway configuration.** Confirm the application binds the configured port and supports
+   the documented gateway IPv6 requirements; require at least one running, ready instance. For queues, confirm worker,
+   local path/port, readiness, queue name, and group association.
+9. **Classify the failure** as application-level, configuration-level, allocation-level, or potentially node-level using
+   the table below.
+10. **Reallocate only with evidence and intent.** Preserve logs/events first. Use the management operation for a known
+    instance ID. From inside the affected instance, read IMDS with `get_status` before using IMDS `reallocate`. Verify
+    replacement allocation and readiness; do not repeat blindly.
+11. **Collect the escalation package** if the issue cannot be resolved within the authorized action and polling budget.
+
+## Decision rules
+
+| Evidence                                                                                                    | Classification                                         | Next action                                                                                             |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Group `pending`/`failed` with registry or preparation event                                                 | Image/registry configuration                           | Correct image or credentials with an authorized update; verify the group.                               |
+| Instances remain `allocating`, with insufficient live quota/availability or restrictive countries/resources | Allocation constraint                                  | Report exact shortfall; change constraints only with user approval.                                     |
+| Instances loop through `downloading`/`allocating` with exit events                                          | Usually application/start failure after pull           | Inspect exit/start events and container logs; validate command/image/runtime.                           |
+| One instance remains downloading while peers with the same version progress                                 | Potential node/network issue                           | Compare timestamps/progress; bounded wait, then evidence-backed reallocation if authorized.             |
+| `running`, `started: false` or startup probe failures                                                       | Startup/application/probe configuration                | Validate initialization time and startup handler; do not use reallocation for a consistently bad probe. |
+| `running`, `started: true`, `ready: false`                                                                  | Readiness/application dependency                       | Validate readiness endpoint and application logs; traffic/work should remain withheld.                  |
+| Running/ready but gateway errors                                                                            | Networking/application                                 | Check port, IPv6 binding, auth, timeouts, and application response.                                     |
+| Exit `0` and group restarts unexpectedly                                                                    | Application lifecycle                                  | Add/restore an intended long-running process; reallocation will not fix it.                             |
+| Exit `137`                                                                                                  | Possible OOM or explicit termination                   | Correlate events and memory before changing RAM; do not assume OOM from code alone.                     |
+| Same error on equivalent instances                                                                          | Application/configuration/hardware-class compatibility | Fix the shared cause; do not churn nodes.                                                               |
+| Only one instance persistently fails a measured real workload requirement while equivalent peers succeed    | Potentially node-level                                 | Reallocate once if explicitly authorized; compare the replacement.                                      |
+
+### Reallocation boundary
+
+Reallocation is appropriate only for a current, isolated instance when evidence shows a node-specific condition, such as
+persistent creating/download behavior or measured failure against a real workload requirement while equivalent peers
+succeed. Capture evidence and obtain explicit intent first.
+
+Reallocation is **not** appropriate for insufficient quota/availability, a bad image or command, missing registry
+credentials, invalid environment/probe/network/queue configuration, application errors reproduced across nodes, or
+uncontrolled performance variation. Compare equivalent hardware and workload settings before considering a performance
+issue node-level.
+
+## Expected states and responses
+
+Troubleshooting reads normally return `200`; the current one-instance get operation specifies `202` with an instance
+body. Management reallocation returns `202`; IMDS reallocation returns `204`. Neither response alone proves a healthy
+replacement. After reallocation, the old instance may disappear and a replacement should progress through actual
+instance states toward `running`, with `started`/`ready` satisfying the workload predicate.
+
+Job statuses, when relevant, are `pending`, `running`, `succeeded`, `cancelled`, and `failed`. Do not conflate job
+failure with an instance-state enum.
+
+## Retry behavior
+
+Retry evidence reads for transient failures within a bounded budget and honor `Retry-After` when present. Do not retry
+an invalid query unchanged. Re-read the instance list before retrying a lifecycle action; the original ID may no longer
+exist. Never loop through reallocations. One unresolved reallocation followed by the same evidence is an escalation, not
+permission to churn more nodes.
+
+## Verification
+
+For configuration recovery, read before the patch, perform the authorized mutation, then read the group and instances;
+success means the corrected fields and required current-version ready capacity are present. For reallocation, read the
+instance before, call `reallocate_container_group_instance` or IMDS `reallocate`, then list instances; success means the
+old assignment is no longer active and replacement capacity reaches the defined ready/running predicate. Pending past
+the budget is unresolved, not success.
+
+## Rollback or recovery
+
+- Restore captured fields with a minimal merge patch if an authorized configuration change worsens the incident.
+- Do not reverse a reallocation: the former node is not a durable recovery target.
+- Recover application/job state from external storage or a durable queue. Instance-local state is ephemeral.
+- Preserve the failed resource and evidence unless the user explicitly authorizes cleanup.
+
+## Stop and escalation conditions
+
+Stop when scope, incident window, evidence, credentials, required configuration, or mutation intent is missing; when
+logs could expose secrets and cannot be safely redacted; when no supported API can perform the requested change; or when
+bounded diagnosis/recovery fails. Escalate rather than changing multiple variables at once or repeatedly reallocating.
+
+An escalation package must include, when available:
+
+- Organization and project names.
+- Container Group name and ID; group version and current status.
+- Instance ID and machine ID for affected instances.
+- Relevant UTC timestamps and incident duration.
+- Desired replicas and counts by actual instance state/readiness.
+- Redacted system events and relevant application log excerpts.
+- Request, trace, span, or job identifiers when returned by the API/application.
+- Exact reproduction steps, expected versus observed result, and frequency.
+- Recent configuration changes and a redacted current configuration summary.
+- Live quota, availability, priority, country, and hardware constraints.
+- For performance issues, comparable measurements from equivalent instances and workload settings.
+
+Send the package through [SaladCloud support](/support/contact); never include API keys or registry/environment secrets.
+
+## Evidence to return to the user
+
+Return the escalation-package fields gathered, the evidence sequence completed, classification and confidence, ruled-out
+causes, any authorized mutation and its before/after reads, polling budget/result, redactions performed, and the next
+safe action. Clearly distinguish resolved, partially resolved, pending, and escalated outcomes.

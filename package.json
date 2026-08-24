@@ -4,7 +4,8 @@
   "description": "Docs for SaladCloud",
   "main": ".",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate:agent-operations": "node scripts/validate-agent-operations.js"
   },
   "author": "",
   "dependencies": {

@@ -3,7 +3,15 @@ title: 'How to Transcribe a Local File using S4 and Salad Transcription API'
 sidebarTitle: 'Transcribe Local File'
 ---
 
-_Last Updated: March 05, 2025_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+
+> Treat signed storage URLs and transcript output as sensitive. Use the current job-state enum and bounded polling from
+> the [primary Transcription runbook](/agents/transcription/submit-and-monitor-job); do not copy the unbounded polling
+> loop or expose the signed URL/API key in logs.
+
+</Visibility>
 
 ## Introduction
 
@@ -20,8 +28,6 @@ Before you begin, make sure you have:
 2. **Salad API Key**: Ensure you have a valid [Salad API key](/reference/api-usage#get-your-saladcloud-api-key).
 
 ---
-
-_Last Updated: March 05, 2025_
 
 ## Uploading and Transcribing
 

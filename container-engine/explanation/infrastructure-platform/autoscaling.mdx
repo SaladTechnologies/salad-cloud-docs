@@ -6,7 +6,13 @@ description:
   performance and cost for batch processing workloads.'
 ---
 
-_Last Updated: July 21, 2025_
+_Last Updated: August 24, 2026_
+
+<Visibility for="agents">
+  > Treat queue length, quota, and capacity as live values. Use the [Job Queue autoscaling
+  > runbook](/agents/container-engine/configure-job-queue-autoscaling), verify the queue/group association, and observe
+  > actual instances and job state before claiming scale-up or scale-down succeeded.
+</Visibility>
 
 **Job Queue Autoscaling** in SaladCloud dynamically adjusts the number of container instances based on the number of
 jobs in your SaladCloud job queues. This ensures that your infrastructure scales up when job volume increases and scales

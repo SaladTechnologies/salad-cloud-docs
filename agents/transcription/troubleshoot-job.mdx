@@ -1,0 +1,137 @@
+---
+title: 'Troubleshoot a Transcription Job'
+sidebarTitle: 'Troubleshoot Transcription'
+description:
+  'Diagnose primary or Lite transcription job submission, pending, failure, output, source-access, rate-limit, and
+  webhook issues without inventing logs or resubmitting work.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use when a `transcribe` or `transcription-lite` request fails, remains non-terminal, succeeds without expected output,
+or completes but the caller does not receive its webhook.
+
+## When not to use it
+
+Do not use troubleshooting as permission to cancel, delete, or resubmit a job. Do not claim access to service logs;
+neither Transcription specification defines a log operation.
+
+## Required inputs
+
+- `SALAD_API_KEY`, `SALAD_ORGANIZATION`, exact product, and `SALAD_TRANSCRIPTION_JOB_ID` when creation returned one.
+- Request/response timestamps in UTC, HTTP response class, and returned `ProblemDetails` fields when available.
+- Redacted intended input field names and expected output behavior.
+- Source accessibility evidence and webhook delivery evidence from systems the user authorized the agent to inspect.
+- A caller-defined read/polling budget and explicit intent before cancellation or replacement submission.
+
+## Authoritative sources
+
+| Product         | Exact job read path and specification                                                                                                                                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primary         | Operation: `get_inference_endpoint_job`; `GET /organizations/{organization_name}/inference-endpoints/transcribe/jobs/{job_id}` — [Get primary job](/reference/transcribe/inference_endpoints/get-an-inference-endpoint-job)              |
+| Lite            | Operation: `get_inference_endpoint_job`; `GET /organizations/{organization_name}/inference-endpoints/transcription-lite/jobs/{job_id}` — [Get Lite job](/reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job) |
+| Endpoint health | Operation: `get_inference_endpoint` on the corresponding fixed endpoint path — [Transcription API reference](/transcription/reference/api)                                                                                               |
+| Recent jobs     | Operation: `get_inference_endpoint_jobs` on the corresponding jobs collection, with `page` and `page_size` when needed                                                                                                                   |
+
+Use `api-specs/transcribe.json` for primary and `api-specs/transcription-lite.json` for Lite. The operation IDs are
+identical, so product/path evidence is mandatory.
+
+## Dynamic values to retrieve
+
+- Live endpoint metadata and access response.
+- Exact job status, events, create/update times, echoed input, metadata, webhook, and output.
+- Current source URI reachability/expiry and webhook receiver records when access is authorized.
+- Current rate-limit response and any server-provided retry guidance.
+
+Redact signed URLs, metadata values, transcript/media contents, and webhook tokens before retaining evidence.
+
+## Preflight checks
+
+1. Confirm the product from a trusted original path or job record; do not infer it from the shared operation ID.
+2. Validate the organization and endpoint with `get_inference_endpoint`.
+3. If a job ID exists, call `get_inference_endpoint_job` on that exact product path.
+4. If no ID was returned from an uncertain create, do not submit another job. A list response cannot reliably identify
+   the request because no idempotency key or metadata filter is documented.
+5. Establish the incident window, expected output, source access method, and polling budget.
+
+## Procedure
+
+1. **Classify the request response.** Preserve redacted `ProblemDetails.type`, `title`, `status`, `detail`, and
+   `instance`; do not treat the example values as a live error taxonomy.
+2. **Read the endpoint.** Distinguish an invalid organization/product path from a job-specific problem.
+3. **Read the job.** Record state, every event action/time, create/update time, and whether output exists.
+4. **Validate input shape.** Compare echoed field names with the selected input schema. `audio_stream_index`,
+   `multichannel`, and `enhanced_accuracy` are valid only on primary; primary-only fields on Lite and undocumented
+   fields are configuration errors.
+5. **Check source access.** Confirm the submitted URI was downloadable by an external service during processing. Do not
+   expose signed query parameters or use private credentials outside their authorized storage flow.
+6. **Interpret state.** Use the decision table below; do not invent a `created` or `started` job state from event names.
+7. **Validate output.** On success, compare observed output property names with the requested features and selected
+   product schema. For primary multichannel diarization, check channel identifiers in the relevant word/sentence
+   segments. Treat an undocumented file-link shape as observed live behavior, not a schema guarantee.
+8. **Separate webhook delivery.** A succeeded job can be retrieved even if the receiver missed the webhook. Inspect the
+   authorized receiver independently; the job APIs expose no delivery log or retry contract.
+9. **Collect an escalation package** when bounded reads and authorized external checks cannot resolve the issue.
+
+## Decision rules
+
+| Evidence                                                  | Classification and next action                                                                                  |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Create returned a schema-validation problem               | Correct only fields allowed by the selected schema; a new submission requires user intent.                      |
+| Endpoint read fails for the trusted scope                 | Scope, access, or product-path problem; stop rather than guessing another organization.                         |
+| Job `404` with a trusted returned ID                      | Recheck product path and organization once; then escalate with the create response and `Location`.              |
+| `pending` with only a `created` event                     | Accepted but queued; continue bounded polling without resubmission.                                             |
+| `running` with a `started` event                          | Processing; continue bounded polling without promising an ETA.                                                  |
+| `failed`                                                  | Terminal failure; preserve events/source/configuration and require new intent before replacement.               |
+| `cancelled` without expected authorization                | Preserve evidence and escalate; do not recreate automatically.                                                  |
+| `succeeded` but expected output is missing                | Output/schema mismatch; preserve the complete response securely and escalate.                                   |
+| Primary multichannel succeeds without channel identifiers | Verify diarization settings and selected stream, then preserve the response and escalate if still inconsistent. |
+| Job succeeded but webhook was not observed                | Verify by GET, then diagnose the receiver; do not resubmit the transcription.                                   |
+| `429`                                                     | Honor `Retry-After` when present and continue only within the original read/polling budget.                     |
+
+## Expected states and responses
+
+Job states are `pending`, `running`, `succeeded`, `cancelled`, and `failed`. Events are separate and use `created`,
+`started`, `succeeded`, `cancelled`, and `failed`. Create returns `201`, reads `200`, and cancellation `202`.
+
+The specifications define no service-log endpoint, completion-time guarantee, webhook-delivery state, update operation,
+or idempotency key.
+
+## Retry behavior
+
+Retry only endpoint/job reads for plausible transient failures with bounded exponential backoff and jitter. Honor
+`Retry-After` when supplied. Do not retry unchanged validation or authorization failures, an uncertain create without an
+ID, a failed job, webhook delivery by resubmitting work, or cancellation without a fresh read and explicit intent.
+
+## Verification
+
+Diagnosis is verified by fresh endpoint/job reads and authorized source/receiver evidence. A recovery submission is a
+new billable/processing operation: preflight it, create once, capture the new ID, and verify independently. Cancellation
+requires a pre-read, the delete operation on the exact product path, and a post-read showing `cancelled`; otherwise it
+remains pending or unresolved.
+
+## Rollback or recovery
+
+- Correct a media URI or request field only in a new job after user approval; existing jobs cannot be updated.
+- Retrieve a succeeded job by ID when webhook delivery failed; do not repeat processing.
+- Preserve failed/cancelled job events and response problem instances.
+- Do not delete evidence or expose media/transcript content in a support package.
+
+## Stop and escalation conditions
+
+Stop when product/scope/job ID is ambiguous, a source or receiver cannot be checked safely, polling expires, a terminal
+failure lacks actionable evidence, or a succeeded response violates the selected output schema. Escalate rather than
+guessing backend logs, retry behavior, or a replacement request.
+
+The escalation package includes the organization, exact product/path, job ID and `Location`, UTC request/create/update
+and event times, current state, redacted input/output property names, media origin without secret query data, webhook
+receiver result, HTTP response class, `ProblemDetails.instance`, polling history, reproduction steps, and recent caller
+changes.
+
+## Evidence to return to the user
+
+Return the exact product/path, organization/job ID, state/events/timestamps, diagnosis and ruled-out causes, safe source
+and webhook checks, response problem identifiers, requested versus observed output property names, retry/poll budget,
+redactions, and next action requiring approval. Clearly label resolved, terminal, pending, and unknown outcomes.

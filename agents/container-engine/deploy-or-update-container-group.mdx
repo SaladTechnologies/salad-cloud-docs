@@ -1,0 +1,219 @@
+---
+title: 'Deploy or Update a Container Group'
+sidebarTitle: 'Deploy or Update'
+description:
+  'Create or safely update a SaladCloud Container Group with duplicate prevention and post-write verification.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use to create a new Container Group or change the configuration of one existing Container Group through the public API.
+
+## When not to use it
+
+Do not use it to start, stop, monitor, or replace an individual instance; use
+[Monitor and Operate a Container Group](/agents/container-engine/monitor-and-operate-container-group). Do not create a
+second group as an implicit rollback or workaround.
+
+## Required inputs
+
+- `SALAD_API_KEY`, `SALAD_ORGANIZATION`, `SALAD_PROJECT`, and intended `SALAD_CONTAINER_GROUP` name.
+- Container image reference, CPU cores, RAM in MB, optional storage in bytes, live GPU class UUIDs if needed, desired
+  replicas, priority, restart policy, and autostart choice.
+- Optional command, environment-variable map, private-registry credentials, countries, networking, probes, queue
+  connection, autoscaler, and scheduled scaling settings.
+- Explicit user intent for an update that scales down, interrupts/replaces running replicas, changes the image or
+  resources, weakens authentication/health controls, or stops/deletes a resource.
+
+Use caller-provided secret variables such as `SALAD_REGISTRY_USERNAME`, `SALAD_REGISTRY_PASSWORD`,
+`SALAD_REGISTRY_TOKEN`, or `SALAD_REGISTRY_SERVICE_KEY` only when the selected registry schema requires them. Never echo
+them or include them in evidence.
+
+## Authoritative sources
+
+| Purpose             | Operation and canonical reference                                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Duplicate check     | Operation: `list_container_groups` — [List Container Groups](/reference/saladcloud-api/container-groups/list-container-groups)            |
+| Read current target | Operation: `get_container_group` — [Get Container Group](/reference/saladcloud-api/container-groups/get-container-group)                  |
+| Create              | Operation: `create_container_group` — [Create Container Group](/reference/saladcloud-api/container-groups/create-container-group)         |
+| Update              | Operation: `update_container_group` — [Update Container Group](/reference/saladcloud-api/container-groups/update-container-group)         |
+| Verify instances    | Operation: `list_container_group_instances` — [List Instances](/reference/saladcloud-api/container-groups/list-container-group-instances) |
+
+Use [Managing Deployments](/container-engine/how-to-guides/managing-deployments),
+[Container Registries](/container-engine/explanation/infrastructure-platform/container-registries), and
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) for product behavior.
+
+## Dynamic values to retrieve
+
+- Exact existing group names and the current target representation, including `version`, `pending_change`, `replicas`,
+  `current_state`, container settings, priority, networking, probes, and queue settings.
+- Current quota, GPU class UUIDs, and CPU/GPU availability from
+  [Discover Scope and Preflight](/agents/container-engine/discover-scope-and-preflight).
+- Current instances and their versions when the update can roll out new configuration.
+
+Registry authentication is not present in the Container Group response schema. Require credentials again when a private
+image update needs them; do not assume they can be recovered from a read.
+
+## Preflight checks
+
+1. Complete the scope, duplicate, quota, hardware, and availability checks in the preflight runbook.
+2. Call `list_container_groups` and compare the exact `name`, not `display_name`, with the intended name.
+3. If the exact name exists, call `get_container_group` and compare current versus intended configuration.
+4. If it does not exist, validate the create body against `ContainerGroupPrototype`. Required fields are `name`,
+   `container`, `replicas`, `restart_policy`, and `autostart_policy`; `container` requires `image` and `resources`;
+   create resources require `cpu` and `memory`.
+5. For an update, use `application/merge-patch+json` and the `ContainerGroupPatch` schema. Do not send response-only
+   fields such as `id`, `current_state`, `version`, `create_time`, or `update_time`.
+6. Record a redacted pre-change copy and success predicate. If a current secret value is masked or omitted and the
+   planned update could replace it, stop for that value.
+
+## Procedure
+
+### Create a group
+
+Create only when the exact-name list check proves the group is absent. This example is a schema-derived template; the
+image placeholder must be replaced, and GPU class UUIDs must come from the live API when GPUs are required.
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "name": "agent-example-group",
+    "display_name": "Agent Example Group",
+    "container": {
+      "image": "<registry>/<repository>:<immutable-tag-or-digest>",
+      "resources": {
+        "cpu": 4,
+        "memory": 8192,
+        "storage_amount": 10737418240
+      },
+      "environment_variables": {
+        "APP_MODE": "production"
+      },
+      "priority": "high"
+    },
+    "autostart_policy": false,
+    "restart_policy": "always",
+    "replicas": 2,
+    "networking": {
+      "protocol": "http",
+      "auth": true,
+      "port": 8080
+    },
+    "readiness_probe": {
+      "http": {
+        "headers": [],
+        "path": "/ready",
+        "port": 8080,
+        "scheme": "http"
+      },
+      "failure_threshold": 3,
+      "initial_delay_seconds": 10,
+      "period_seconds": 5,
+      "success_threshold": 1,
+      "timeout_seconds": 2
+    }
+  }'
+```
+
+Replace `agent-example-group` with the approved `SALAD_CONTAINER_GROUP` value when constructing the actual request; do
+not execute the example name. Set `autostart_policy: true` only when the user intends creation to start capacity.
+
+### Update a group
+
+1. Read with `get_container_group` immediately before the patch.
+2. Build nested objects using only fields allowed by `ContainerGroupPatch`, carrying forward any unrelated
+   caller-managed values that the selected patch could replace. For environment variables, preserve unrelated key/value
+   pairs locally and do not log secret values.
+3. Send the smallest merge patch that has an unambiguous effect. For example, an approved scale-up from the observed
+   replica count to 3 is:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request PATCH \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers/${SALAD_CONTAINER_GROUP}" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/merge-patch+json' \
+  --header 'Accept: application/json' \
+  --data '{"replicas":3}'
+```
+
+4. Call `get_container_group` after the write. If runtime configuration changed, call `list_container_group_instances`
+   and compare each instance `version` with the group `version`.
+5. Poll within the declared budget until the success condition is met or report partial/pending state.
+
+## Decision rules
+
+| Current evidence and intent                                           | Action                                                                                                                      |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| No exact-name group exists                                            | Create after complete preflight.                                                                                            |
+| Exact-name group exists and matches intent                            | Return no-op success with the fresh read.                                                                                   |
+| Exact-name group exists but differs                                   | Patch it; do not create a duplicate.                                                                                        |
+| Only `display_name` matches                                           | Treat as ambiguous and ask for the intended immutable `name`.                                                               |
+| User requests fewer replicas                                          | Require explicit capacity-reduction intent before patching.                                                                 |
+| User changes image, command, environment, probes, or gateway settings | Warn that canonical deployment guidance says a new container version can restart replicas.                                  |
+| User changes CPU, RAM, GPU, or storage                                | Warn that noncompliant instances may be reallocated.                                                                        |
+| User requests autostart/restart-policy update                         | Stop: those fields are required on create but absent from the current patch schema.                                         |
+| User requests gateway auth/protocol update                            | Stop: the current patch schema exposes only networking `port`.                                                              |
+| Existing group lacks `queue_connection`                               | Do not attach it with update: the current patch schema has no `queue_connection`; request an approved replacement strategy. |
+
+Priority is `container.priority` in create/update requests. Valid values are `high`, `medium`, `low`, and `batch`.
+Select at most the approved countries through `country_codes`; omitting the field permits any country.
+
+For a probe, choose the intended `exec`, `grpc`, `http`, or `tcp` handler and include all required timing fields.
+Startup protects slow initialization; readiness controls whether work or gateway traffic should reach a running
+instance; liveness detects an unrecoverable running application. Misconfigured startup or liveness probes can cause
+reallocation, so validate the handler inside the image before enabling it.
+
+## Expected states and responses
+
+- Create returns `201` with a Container Group representation. With image preparation or autostart, status may progress
+  through `pending`, `stopped`, `deploying`, and `running`; use the live response, not a fixed sequence assumption.
+- Update returns `200`. `pending_change: true` means requested configuration has not reached all containers.
+- Group status enum values are `pending`, `running`, `stopped`, `succeeded`, `failed`, and `deploying`.
+- Instance state enum values are `allocating`, `downloading`, `creating`, `running`, and `stopping`.
+- `replicas` is desired capacity. Compare it with `current_state.instance_status_counts` and the instance list; ready
+  capacity requires `state: running` and `ready: true` when readiness matters.
+
+## Retry behavior
+
+Retry reads within a bounded budget. Do not retry `create_container_group` until an exact-name list/get reconciliation
+proves the first request did not create the resource. Before retrying a patch, re-read and skip it if the desired state
+already applied. Do not retry unchanged `400`, `401`, or `403` responses. Honor `Retry-After` on `429` when present.
+
+## Verification
+
+| Mutation                 | Verification read                                                                 | Success                                                                                              | Failure or unresolved                                                              |
+| ------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `create_container_group` | `get_container_group` by the exact created name                                   | Configuration matches and reaches the user-approved stopped or running predicate                     | `failed`, mismatch, `404` after reconciliation, or pending past budget             |
+| `update_container_group` | `get_container_group`, then `list_container_group_instances` when runtime changes | Intended fields match, `pending_change` clears, and required instances run the current group version | Mismatch, group `failed`, partial old versions past budget, or pending past budget |
+
+Never claim deployment success solely from `201` or `200`.
+
+## Rollback or recovery
+
+- For an update, re-read, then merge-patch only changed fields back to captured pre-change values. Verify again.
+- Image rollback for a private registry requires the prior image reference and usable registry credentials; stop if they
+  are unavailable.
+- If a create prepares but fails, retain it for logs and system events. Deletion requires explicit user intent.
+- If availability or quota prevents convergence, do not silently relax hardware, countries, priority, or replicas.
+
+## Stop and escalation conditions
+
+Stop for ambiguous names, missing required fields or secrets, insufficient quota/availability, unsupported patch fields,
+masked values that cannot be preserved, missing interruption authorization, persistent `pending_change`, a `failed`
+group, or instances that do not converge before the polling budget. Continue with the
+[troubleshooting runbook](/agents/container-engine/troubleshoot-container-group) before escalation.
+
+## Evidence to return to the user
+
+Return the scope and exact group name; create-versus-update decision; redacted changed field names; operation IDs and
+response classes; old/new group versions; desired replicas; status and instance counts; current-version ready/running
+instances; UTC start/end times; retry/poll count; and rollback, partial, or escalation status. Do not return environment
+values or registry/API credentials.

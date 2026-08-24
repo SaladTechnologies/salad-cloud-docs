@@ -1,0 +1,176 @@
+---
+title: 'Monitor and Operate a Container Group'
+sidebarTitle: 'Monitor and Operate'
+description: 'Read, scale, start, stop, and monitor SaladCloud Container Groups with bounded polling and verification.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use to read current group and instance state, retrieve logs or system events, scale safely, start or stop a group, and
+report asynchronous or partial outcomes.
+
+## When not to use it
+
+Do not use it to create or change runtime configuration beyond replica count. Do not reallocate, recreate, restart,
+delete, or replace anything without the task-specific evidence and explicit user intent described here and in the
+[troubleshooting runbook](/agents/container-engine/troubleshoot-container-group).
+
+## Required inputs
+
+- `SALAD_API_KEY`, `SALAD_ORGANIZATION`, `SALAD_PROJECT`, and exact `SALAD_CONTAINER_GROUP` name.
+- The requested observation window in UTC for logs/events.
+- For scaling, the intended replica count and quota/capacity constraints.
+- Explicit user intent before stop, scale-down, delete, reallocate, recreate, restart, or replacement.
+- A caller-defined polling attempt and elapsed-time budget.
+
+## Authoritative sources
+
+| Purpose                           | Operation and canonical reference                                                                                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Read group                        | Operation: `get_container_group` — [Get Container Group](/reference/saladcloud-api/container-groups/get-container-group)                                          |
+| Read instances                    | Operation: `list_container_group_instances` — [List Instances](/reference/saladcloud-api/container-groups/list-container-group-instances)                         |
+| Inspect one instance              | Operation: `get_container_group_instance` — [Get Instance](/reference/saladcloud-api/container-groups/get-container-group-instance)                               |
+| Scale                             | Operation: `update_container_group` — [Update Container Group](/reference/saladcloud-api/container-groups/update-container-group)                                 |
+| Start                             | Operation: `start_container_group` — [Start Container Group](/reference/saladcloud-api/container-groups/start-container-group)                                    |
+| Stop                              | Operation: `stop_container_group` — [Stop Container Group](/reference/saladcloud-api/container-groups/stop-container-group)                                       |
+| Query application and system logs | Operation: `query_log_entries` — [Query Log Entries](/reference/saladcloud-api/logs/query-log-entries)                                                            |
+| Legacy group system logs          | Operation: `get_system_logs` — [Get Container Group Logs](/reference/saladcloud-api/container-groups/get-container-group-logs)                                    |
+| Scale-up preflight                | Operations: `get_quotas`, `list_gpu_classes`, `get_gpu_availability`, `get_cpu_availability` — [Preflight](/agents/container-engine/discover-scope-and-preflight) |
+| Queue drain evidence              | Operations: `get_queue`, `list_queue_jobs` — [Queue API](/reference/saladcloud-api/queues/get-queue)                                                              |
+
+The canonical `get_system_logs` page marks that endpoint deprecated and directs users to `query_log_entries`, although
+the current OpenAPI operation is not marked deprecated. Prefer `query_log_entries` and use
+[Log Queries](/container-engine/reference/log-queries) for filters.
+
+## Dynamic values to retrieve
+
+- Group `status`, `replicas`, `version`, `pending_change`, and `instance_status_counts`.
+- Every instance `id`, `machine_id`, `state`, `ready`, `started`, `version`, `update_time`, and pulling progress when
+  present.
+- Current quota/availability before scale-up.
+- Queue length and in-flight jobs before reducing workers.
+- Logs and events for a bounded UTC range; query both controller resource types and `container` logs when diagnosing.
+
+## Preflight checks
+
+1. Read the group, then list instances. Stop on `404` until the supplied scope/name is reconfirmed.
+2. Compare the current state with the requested state; avoid a no-op mutation.
+3. Before scale-up, run quota and availability preflight for the additional replicas.
+4. Before scale-down or stop, identify active jobs/requests, externalize state, and obtain explicit user intent. If
+   `queue_connection` is configured, read the exact queue with `get_queue` and jobs with `list_queue_jobs`. For direct
+   gateway traffic, stop if the caller cannot provide a safe drain predicate; no active-request read is documented.
+5. Record the current version, desired replicas, instance IDs/states, and a success predicate.
+6. For log queries, use explicit UTC `start_time`/`end_time`, project and group filters, and the smallest useful page
+   size/window.
+
+## Procedure
+
+### Read and classify current capacity
+
+1. Call `get_container_group`.
+2. Call `list_container_group_instances`.
+3. Treat `replicas` as desired capacity. Use `current_state.instance_status_counts` for allocating, creating, running,
+   and stopping totals. The summary has no downloading count; count `state: downloading` in the instance list.
+4. Count ready capacity from instances where `state` is `running` and `ready` is `true`. Do not infer a `failed`
+   instance state; it is not in the current enum.
+
+### Scale up or down
+
+1. Read with `get_container_group` immediately before the mutation.
+2. For scale-up, validate quota and availability. For scale-down, confirm explicit intent and workload drain behavior.
+3. Operation: `update_container_group`. Send `Content-Type: application/merge-patch+json` and only the approved
+   `replicas` value.
+4. Verify with `get_container_group` and `list_container_group_instances` until the desired and required ready capacity
+   predicate is met or the polling budget ends.
+
+### Start
+
+1. Read with `get_container_group`; skip if it already satisfies the user's running predicate.
+2. Operation: `start_container_group`. A successful request returns `202 Accepted` with no response body.
+3. Verify with `get_container_group` and `list_container_group_instances` until the group is `running` and required
+   instances are current-version, running, and ready.
+
+### Stop
+
+1. Read with `get_container_group` and list instances. Confirm explicit stop intent and record active work.
+2. Operation: `stop_container_group`. A successful request returns `202 Accepted` with no response body.
+3. Verify with `get_container_group` and `list_container_group_instances`. A group can report `stopped` while stop
+   messages are still propagating, so report pending until no instance remains running or the polling budget ends.
+
+### Inspect logs and system events
+
+Use Operation: `query_log_entries` with resource filters:
+
+- `resource.type = "deployment_controller"` for group-level system events.
+- `resource.type = "instance_controller"` for instance lifecycle and probe events.
+- `resource.type = "container"` for stdout/stderr application logs.
+
+Always add `resource.labels.project_name` and `resource.labels.container_group_name`; add `instance_id` or `machine_id`
+only after retrieving it live. Keep relevant trace/span identifiers from the response when present.
+
+## Decision rules
+
+| Operation           | Meaning and authorization                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stop group          | Retains the resource configuration but requests all workload capacity to stop; explicit intent required.                                        |
+| Delete group        | Removes the resource asynchronously; not part of this runbook and always requires explicit destructive intent.                                  |
+| Restart instance    | Restarts the container on the same node; local data may remain according to canonical deployment guidance, but interruption intent is required. |
+| Recreate instance   | Rebuilds the container on the same node; treat local container state as disposable and require intent.                                          |
+| Reallocate instance | Moves work to another node and restarts allocation/download; use only for evidence-backed node conditions and require intent.                   |
+| Replace group       | Creates a separately named group and changes traffic/workflows; this is a deployment strategy, not an automatic recovery.                       |
+
+| Observed capacity                                                         | Report                                                                                     |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Desired equals ready/running current-version count                        | Converged for the declared predicate.                                                      |
+| Some, but not all, desired instances are ready                            | Partial success with exact counts and states.                                              |
+| Desired count is set but instances remain allocating/downloading/creating | Accepted but pending; continue bounded polling and inspect events.                         |
+| Group is `running` but ready count is zero                                | Runtime started but service is unavailable; troubleshoot readiness/application/networking. |
+| Group is `failed`                                                         | Stop normal polling and troubleshoot preparation/configuration.                            |
+
+## Expected states and responses
+
+Group statuses are `pending`, `running`, `stopped`, `succeeded`, `failed`, and `deploying`. Instance states are
+`allocating`, `downloading`, `creating`, `running`, and `stopping`. Instance `started` reports startup completion;
+`ready` reports readiness. A running instance can therefore be started but not ready.
+
+`update_container_group` returns `200`; start and stop return `202`. The current spec defines `202` for
+`get_container_group_instance`, even though it is a read; consume the response body and do not reinterpret that status
+as completion of a mutation.
+
+## Retry behavior
+
+Poll with bounded exponential backoff and jitter within the caller's total time/attempt budget. Honor `Retry-After` when
+present. Re-read state before retrying a start, stop, or scale request. Do not retry a scale-down or stop without the
+original explicit intent, and do not extend the polling budget indefinitely.
+
+## Verification
+
+| Mutation | Read before                                             | Read after           | Success                                                                        | Failure or unresolved                                                     |
+| -------- | ------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Scale    | `get_container_group`, `list_container_group_instances` | Same operations      | Desired `replicas` matches and required ready/current-version count is reached | Mismatch, `failed`, partial capacity, or pending past budget              |
+| Start    | `get_container_group`                                   | Group plus instances | `running` and declared ready/current-version capacity reached                  | `failed`, no ready capacity, or pending past budget                       |
+| Stop     | Group plus instances                                    | Same operations      | `stopped` and no instance remains running                                      | Running/stopping instances remain past budget or status fails to converge |
+
+## Rollback or recovery
+
+- Scale-up can be reversed only with explicit approval to reduce capacity; do not auto-scale back down.
+- A mistaken scale-down can be corrected by restoring the captured replica count after fresh quota/availability checks.
+- A mistaken start can be stopped only with explicit stop intent. A mistaken stop can be started after confirming the
+  intended capacity and availability.
+- Preserve logs/events before instance turnover or another mutation changes the evidence.
+
+## Stop and escalation conditions
+
+Stop on missing intent, ambiguous scope, insufficient quota, active work that cannot drain, group `failed`, repeated
+non-transient errors, or convergence beyond the polling budget. When pending, return the last state and UTC update time;
+do not claim failure solely because allocation is slow. Use the troubleshooting decision tree and collect an escalation
+package if evidence remains inconclusive.
+
+## Evidence to return to the user
+
+Return scope/name, requested action, operation IDs/status classes, before/after group status and version, desired
+replicas, counts by actual instance state, current-version running/ready counts, relevant instance IDs, UTC observation
+window, event/log query filters, partial/pending classification, polling attempts/elapsed time, and next safe action.
+Redact credentials, environment values, and sensitive log content.

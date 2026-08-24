@@ -1,0 +1,157 @@
+---
+title: 'Submit and Monitor a Transcription Lite Job'
+sidebarTitle: 'Transcription Lite Job'
+description:
+  'Submit, poll, verify, and optionally cancel one Salad Transcription Lite job without using primary-only fields or
+  creating duplicates.'
+---
+
+_Last Updated: August 24, 2026_
+
+## When to use this runbook
+
+Use after preflight selects `transcription-lite` and every requested feature exists in the current Lite input schema.
+
+## When not to use it
+
+Do not use Lite for primary-only LLM, insight, custom-vocabulary, classification, or translated-SRT fields. Do not
+resubmit an uncertain/failed job automatically or cancel without explicit user intent.
+
+## Required inputs
+
+- `SALAD_API_KEY` and `SALAD_ORGANIZATION`.
+- For a new submission, a trusted downloadable `SALAD_MEDIA_URL` and exact approved Lite fields: required `url` and
+  optional `language_code`, `return_as_file`, timestamp, diarization, `srt`, or `translate` settings.
+- Optional non-secret caller metadata and webhook URI.
+- A caller-defined polling attempt and elapsed-time budget.
+- For an existing job, `SALAD_TRANSCRIPTION_LITE_JOB_ID`, obtained only from a successful create response, `Location`,
+  or trusted record.
+
+Treat media URIs, job input/output, metadata, and webhook URIs as potentially sensitive.
+
+## Authoritative sources
+
+| Action        | Operation, exact path, and canonical reference                                                                                                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Read endpoint | Operation: `get_inference_endpoint`; `GET /organizations/{organization_name}/inference-endpoints/transcription-lite` — [Transcription API reference](/transcription/reference/api)                                                                   |
+| List jobs     | Operation: `get_inference_endpoint_jobs`; `GET /organizations/{organization_name}/inference-endpoints/transcription-lite/jobs` — [Transcription API reference](/transcription/reference/api)                                                         |
+| Create job    | Operation: `create_inference_endpoint_job`; `POST /organizations/{organization_name}/inference-endpoints/transcription-lite/jobs` — [Create Lite job](/reference/transcription-lite/inference_endpoints/create-an-inference-endpoint-job)            |
+| Read job      | Operation: `get_inference_endpoint_job`; `GET /organizations/{organization_name}/inference-endpoints/transcription-lite/jobs/{job_id}` — [Get Lite job](/reference/transcription-lite/inference_endpoints/get-an-inference-endpoint-job)             |
+| Cancel job    | Operation: `delete_inference_endpoint_job`; `DELETE /organizations/{organization_name}/inference-endpoints/transcription-lite/jobs/{job_id}` — [Delete Lite job](/reference/transcription-lite/inference_endpoints/delete-an-inference-endpoint-job) |
+
+Use `api-specs/transcription-lite.json`; the same operation IDs also occur in other specifications.
+
+## Dynamic values to retrieve
+
+- Current Lite endpoint metadata and price description.
+- The create response ID, `Location`, status, events, and timestamps.
+- Current job status/events/output during verification.
+- Current source-URI accessibility and rate-limit response.
+
+## Preflight checks
+
+1. Complete [Choose a Transcription API and Preflight](/agents/transcription/choose-api-and-preflight).
+2. Confirm the path contains `/transcription-lite/` and the endpoint read succeeds.
+3. Validate against `CreateSaladCloudTranscriptionLiteAPIJob`; `input.url` is required.
+4. Reject primary-only and undocumented fields, including `audio_stream_index`, `multichannel`, `enhanced_accuracy`,
+   `summarize`, LLM/classification fields, custom vocabulary, and `srt_translation`.
+5. The Lite `language_code` schema has no enum. Require a caller-approved value and do not claim arbitrary strings are
+   supported.
+6. If a trusted application record already has a job ID, read it instead of creating another.
+7. Define terminal and polling predicates before submission.
+
+## Procedure
+
+Read the Lite endpoint immediately before submitting this schema-derived request:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/inference-endpoints/transcription-lite/jobs" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "input": {
+      "url": "<downloadable-media-url>",
+      "language_code": "en",
+      "return_as_file": false,
+      "sentence_level_timestamps": true,
+      "word_level_timestamps": false,
+      "diarization": false,
+      "sentence_diarization": false,
+      "srt": false
+    },
+    "metadata": {
+      "client_request_id": "<caller-generated-non-secret-correlation-value>"
+    }
+  }'
+```
+
+Replace placeholders without logging signed query parameters. Correlation metadata is not an idempotency guarantee.
+Persist the ID and `Location` from the `201` response.
+
+Poll the exact Lite job:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/inference-endpoints/transcription-lite/jobs/${SALAD_TRANSCRIPTION_LITE_JOB_ID}" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Accept: application/json'
+```
+
+On `succeeded`, verify required `text`, `duration`, and `processing_time`, plus any requested timestamps or SRT fields.
+The schema does not define the alternative file-URL shape described by canonical `return_as_file` guidance; use and
+redact the live response without inventing property names.
+
+For cancellation, read immediately before `delete_inference_endpoint_job`, require explicit intent, then verify with the
+exact get operation within the polling budget.
+
+## Decision rules
+
+| Evidence or intent                                  | Action                                                      |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| Requested field is absent from the Lite schema      | Stop or switch to primary only with user approval.          |
+| Trusted record contains a Lite job ID               | Read it; do not submit again.                               |
+| Create returns `201` and an ID                      | Persist and verify that exact ID.                           |
+| Create result is unknown and no ID was returned     | Stop; list/metadata cannot prove identity or idempotency.   |
+| `pending` or `running`                              | Continue bounded polling.                                   |
+| `succeeded` with requested output                   | Return verified success.                                    |
+| `failed`, unexpected `cancelled`, or missing output | Troubleshoot; a replacement submission requires new intent. |
+| User requests an update to an existing job          | Stop: no update operation exists.                           |
+
+## Expected states and responses
+
+Create returns `201`, reads return `200`, and cancellation returns `202`. States are `pending`, `running`, `succeeded`,
+`cancelled`, and `failed`; events use `created`, `started`, `succeeded`, `cancelled`, and `failed`.
+
+## Retry behavior
+
+Retry only reads for plausible transient transport, `429`, or server failures within a fixed budget, honoring
+`Retry-After` when present. Never retry an uncertain create without an ID, automatically resubmit a failed job, or retry
+cancellation without a fresh read and the original intent.
+
+## Verification
+
+| Mutation                        | Read before                        | Read after                   | Success                                                   | Failure or unresolved                                        |
+| ------------------------------- | ---------------------------------- | ---------------------------- | --------------------------------------------------------- | ------------------------------------------------------------ |
+| `create_inference_endpoint_job` | Endpoint and trusted job-ID lookup | `get_inference_endpoint_job` | Returned ID reaches `succeeded` with required Lite output | Unknown create, terminal failure, missing output, or timeout |
+| `delete_inference_endpoint_job` | `get_inference_endpoint_job`       | Same operation               | State becomes `cancelled`                                 | Active past budget; post-acceptance `404` remains unresolved |
+
+## Rollback or recovery
+
+Lite jobs cannot be edited. Do not use cancellation as automatic rollback. Preserve failed job evidence and submit a
+replacement only after correcting the cause and obtaining explicit new-job intent.
+
+## Stop and escalation conditions
+
+Stop on an unsupported Lite field, missing scope/source, invalid request, uncertain create, terminal failure, missing
+output, or exhausted polling. Escalate persistent service behavior with product/path, organization, job ID, UTC event
+times, redacted field names, response problem instance, and expected versus observed result.
+
+## Evidence to return to the user
+
+Return the Lite path, organization, job ID, response classes, requested field names, redacted source origin,
+status/events/timestamps, polling attempts/elapsed time, verified output property names, cancellation state, and any
+unresolved result. Never expose API keys, complete signed/webhook URIs, media, transcript text, or sensitive metadata
+unless explicitly requested through an authorized channel.
