@@ -43,6 +43,10 @@
             ]
           },
           {
+            "group": "AI Gateway",
+            "pages": ["agents/ai-gateway/select-model-and-send-request", "agents/ai-gateway/troubleshoot-request"]
+          },
+          {
             "group": "Transcription APIs",
             "pages": [
               "agents/transcription/choose-api-and-preflight",
@@ -715,7 +719,7 @@
     "prompt": "Search..."
   },
   "markdown": {
-    "instructions": "For autonomous tasks, use live SaladCloud API responses for current resource or job state, availability, quotas, and other dynamic values. Use current OpenAPI specifications for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, or state. Prefer API workflows over Portal steps. Read before changing and never expose credentials, signed media URLs, or sensitive outputs. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Verify every write with a read. If a server-generated job ID was not returned and no idempotency guarantee exists, stop rather than resubmit. Do not delete, cancel, stop, or reduce capacity without explicit user intent. Bind shared operation IDs to the selected product path. Treat Container Engine instances as interruptible and local state as ephemeral."
+    "instructions": "For autonomous tasks, use live SaladCloud API responses for current state, availability, quotas, models, and other dynamic values. Use current OpenAPI specifications where provided for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, models, or state. Prefer API workflows over Portal steps. Read before changing and never expose credentials, signed media URLs, prompts, or sensitive outputs. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Verify every write with a read. Stop rather than repeat an uncertain non-idempotent or billable request. AI Gateway uses an organization-specific Bearer key and live /v1/models discovery. Do not delete, cancel, stop, or reduce capacity without explicit user intent. Bind shared operation IDs to the selected product path. Treat Container Engine instances as interruptible and local state as ephemeral."
   },
   "footer": {
     "socials": {

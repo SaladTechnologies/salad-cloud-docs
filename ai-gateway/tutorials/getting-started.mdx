@@ -6,6 +6,12 @@ description: 'Make your first API call to Salad AI Gateway in under 5 minutes.'
 
 _Last Updated: September 1, 2026_
 
+<Visibility for="agents">
+  > Treat examples as minimal templates, not live model or account facts. Use the `salad-ai-gateway-request` skill,
+  > confirm the exact model with `/v1/models`, keep `SALAD_AI_GATEWAY_API_KEY` and all prompt/output content secret, and
+  > stop rather than retry an uncertain completion or partial stream.
+</Visibility>
+
 <Warning>Salad AI Gateway is currently in **beta**.</Warning>
 
 ## Prerequisites
@@ -51,8 +57,8 @@ You should receive a JSON response containing the model's reply.
 ## Step 2: Use the SaladCloud AI SDK Provider
 
 For JavaScript and TypeScript applications built with the Vercel AI SDK, use the official
-[`@saladtechnologies-oss/ai-sdk-provider`](https://www.npmjs.com/package/@saladtechnologies-oss/ai-sdk-provider). The
-provider requires Node.js 22 or later and automatically uses the Salad AI Gateway base URL.
+`@saladtechnologies-oss/ai-sdk-provider`. The provider requires Node.js 22 or later and automatically uses the Salad AI
+Gateway base URL.
 
 Install the provider, Vercel AI SDK, and Zod:
 

@@ -15,6 +15,8 @@ const runbooks = [
     'agents/container-engine/monitor-and-operate-container-group.mdx',
     'agents/container-engine/troubleshoot-container-group.mdx',
     'agents/container-engine/configure-job-queue-autoscaling.mdx',
+    'agents/ai-gateway/select-model-and-send-request.mdx',
+    'agents/ai-gateway/troubleshoot-request.mdx',
     'agents/transcription/choose-api-and-preflight.mdx',
     'agents/transcription/submit-and-monitor-job.mdx',
     'agents/transcription-lite/submit-and-monitor-job.mdx',
@@ -27,6 +29,8 @@ const skills = [
     'salad-container-engine-operate',
     'salad-container-engine-troubleshoot',
     'salad-job-queue-autoscaling',
+    'salad-ai-gateway-request',
+    'salad-ai-gateway-troubleshoot',
     'salad-transcription-preflight',
     'salad-transcription-job',
     'salad-transcription-lite-job',
@@ -109,6 +113,7 @@ const specsByPath = new Map(specPaths.map((specPath) => [specPath, YAML.parse(re
 const operationsBySpec = new Map(specPaths.map((specPath) => [specPath, collectOperations(specPath)]))
 const operationIds = new Set([...operationsBySpec.values()].flatMap((operations) => [...operations]))
 const schemaFields = new Set(specPaths.flatMap((specPath) => [...collectSchemaFields(specPath)]))
+const aiGatewayEndpoints = new Set(['GET /v1/models', 'POST /v1/chat/completions'])
 
 function validateTranscriptionProductSchemas() {
     const primary = specsByPath.get('api-specs/transcribe.json')?.components?.schemas
@@ -429,12 +434,19 @@ if (!Array.isArray(scenarios) || scenarios.length < 8) {
 } else {
     const ids = new Set()
     for (const scenario of scenarios) {
+        const isAiGatewayScenario = scenario.expected_skill?.startsWith('salad-ai-gateway-')
         for (const field of scenarioFields) {
             if (scenario[field] === undefined || scenario[field] === null) {
                 errors.push(`Scenario ${scenario.id || '<unknown>'} is missing ${field}`)
             }
         }
         for (const field of scenarioFields.slice(3)) {
+            if (field === 'required_operations' && isAiGatewayScenario) {
+                if (!Array.isArray(scenario[field])) {
+                    errors.push(`Scenario ${scenario.id || '<unknown>'} must define ${field} as a list`)
+                }
+                continue
+            }
             if (!Array.isArray(scenario[field]) || scenario[field].length === 0) {
                 errors.push(`Scenario ${scenario.id || '<unknown>'} must have a non-empty ${field} list`)
             }
@@ -446,6 +458,20 @@ if (!Array.isArray(scenarios) || scenarios.length < 8) {
         }
         for (const source of scenario.required_sources || []) read(source)
         const requiredSpecs = (scenario.required_sources || []).filter((source) => source.startsWith('api-specs/'))
+        if (isAiGatewayScenario) {
+            if (!Array.isArray(scenario.required_endpoints) || scenario.required_endpoints.length === 0) {
+                errors.push(`AI Gateway scenario ${scenario.id} must name at least one required endpoint`)
+            }
+            for (const endpoint of scenario.required_endpoints || []) {
+                if (!aiGatewayEndpoints.has(endpoint)) {
+                    errors.push(`Unknown AI Gateway endpoint in ${scenario.id}: ${endpoint}`)
+                }
+            }
+            if ((scenario.required_operations || []).length !== 0) {
+                errors.push(`AI Gateway scenario ${scenario.id} must not invent OpenAPI operation IDs`)
+            }
+            continue
+        }
         if (requiredSpecs.length === 0) errors.push(`Scenario ${scenario.id} must name at least one API specification`)
         const scenarioOperations = new Set(
             requiredSpecs.flatMap((specPath) => [...(operationsBySpec.get(specPath) || [])]),

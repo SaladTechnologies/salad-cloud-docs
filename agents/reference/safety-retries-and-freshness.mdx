@@ -4,22 +4,24 @@ sidebarTitle: 'Safety and Retries'
 description: 'Global safety, retry, verification, freshness, and stop rules for autonomous SaladCloud operations.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: September 1, 2026_
 
 ## When to use this runbook
 
-Apply these rules to every autonomous Salad Container Engine and Transcription read, create, update, start, stop, scale,
-queue, job, instance, log, or IMDS workflow.
+Apply these rules to every autonomous Salad Container Engine, AI Gateway, and Transcription read, create, update, start,
+stop, scale, queue, job, instance, log, model-selection, completion, or IMDS workflow.
 
 ## When not to use it
 
 Do not use these generic rules to infer an endpoint-specific request body or success state. Use the current OpenAPI
-operation and the applicable task runbook for those details.
+operation where provided and the applicable task runbook for those details.
 
 ## Required inputs
 
 - A caller-provided time budget and operational objective.
-- `SALAD_API_KEY` for the public API; never print or persist its value.
+- `SALAD_API_KEY` for the public SaladCloud API; never print or persist its value.
+- `SALAD_AI_GATEWAY_API_KEY` for AI Gateway Bearer authentication; never print, persist, or substitute the regular API
+  key.
 - Trusted resource scope and explicit user intent for destructive or capacity-reducing actions.
 - A safe location for redacted pre-change or job evidence when recovery may be required.
 
@@ -27,33 +29,37 @@ operation and the applicable task runbook for those details.
 
 - [Using the API](/reference/api-usage)
 - [Agent Operations Overview](/agents/overview)
+- [Select a Model and Send an AI Gateway Request](/agents/ai-gateway/select-model-and-send-request)
 - The current public API and IMDS OpenAPI specifications linked from the
   [Container Engine API reference](/container-engine/reference/api)
 
 ## Dynamic values to retrieve
 
-Treat resource state, versions, instances, logs, events, queues, transcription jobs, endpoint metadata, quotas, GPU
-classes, availability, prices, and capacity as dynamic. Retrieve them for the target scope immediately before they
-affect a decision and again after every mutation.
+Treat resource state, versions, instances, logs, events, queues, transcription jobs, endpoint metadata, AI Gateway model
+IDs, quotas, GPU classes, availability, prices, and capacity as dynamic. Retrieve them for the target scope immediately
+before they affect a decision and again after every mutation.
 
 ## Preflight checks
 
-1. Verify the target names and authorization boundary.
+1. Verify the target names or model selection and the authorization boundary.
 2. Classify the operation as a read, idempotent write, non-idempotent create, destructive action, or asynchronous
-   lifecycle request.
-3. Read the resource and save a redacted record of fields that may change.
-4. Define the success condition, verification read, maximum attempts, elapsed-time budget, and stop condition.
+   lifecycle or billable model request.
+3. Before a resource change, read the resource and save a redacted record of fields that may change.
+4. Define the success condition, verification method, maximum attempts, elapsed-time budget, and stop condition.
 5. For Container Engine, check that local instance/job state is externalized before replacement. For Transcription,
    protect signed media URLs, metadata, webhooks, and output as sensitive data.
+6. For AI Gateway, protect prompts, conversation history, images, tool definitions and results, and model output. Treat
+   a completion as billable and non-idempotent when the documentation does not guarantee otherwise.
 
 ## Procedure
 
-1. Retrieve live resource/job state and compare it with the requested state.
+1. Retrieve the applicable live resource, job, or model state and compare it with the requested outcome.
 2. Skip a write when the desired outcome is already true.
-3. Use the narrowest valid mutation. For merge patches, send only intended changes while preserving current nested
-   values that must remain.
+3. Use the narrowest valid mutation or documented model request. For merge patches, send only intended changes while
+   preserving current nested values that must remain.
 4. Record the response status and identifiers without credential-bearing headers or secret fields.
-5. Perform the specified verification read and bounded polling if the operation is asynchronous.
+5. Perform the specified verification. Use a fresh read and bounded polling for asynchronous operations; for AI Gateway,
+   confirm the live model before the request and retain the exact response or stream afterward.
 6. Return the verified result or stop with the last observed state.
 
 ## Decision rules
@@ -64,6 +70,7 @@ affect a decision and again after every mutation.
 | `PATCH` with a known desired state                         | Re-read first; retry only after proving the first request did not apply.                     |
 | `POST` named-resource create                               | List by exact scope/name before retrying; never create again while outcome is uncertain.     |
 | `POST` server-ID job create                                | Persist the returned ID; without an ID or documented idempotency, stop rather than resubmit. |
+| AI Gateway chat completion or stream                       | Do not repeat it when delivery, completion, or billing outcome is uncertain.                 |
 | `POST` start/stop or instance lifecycle                    | Re-read current state before any retry; acceptance may be asynchronous.                      |
 | `DELETE`, cancel, stop, scale-down, reallocate, or replace | Require explicit user intent; never infer authorization.                                     |
 | `400` or schema/configuration error                        | Correct the request or stop; do not retry unchanged.                                         |
@@ -82,6 +89,9 @@ Container Group status values are `pending`, `running`, `stopped`, `succeeded`, 
 state values are `allocating`, `downloading`, `creating`, `running`, and `stopping`. Transcription job states are
 `pending`, `running`, `succeeded`, `cancelled`, and `failed`. Do not mix state enums across resource types.
 
+AI Gateway returns an immediate completion response or stream rather than a durable job state. A partial stream or
+transport failure is not proof that the request failed or was not billed.
+
 ## Retry behavior
 
 Use bounded exponential backoff with jitter as agent behavior, not as a SaladCloud API guarantee. The caller or task
@@ -93,6 +103,7 @@ Never blindly retry:
 - Authentication or authorization failures.
 - Schema validation, invalid enum, invalid configuration, or missing-field errors.
 - A create request whose outcome is unknown, especially a job create with no returned server ID.
+- An AI Gateway completion after a timeout, `5xx`, interrupted response, or partial stream.
 - A destructive action, cancellation, or capacity reduction.
 - Reallocation as a generic response to application or configuration failures.
 
@@ -100,7 +111,9 @@ Never blindly retry:
 
 Verification is a fresh read, not the mutation response. Compare observed configuration, version, state, counts, job
 events/output, and relevant instance fields with an explicit success predicate. For named creates, list/get the exact
-name. For queue or transcription jobs, read the returned job ID. Retain the last response and UTC observation time.
+name. For queue or transcription jobs, read the returned job ID. Retain the last response and UTC observation time. For
+AI Gateway, verify the selected model with a fresh `/v1/models` response before sending one completion, then retain the
+exact response or stream result. No documented completion-status read exists for reconciliation.
 
 ## Rollback or recovery
 
@@ -111,17 +124,20 @@ name. For queue or transcription jobs, read the returned job ID. Retain the last
 - If an instance is replaced, recover from external storage or a durable queue; local instance state is ephemeral.
 - A transcription job cannot be updated. Cancellation or replacement requires explicit intent; retrieve a succeeded job
   by ID instead of repeating work after a webhook failure.
+- AI Gateway token usage and generated output cannot be rolled back. A corrective request is new billable work.
 
 ## Stop and escalation conditions
 
 Stop when required scope, credentials, intent, current state, or rollback values are missing; when a non-transient error
 persists; when resources remain pending past the caller's polling budget; or when evidence suggests a service-side
 fault. Do not turn an unresolved operation into success. Escalate with the package defined in
-[Troubleshoot a Container Group](/agents/container-engine/troubleshoot-container-group).
+[Troubleshoot a Container Group](/agents/container-engine/troubleshoot-container-group) or
+[Troubleshoot an AI Gateway Request](/agents/ai-gateway/troubleshoot-request).
 
 ## Evidence to return to the user
 
 Return the target scope/product/path, operation IDs, redacted request field names, response classes, verification reads,
 UTC timestamps, attempt count, elapsed polling time, last observed state, success predicate, and recovery/escalation.
 Never return API keys, registry credentials, environment-variable secret values, signed media URLs, webhook secrets,
-transcript/media content without authorization, or full credential-bearing requests.
+prompts, conversations, images, tool definitions or results, model/transcript/media content without authorization, or
+full credential-bearing requests.
