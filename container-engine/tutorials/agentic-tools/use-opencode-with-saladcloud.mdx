@@ -1,22 +1,21 @@
 ---
 title: 'Use OpenCode with SaladCloud'
 sidebarTitle: 'OpenCode'
-description: 'Learn how to use the OpenCode terminal coding agent with a self-hosted model on SaladCloud.'
+description: 'Use the OpenCode terminal coding agent with Salad AI Gateway or a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: May 18, 2026_
+_Last Updated: September 1, 2026_
 
 ## Introduction
 
-[OpenCode](https://opencode.ai) is an open-source AI coding agent that runs as a terminal UI. Built in Go, it provides a
-rich interactive interface for coding, planning, reviewing, and debugging directly from your terminal. OpenCode was
-built with custom model providers in mind and includes first-class support for OpenAI-compatible endpoints.
+[OpenCode](https://opencode.ai) is an open-source AI coding agent that runs in your terminal. It provides an interactive
+interface for coding, planning, reviewing, and debugging.
 
 OpenCode works with SaladCloud in two ways:
 
-- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  point OpenCode at a single shared endpoint, and use your Salad API key directly. Currently in closed beta with monthly
-  flat-rate access.
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure or custom provider configuration to
+  manage. OpenCode discovers Salad AI Gateway through [models.dev](https://models.dev) and loads the SaladCloud AI SDK
+  provider automatically.
 - **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
   configuration. Still very easy to set up and use.
 
@@ -25,8 +24,8 @@ OpenCode works with SaladCloud in two ways:
 Before getting started, make sure you have:
 
 - A [SaladCloud account](https://portal.salad.com)
-- Node.js 18+ installed (for the `@ai-sdk/openai-compatible` package used internally by OpenCode)
 - A terminal environment (Linux, macOS, or WSL on Windows)
+- For Salad AI Gateway, an [organization-specific AI Gateway API key](/ai-gateway/tutorials/pay-per-token-onboarding)
 
 ## Step-by-Step Setup
 
@@ -36,16 +35,15 @@ Before getting started, make sure you have:
   <Tab title="Salad AI Gateway">
     Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
-    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+    1. Sign in to the [SaladCloud portal](https://portal.salad.com).
+    2. Create or copy your **AI Gateway API key** by following
+       [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding).
 
     Available models:
 
-    | Model                         | Description                                                                      |
-    | :---------------------------- | :------------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b`          | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
-    | `qwen3.6-27b`              | Qwen 3.6 27B - strong balance of capability and speed                           |
-    | `qwen3.5-9b`               | Qwen 3.5 9B - fastest response times, suited for lighter tasks                  |
+    | Model                | Description                                                               |
+    | :------------------- | :------------------------------------------------------------------------ |
+    | `qwen3.6-35b-a3b` | Qwen3.6 35B-A3B - suited to agentic tasks, coding, and complex reasoning |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -99,47 +97,55 @@ Verify the installation:
 opencode --version
 ```
 
-### Step 3: Configure OpenCode to Use Your SaladCloud Endpoint
+### Step 3: Connect OpenCode to SaladCloud
 
-Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.json`:
+Choose the instructions for your backend:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
+    Export your Salad AI Gateway API key before asking OpenCode to discover the provider:
+
+    ```bash
+    export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"
+    ```
+
+    Refresh the models catalog and verify that the model is available:
+
+    ```bash
+    opencode models salad-cloud --refresh
+    ```
+
+    The command should print:
+
+    ```text
+    salad-cloud/qwen3.6-35b-a3b
+    ```
+
+    <Note>
+      OpenCode only makes providers available when their required environment variables are set. If you run the models
+      command before exporting `SALAD_CLOUD_API_KEY`, OpenCode reports `Provider not found: salad-cloud` even when its
+      models cache is current.
+    </Note>
+
+    No custom provider block is required. OpenCode gets the endpoint and model metadata from models.dev and installs
+    `@saladtechnologies-oss/ai-sdk-provider` automatically.
+
+    To make Salad AI Gateway the default, create or edit `~/.config/opencode/opencode.json`:
+
     ```json
     {
       "$schema": "https://opencode.ai/config.json",
-      "model": "saladcloud/qwen3.6-35b-a3b",
-      "provider": {
-        "saladcloud": {
-          "npm": "@ai-sdk/openai-compatible",
-          "name": "SaladCloud AI Gateway",
-          "options": {
-            "baseURL": "https://ai.salad.cloud/v1",
-            "apiKey": "your-salad-api-key"
-          },
-          "models": {
-            "qwen3.6-35b-a3b": {
-              "name": "Qwen 3.6-35B-A3B",
-              "limit": { "context": 262144, "output": 32768 }
-            },
-            "qwen3.6-27b": {
-              "name": "Qwen 3.6-27B",
-              "limit": { "context": 262144, "output": 32768 }
-            },
-            "qwen3.5-9b": {
-              "name": "Qwen 3.5-9B",
-              "limit": { "context": 262144, "output": 32768 }
-            }
-          }
-        }
-      }
+      "model": "salad-cloud/qwen3.6-35b-a3b"
     }
     ```
 
-    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
+    The `model` setting is optional if you prefer to pass `--model salad-cloud/qwen3.6-35b-a3b` when launching
+    OpenCode.
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
+    Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.json`:
+
     ```json
     {
       "$schema": "https://opencode.ai/config.json",
@@ -184,9 +190,17 @@ Create or edit the OpenCode configuration file at `~/.config/opencode/opencode.j
   </Tab>
 </Tabs>
 
-### Step 4: Launch OpenCode and Test the Connection
+### Step 4: Test the Connection
 
-Navigate to your project directory and start OpenCode:
+For Salad AI Gateway, make a test request directly from the command line:
+
+```bash
+opencode run \
+  --model salad-cloud/qwen3.6-35b-a3b \
+  "Explain distributed inference in five sentences."
+```
+
+For an interactive session, navigate to your project and start OpenCode:
 
 ```bash
 cd /path/to/your/project
@@ -198,6 +212,26 @@ OpenCode will open a TUI in your terminal. Test with a simple task:
 > "Create a hello world Python script that prints 'Hello from SaladCloud!'"
 
 If OpenCode successfully creates the file, your setup is complete.
+
+### Troubleshoot Provider Discovery
+
+If OpenCode reports `Provider not found: salad-cloud`:
+
+1. Confirm the API key is available in the same terminal session:
+
+   ```bash
+   test -n "$SALAD_CLOUD_API_KEY" && echo "API key is set"
+   ```
+
+2. Export the key before refreshing the models catalog.
+3. Check your OpenCode version and upgrade if necessary:
+
+   ```bash
+   opencode --version
+   opencode upgrade
+   ```
+
+4. Run `opencode models salad-cloud --refresh` again.
 
 ## Tips for Best Results
 
@@ -215,9 +249,21 @@ actual deployment configuration.
 
 ### Persist Your API Key
 
-To avoid re-exporting `SALAD_API_KEY` in every terminal session, add it to your shell profile:
+To avoid re-exporting the key in every terminal session, add the appropriate variable to your shell profile:
 
-```bash
-echo 'export SALAD_API_KEY=your-salad-api-key' >> ~/.bashrc
-source ~/.bashrc
-```
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    ```bash
+    echo 'export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"' >> ~/.bashrc
+    source ~/.bashrc
+    ```
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    ```bash
+    echo 'export SALAD_API_KEY="your-salad-api-key"' >> ~/.bashrc
+    source ~/.bashrc
+    ```
+
+  </Tab>
+</Tabs>

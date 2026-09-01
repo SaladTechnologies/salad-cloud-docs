@@ -500,7 +500,11 @@
         "groups": [
           {
             "group": "AI Gateway",
-            "pages": ["ai-gateway/explanation/overview", "ai-gateway/tutorials/getting-started"]
+            "pages": [
+              "ai-gateway/explanation/overview",
+              "ai-gateway/tutorials/pay-per-token-onboarding",
+              "ai-gateway/tutorials/getting-started"
+            ]
           },
           {
             "group": "Reference",

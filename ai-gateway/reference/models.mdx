@@ -6,12 +6,9 @@ description:
   use cases.'
 ---
 
-_Last Updated: May 18, 2026_
+_Last Updated: September 1, 2026_
 
-<Warning>
-  Salad AI Gateway is currently in **closed beta**. The model catalog will expand as the service moves toward general
-  availability.
-</Warning>
+<Warning>Salad AI Gateway is currently in **beta**.</Warning>
 
 ## Available Models
 
@@ -53,6 +50,27 @@ quality. A good choice when you need consistent performance across a range of ta
 
 ---
 
+### qwen3.5-35b-a3b
+
+| Property       | Value                    |
+| :------------- | :----------------------- |
+| Model ID       | `qwen3.5-35b-a3b`        |
+| Model name     | Qwen3.5 35B-A3B          |
+| Architecture   | Mixture of Experts (MoE) |
+| Active params  | ~3.5B (35B total)        |
+| Context window | 131,072 tokens           |
+| Max output     | 16,384 tokens            |
+| Input          | Text, image              |
+| Output         | Text                     |
+
+**Best for**: Agentic tasks, complex multi-step reasoning, code generation, instruction following.
+
+The Mixture of Experts architecture activates only a subset of parameters per token, providing strong reasoning
+capability at lower latency than a dense 35B model. It handles tool calling reliably and performs well in long agentic
+sessions.
+
+---
+
 ### qwen3.5-9b
 
 | Property       | Value          |
@@ -67,8 +85,8 @@ quality. A good choice when you need consistent performance across a range of ta
 
 **Best for**: High-volume queries, simple Q&A, fast responses where latency matters.
 
-The fastest model in the lineup. Well-suited for applications that need quick turnaround on straightforward prompts. May
-struggle with complex multi-step reasoning or large codebases compared to the larger models.
+The fastest model in the lineup. Well-suited for applications that need quick turnaround on straightforward prompts. It
+may struggle with complex multi-step reasoning or large codebases compared to the larger models.
 
 ---
 
@@ -79,6 +97,7 @@ struggle with complex multi-step reasoning or large codebases compared to the la
 | Agentic coding (Cline, Roo Code) | `qwen3.6-35b-a3b` |
 | Complex reasoning / planning     | `qwen3.6-35b-a3b` |
 | General chat / assistant         | `qwen3.6-27b`     |
+| Cost-efficient agentic tasks     | `qwen3.5-35b-a3b` |
 | Simple Q&A / high volume         | `qwen3.5-9b`      |
 | Fast autocomplete                | `qwen3.5-9b`      |
 
@@ -89,7 +108,7 @@ Specify the model ID in the `model` field of your request:
 ```bash
 curl https://ai.salad.cloud/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $SALAD_API_KEY" \
+  -H "Authorization: Bearer $SALAD_AI_GATEWAY_API_KEY" \
   -d '{
     "model": "qwen3.6-35b-a3b",
     "messages": [{"role": "user", "content": "Hello"}]
@@ -100,7 +119,7 @@ To list available models programmatically:
 
 ```bash
 curl https://ai.salad.cloud/v1/models \
-  -H "Authorization: Bearer $SALAD_API_KEY"
+  -H "Authorization: Bearer $SALAD_AI_GATEWAY_API_KEY"
 ```
 
 ## Notes
@@ -108,4 +127,4 @@ curl https://ai.salad.cloud/v1/models \
 - All models support the `/v1/chat/completions` endpoint with streaming (`"stream": true`).
 - All models support text and image inputs, text outputs, tool calling, structured outputs, and reasoning.
 - Context window limits are enforced server-side. If your input exceeds the limit, the request will return an error.
-- Additional models will be added during the beta period and at general availability.
+- The model catalog may expand during beta.
