@@ -3,7 +3,7 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: September 1, 2026_
+_Last Updated: September 2, 2026_
 
 <Visibility for="agents">
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
@@ -61,10 +61,25 @@ workflow.
 
 ## Refreshing API Keys
 
-If you need to update your API key for any reason, you can refresh the API key from the `API Access` page.
+If you need to update your API key for any reason, you can refresh the API key from the `API Access` page. Select
+**Change API Key**, then choose how long the previous key should remain valid.
+
+<img src="/reference/images/change-api-key.png" alt="Change API Key Screen" />
+
+| Current API Key Expiration Date | Previous key stops working |
+| ------------------------------- | -------------------------- |
+| **Now** (default)               | Immediately                |
+| **1 Hour**                      | 1 hour after the change    |
+| **1 Day**                       | 24 hours after the change  |
+| **1 Week**                      | 7 days after the change    |
+
+If you choose an overlap window, both the previous key and the new key authenticate successfully until that window
+elapses. This lets you roll the new key out to your applications without downtime. Once the window elapses, the previous
+key is permanently invalidated and cannot be recovered.
 
 <Note>
-  When you refresh an API token, the previous token is immediately invalidated and will no longer grant API access.
+  The default is **Now**. If you leave it selected, the previous token is invalidated immediately and will no longer
+  grant API access.
 </Note>
 
 ## Rate Limits
