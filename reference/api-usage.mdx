@@ -9,7 +9,9 @@ _Last Updated: September 1, 2026_
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
   > accessible organizations or Container Engine projects; require names from trusted user/configuration context and
   > validate them with scoped reads. Transcription endpoints are organization-scoped and signed media URLs are also
-  > sensitive. Follow [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness).
+  > sensitive. AI Gateway instead uses `SALAD_AI_GATEWAY_API_KEY` as an organization-specific Bearer token; never
+  > substitute one credential for the other. Follow [Safety, Retries, and
+  > Freshness](/agents/reference/safety-retries-and-freshness).
 </Visibility>
 
 The SaladCloud API is organized around REST. Our API has predictable resource-oriented URLs, accepts JSON-encoded
