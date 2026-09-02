@@ -6,7 +6,7 @@ description:
   use cases.'
 ---
 
-_Last Updated: September 1, 2026_
+_Last Updated: September 2, 2026_
 
 <Visibility for="agents">
   > Model IDs and availability are dynamic. Query `GET https://ai.salad.cloud/v1/models` immediately before selection,
@@ -37,25 +37,6 @@ structured output, and performs well in long agentic sessions.
 
 ---
 
-### qwen3.6-27b
-
-| Property       | Value          |
-| :------------- | :------------- |
-| Model ID       | `qwen3.6-27b`  |
-| Model name     | Qwen3.6 27B    |
-| Context window | 262,144 tokens |
-| Max input      | 262,144 tokens |
-| Max output     | 262,144 tokens |
-| Input          | Text, image    |
-| Output         | Text           |
-
-**Best for**: General-purpose tasks requiring a balance of capability and speed.
-
-A strong all-around model. Slightly faster than qwen3.6-35b-a3b on simpler tasks, with comparable instruction-following
-quality. A good choice when you need consistent performance across a range of task types.
-
----
-
 ### qwen3.5-35b-a3b
 
 | Property       | Value                    |
@@ -77,35 +58,13 @@ sessions.
 
 ---
 
-### qwen3.5-9b
-
-| Property       | Value          |
-| :------------- | :------------- |
-| Model ID       | `qwen3.5-9b`   |
-| Model name     | Qwen3.5 9B     |
-| Context window | 262,144 tokens |
-| Max input      | 262,144 tokens |
-| Max output     | 262,144 tokens |
-| Input          | Text, image    |
-| Output         | Text           |
-
-**Best for**: High-volume queries, simple Q&A, fast responses where latency matters.
-
-The fastest model in the lineup. Well-suited for applications that need quick turnaround on straightforward prompts. It
-may struggle with complex multi-step reasoning or large codebases compared to the larger models.
-
----
-
 ## Choosing a Model
 
 | Use Case                         | Recommended Model |
 | :------------------------------- | :---------------- |
 | Agentic coding (Cline, Roo Code) | `qwen3.6-35b-a3b` |
 | Complex reasoning / planning     | `qwen3.6-35b-a3b` |
-| General chat / assistant         | `qwen3.6-27b`     |
 | Cost-efficient agentic tasks     | `qwen3.5-35b-a3b` |
-| Simple Q&A / high volume         | `qwen3.5-9b`      |
-| Fast autocomplete                | `qwen3.5-9b`      |
 
 ## API Usage
 
