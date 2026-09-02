@@ -1,0 +1,137 @@
+---
+title: 'Troubleshoot an AI Gateway Request'
+sidebarTitle: 'Troubleshoot a Request'
+description:
+  'Classify Salad AI Gateway authentication, model, request, rate-limit, transport, streaming, and output failures using
+  live evidence without repeating uncertain billable requests.'
+---
+
+_Last Updated: September 1, 2026_
+
+## When to use this runbook
+
+Use when a Salad AI Gateway model-list or chat-completion request fails, times out, is rate limited, disconnects during
+streaming, or returns missing or unusable output.
+
+## When not to use it
+
+Do not use it to inspect SaladCloud backend logs, reveal credentials or prompt content, create or fund an organization,
+operate a self-hosted Container Engine model, or repeat a completion without explicit authorization when the first
+request may have been processed.
+
+## Required inputs
+
+- Confirmation that `SALAD_AI_GATEWAY_API_KEY` contains an organization-specific AI Gateway key; never collect or print
+  its value.
+- Exact endpoint path, method, model ID, streaming mode, UTC incident window, client/SDK name and version, and caller
+  attempt/time budget.
+- Response status, safe headers, redacted error body, and any safe request/trace identifier returned by the service.
+- The expected output shape and a redacted description of the observed mismatch.
+- Explicit approval before any new billable diagnostic completion.
+
+Treat prompts, messages, conversation history, images, tool definitions/arguments/results, generated output, API keys,
+and organization billing context as sensitive.
+
+## Authoritative sources
+
+| Evidence or behavior    | Canonical source                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Authentication and key  | [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) and [Using the API](/reference/api-usage) |
+| Model IDs and endpoint  | [Models reference](/ai-gateway/reference/models)                                                                     |
+| Request examples        | [Getting Started](/ai-gateway/tutorials/getting-started)                                                             |
+| Rates and billing model | [AI Gateway Pricing](/ai-gateway/reference/pricing)                                                                  |
+| Global safety rules     | [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness)                                     |
+
+No AI Gateway OpenAPI specification is stored in this repository. Treat live responses as evidence, clearly label
+undocumented behavior, and do not invent fields, error meanings, retry guarantees, backend state, or provider logs.
+
+## Dynamic values to retrieve
+
+- Current reachability and response from `GET https://ai.salad.cloud/v1/models` with the supplied key.
+- Current live model IDs and whether the failing exact ID is present.
+- Exact response class, safe headers, server-provided retry guidance, and redacted problem details.
+- Current published rate for the selected model when billing is part of the incident.
+- Client runtime, provider/SDK version, configured base URL, and whether a proxy changed request or streaming behavior.
+
+## Preflight checks
+
+1. Confirm the base URL is exactly `https://ai.salad.cloud/v1` and the selected endpoint is `/models` or
+   `/chat/completions`.
+2. Confirm Bearer authentication uses the organization-specific AI Gateway key, not `Salad-Api-Key` or the regular
+   user-level key.
+3. Remove key values, prompt/output content, images, tool payloads, and unrelated headers from collected evidence.
+4. Determine whether the failed completion could have reached the service. If yes or unknown, prohibit an automatic
+   retry.
+5. Define the classification and evidence needed before any diagnostic request.
+
+## Procedure
+
+1. Capture the client/runtime, endpoint, model ID, stream flag, UTC window, response class, safe headers, and redacted
+   error without reproducing the secret or content.
+2. Call `GET /v1/models` within a bounded read budget. Use the result to separate reachability/authentication from a
+   completion-specific failure.
+3. Check whether the exact model ID is present. Do not normalize spelling or silently choose another model.
+4. Compare the request's field names and types with the minimal examples in Getting Started and with the SDK version in
+   use. Do not infer support from another provider.
+5. Classify the incident as local configuration, authentication/authorization, unavailable model, request validation,
+   rate limiting, billing/access, transport, service failure, stream handling, or output mismatch.
+6. Send a minimal diagnostic completion only with explicit approval and only when it will add evidence not available
+   from the original response and model-list read.
+7. Verify the correction once, preserve redacted evidence, and stop or escalate within budget.
+
+## Decision rules
+
+| Evidence                                                | Classification and action                                                                                         |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Base URL/path differs from the documented endpoint      | Correct local configuration, then verify once if authorized.                                                      |
+| `/models` returns `401` or `403`                        | Credential type, validity, or authorization problem; stop and request a valid AI Gateway key.                     |
+| `/models` succeeds but exact model is absent            | Model-catalog mismatch; stop or request approval for a listed alternative.                                        |
+| `/models` succeeds and completion returns a clear `4xx` | Inspect documented field names/types and billing/access evidence; do not retry unchanged.                         |
+| `429` includes retry guidance                           | Honor it within budget; do not create concurrent retry storms.                                                    |
+| Timeout, transport error, `5xx`, or disconnected stream | Outcome and charge may be uncertain; preserve partial evidence and do not automatically resend.                   |
+| `2xx` lacks required choice/content                     | Output-shape mismatch; record safe response structure and client version, then escalate if reproducible.          |
+| Only a different client fails                           | Compare base URL, Bearer header construction, serialization, stream parsing, proxies, and exact package versions. |
+| User reports unexpected spend                           | Preserve model/usage/time evidence; do not infer credit balance or billing records the Gateway endpoints omit.    |
+
+## Expected states and responses
+
+`GET /v1/models` should return `200` with a live catalog. `POST /v1/chat/completions` should return a successful
+OpenAI-compatible response or stream. Error status alone does not prove whether a timed-out or disconnected completion
+was processed; no reconciliation endpoint for an individual completion is documented.
+
+## Retry behavior
+
+Retry only the model-list read for plausible transient failures within a bounded budget, honoring `Retry-After`.
+Retrying an unchanged authentication, authorization, model, or validation error adds no evidence.
+
+Never automatically retry an uncertain completion or partial stream. A diagnostic or replacement completion is new
+billable work and requires explicit approval. If the service clearly rejected the request before processing, apply a
+documented correction and verify once within the original budget.
+
+## Verification
+
+A diagnosis is verified when live evidence isolates the failure class and the next action has a measurable predicate.
+When a correction is authorized, success requires the live model list to contain the exact model and one request to
+return the required output shape. Report unresolved uncertainty instead of converting a successful `/models` read into
+completion success.
+
+## Rollback or recovery
+
+Restore only local client configuration changed during diagnosis. A completion cannot be rolled back, and token usage
+cannot be reversed from these endpoints. Preserve partial stream output only as long as authorized and never send it
+again automatically as conversation history.
+
+## Stop and escalation conditions
+
+Stop for missing credential/type confirmation, sensitive evidence that cannot be redacted, absent model, unsupported
+field, unclear billing/access error, uncertain completion, exhausted retry budget, repeated rate limiting, persistent
+service failure, or reproducible output mismatch. Escalate through [SaladCloud Support](/support/contact) with endpoint,
+model ID, UTC window, safe request/trace identifiers, client/runtime versions, response class, retry history, and
+redacted error structure. State which backend or billing evidence is unavailable.
+
+## Evidence to return to the user
+
+Return the failure classification, endpoint, exact live model result, stream flag, response classes, safe headers and
+identifiers, UTC times, client/runtime versions, attempt budget, observed versus expected output shape, correction and
+verification result, and unresolved evidence. Never return credentials, prompts, conversations, images, tools, model
+output, or billing details beyond what the user explicitly authorized.

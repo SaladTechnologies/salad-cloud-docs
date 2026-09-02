@@ -1,0 +1,161 @@
+---
+title: 'Select a Model and Send an AI Gateway Request'
+sidebarTitle: 'Select Model and Send'
+description:
+  'Discover live Salad AI Gateway models, send one authorized chat completion, and verify the response without exposing
+  credentials or automatically repeating uncertain billable work.'
+---
+
+_Last Updated: September 1, 2026_
+
+## When to use this runbook
+
+Use when an agent needs to discover currently available Salad AI Gateway models or send one OpenAI-compatible chat
+completion using an existing organization-specific AI Gateway key.
+
+## When not to use it
+
+Do not use this runbook to create an account, organization, credit balance, or API key; operate a self-hosted Container
+Engine model; run an unapproved load test; or automatically repeat a request whose outcome or charge is uncertain.
+
+## Required inputs
+
+- `SALAD_AI_GATEWAY_API_KEY`, containing the organization-specific AI Gateway key and supplied only through a secret
+  environment variable. Do not substitute the user-level `SALAD_API_KEY` used with the `Salad-Api-Key` header.
+- The intended prompt or messages, expected output, and authorization to send their content to the selected model.
+- An exact model ID or enough approved capability/cost criteria to select one from the live model list.
+- Whether streaming is required and a caller-defined attempt and elapsed-time budget.
+- Any tool definitions or image inputs. Treat prompts, conversation history, tool arguments/results, images, and model
+  output as potentially sensitive.
+
+## Authoritative sources
+
+| Action or behavior      | Exact endpoint and canonical source                                                                                              |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Discover models         | `GET https://ai.salad.cloud/v1/models` — [Models reference](/ai-gateway/reference/models)                                        |
+| Create a chat response  | `POST https://ai.salad.cloud/v1/chat/completions` — [Getting Started](/ai-gateway/tutorials/getting-started)                     |
+| Authenticate            | `Authorization: Bearer <organization-specific-key>` — [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) |
+| Compare published rates | [AI Gateway Pricing](/ai-gateway/reference/pricing)                                                                              |
+
+This repository does not currently contain an OpenAPI specification for Salad AI Gateway. Do not infer unsupported
+request fields, response fields, idempotency, retry guarantees, or model availability from the SaladCloud public API
+specification, a different OpenAI-compatible provider, an SDK type alone, or an example.
+
+## Dynamic values to retrieve
+
+- Live model IDs from `/v1/models` immediately before model selection.
+- Current response status, headers, server-provided retry guidance, and response body for the exact request.
+- Published input/output rates when cost affects selection; do not treat an old copied price as current.
+- Response usage metadata when the live response supplies it.
+
+The Gateway API does not expose the organization's credit balance through these endpoints. Do not infer balance from a
+successful key check or from historical usage.
+
+## Preflight checks
+
+1. Confirm the credential is an AI Gateway key and will be sent only as a Bearer token to `ai.salad.cloud`.
+2. Confirm prompts, messages, images, tool definitions, and conversation history are authorized for processing and will
+   not be printed in logs or returned as evidence unless explicitly requested.
+3. Call `GET /v1/models`. If the requested model ID is absent, stop or ask the user to approve a live alternative.
+4. Check the [published rates](/ai-gateway/reference/pricing) when model cost is part of the decision.
+5. Use the smallest documented request that satisfies the task. Do not copy provider-specific fields without evidence
+   that Salad AI Gateway supports them.
+6. Define the expected output, streaming mode, attempt budget, and stop condition before sending the billable request.
+
+## Procedure
+
+### Discover live models
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --url 'https://ai.salad.cloud/v1/models' \
+  --header "Authorization: Bearer ${SALAD_AI_GATEWAY_API_KEY}" \
+  --header 'Accept: application/json'
+```
+
+Select only a model ID returned by the live response. Documentation lists supported models for reference, but the live
+catalog is authoritative for immediate request routing.
+
+### Send one non-streaming request
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request POST \
+  --url 'https://ai.salad.cloud/v1/chat/completions' \
+  --header "Authorization: Bearer ${SALAD_AI_GATEWAY_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "model": "qwen3.6-35b-a3b",
+    "messages": [
+      {"role": "user", "content": "Say hello in one sentence."}
+    ],
+    "stream": false
+  }'
+```
+
+Replace the model and content in memory or a protected local configuration. Do not place sensitive prompts, keys, or
+complete responses in shell history, source control, telemetry, or evidence output.
+
+For streaming, use the documented SDK or set `stream` to `true` only when the caller can consume and preserve partial
+output safely. A disconnected stream can have an uncertain final outcome and charge.
+
+## Decision rules
+
+| Evidence or outcome                                | Action                                                                                                         |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Requested model appears in the live catalog        | Use that exact ID.                                                                                             |
+| Requested model is absent                          | Stop or request approval for a live alternative; do not silently substitute.                                   |
+| Model choice is open and cost matters              | Compare current published rates and required capabilities, then state the selected tradeoff.                   |
+| `401` or `403`                                     | Stop; distinguish the AI Gateway key from the regular SaladCloud API key and request valid authorization.      |
+| Clear validation failure                           | Correct only documented fields; do not retry the unchanged body.                                               |
+| `429` with `Retry-After`                           | Honor the header within the caller's budget; retry only when the response clearly rejected the request.        |
+| Transport failure, timeout, or `5xx` after sending | Treat completion and billing as uncertain; do not automatically repeat the prompt.                             |
+| Stream disconnects after partial output            | Preserve the partial result and stop unless the caller explicitly accepts a new, separately billed generation. |
+| `2xx` response lacks the required output           | Report an unresolved response mismatch; do not claim success from status alone.                                |
+
+## Expected states and responses
+
+The model-list request should return `200` and a live catalog. A non-streaming chat completion should return `200` and
+an OpenAI-compatible response containing the generated choice. Streaming returns a sequence of events rather than one
+complete JSON response.
+
+An accepted or partially streamed request is billable work, not an idempotent resource mutation. The service exposes no
+read endpoint that can reconcile whether an uncertain chat completion finished after the client disconnected.
+
+## Retry behavior
+
+Retry `GET /v1/models` only for plausible transient transport, `429`, or server failures within the declared budget.
+Honor `Retry-After` when present. Do not blindly retry authentication, authorization, validation, or model-not-found
+responses.
+
+Do not automatically retry `POST /v1/chat/completions` after an uncertain transport failure, timeout, server failure, or
+partial stream. A retry can produce a different answer and another charge. A new attempt requires either clear evidence
+that the prior request was rejected before processing or explicit caller acceptance of duplicate billable work.
+
+## Verification
+
+Success requires all of the following: the exact model appeared in the live catalog, the request returned successfully
+within budget, and the response or completed stream contains the expected output shape. Record response class, model ID,
+streaming mode, UTC time, and usage fields when returned. Never treat a successful model-list request as proof that the
+organization has sufficient credits for a completion.
+
+## Rollback or recovery
+
+A generated response cannot be rolled back and consumed tokens cannot be refunded. If output is incomplete or wrong,
+preserve a redacted failure summary and require approval before sending a revised prompt. Delete sensitive temporary
+prompt/output artifacts when they are no longer required by the authorized workflow.
+
+## Stop and escalation conditions
+
+Stop for a missing or wrong credential type, absent model, unapproved sensitive content, unknown request field,
+exhausted budget, uncertain completion, repeated rate limiting, persistent service failure, or missing required output.
+Escalate with the exact endpoint, model ID, UTC time, response class, safe request/trace identifiers, retry history, and
+redacted error details. Never include the key, prompt, conversation, images, tool arguments/results, or generated
+content unless the user explicitly authorizes that evidence.
+
+## Evidence to return to the user
+
+Return the endpoint, selected live model ID and selection reason, streaming mode, response class, UTC observation time,
+attempt count, elapsed time, usage metadata when supplied, expected-output check, and any uncertain or escalation state.
+Report only field names or redacted summaries for sensitive request/response content and credential-bearing headers.

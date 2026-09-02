@@ -5,31 +5,36 @@ description:
   'Source precedence, authorization boundaries, and evidence requirements for autonomous SaladCloud operations.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: September 1, 2026_
 
-This section is an execution layer for AI agents operating Salad Container Engine, Salad Transcription API, and
-Transcription Lite through the public API. It adds workflow and safety rules to canonical product documentation; it does
-not replace the OpenAPI specifications.
+This section is an execution layer for AI agents operating Salad Container Engine, AI Gateway, Salad Transcription API,
+and Transcription Lite. It adds workflow and safety rules to canonical product documentation; where a product has an
+OpenAPI specification, these runbooks do not replace it.
 
 ## When to use this runbook
 
-Use this page before any autonomous Container Engine or Transcription task and whenever sources disagree, identifiers
-are missing, or an action could stop/cancel work, reduce capacity, replace an instance, or submit a potentially
-duplicate asynchronous job.
+Use this page before any autonomous Container Engine, AI Gateway, or Transcription task and whenever sources disagree,
+identifiers are missing, or an action could stop/cancel work, reduce capacity, replace an instance, or repeat
+potentially billable or non-idempotent work.
 
 ## When not to use it
 
-Do not use these runbooks for AI Gateway, Gateway Service, S4, general account administration, or as a substitute for
-live account data.
+Do not use these runbooks for Gateway Service, S4, general account administration, or as a substitute for live account
+data. AI Gateway account, organization, credit, and key creation remain user-facing Portal tasks.
 
 ## Required inputs
 
-- `SALAD_API_KEY`, supplied through a secret environment variable and sent only in the `Salad-Api-Key` header.
-- `SALAD_ORGANIZATION`, obtained from the user, trusted configuration, or the Portal.
-- For Container Engine only, `SALAD_PROJECT`. Transcription endpoints are organization-scoped and do not use a project.
-- The intended outcome, target resource name, and authorization boundary.
+- `SALAD_API_KEY` for the public SaladCloud API, supplied through a secret environment variable and sent only in the
+  `Salad-Api-Key` header.
+- `SALAD_AI_GATEWAY_API_KEY` for AI Gateway, supplied through a secret environment variable and sent only as a Bearer
+  token. This key belongs to one user and organization; never substitute the regular SaladCloud API key.
+- `SALAD_ORGANIZATION` for organization-scoped public API operations, obtained from the user, trusted configuration, or
+  the Portal. An AI Gateway key already carries its organization scope; confirm the intended organization from trusted
+  context when it affects billing.
+- For Container Engine only, `SALAD_PROJECT`. Transcription endpoints and AI Gateway do not use a project.
+- The intended outcome, target resource or model, authorized request content, and authorization boundary.
 - Explicit user intent before stopping or deleting a workload, scaling down, replacing or reallocating an instance, or
-  cancelling/resubmitting a transcription job.
+  cancelling/resubmitting a transcription job or repeating an uncertain AI Gateway completion.
 
 The relevant OpenAPI specifications address organizations, and Container Engine projects, by **name**. They do not
 define an operation to list organizations accessible to an API key. Never guess or enumerate names.
@@ -53,6 +58,11 @@ Use this precedence order:
 Authentication behavior is documented in [Using the API](/reference/api-usage). Canonical operation pages are under the
 [Container Engine API reference](/container-engine/reference/api).
 
+The repository does not currently contain an AI Gateway OpenAPI specification. For AI Gateway, use the
+[request runbook](/agents/ai-gateway/select-model-and-send-request), the documented OpenAI-compatible request shape, and
+live `/v1/models` results. Do not transfer undocumented fields, idempotency guarantees, or retry behavior from another
+provider.
+
 ## Dynamic values to retrieve
 
 Retrieve immediately before a decision:
@@ -62,6 +72,8 @@ Retrieve immediately before a decision:
 - Current quotas, GPU classes, CPU/GPU availability, country constraints, and priority-specific capacity estimates.
 - Current queue length, job status, system events, and application logs for the relevant UTC window.
 - Current transcription job status, events, timestamps, and output for the exact selected product path and returned ID.
+- Current AI Gateway model IDs, documented rates, response and rate-limit metadata, and usage fields returned for the
+  exact request.
 
 Do not cache these values as permanent facts. Prices and example hardware identifiers are also not account state.
 
@@ -69,21 +81,23 @@ Do not cache these values as permanent facts. Prices and example hardware identi
 
 1. Confirm no credential value will be printed, logged, committed, or included in returned evidence.
 2. Confirm the user supplied or approved the organization and any project name required by the selected API.
-3. Validate the supplied scope with the applicable product read: Container Engine quota/project reads or the exact
-   Transcription endpoint read.
-4. Read the target before any mutation and compare its current state with the requested outcome.
-5. Run [Container Engine preflight](/agents/container-engine/discover-scope-and-preflight) or
+3. Validate the supplied scope with the applicable product read: Container Engine quota/project reads, the exact
+   Transcription endpoint read, or AI Gateway `GET /v1/models`.
+4. For a resource mutation, read the target and compare its current state with the requested outcome.
+5. Run [Container Engine preflight](/agents/container-engine/discover-scope-and-preflight),
+   [AI Gateway request preflight](/agents/ai-gateway/select-model-and-send-request), or
    [Transcription preflight](/agents/transcription/choose-api-and-preflight).
-6. Establish a polling limit and a stop condition before sending a write.
+6. Establish a polling or attempt limit and a stop condition before sending a write or billable request.
 
 ## Procedure
 
 1. Select the narrowest task-specific runbook and its corresponding skill.
 2. Resolve names from trusted input; resolve generated IDs only from live responses or trusted application records.
 3. Retrieve all dynamic values required for the decision.
-4. Present or record the planned mutation and any interruption or capacity impact.
-5. Obtain explicit intent when the action is destructive, capacity-reducing, or instance-replacing.
-6. Perform one mutation, then verify it with the documented read operation.
+4. Present or record the planned mutation or billable request and any interruption, capacity, privacy, or cost impact.
+5. Obtain explicit intent when the action is destructive, capacity-reducing, instance-replacing, or repeats uncertain
+   billable work.
+6. Perform one mutation or completion, then verify it with the method defined by the selected runbook.
 7. Return the requested outcome, verification evidence, and any unresolved state without secrets.
 
 ## Decision rules
@@ -97,6 +111,8 @@ Do not cache these values as permanent facts. Prices and example hardware identi
 | Mutation reduces capacity, interrupts, or cancels work | Require explicit user intent.                                        |
 | Transcription operation ID is shared between specs     | Bind it to the selected product and exact path before use.           |
 | Job-create result is uncertain and no ID was returned  | Stop; do not resubmit without documented idempotency.                |
+| AI Gateway completion or stream outcome is uncertain   | Stop; require explicit approval before repeating billable work.      |
+| Requested model is absent from live `/v1/models`       | Stop and ask the user to select an available alternative.            |
 | Documentation conflicts with request/response shape    | Use OpenAPI for shape and report the discrepancy.                    |
 | Live response conflicts with an example                | Use the live response and identify the example as non-authoritative. |
 
@@ -106,38 +122,48 @@ Successful create operations return a resource or job, while start, stop, delete
 operations may return `202 Accepted` and continue asynchronously. A `2xx` response confirms acceptance or immediate
 response handling; it is not proof that a runtime state or transcription terminal state has been reached.
 
+AI Gateway returns an immediate completion response or stream. It does not provide a documented reconciliation read for
+a completion whose outcome is uncertain, so do not infer that an interrupted request failed or was not billed.
+
 ## Retry behavior
 
 Follow [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness). Retry reads and other safe or
 idempotent requests only within a caller-defined attempt and elapsed-time budget. Honor `Retry-After` when present. Do
-not blindly retry authentication, authorization, validation, conflict, or invalid-configuration failures.
+not blindly retry authentication, authorization, validation, conflict, or invalid-configuration failures. Do not
+automatically retry an AI Gateway completion after a timeout, `5xx`, interrupted response, or partial stream.
 
 ## Verification
 
 Every mutation requires a verification read from the same trusted organization and, when applicable, project. Success
 means the live resource reflects the requested configuration/terminal state, or the exact transcription job reaches the
-expected terminal state and output. Report partial or pending results rather than inferring completion.
+expected terminal state and output. Report partial or pending results rather than inferring completion. For AI Gateway,
+verify the model against a fresh `/v1/models` response before the request, then verify the exact response or stream
+received; there is no documented completion-status read.
 
 ## Rollback or recovery
 
 Capture a redacted pre-change representation before updating. Prefer a corrective merge patch that restores only the
 changed fields. Never delete, cancel, replace, or resubmit as an implicit rollback. Transcription jobs cannot be
-updated; a replacement is a new submission requiring intent. If a prior value is unavailable or redacted, stop.
+updated; a replacement is a new submission requiring intent. If a prior value is unavailable or redacted, stop. AI
+Gateway generations and consumed tokens cannot be rolled back; a corrective prompt is a new billable request.
 
 ## Stop and escalation conditions
 
 Stop when credentials, scope, required fields, destructive authorization, current state, or a reliable prior value are
 missing. Stop after the polling budget expires, on repeated non-transient errors, or when the evidence indicates a
 product-side issue. Use the [troubleshooting runbook](/agents/container-engine/troubleshoot-container-group) to build a
-support package before contacting [SaladCloud support](/support/contact).
+support package. For AI Gateway, use [Troubleshoot an AI Gateway Request](/agents/ai-gateway/troubleshoot-request)
+before contacting [SaladCloud support](/support/contact).
 
 ## Evidence to return to the user
 
 Return:
 
 - Organization and relevant project/resource names; instance or job IDs only when retrieved from trusted evidence.
-- Operation IDs and HTTP response classes used, with no credential-bearing headers.
+- Operation IDs or exact endpoint methods/paths and HTTP response classes used, with no credential-bearing headers.
 - A concise pre-change summary, the intended change, and the verification read result.
 - Current resource/job status, relevant instance counts or job events/output fields, version, and UTC timestamps.
+- For AI Gateway, the selected model, streaming mode, response class, safe usage metadata, and UTC timestamp without
+  prompt or generated content unless the user explicitly requests it.
 - Partial, pending, failed, or skipped checks and the exact stop reason.
 - Recovery performed or the next safe action requiring user approval.

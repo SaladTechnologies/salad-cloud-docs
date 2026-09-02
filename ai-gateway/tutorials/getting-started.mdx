@@ -4,17 +4,21 @@ sidebarTitle: 'Getting Started'
 description: 'Make your first API call to Salad AI Gateway in under 5 minutes.'
 ---
 
-_Last Updated: May 18, 2026_
+_Last Updated: September 1, 2026_
 
-<Warning>
-  Salad AI Gateway is currently in **closed beta**. To request access, sign up at
-  [salad.com/ai-gateway](https://salad.com/ai-gateway).
-</Warning>
+<Visibility for="agents">
+  > Treat examples as minimal templates, not live model or account facts. Use the `salad-ai-gateway-request` skill,
+  > confirm the exact model with `/v1/models`, keep `SALAD_AI_GATEWAY_API_KEY` and all prompt/output content secret, and
+  > stop rather than retry an uncertain completion or partial stream.
+</Visibility>
+
+<Warning>Salad AI Gateway is currently in **beta**.</Warning>
 
 ## Prerequisites
 
-- A Salad API key — find it in the [portal](https://portal.salad.com/api-key) after you have been approved for beta
-  access
+- A SaladCloud organization with a positive credit balance
+- An organization-specific AI Gateway API key. Follow
+  [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to create one.
 
 ## Base URL
 
@@ -26,10 +30,10 @@ https://ai.salad.cloud/v1
 
 ## Authentication
 
-Pass your Salad API key as a Bearer token in the `Authorization` header:
+Pass your organization-specific AI Gateway API key as a Bearer token in the `Authorization` header:
 
 ```
-Authorization: Bearer <your-salad-api-key>
+Authorization: Bearer <your-ai-gateway-api-key>
 ```
 
 ## Step 1: Test with curl
@@ -39,7 +43,7 @@ The quickest way to verify access is a single curl call:
 ```bash
 curl https://ai.salad.cloud/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $SALAD_API_KEY" \
+  -H "Authorization: Bearer $SALAD_AI_GATEWAY_API_KEY" \
   -d '{
     "model": "qwen3.6-35b-a3b",
     "messages": [
@@ -50,7 +54,50 @@ curl https://ai.salad.cloud/v1/chat/completions \
 
 You should receive a JSON response containing the model's reply.
 
-## Step 2: Use the OpenAI Python SDK
+## Step 2: Use the SaladCloud AI SDK Provider
+
+For JavaScript and TypeScript applications built with the Vercel AI SDK, use the official
+`@saladtechnologies-oss/ai-sdk-provider`. The provider requires Node.js 22 or later and automatically uses the Salad AI
+Gateway base URL.
+
+Install the provider, Vercel AI SDK, and Zod:
+
+```bash
+npm install @saladtechnologies-oss/ai-sdk-provider ai zod
+```
+
+The provider reads your key from `SALAD_CLOUD_API_KEY`. If you followed the pay-per-token onboarding guide, map the
+existing variable before running your application:
+
+```bash
+export SALAD_CLOUD_API_KEY="$SALAD_AI_GATEWAY_API_KEY"
+```
+
+Create `index.mjs`:
+
+```javascript index.mjs
+import { generateText } from 'ai'
+import { saladCloud } from '@saladtechnologies-oss/ai-sdk-provider'
+
+const result = await generateText({
+  model: saladCloud('qwen3.6-35b-a3b'),
+  prompt: 'Say hello in one sentence.',
+})
+
+console.log(result.text)
+```
+
+Run the example:
+
+```bash
+node index.mjs
+```
+
+The provider also supports streaming, tool calling, structured output, reasoning options, and image inputs. See the
+[SaladCloud AI SDK Provider repository](https://github.com/SaladTechnologies/ai-sdk-provider) for configuration and
+additional examples.
+
+## Step 3: Use the OpenAI Python SDK
 
 Salad AI Gateway is fully compatible with the OpenAI Python SDK — just point it at a different base URL:
 
@@ -63,7 +110,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="https://ai.salad.cloud/v1",
-    api_key="your-salad-api-key",
+    api_key="your-ai-gateway-api-key",
 )
 
 response = client.chat.completions.create(
@@ -77,7 +124,7 @@ print(response.choices[0].message.content)
 Store your key in an environment variable rather than hardcoding it:
 
 ```bash
-export SALAD_API_KEY=your-salad-api-key
+export SALAD_AI_GATEWAY_API_KEY=your-ai-gateway-api-key
 ```
 
 ```python
@@ -86,11 +133,11 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="https://ai.salad.cloud/v1",
-    api_key=os.environ["SALAD_API_KEY"],
+    api_key=os.environ["SALAD_AI_GATEWAY_API_KEY"],
 )
 ```
 
-## Step 3: Streaming
+## Step 4: Streaming
 
 For real-time output, enable streaming:
 
@@ -100,7 +147,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="https://ai.salad.cloud/v1",
-    api_key=os.environ["SALAD_API_KEY"],
+    api_key=os.environ["SALAD_AI_GATEWAY_API_KEY"],
 )
 
 stream = client.chat.completions.create(
@@ -114,7 +161,7 @@ for chunk in stream:
         print(chunk.choices[0].delta.content, end="", flush=True)
 ```
 
-## Step 4: Use the OpenAI JavaScript/TypeScript SDK
+## Step 5: Use the OpenAI JavaScript/TypeScript SDK
 
 ```bash
 npm install openai
@@ -125,7 +172,7 @@ import OpenAI from 'openai'
 
 const client = new OpenAI({
   baseURL: 'https://ai.salad.cloud/v1',
-  apiKey: process.env.SALAD_API_KEY,
+  apiKey: process.env.SALAD_AI_GATEWAY_API_KEY,
 })
 
 const response = await client.chat.completions.create({
@@ -142,6 +189,7 @@ console.log(response.choices[0].message.content)
 | :---------------- | :------------- | :--------------------------------------- |
 | `qwen3.6-35b-a3b` | 262,144 tokens | Complex reasoning, agentic tasks, coding |
 | `qwen3.6-27b`     | 262,144 tokens | Balanced capability and speed            |
+| `qwen3.5-35b-a3b` | 131,072 tokens | Cost-efficient agentic tasks             |
 | `qwen3.5-9b`      | 262,144 tokens | Fast responses, simple tasks             |
 
 See the [Models Reference](/ai-gateway/reference/models) for full details.
@@ -149,4 +197,5 @@ See the [Models Reference](/ai-gateway/reference/models) for full details.
 ## Next Steps
 
 - Browse [integration guides](/ai-gateway/integrations/overview) for agentic tools, IDEs, and frameworks
-- Read the [Models Reference](/ai-gateway/reference/models) to choose the right model for your use case
+- Read the [Models Reference](/ai-gateway/reference/models) for model capabilities and limits
+- Review [AI Gateway Pricing](/ai-gateway/reference/pricing) for monthly subscription and pay-per-token options

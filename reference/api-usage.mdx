@@ -3,13 +3,15 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: September 1, 2026_
 
 <Visibility for="agents">
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
   > accessible organizations or Container Engine projects; require names from trusted user/configuration context and
   > validate them with scoped reads. Transcription endpoints are organization-scoped and signed media URLs are also
-  > sensitive. Follow [Safety, Retries, and Freshness](/agents/reference/safety-retries-and-freshness).
+  > sensitive. AI Gateway instead uses `SALAD_AI_GATEWAY_API_KEY` as an organization-specific Bearer token; never
+  > substitute one credential for the other. Follow [Safety, Retries, and
+  > Freshness](/agents/reference/safety-retries-and-freshness).
 </Visibility>
 
 The SaladCloud API is organized around REST. Our API has predictable resource-oriented URLs, accepts JSON-encoded
@@ -44,12 +46,25 @@ SaladCloud APIs.
 
 <img src="/reference/images/api-access-key.png" alt="API Key Retrieval Screen" />
 
+## Get Your Salad AI Gateway API Key
+
+Salad AI Gateway does not use the **Current API Key** or the `Salad-Api-Key` header. It uses a separate API key for each
+user and organization:
+
+1. Create the key from the organization's **AI Gateway** page.
+2. Select your username in the upper-right corner of the portal, then select **API Access**.
+3. Under **AI Gateway Keys**, find the organization and click the copy icon next to its masked key.
+
+Send this key as a Bearer token in the `Authorization` header. Follow
+[Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) for the complete setup and first-request
+workflow.
+
 ## Refreshing API Keys
 
 If you need to update your API key for any reason, you can refresh the API key from the `API Access` page.
 
 <Note>
-  When you refresh an API token, the previous token is immediately invalidated and will not longer grant API access.
+  When you refresh an API token, the previous token is immediately invalidated and will no longer grant API access.
 </Note>
 
 ## Rate Limits
