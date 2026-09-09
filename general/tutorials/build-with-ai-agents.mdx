@@ -155,22 +155,6 @@ Three more things every agent can use:
   [`api-specs` directory](https://github.com/SaladTechnologies/salad-cloud-docs/tree/main/api-specs) of this
   documentation's repository. They are authoritative for paths, schemas, required fields, and enums.
 
-{/\* TODO (agent readiness plan, step 4): uncomment when the saladcloud CLI is published.
-
-## Use the saladcloud CLI
-
-The `saladcloud` CLI is built for agents and CI first: every command is non-interactive, `-o json` emits one JSON
-document with every key always present, errors are a one-line JSON document on stderr, and exit codes are stable (2
-usage, 3 auth, 4 not found, 5 rate limited, 6 invalid input, 7 network). Writes verify themselves and report on stderr
-when the API applied something other than what was asked. Install it from <RELEASES URL>, then in any project:
-
-```bash
-saladcloud agent init
-```
-
-writes a short SaladCloud section into the project's `AGENTS.md` (or `CLAUDE.md` under Claude Code) so coding agents
-working in that repository know to use the CLI and where the skills are. \*/}
-
 ## Building for SaladCloud with a coding agent
 
 A coding agent that has never deployed here will make the same mistakes a new engineer makes: assume the disk persists,
