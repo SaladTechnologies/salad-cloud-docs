@@ -1,0 +1,195 @@
+---
+title: 'Build with AI Agents'
+sidebarTitle: 'Build with AI Agents'
+description:
+  'Connect Claude Code, Codex, Cursor, or any MCP-capable agent to SaladCloud: install the skills, add the docs MCP
+  server, hand over an API key safely, and know which runbooks the agent should follow.'
+---
+
+_Last Updated: September 9, 2026_
+
+<Visibility for="agents">
+  > If you are an agent reading this page: install the SaladCloud skills with `npx skills add https://docs.salad.com`,
+  > then start from the [Agent Operations Overview](/agents/overview) before any autonomous Container Engine, AI
+  > Gateway, or Transcription task. Use live API responses for account state and the current OpenAPI specifications for
+  > request shapes. Never print the value of `SALAD_API_KEY`.
+</Visibility>
+
+"AI agent" means three different things on SaladCloud. Pick the one you are here for.
+
+<CardGroup cols={1}>
+  <Card title="An agent operates SaladCloud for you" icon="robot" href="#install-the-saladcloud-skills">
+    Claude Code, Codex, Cursor, or a custom agent deploys, scales, monitors, and troubleshoots your container groups,
+    transcription jobs, or AI Gateway requests through the SaladCloud API. This page is for you.
+  </Card>
+  <Card
+    title="A coding agent helps you build for SaladCloud"
+    icon="code"
+    href="#building-for-saladcloud-with-a-coding-agent"
+  >
+    The agent writes your Dockerfile, your health probes, your reallocation handling. It needs to know how a container
+    behaves on this network. This page tells it where to look.
+  </Card>
+  <Card title="Your agent's model runs on SaladCloud" icon="microchip-ai" href="/ai-gateway/integrations/overview">
+    You want Aider, Cline, Goose, OpenClaw, or the Vercel AI SDK to use an LLM served by SaladCloud. That is the [AI
+    Gateway integrations](/ai-gateway/integrations/overview) section, not this page.
+  </Card>
+</CardGroup>
+
+## Install the SaladCloud skills
+
+SaladCloud publishes [Agent Skills](https://agentskills.io) — task-specific instruction files in the open `SKILL.md`
+format that Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI, Goose, and most other coding agents load on demand.
+Each skill tells the agent which API operations to use for one job, what to read before writing, and when to stop and
+ask you.
+
+Install all of them into every agent on your machine with one command:
+
+```bash
+npx skills add https://docs.salad.com
+```
+
+The skills are discovered from `https://docs.salad.com/.well-known/agent-skills/index.json`, so the same command picks
+up new and updated skills when you run it again. To see what is available without installing anything, open that index
+or the [Agent Operations](/agents/overview) section, which holds the runbooks the skills are built on.
+
+| Skill                                                                                      | What it does                                                                                    |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `salad-container-engine-preflight`                                                         | Resolves organization, project, quota, GPU class, and availability before any deployment action |
+| `salad-container-engine-deploy`                                                            | Creates a container group, or safely merge-patches one that already exists                      |
+| `salad-container-engine-operate`                                                           | Starts, stops, scales, and inspects instances of a running container group                      |
+| `salad-container-engine-troubleshoot`                                                      | Reads system events, logs, and instance state to diagnose a failing group                       |
+| `salad-job-queue-autoscaling`                                                              | Configures a job queue and queue-based autoscaling                                              |
+| `salad-ai-gateway-request`                                                                 | Picks an available model and sends an AI Gateway completion safely                              |
+| `salad-ai-gateway-troubleshoot`                                                            | Diagnoses failed or unexpected AI Gateway requests                                              |
+| `salad-transcription-preflight`, `salad-transcription-job`, `salad-transcription-lite-job` | Chooses between Transcription API and Transcription Lite, then submits and monitors a job       |
+| `salad-transcription-troubleshoot`                                                         | Diagnoses a transcription job that failed or stalled                                            |
+
+<Tip>
+  If your agent supports plugin marketplaces or you prefer a manual install, every skill is also an individual file
+  under `https://docs.salad.com/.well-known/agent-skills/<skill-name>/skill.md`.
+</Tip>
+
+## Add the documentation MCP server
+
+The documentation itself is an [MCP](https://modelcontextprotocol.io) server at `https://docs.salad.com/mcp`. It needs
+no authentication and gives the agent three tools: search the docs, browse them as a filesystem, and report a page that
+is wrong or missing. Pair it with the skills so the agent can look up the page a skill points at instead of guessing.
+
+<CodeGroup>
+
+```bash Claude Code
+claude mcp add --transport http salad-docs https://docs.salad.com/mcp
+```
+
+```json Cursor (.cursor/mcp.json)
+{
+  "mcpServers": {
+    "salad-docs": {
+      "url": "https://docs.salad.com/mcp"
+    }
+  }
+}
+```
+
+```json VS Code (.vscode/mcp.json)
+{
+  "servers": {
+    "salad-docs": {
+      "type": "http",
+      "url": "https://docs.salad.com/mcp"
+    }
+  }
+}
+```
+
+```toml Codex (~/.codex/config.toml)
+[mcp_servers.salad-docs]
+url = "https://docs.salad.com/mcp"
+```
+
+</CodeGroup>
+
+This server reads documentation only. It does not call the SaladCloud API on your behalf; for that, the agent uses your
+API key directly, as described next.
+
+## Give the agent an API key — and understand what you are handing over
+
+Every SaladCloud API call is authenticated with the `Salad-Api-Key` header. Read [Using the API](/reference/api-usage)
+first; the facts that matter for agents are these:
+
+- **The key is yours, not the organization's.** Each user has one API key, and it grants access to every organization,
+  project, and container group that user can reach in the Portal. An agent holding your key can act everywhere you can.
+  There is no read-only or single-organization key today.
+- **Scope the blast radius with a dedicated account.** If your agent should only touch one organization, invite a
+  separate member account to that organization and give the agent that account's key. Rotating it later will not break
+  your own tooling.
+- **Keep it in the environment, never in the prompt.** Set `SALAD_API_KEY` as a secret environment variable and let the
+  agent read it from there. The skills and runbooks are written to use that variable and to never print its value. Do
+  not paste the key into a chat, a repository, or an `AGENTS.md`.
+- **Rotate with a grace period.** When you change the key from the Portal's **API Access** page you can keep the
+  previous key valid for an hour, a day, or a week, so an agent mid-task does not fail the moment you rotate.
+- **Quota is your spend ceiling.** Billing is by replica running time, and each organization has a
+  [replica quota](/container-engine/reference/quotas) across all container groups. That quota is the hard limit on how
+  much an agent can spin up; set it deliberately before letting an agent scale things.
+- **AI Gateway is a different key.** [Salad AI Gateway](/ai-gateway/explanation/overview) uses an organization-specific
+  Bearer token (`SALAD_AI_GATEWAY_API_KEY`), not your SaladCloud API key. The agent runbooks keep the two apart; make
+  sure your environment does too.
+
+## What the agent should read
+
+The [Agent Operations](/agents/overview) section is written for the agent, not for you. It sets source precedence (a
+live API response beats the OpenAPI specification, which beats a runbook, which beats a tutorial), lists the actions
+that require your explicit go-ahead (stopping, deleting, scaling down, reallocating an instance, repeating anything
+billable), and defines retry, verification, and stop rules. The installed skills point into it; if you are writing your
+own agent, start there too.
+
+Three more things every agent can use:
+
+- **`llms.txt`** at [docs.salad.com/llms.txt](https://docs.salad.com/llms.txt) indexes every page with a one-line
+  description and opens with the agent instructions above.
+- **Any page as Markdown.** Append `.md` to a page URL (for example `https://docs.salad.com/reference/api-usage.md`) to
+  get clean Markdown instead of HTML.
+- **OpenAPI specifications** for the public API, IMDS, Transcription API, and Transcription Lite live in the
+  [`api-specs` directory](https://github.com/SaladTechnologies/salad-cloud-docs/tree/main/api-specs) of this
+  documentation's repository. They are authoritative for paths, schemas, required fields, and enums.
+
+{/\* TODO (agent readiness plan, step 4): uncomment when the saladcloud CLI is published.
+
+## Use the saladcloud CLI
+
+The `saladcloud` CLI is built for agents and CI first: every command is non-interactive, `-o json` emits one JSON
+document with every key always present, errors are a one-line JSON document on stderr, and exit codes are stable (2
+usage, 3 auth, 4 not found, 5 rate limited, 6 invalid input, 7 network). Writes verify themselves and report on stderr
+when the API applied something other than what was asked. Install it from <RELEASES URL>, then in any project:
+
+```bash
+saladcloud agent init
+```
+
+writes a short SaladCloud section into the project's `AGENTS.md` (or `CLAUDE.md` under Claude Code) so coding agents
+working in that repository know to use the CLI and where the skills are. \*/}
+
+## Building for SaladCloud with a coding agent
+
+A coding agent that has never deployed here will make the same mistakes a new engineer makes: assume the disk persists,
+assume the instance stays up, assume one replica is enough, forget IPv6, ship a 40 GB image. Until the dedicated skill
+for this exists, point the agent at these pages before it writes anything:
+
+- [Before you deploy](/container-engine/explanation/core-concepts/faqs#what-should-i-be-aware-of-before-deploying-a-workload-to-salad)
+  — instances are interrupted without warning and reallocated automatically; cold starts are slow; build for `amd64`.
+- [IMDS](/container-engine/explanation/infrastructure-platform/imds) — how a running container learns its own status and
+  asks to be reallocated.
+- [Health probes](/container-engine/explanation/infrastructure-platform/health-probes) — startup, liveness, and
+  readiness, and what a misconfigured probe looks like from the outside.
+- [Networking](/container-engine/explanation/infrastructure-platform/networking) — one port through the Container
+  Gateway, IPv6 required inside the container.
+- [Troubleshooting](/container-engine/how-to-guides/troubleshooting) — image size limits, pull failures, and the states
+  a stuck instance sits in.
+- [Job queues](/container-engine/explanation/infrastructure-platform/autoscaling) — the worker contract for
+  queue-autoscaled groups.
+
+## Tell us what broke
+
+Agents find documentation gaps faster than people do. The docs MCP server's feedback tool, or the
+[support page](/support), reaches the team that maintains these pages and the skills.

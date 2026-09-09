@@ -3,7 +3,7 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: September 2, 2026_
+_Last Updated: September 9, 2026_
 
 <Visibility for="agents">
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
@@ -27,6 +27,11 @@ unique API token that grants API access to any Organization, Project, or Contain
 you need to get a new API Token, you are able to refresh API tokens directly from the Web Portal.
 
 This API token should be included in the `Salad-Api-Key` header of each request.
+
+<Note>
+  Handing this key to an AI agent? It grants everything your account can reach. See [Build with AI
+  Agents](/general/tutorials/build-with-ai-agents) for how to scope and store it.
+</Note>
 
 ```http
 Salad-Api-Key: YOUR_API_KEY
