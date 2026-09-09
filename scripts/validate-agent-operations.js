@@ -25,6 +25,7 @@ const runbooks = [
 ]
 const skills = [
     'salad',
+    'salad-container-image',
     'salad-container-engine-preflight',
     'salad-container-engine-deploy',
     'salad-container-engine-operate',

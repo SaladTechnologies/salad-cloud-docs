@@ -79,19 +79,19 @@ surface and no API here controls it.
 
 ## Route to a specialist skill
 
-| The user wants to…                                                | Load                                                               | Runbook                                                                                     |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Confirm org/project, quota, GPU class, availability before acting | `salad-container-engine-preflight`                                 | [Discover scope and preflight](/agents/container-engine/discover-scope-and-preflight)       |
-| Create a container group or change an existing one                | `salad-container-engine-deploy`                                    | [Deploy or update](/agents/container-engine/deploy-or-update-container-group)               |
-| Start, stop, scale, read instances, tail logs                     | `salad-container-engine-operate`                                   | [Monitor and operate](/agents/container-engine/monitor-and-operate-container-group)         |
-| Find out why a group is not running, pulling, or passing probes   | `salad-container-engine-troubleshoot`                              | [Troubleshoot](/agents/container-engine/troubleshoot-container-group)                       |
-| Set up a job queue and scale on queue depth                       | `salad-job-queue-autoscaling`                                      | [Configure job queue autoscaling](/agents/container-engine/configure-job-queue-autoscaling) |
-| Send a chat completion through Salad AI Gateway                   | `salad-ai-gateway-request`                                         | [Select a model and send a request](/agents/ai-gateway/select-model-and-send-request)       |
-| Diagnose a failed AI Gateway request                              | `salad-ai-gateway-troubleshoot`                                    | [Troubleshoot a request](/agents/ai-gateway/troubleshoot-request)                           |
-| Choose Transcription API vs Transcription Lite                    | `salad-transcription-preflight`                                    | [Choose API and preflight](/agents/transcription/choose-api-and-preflight)                  |
-| Submit and monitor a transcription job                            | `salad-transcription-job` or `salad-transcription-lite-job`        | [Submit and monitor](/agents/transcription/submit-and-monitor-job)                          |
-| Diagnose a stuck or failed transcription job                      | `salad-transcription-troubleshoot`                                 | [Troubleshoot a job](/agents/transcription/troubleshoot-job)                                |
-| Write a Dockerfile or service that will behave well on Salad      | this skill's "Building for Salad" section, then the pages it links | —                                                                                           |
+| The user wants to…                                                | Load                                                        | Runbook                                                                                     |
+| ----------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Confirm org/project, quota, GPU class, availability before acting | `salad-container-engine-preflight`                          | [Discover scope and preflight](/agents/container-engine/discover-scope-and-preflight)       |
+| Create a container group or change an existing one                | `salad-container-engine-deploy`                             | [Deploy or update](/agents/container-engine/deploy-or-update-container-group)               |
+| Start, stop, scale, read instances, tail logs                     | `salad-container-engine-operate`                            | [Monitor and operate](/agents/container-engine/monitor-and-operate-container-group)         |
+| Find out why a group is not running, pulling, or passing probes   | `salad-container-engine-troubleshoot`                       | [Troubleshoot](/agents/container-engine/troubleshoot-container-group)                       |
+| Set up a job queue and scale on queue depth                       | `salad-job-queue-autoscaling`                               | [Configure job queue autoscaling](/agents/container-engine/configure-job-queue-autoscaling) |
+| Send a chat completion through Salad AI Gateway                   | `salad-ai-gateway-request`                                  | [Select a model and send a request](/agents/ai-gateway/select-model-and-send-request)       |
+| Diagnose a failed AI Gateway request                              | `salad-ai-gateway-troubleshoot`                             | [Troubleshoot a request](/agents/ai-gateway/troubleshoot-request)                           |
+| Choose Transcription API vs Transcription Lite                    | `salad-transcription-preflight`                             | [Choose API and preflight](/agents/transcription/choose-api-and-preflight)                  |
+| Submit and monitor a transcription job                            | `salad-transcription-job` or `salad-transcription-lite-job` | [Submit and monitor](/agents/transcription/submit-and-monitor-job)                          |
+| Diagnose a stuck or failed transcription job                      | `salad-transcription-troubleshoot`                          | [Troubleshoot a job](/agents/transcription/troubleshoot-job)                                |
+| Write a Dockerfile or service that will behave well on Salad      | `salad-container-image`                                     | —                                                                                           |
 
 Load exactly one specialist skill per task step. Preflight is not optional: run it before any create, update, scale, or
 billable request.
@@ -136,16 +136,14 @@ re-deriving it.
 
 ## Building for Salad (coding-agent guidance)
 
-Until the dedicated `salad-container-image` skill ships, read these before writing a Dockerfile or service for Salad:
-[what to know before deploying](/container-engine/explanation/core-concepts/faqs),
+Load `salad-container-image` before writing a Dockerfile, entrypoint, server, or worker for Salad. The rules it
+enforces: assume the process dies without notice, keep no state on disk, make startup idempotent, listen on IPv6, keep
+the image small, and give probes a path that reflects real readiness. Its reading list is the platform's own pages on
+[deployment prerequisites](/container-engine/explanation/core-concepts/faqs),
 [IMDS](/container-engine/explanation/infrastructure-platform/imds),
 [health probes](/container-engine/explanation/infrastructure-platform/health-probes),
-[networking and IPv6](/container-engine/explanation/infrastructure-platform/networking),
-[environment variables](/container-engine/how-to-guides/environment-variables),
-[job queues and autoscaling](/container-engine/explanation/infrastructure-platform/autoscaling), and
-[troubleshooting](/container-engine/how-to-guides/troubleshooting). The rules that follow from them: assume the process
-dies without notice, keep no state on disk, make startup idempotent, listen on IPv6, keep the image small, and give
-probes a path that reflects real readiness.
+[networking and IPv6](/container-engine/explanation/infrastructure-platform/networking), and
+[troubleshooting](/container-engine/how-to-guides/troubleshooting).
 
 ## Safety, retries, verification, escalation
 

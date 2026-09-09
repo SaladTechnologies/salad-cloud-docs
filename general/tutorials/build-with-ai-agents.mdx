@@ -64,6 +64,7 @@ or the [Agent Operations](/agents/overview) section, which holds the runbooks th
 | `salad-ai-gateway-troubleshoot`                                                            | Diagnoses failed or unexpected AI Gateway requests                                              |
 | `salad-transcription-preflight`, `salad-transcription-job`, `salad-transcription-lite-job` | Chooses between Transcription API and Transcription Lite, then submits and monitors a job       |
 | `salad-transcription-troubleshoot`                                                         | Diagnoses a transcription job that failed or stalled                                            |
+| `salad-container-image`                                                                    | Teaches a coding agent how a container must behave on Salad before it writes the Dockerfile     |
 
 <Tip>
   If your agent supports plugin marketplaces or you prefer a manual install, every skill is also an individual file
@@ -173,8 +174,8 @@ working in that repository know to use the CLI and where the skills are. \*/}
 ## Building for SaladCloud with a coding agent
 
 A coding agent that has never deployed here will make the same mistakes a new engineer makes: assume the disk persists,
-assume the instance stays up, assume one replica is enough, forget IPv6, ship a 40 GB image. Until the dedicated skill
-for this exists, point the agent at these pages before it writes anything:
+assume the instance stays up, assume one replica is enough, forget IPv6, ship a 40 GB image. The `salad-container-image`
+skill (installed with the command above) carries the rules; these are the pages it is built from:
 
 - [Before you deploy](/container-engine/explanation/core-concepts/faqs#what-should-i-be-aware-of-before-deploying-a-workload-to-salad)
   — instances are interrupted without warning and reallocated automatically; cold starts are slow; build for `amd64`.
