@@ -31,7 +31,8 @@ You will:
 - A SaladCloud organization and project.
 - Portal access, or a SaladCloud API key for the optional API workflow.
 - Access to an AMD GPU class in that organization. Current inventory and capacity can vary.
-- A versioned `rocm/pytorch` image compatible with the AMD architecture you intend to use.
+- A versioned `rocm/pytorch` image compatible with the AMD architecture you intend to use. The image must ship ROCm 7.1
+  or newer; see [AMD GPUs and ROCm](/container-engine/reference/amd-gpus#image-requirements).
 - Enough credits to run the validation and any multi-replica follow-up.
 - For the API workflow, `curl` and `jq` on your local machine.
 
@@ -96,7 +97,7 @@ Changing one of these values creates a new combination that needs to be validate
 
 SaladCloud handles the GPU device and runtime-library integration after you select the GPU class. Do not copy local WSL2
 Docker device or library-mount options into the container group. See
-[SaladCloud's WSL2 GPU Runtime](/container-engine/reference/amd-gpus#saladclouds-wsl2-gpu-runtime).
+[What the Host Provides](/container-engine/reference/amd-gpus#what-the-host-provides).
 
 ## 3. Verify PyTorch ROCm
 
@@ -179,9 +180,10 @@ This test allocates its inputs on the GPU, waits for asynchronous GPU work to fi
 checks a known result. It is stronger than device enumeration, but it is not a substitute for running the real
 application.
 
-## Optional `rocminfo` Diagnostics
+## `rocminfo` Device Check
 
-When the image includes `rocminfo`, use it to identify the GPU's `gfx` target:
+`rocminfo` is the canonical device-readiness check on SaladCloud: it enumerates the ROCr agents and fails with a
+diagnosable error when it cannot. Include it in the image and use it to identify the GPU's `gfx` target:
 
 ```bash
 if command -v rocminfo >/dev/null 2>&1; then
@@ -191,9 +193,11 @@ else
 fi
 ```
 
-Do not make AMD SMI success an acceptance requirement. SaladCloud's WSL2 environment does not expose the native Linux
-`amdgpu` kernel module expected by AMD SMI. Do not run a suggested `modprobe` command inside SaladCloud; use `rocminfo`
-and the PyTorch operation as the device checks.
+SaladCloud injects a DXG-capable `amd-smi` from the host and puts it first on `PATH`, so `amd-smi` works in the
+container. The copy bundled in your image does not: it checks `/proc/modules` for an `amdgpu` kernel driver that WSL2
+does not expose. Do not run a suggested `modprobe` command inside SaladCloud. Do not use `rocm-smi` as an acceptance
+check either; it exits 0 even when it has not talked to a GPU. Use `rocminfo` and the PyTorch operation as the device
+checks. See [Checking That the GPU Works](/container-engine/reference/amd-gpus#checking-that-the-gpu-works).
 
 Diagnostic executables are supplied by the image, not added automatically by GPU selection. A missing utility identifies
 an image-inventory issue; it does not by itself override a passing PyTorch GPU test.
@@ -361,12 +365,14 @@ support.
 ### `rocminfo` Is Missing
 
 The utility is not included in the image or is not on `PATH`. Add the required user-space diagnostic package while
-building the image. SaladCloud manages the GPU runtime; do not try to replace it from the container.
+building the image; `rocminfo` is the canonical readiness check and is worth carrying in production images. SaladCloud
+manages the GPU runtime; do not try to replace it from the container.
 
 ### AMD SMI Reports That `amdgpu` Is Not Loaded
 
-SaladCloud's environment does not expose the native Linux `amdgpu` kernel module expected by AMD SMI. Do not run
-`sudo modprobe amdgpu` inside the container. Use `rocminfo` and the PyTorch GPU operation as the acceptance checks.
+You are running the image's own AMD SMI rather than the host build SaladCloud injects. Do not run `sudo modprobe amdgpu`
+inside the container. Confirm that `/opt/rocm-wsl/bin` is still first on `PATH`, or invoke `/opt/rocm-wsl/bin/amd-smi`
+directly. See [Checking That the GPU Works](/container-engine/reference/amd-gpus#checking-that-the-gpu-works).
 
 ### `hipErrorNoBinaryForGPU`
 
@@ -388,5 +394,5 @@ For additional diagnosis, see [AMD GPU troubleshooting](/container-engine/refere
 - Build a custom image from the versioned ROCm base and install dependencies at image-build time.
 - Add application readiness checks that load the model and complete a representative GPU operation.
 - Preserve the validation record with the image source and deployment configuration.
-- Review the [AMD GPU production best practices](/container-engine/reference/amd-gpus#production-best-practices) before
-  increasing replicas or adding another AMD class.
+- Review [Choosing AMD GPU Classes](/container-engine/reference/amd-gpus#choosing-amd-gpu-classes) before increasing
+  replicas or adding another AMD class.

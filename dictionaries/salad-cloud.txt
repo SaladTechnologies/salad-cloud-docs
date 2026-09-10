@@ -4,6 +4,7 @@ adamw
 AKIAIOSFODNN
 alwayson
 amdgpu
+amdsmi
 amqps
 amzn
 APAC
@@ -129,9 +130,13 @@ Kuzco
 LAVIS
 Letzeburgesch
 lib-dynload
+libcuda
+libd
 libdrm
+libdxcore
 libgl1
 libgl1-mesa-dev
+librocdxg
 libsm6
 libxext6
 libxrender1
@@ -221,6 +226,7 @@ qwen
 randn
 rclone
 Rclone
+rdna
 reauthentication
 rerank
 reranker
@@ -228,6 +234,7 @@ REVAI
 risc
 risczero
 Roboflow
+rocdxg
 rocm
 rocminfo
 rocprofv
