@@ -6,7 +6,7 @@ description:
   savings while maintaining job orchestration capabilities.'
 ---
 
-_Last Updated: July 21, 2026_
+_Last Updated: September 11, 2026_
 
 # Overview
 
@@ -53,10 +53,10 @@ GPU-intensive workloads. SaladCloud offers a compelling alternative that address
 **Cost Advantages:**
 
 - **Lower Compute Costs**: GPU + CPU + RAM combined cost a fraction of comparable EC2 GPU instances
-  - RTX 4090 setup: \$0.364/hr at high priority vs AWS g5.xlarge: \$1.006/hr
+  - RTX 4090 setup: \$0.330/hr at high priority vs AWS g5.xlarge: \$1.006/hr
 - **Transparent Component Pricing**:
   - **GPU Containers:** GPU hourly rate
-  - **CPU-only Containers:** \$0.004/vCPU/hour + \$0.001/GB RAM/hour
+  - **CPU-only Containers:** \$0.005/vCPU/hour + \$0.001/GB RAM/hour
 - **Per-Second Billing**: Hourly rates tracked per second for running containers
 - **No Hidden Costs**: No charges for VPC endpoints, NAT gateways, or data transfer between AZs
 
@@ -819,7 +819,7 @@ deepest discounts:
 | **High**   | Production, time-critical | Baseline                                           | Highest      |
 | **Medium** | Standard workloads        | ~15-20% additional savings                         | Very Good    |
 | **Low**    | Flexible deadlines        | ~25-35% additional savings                         | Good         |
-| **Lowest** | Non-urgent processing     | **~40-50% additional savings**                     | Variable     |
+| **Lowest** | Non-urgent processing     | **~40-55% additional savings**                     | Variable     |
 
 Example pricing for GPU batch workloads. AWS examples use Linux On-Demand prices in US East (N. Virginia); the
 SaladCloud example requests 24 GB VRAM, 8 vCPU, and 32 GB RAM.
@@ -836,17 +836,16 @@ SaladCloud example requests 24 GB VRAM, 8 vCPU, and 32 GB RAM.
 - Per GPU: ~\$1.006/hour
 - Includes: 4 vCPUs, 16 GB RAM
 
-**SaladCloud RTX 4090 (24 GB):**
+**SaladCloud RTX 4090 (24 GB):** GPU rates are all-inclusive, so the 8 vCPU and 32 GB RAM carry no additional charge.
 
-- High Priority: \$0.30/hour GPU + \$0.032/hour (8 vCPU) + \$0.032/hour (32 GB RAM) = **\$0.364/hour total** (64% less
-  than g5.xlarge)
-- Medium: \$0.26 + \$0.032 + \$0.032 = **\$0.324/hour**
-- Low: \$0.22 + \$0.032 + \$0.032 = **\$0.284/hour**
-- **Lowest/Batch: \$0.18 + \$0.032 + \$0.032 = \$0.244/hour** (76% less than g5.xlarge and 91% less than P4d per GPU)
+- High Priority: **\$0.330/hour total** (67% less than g5.xlarge)
+- Medium: **\$0.273/hour**
+- Low: **\$0.217/hour**
+- **Lowest: \$0.160/hour** (84% less than g5.xlarge and 94% less than P4d per GPU)
 
 ```python
-# Configure container group with Lowest/Batch priority for maximum savings
-# This gives you an additional 40% off the high-priority GPU rate
+# Configure container group with Lowest priority for maximum savings
+# This gives you roughly 50% off the high-priority GPU rate
 container_group = sdk.container_groups.create_container_group(
     organization_name="your-org",
     project_name="your-project",
