@@ -6,7 +6,7 @@ description:
   real-time object detection."
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: September 11, 2026_
 
 # YOLOv8 on Salad
 
@@ -846,22 +846,27 @@ memory separately. You can only pick preconfigured computes. With SaladCloud you
 | Service   | Configuration             | Cost Per Hour | Remarks                                   |
 | --------- | ------------------------- | ------------- | ----------------------------------------- |
 | **Azure** | 4 core, 16GB RAM (No GPU) | $0.19         | General purpose compute, no dedicated GPU |
-| **Salad** | 4 vCores, 16GB RAM        | $0.032        | Equivalent to Azure's general compute     |
+| **Salad** | 4 vCores, 16GB RAM        | $0.036        | Equivalent to Azure's general compute     |
 
 #### Percentage Cost Difference for General Compute
 
-- **SaladCloud is approximately 83% cheaper than Azure for general compute configurations.**
+- **SaladCloud is approximately 81% cheaper than Azure for general compute configurations.**
 
 #### 2. Processing with GPU Support. This is the GPU Azure recommends for YOLOv5.
 
 | Service   | Configuration                            | Cost Per Hour | Remarks                              |
 | --------- | ---------------------------------------- | ------------- | ------------------------------------ |
 | **Azure** | NC16as_T4_v3 (16 vCPU, 110GB RAM, 1 GPU) | $1.20         | Recommended for YOLOv5               |
-| **Salad** | Equivalent GPU Configuration             | $0.326        | SaladCloud's equivalent GPU offering |
+| **Salad** | RTX 4080 (16 GB), High priority          | $0.230        | SaladCloud's equivalent GPU offering |
 
 #### Percentage Cost Difference for GPU Compute
 
-- **SaladCloud is approximately 73% cheaper than Azure for similar GPU configurations.**
+- **SaladCloud is approximately 81% cheaper than Azure for similar GPU configurations.**
+
+<Note>
+  Prices are approximate, exclude applicable taxes, and are subject to change. Check
+  [salad.com/pricing](https://salad.com/pricing) for current rates.
+</Note>
 
 ---
 
