@@ -1,0 +1,107 @@
+---
+title: 'Use Mastra with SaladCloud'
+sidebarTitle: 'Mastra'
+description: 'Build a Mastra agent using the SaladCloud AI SDK provider and Salad AI Gateway.'
+---
+
+_Last Updated: September 17, 2026_
+
+[Mastra](https://mastra.ai) is a framework for building AI agents and workflows. Connect an agent directly to
+[Salad AI Gateway](/ai-gateway/explanation/overview) using the published SaladCloud AI SDK provider and
+`qwen3.6-35b-a3b`. AI Gateway is in beta with [pay-per-token billing](/ai-gateway/reference/pricing).
+
+## Prerequisites
+
+- Node.js 22.13.0 or newer
+- A [SaladCloud account](https://portal.salad.com), credits, and an organization-specific AI Gateway API key from
+  [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding)
+
+## Step 1: Install the Packages
+
+In a new project directory:
+
+```bash
+npm init -y
+npm pkg set type=module
+npm install @mastra/core@^1.67.0 @saladtechnologies-oss/ai-sdk-provider@^0.2.0
+```
+
+For an existing project, keep its configuration and install the packages in that project. Mastra added support for AI
+SDK 7 model providers in `@mastra/core` version `1.47.0`; this guide uses the newer `1.67.0` release line. See
+[Mastra's AI SDK 7 support documentation](https://mastra.ai/blog/ai-sdk-v7-support).
+
+## Step 2: Set Your API Key
+
+Create `.env`:
+
+```bash
+SALAD_CLOUD_API_KEY=your-ai-gateway-api-key
+```
+
+Add `.env` to `.gitignore`. Keep this key server-side and do not use your regular SaladCloud API key in its place. The
+SaladCloud provider supplies the Gateway endpoint and Bearer authentication automatically.
+
+## Step 3: Create the Agent
+
+Create `agent.js`:
+
+```javascript agent.js
+import { Agent } from '@mastra/core/agent'
+import { saladCloud } from '@saladtechnologies-oss/ai-sdk-provider'
+
+export const agent = new Agent({
+  id: 'salad-assistant',
+  name: 'Salad Assistant',
+  instructions: 'You are a helpful assistant. Give clear, concise answers.',
+  model: saladCloud('qwen3.6-35b-a3b'),
+})
+```
+
+<Note>
+  Pass the model object returned by `saladCloud(...)`. Do not replace it with the string `salad-cloud/qwen3.6-35b-a3b`:
+  the models.dev listing does not currently add SaladCloud to Mastra's built-in model registry. This direct SDK setup
+  does not depend on that registry.
+</Note>
+
+## Step 4: Generate a Response
+
+Create `test.js`:
+
+```javascript test.js
+import { agent } from './agent.js'
+
+const result = await agent.generate('Explain distributed GPU computing in one paragraph.')
+console.log(result.text)
+```
+
+```bash
+node --env-file=.env test.js
+```
+
+You should see the model's answer in the terminal. Requests are billed to your SaladCloud organization.
+
+## Stream a Response
+
+Create `stream.js`:
+
+```javascript stream.js
+import { agent } from './agent.js'
+
+const result = await agent.stream('Give three practical uses for an AI coding assistant.')
+for await (const chunk of result.textStream) {
+  process.stdout.write(chunk)
+}
+process.stdout.write('\n')
+```
+
+```bash
+node --env-file=.env stream.js
+```
+
+## Troubleshooting
+
+- **Unknown provider or model:** use `saladCloud('qwen3.6-35b-a3b')` as shown, not a model-router string.
+- **Unsupported model version:** upgrade `@mastra/core` to the version range above. The SaladCloud `0.2.0` package uses
+  the AI SDK 7 provider interface.
+- **Missing API key or HTTP 401:** check that `.env` contains `SALAD_CLOUD_API_KEY`, run Node with `--env-file=.env`,
+  and use your organization's AI Gateway key.

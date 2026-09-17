@@ -4,7 +4,7 @@ sidebarTitle: 'Cline'
 description: 'Learn how to use the Cline AI coding agent with SaladCloud for AI-powered development.'
 ---
 
-_Last Updated: September 2, 2026_
+_Last Updated: September 17, 2026_
 
 ## Introduction
 
@@ -14,13 +14,13 @@ applications through natural language conversations.
 
 Cline works with SaladCloud in two ways:
 
-- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  point Cline at a single shared endpoint, and use your Salad API key directly. Currently in closed beta.
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Available in beta
+  with [pay-per-token billing](/ai-gateway/reference/pricing). Connect to the shared endpoint using your
+  organization-specific AI Gateway API key.
 - **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
   configuration. Still very easy to set up and use.
 
-Self-hosted models are billed per hour. Salad AI Gateway is available via monthly flat-rate access during the closed
-beta period.
+Self-hosted models are billed per hour. Salad AI Gateway is billed per input and output token.
 
 For real-world examples of building applications with Cline and SaladCloud, check out our blog post:
 [Use Cline with SaladCloud: Building Real Apps for Under $0.01](https://blog.salad.com/use-cline-with-saladcloud-building-real-apps-for-under-1-cent/)
@@ -40,8 +40,9 @@ Before getting started, make sure you have:
   <Tab title="Salad AI Gateway">
     Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
-    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+    1. Sign in to the [SaladCloud portal](https://portal.salad.com).
+    2. Follow [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to add credits and create your
+       organization's **AI Gateway API key**.
 
     Available models:
 

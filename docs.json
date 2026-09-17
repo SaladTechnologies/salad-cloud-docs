@@ -540,7 +540,10 @@
               },
               {
                 "group": "Developer Frameworks & SDKs",
-                "pages": ["container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud"]
+                "pages": [
+                  "container-engine/tutorials/agentic-tools/use-vercel-ai-sdk-with-saladcloud",
+                  "container-engine/tutorials/agentic-tools/use-mastra-with-saladcloud"
+                ]
               }
             ]
           }
