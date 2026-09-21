@@ -92,39 +92,21 @@ A few consequences follow from the sampling model:
 
 ### GPU workloads
 
-For container groups with a GPU class, vCPUs and RAM are included in the GPU price — as described in
-[billing](/container-engine/explanation/billing-pricing/billing), there are no additional charges for RAM and vCPU on a
-GPU container group. Because those resources are not billed separately, SaladCloud does not cap them:
+On GPU container groups, SaladCloud does not strictly enforce the vCPU and RAM you request, so utilization above 100% is
+possible — a workload that requested 2 vCPUs but can keep 8 cores busy reports `CPU 400%`.
 
-- **CPU is not capped at all.** A GPU workload that requested 2 vCPUs but can keep 8 cores busy will use all 8 and
-  report `CPU 400%`. This is your workload getting more than it asked for, at no extra cost.
-- **The memory ceiling is raised above your request.** When the node has spare memory at container start, SaladCloud
-  grants the container headroom above the amount you requested. A GPU workload can therefore report RAM above 100%
-  without being terminated.
-
-If you regularly see CPU well above 100% on a GPU workload, your request is lower than what your application actually
-wants. Raising the configured vCPU count on a GPU container group does not increase your bill, and it makes the
-utilization figure meaningful again.
+Do not rely on this. How much a container is allowed to exceed its request varies by node, so an application that
+routinely runs over will work on some nodes and fail unexpectedly on others. If you see utilization above 100%, raise
+the requested vCPUs or RAM to cover what your application actually uses. On a GPU container group this does not change
+your bill.
 
 ### CPU-only workloads
 
-For container groups without a GPU, vCPUs and RAM are billed directly, and the limits are enforced:
-
-- **CPU is capped** at your requested core count, so `cpu_percent` should sit at or below 100%. Brief readings slightly
-  above 100% can occur where a sampling interval does not line up exactly with the enforcement window; sustained values
-  well above 100% are not expected.
-- **Memory is capped** at exactly your requested allocation. A CPU-only container that tries to exceed it is
-  out-of-memory killed rather than allowed to run over, which surfaces as an
-  `Instance Exited:137 (Likely Out of System Memory)`
-  [system event](/container-engine/explanation/container-groups/system-events). If you see that, increase the RAM
-  allocated to the container group.
-
-### Older instances
-
-Instances started before resource limits were recorded on the container fall back to measuring against the node's
-available resources instead of your request. These are rare, and the percentage will typically read much lower than
-expected because the denominator is larger. Restarting or recreating the instance restores measurement against your
-configured allocation.
+On container groups without a GPU, the limits are enforced. CPU is capped at your requested core count, so `cpu_percent`
+stays at or below 100%. Memory is capped at exactly your allocation, and a container that exceeds it is out-of-memory
+killed rather than allowed to run over — which appears as an `Instance Exited:137 (Likely Out of System Memory)`
+[system event](/container-engine/explanation/container-groups/system-events). If you see that, increase the RAM
+allocated to the container group.
 
 ## Using utilization to right-size a deployment
 
