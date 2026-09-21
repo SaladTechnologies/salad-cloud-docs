@@ -32,6 +32,14 @@ Before you begin, ensure you have:
   workload examples, see our [AI & Machine Learning guides](/container-engine/how-to-guides/ai-machine-learning/).
 </Tip>
 
+<Note>
+  SaladCloud also reports per-instance CPU and RAM utilization automatically, with no instrumentation required. If you
+  only need to *see* utilization rather than act on it, see [CPU and RAM
+  Utilization](/container-engine/explanation/container-groups/resource-utilization). Those values are sampled once a
+  minute; the approach below collects metrics from inside your container, which gives you finer resolution and GPU
+  metrics.
+</Note>
+
 ## Overview
 
 Hardware utilization autoscaling works by:

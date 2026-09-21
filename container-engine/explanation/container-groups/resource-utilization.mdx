@@ -1,0 +1,124 @@
+---
+title: 'CPU and RAM Utilization'
+sidebarTitle: 'CPU & RAM Utilization'
+description:
+  'Understand the CPU and RAM utilization SaladCloud reports for each container group instance, how often it updates,
+  and why a percentage can legitimately exceed 100%.'
+---
+
+_Last Updated: September 21, 2026_
+
+SaladCloud reports CPU and RAM utilization for every running container group instance. The values appear in the
+SaladCloud Portal and in the
+[SaladCloud API](/reference/saladcloud-api/container-groups/list-container-group-instances), so you can see whether a
+workload is actually using the hardware you requested without adding any instrumentation to your container.
+
+## Where to find it
+
+In the Portal, open your container group and look at the **Utilization** column of the instance table. Each running
+instance shows a line for CPU and a line for RAM:
+
+```
+CPU 28.2%
+RAM 41.7%
+```
+
+Opening an individual instance from that table shows the same two figures, with the absolute memory figure alongside the
+percentage — for example `RAM 41.7% (2.5 GB)`.
+
+Utilization is only displayed for instances in the **running** state. An instance that is allocating, downloading, or
+starting has no container to measure yet, so no value is shown.
+
+From the API,
+`GET /organizations/{organization_name}/projects/{project_name}/containers/{container_group_name}/instances` returns the
+same data on each instance:
+
+| Field                  | Description                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| `cpu_percent`          | CPU used during the last sampling interval, as a percentage of your requested vCPUs |
+| `cpu_usage`            | CPU time consumed during the last sampling interval, in seconds                     |
+| `cpu_usage_total`      | Cumulative CPU time consumed since the instance started, in seconds                 |
+| `memory_usage_mb`      | Current memory in use, in MB                                                        |
+| `memory_usage_percent` | Current memory in use, as a percentage of your requested RAM                        |
+
+<Note>
+  These fields are omitted for instances that are not running, and for instances that have not yet produced a first
+  measurement. Treat them as optional in your client code rather than assuming they are always present.
+</Note>
+
+## What the percentages are measured against
+
+Both percentages are relative to **what you requested for the container group**, not to the node's total hardware:
+
+- `cpu_percent` is measured against the **number of vCPUs** you configured.
+- `memory_usage_percent` is measured against the **memory (RAM)** you configured.
+
+So a container group configured with 4 vCPUs that reports `CPU 50%` is consuming the equivalent of 2 full cores. This is
+deliberately not a percentage of the node: SaladCloud nodes vary widely in size, and a percentage of node hardware would
+mean something different on every machine. A percentage of your own allocation means the same thing everywhere, and it
+is the number that tells you whether you are paying for resources you do not use.
+
+## How often the values update
+
+Each node samples its running containers **once every 60 seconds** and reports the result up to the platform. Allowing
+for propagation, expect a value in the Portal or API to be up to roughly two minutes behind real time.
+
+A few consequences follow from the sampling model:
+
+- **CPU is an average, not an instantaneous reading.** `cpu_percent` is derived from the CPU time consumed between two
+  consecutive samples, divided by the elapsed wall-clock time and your vCPU count. A workload that is idle for 50
+  seconds and then saturates 4 cores for 10 seconds reports roughly the same number as one running steadily at a low
+  level. Short spikes are flattened.
+- **RAM is an instantaneous reading.** `memory_usage_mb` and `memory_usage_percent` are the values at the moment of the
+  sample, so a brief allocation spike between samples is not captured at all.
+- **The first CPU reading takes about a minute.** Because CPU utilization is a delta between two samples, a newly
+  started instance has nothing to compare against until its second sample. Expect `CPU 0%` for roughly the first minute
+  after an instance starts.
+- **A restart or recreate resets the CPU baseline.** When a container is restarted or recreated, its cumulative CPU
+  counter starts over, so that interval is reported as `0%` and normal readings resume on the next sample. Memory
+  reporting is unaffected.
+- **Values below 0.1% display as `<0.1`.** Anything in that range means the same thing — idle — and rounding it to `0.0`
+  would read as a broken metric.
+
+<Tip>
+  If you need finer resolution than one minute, or need per-process or per-GPU detail, instrument the container itself.
+  See [Implementing Performance Monitoring](/container-engine/tutorials/performance/performance-monitoring) for a
+  `psutil` and `nvidia-smi` based approach, and [Hardware Utilization
+  Autoscaling](/container-engine/how-to-guides/autoscaling/hardware-metrics-scaling) for using those metrics to drive
+  replica counts.
+</Tip>
+
+## Why utilization can exceed 100%
+
+### GPU workloads
+
+On GPU container groups, SaladCloud does not strictly enforce the vCPU and RAM you request, so utilization above 100% is
+possible — a workload that requested 2 vCPUs but can keep 8 cores busy reports `CPU 400%`.
+
+Do not rely on this. How much a container is allowed to exceed its request varies by node, so an application that
+routinely runs over will work on some nodes and fail unexpectedly on others. If you see utilization above 100%, raise
+the requested vCPUs or RAM to cover what your application actually uses. On a GPU container group this does not change
+your bill.
+
+### CPU-only workloads
+
+On container groups without a GPU, the limits are enforced. CPU is capped at your requested core count, so `cpu_percent`
+stays at or below 100%. Memory is capped at exactly your allocation, and a container that exceeds it is out-of-memory
+killed rather than allowed to run over — which appears as an `Instance Exited:137 (Likely Out of System Memory)`
+[system event](/container-engine/explanation/container-groups/system-events). If you see that, increase the RAM
+allocated to the container group.
+
+## Using utilization to right-size a deployment
+
+<Warning>
+  Utilization is a one-minute average from a single instance. Before changing your configuration, look across several
+  instances and several samples — one instance reading low may simply have been between jobs when it was sampled.
+</Warning>
+
+Low CPU on a GPU workload is often fine — a GPU-bound pipeline, or an instance idle waiting for work — so check it
+against your own request volume before reducing anything. Low RAM on a CPU-only workload is worth acting on: you are
+billed for the allocation whether you use it or not, and a smaller request also widens the pool of nodes your workload
+can be scheduled on. A CPU-only workload sitting near 100% RAM is the opposite signal, and is at risk of exit code 137.
+
+For automating this rather than doing it by hand, see
+[Hardware Utilization Autoscaling](/container-engine/how-to-guides/autoscaling/hardware-metrics-scaling).
