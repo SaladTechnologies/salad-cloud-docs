@@ -115,14 +115,10 @@ allocated to the container group.
   instances and several samples — one instance reading low may simply have been between jobs when it was sampled.
 </Warning>
 
-- **CPU consistently near 0% on a GPU workload** usually means your pipeline is GPU-bound and the CPU request is fine,
-  or that the instance is idle waiting for work. Check it against your own request volume before reducing anything.
-- **CPU consistently above 100% on a GPU workload** means your application wants more cores than you requested. Raise
-  the vCPU count — it does not change the price of a GPU container group.
-- **RAM consistently near or above 100%** on a **CPU-only** workload is a warning sign: you are close to the enforced
-  ceiling and at risk of exit code 137. Increase the RAM allocation.
-- **RAM consistently below 30%** on a CPU-only workload means you are paying for memory you do not use. Reducing the
-  allocation lowers your hourly rate, and it also widens the pool of nodes your workload can be scheduled on.
+Low CPU on a GPU workload is often fine — a GPU-bound pipeline, or an instance idle waiting for work — so check it
+against your own request volume before reducing anything. Low RAM on a CPU-only workload is worth acting on: you are
+billed for the allocation whether you use it or not, and a smaller request also widens the pool of nodes your workload
+can be scheduled on. A CPU-only workload sitting near 100% RAM is the opposite signal, and is at risk of exit code 137.
 
 For automating this rather than doing it by hand, see
 [Hardware Utilization Autoscaling](/container-engine/how-to-guides/autoscaling/hardware-metrics-scaling).
