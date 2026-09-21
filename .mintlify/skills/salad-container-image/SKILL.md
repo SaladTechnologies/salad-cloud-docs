@@ -65,8 +65,9 @@ documentation pages above; do not rely on this skill's summary when the two disa
   start), `SALAD_MACHINE_ID`, and `HOSTNAME` (defaults to the instance ID).
 - **Control from inside.** IMDS at `http://169.254.169.254` (port 80), header `Metadata: true`, proxies bypassed, no
   `X-Forwarded-*` headers. Operations (IMDS operation IDs): `get_status` (`ready`, `started`), `get_token` (a signed
-  identity JWT for the instance), `reallocate`, `recreate`, `restart`, `get_deletion_cost`, `replace_deletion_cost`.
-  Prefer the IMDS SDKs (Python, JS, Java, Go, .NET) over hand-written HTTP.
+  identity JWT for the instance), `reallocate`, `recreate`, `restart`, `get_deletion_cost`, `replace_deletion_cost`. The
+  HTTP endpoints are the contract. SDKs exist (Python, JS, Java, Go, .NET) and wrap them; if you use one, verify its
+  behavior against the IMDS API reference rather than assuming it.
 - **Health.** Startup, liveness, and readiness probes over `exec`, `tcp`, `grpc`, or `http`. A failed startup or
   liveness probe reallocates the instance; a failed readiness probe keeps it running but removes it from the gateway.
 - **Priority.** GPU groups run at `high`, `medium`, `low`, or `batch` priority and can be preempted by higher-priority
@@ -80,10 +81,11 @@ documentation pages above; do not rely on this skill's summary when the two disa
    preflight skill), then choose CUDA or ROCm accordingly. RTX 5090 requires CUDA 12.8 or newer, and CUDA 12.8 images do
    not run on older GPUs; plan separate tags if both are targeted. Build for `linux/amd64` explicitly
    (`docker buildx build --platform linux/amd64`).
-3. **Keep the image small and self-contained.** Hard limit 35 GB compressed; every gigabyte is roughly two minutes of
-   download on an average node. Order Dockerfile layers so weights and dependencies sit below code. Bake model weights
-   in, or fetch them at startup from the user's storage or S4 behind a startup probe — never assume a previous
-   instance's download is present.
+3. **Keep the image small and self-contained.** Hard limit 35 GB compressed. Pull time varies widely with the node's
+   network; slower than two minutes per GB is the documented signal of a below-average node, not the expected case. Size
+   still dominates time to first ready instance, so cut what you can. Order Dockerfile layers so weights and
+   dependencies sit below code. Bake model weights in, or fetch them at startup from the user's storage or S4 behind a
+   startup probe — never assume a previous instance's download is present.
 4. **Make startup idempotent and the process long-lived.** The container is started many times per deployment. It must
    tolerate a cold disk, must not depend on state from a previous run, and must run a foreground process forever — an
    image whose `CMD` exits (an `ubuntu` base, a one-shot script) exits `0` and is restarted in a loop. If the user sets
