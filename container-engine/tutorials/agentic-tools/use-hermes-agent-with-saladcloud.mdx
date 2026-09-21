@@ -2,11 +2,11 @@
 title: 'Use Hermes Agent with SaladCloud'
 sidebarTitle: 'Hermes Agent'
 description:
-  'Learn how to use Hermes Agent, a self-improving open-source AI agent with MCP support, with a self-hosted model on
+  'Use the SaladCloud provider plugin to connect Hermes Agent to Salad AI Gateway, or configure a self-hosted model on
   SaladCloud.'
 ---
 
-_Last Updated: September 2, 2026_
+_Last Updated: September 17, 2026_
 
 ## Introduction
 
@@ -24,8 +24,10 @@ Hermes Agent pairs especially well with SaladCloud because:
 
 Hermes Agent works with SaladCloud in two ways:
 
-- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  use your Salad API key with standard authentication. Currently in closed beta with monthly flat-rate access.
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - install the
+  [SaladCloud provider plugin](https://github.com/SaladTechnologies/hermes-saladcloud-provider) and use AI Gateway API
+  key. No infrastructure to deploy or manage. AI Gateway is in beta, with
+  [self-service pay-per-token onboarding](/ai-gateway/tutorials/pay-per-token-onboarding).
 - **Self-hosted model** - deploy your own LLM recipe on SaladCloud Container Engine, billed per hour. Note: Hermes Agent
   cannot pass custom headers, so authentication must be disabled on self-hosted deployments.
 
@@ -36,6 +38,8 @@ Before getting started, make sure you have:
 - A [SaladCloud account](https://portal.salad.com)
 - Linux, macOS, or Windows (WSL2)
 - Python 3.10+ and Node.js 18+ (the installer handles these automatically)
+- Git to install the SaladCloud provider plugin
+- For AI Gateway, an [AI Gateway API key](/ai-gateway/tutorials/pay-per-token-onboarding)
 
 ## Step-by-Step Setup
 
@@ -43,18 +47,23 @@ Before getting started, make sure you have:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    Salad AI Gateway is the recommended option for Hermes Agent - it uses standard Bearer token authentication, which
-    Hermes Agent supports natively.
+    Salad AI Gateway uses standard Bearer token authentication. The SaladCloud plugin supplies the endpoint and model
+    configuration for Hermes Agent.
 
-    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
-    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+    1. Sign in to the [SaladCloud portal](https://portal.salad.com).
+    2. Follow [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to fund your organization and
+       create its **AI Gateway API key**.
 
-    Available models:
+    The plugin exposes one model:
 
-    | Model                         | Description                                                                      |
-    | :---------------------------- | :------------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B-A3B - cost-efficient agentic tasks and reasoning                   |
+    | Model | Description |
+    | :---- | :---------- |
+    | `qwen3.6-35b-a3b` | Qwen3.6 35B-A3B for agentic tasks, coding, and reasoning |
+
+    <Warning>
+      Use the organization-specific key under **AI Gateway Keys**, not the regular SaladCloud **Current API Key**.
+      AI Gateway does not use the `Salad-Api-Key` header required by authenticated Container Engine endpoints.
+    </Warning>
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -108,26 +117,81 @@ source ~/.bashrc   # or ~/.zshrc on macOS
 hermes --version
 ```
 
-### Step 3: Run the Setup Wizard
-
-Run the interactive setup wizard, which handles all model configuration:
-
-```bash
-hermes setup
-```
-
-When the wizard asks for a model provider, select **Custom OpenAI-compatible endpoint** and fill in:
+### Step 3: Connect Hermes Agent to Your Backend
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    - **Base URL**: `https://ai.salad.cloud/v1`
-    - **API key**: your Salad API key
-    - **Context length**: `262144`
+    Update Hermes before installing the plugin. Older versions have a fixed provider list and reject `saladcloud`:
 
-    The wizard will auto-detect the available models from your endpoint.
+    ```bash
+    hermes update
+    ```
+
+    Install the [SaladCloud provider plugin](https://github.com/SaladTechnologies/hermes-saladcloud-provider) into
+    Hermes' user model-provider directory:
+
+    ```bash
+    mkdir -p ~/.hermes/plugins/model-providers
+    git clone https://github.com/SaladTechnologies/hermes-saladcloud-provider.git \
+      ~/.hermes/plugins/model-providers/saladcloud
+    ```
+
+    If you set a custom `HERMES_HOME`, use `$HERMES_HOME/plugins/model-providers/saladcloud` instead. If the plugin is
+    already installed, skip the clone command.
+
+    **Recommended: save your connection with the setup wizard.** After installing the plugin, run:
+
+    ```bash
+    hermes setup
+    ```
+
+    In the model/provider section:
+
+    1. Select **SaladCloud AI Gateway**.
+    2. Enter your organization's **AI Gateway API key** when prompted.
+    3. For **Base URL**, accept `https://ai.salad.cloud/v1`, or enter it if needed.
+    4. Select `qwen3.6-35b-a3b` as your default model, then finish the wizard.
+
+    If you have already configured Hermes and only want to change the provider and model, run `hermes setup model`
+    instead of the full wizard.
+
+    Hermes saves the API key and URL locally in `~/.hermes/.env` and full configuration in
+    `~/.hermes/config.yaml`. It loads these settings in future sessions, so **you do not need to export the key each
+    time you open a terminal**. With a custom `HERMES_HOME`, the files are saved under that directory instead. Keep
+    the `.env` file private and do not commit it to Git.
+
+    <Note>
+      Run the Git installation step before setup so that **SaladCloud AI Gateway** appears in the provider list.
+      The setup wizard saves credentials; it does not install the plugin. This remains a separately installed
+      plugin, not a provider bundled with Hermes.
+    </Note>
+
+    <Accordion title="Alternative: supply the key for a single terminal session">
+      If you do not use the setup wizard, export your AI Gateway key in the terminal where you launch Hermes:
+
+      ```bash
+      export SALAD_API_KEY="your-ai-gateway-api-key"
+      ```
+
+      The plugin also accepts `SALAD_CLOUD_API_KEY`, but `SALAD_API_KEY` takes precedence if both are set. Use the
+      explicit provider/model command in Step 5. Exporting a variable does not save it for future terminal sessions.
+
+    </Accordion>
+
+    You do not need to edit Hermes source code. See the
+    [Hermes model-provider plugin documentation](https://hermes-agent.nousresearch.com/docs/developer-guide/model-provider-plugin/)
+    for details.
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
+    Run the interactive setup wizard:
+
+    ```bash
+    hermes setup
+    ```
+
+    When the wizard asks for a model provider, select **Custom OpenAI-compatible endpoint** and fill in:
+
     - **Base URL**: `https://your-endpoint.salad.cloud/v1`
     - **API key**: `dummy` (any non-empty string - the endpoint has no auth)
     - **Context length**: `262144`
@@ -135,47 +199,87 @@ When the wizard asks for a model provider, select **Custom OpenAI-compatible end
     The wizard will auto-detect the available models from your endpoint, so you do not need to specify a model name
     manually.
 
+    It also configures memory, tools, terminal backend, and optional messaging channels. You can accept defaults and
+    adjust them later with `hermes config edit`.
+
   </Tab>
 </Tabs>
-
-It also configures memory, tools, terminal backend, and optional messaging channels - you can accept defaults for
-everything and adjust later via `hermes config edit`, which opens `~/.hermes/config.yaml`.
 
 <Tip>Hermes Agent can import existing OpenClaw settings automatically if you have previously configured it.</Tip>
 
 ### Step 4: Verify Your Configuration
 
-Before testing, confirm your setup by checking the configuration file:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    Run the provider health checks:
 
-```bash
-hermes config show
-```
+    ```bash
+    hermes doctor
+    ```
 
-Verify that:
+    Check that **SaladCloud AI Gateway** appears in the provider connectivity results. A successful check confirms
+    that Hermes can discover the plugin and reach the models endpoint with your key.
 
-- `model.base_url` points to your endpoint with `/v1` appended
-- `model.api_key` is set to your Salad API key (AI Gateway) or any non-empty value (self-hosted)
-- `model.default` is detected correctly from your endpoint
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Open the configuration file:
 
-If anything looks incorrect, edit the config:
+    ```bash
+    hermes config edit
+    ```
 
-```bash
-hermes config edit
-```
+    Verify that `model.base_url` points to your endpoint with `/v1` appended, `model.api_key` is a non-empty value such
+    as `dummy`, and `model.default` is the model served by your endpoint.
+
+  </Tab>
+</Tabs>
 
 ### Step 5: Test the Connection
 
-Launch Hermes Agent:
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    After saving your settings with `hermes setup`, launch Hermes in this or a new terminal:
 
-```bash
-hermes chat
-```
+    ```bash
+    hermes chat
+    ```
+
+    Hermes uses your saved provider, model, and API key. No additional export is required. To select the provider and
+    model explicitly, or if you used the temporary environment-variable alternative:
+
+    ```bash
+    hermes chat --provider saladcloud -m qwen3.6-35b-a3b
+    ```
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    Launch Hermes with the configuration from the setup wizard:
+
+    ```bash
+    hermes chat
+    ```
+
+  </Tab>
+</Tabs>
 
 Test with a simple task:
 
 > "Summarize what SaladCloud is in two sentences."
 
 If Hermes Agent responds, your setup is complete.
+
+### Troubleshoot the AI Gateway Plugin
+
+- **`invalid choice: 'saladcloud'`**: run `hermes update`, then retry. The command must use a Hermes version with
+  model-provider plugin support.
+- **Provider missing**: confirm `__init__.py` and `plugin.yaml` are directly inside
+  `~/.hermes/plugins/model-providers/saladcloud`, or the equivalent directory under your custom `HERMES_HOME`, then
+  rerun `hermes setup model`.
+- **Key missing in a new terminal**: run `hermes setup model` to save it instead of relying on a temporary export. Make
+  sure setup and chat use the same `HERMES_HOME` or Hermes profile.
+- **`401 Unauthorized`**: use the organization-specific AI Gateway key, not the regular SaladCloud API key. Run
+  `hermes setup model` to replace a saved key. If you use `SALAD_CLOUD_API_KEY`, check that an older `SALAD_API_KEY`
+  value is not taking precedence.
 
 ## Built-in Tools
 

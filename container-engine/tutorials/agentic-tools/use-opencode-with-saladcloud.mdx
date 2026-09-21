@@ -4,7 +4,7 @@ sidebarTitle: 'OpenCode'
 description: 'Use the OpenCode terminal coding agent with Salad AI Gateway or a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: September 1, 2026_
+_Last Updated: September 17, 2026_
 
 ## Introduction
 
@@ -103,10 +103,28 @@ Choose the instructions for your backend:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    Export your Salad AI Gateway API key before asking OpenCode to discover the provider:
+    Log in once to save your AI Gateway API key in OpenCode:
 
     ```bash
-    export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"
+    opencode providers login
+    ```
+
+    1. Search for and select **SaladCloud AI Gateway**.
+    2. Paste **AI Gateway API key** you created during onboarding.
+    3. Press Enter to save it.
+
+    To skip provider selection, use `opencode providers login --provider salad-cloud` instead.
+
+    <Warning>
+      Use the key listed under **AI Gateway Keys** for your organization, not the regular SaladCloud **Current API
+      Key**. Do not add a `Salad-Api-Key` header for AI Gateway.
+    </Warning>
+
+    OpenCode saves the credential locally, so you do not need to export an environment variable each time you open a
+    terminal. Confirm that **SaladCloud AI Gateway** appears in the saved providers:
+
+    ```bash
+    opencode providers list
     ```
 
     Refresh the models catalog and verify that the model is available:
@@ -122,15 +140,22 @@ Choose the instructions for your backend:
     ```
 
     <Note>
-      OpenCode only makes providers available when their required environment variables are set. If you run the models
-      command before exporting `SALAD_CLOUD_API_KEY`, OpenCode reports `Provider not found: salad-cloud` even when its
-      models cache is current.
+      Log in before running the models command. Without a saved credential or `SALAD_CLOUD_API_KEY` in the environment,
+      OpenCode can report `Provider not found: salad-cloud` even when its models cache is current. If your version does
+      not recognize `providers`, run `opencode upgrade` or use the older alias `opencode auth login`.
     </Note>
 
     No custom provider block is required. OpenCode gets the endpoint and model metadata from models.dev and installs
     `@saladtechnologies-oss/ai-sdk-provider` automatically.
 
-    To make Salad AI Gateway the default, create or edit `~/.config/opencode/opencode.json`:
+    As an alternative to saving credentials, export the key in the same terminal before running OpenCode:
+
+    ```bash
+    export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"
+    ```
+
+    To make Salad AI Gateway the default, add the `model` setting to `~/.config/opencode/opencode.json`. A minimal
+    configuration is shown below; preserve any settings already in your file:
 
     ```json
     {
@@ -217,13 +242,14 @@ If OpenCode successfully creates the file, your setup is complete.
 
 If OpenCode reports `Provider not found: salad-cloud`:
 
-1. Confirm the API key is available in the same terminal session:
+1. Check whether SaladCloud appears in your saved providers:
 
    ```bash
-   test -n "$SALAD_CLOUD_API_KEY" && echo "API key is set"
+   opencode providers list
    ```
 
-2. Export the key before refreshing the models catalog.
+2. If it is missing, run `opencode providers login` and select **SaladCloud AI Gateway**. If you use the environment
+   variable instead, confirm that `SALAD_CLOUD_API_KEY` is set in the terminal where you run OpenCode.
 3. Check your OpenCode version and upgrade if necessary:
 
    ```bash
@@ -232,6 +258,9 @@ If OpenCode reports `Provider not found: salad-cloud`:
    ```
 
 4. Run `opencode models salad-cloud --refresh` again.
+
+If the provider is listed but requests return `401 Unauthorized`, log in again with the organization-specific AI Gateway
+key. Listing models confirms provider discovery, not that your API key is valid.
 
 ## Tips for Best Results
 
@@ -249,14 +278,13 @@ actual deployment configuration.
 
 ### Persist Your API Key
 
-To avoid re-exporting the key in every terminal session, add the appropriate variable to your shell profile:
+Choose how to keep your credentials available:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    ```bash
-    echo 'export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"' >> ~/.bashrc
-    source ~/.bashrc
-    ```
+    `opencode providers login` saves your key locally for future sessions. No shell-profile change or API key in
+    `opencode.json` is needed. Treat OpenCode's credential file as a secret and do not commit or share it. See
+    [OpenCode's authentication documentation](https://opencode.ai/docs/cli/#auth) for storage details.
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">

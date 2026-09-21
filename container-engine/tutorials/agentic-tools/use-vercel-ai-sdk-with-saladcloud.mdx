@@ -2,23 +2,29 @@
 title: 'Use Vercel AI SDK with SaladCloud'
 sidebarTitle: 'Vercel AI SDK'
 description:
-  'Learn how to build AI-powered JavaScript and Next.js applications using the Vercel AI SDK with a self-hosted model on
-  SaladCloud.'
+  'Build JavaScript and Next.js applications with AI SDK 7, the SaladCloud provider, and Salad AI Gateway or a
+  self-hosted model.'
 ---
 
-_Last Updated: September 2, 2026_
+_Last Updated: September 17, 2026_
 
 ## Introduction
 
-The [Vercel AI SDK](https://sdk.vercel.ai) is a popular framework for building AI-powered applications in JavaScript and
-TypeScript. It provides a unified interface for text generation, streaming, structured output, and tool calling - and
-includes an `@ai-sdk/openai-compatible` package for connecting to any OpenAI-compatible endpoint, including SaladCloud.
+The [Vercel AI SDK](https://ai-sdk.dev/docs/introduction) provides a shared interface for building AI-powered JavaScript
+and TypeScript applications. For AI SDK 7, use the published
+[SaladCloud provider](https://github.com/SaladTechnologies/ai-sdk-provider) to connect to Salad AI Gateway. For
+self-hosted OpenAI-compatible servers, use `@ai-sdk/openai-compatible` instead.
+
+<Note>
+  This is a direct connection to SaladCloud using the AI SDK library, not a connection through the hosted Vercel AI
+  Gateway. You do not need a Vercel account or Vercel API key.
+</Note>
 
 The Vercel AI SDK works with SaladCloud in two ways:
 
-- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Sign up for access,
-  point your app at a single shared endpoint, and use your Salad API key directly. Currently in closed beta with monthly
-  flat-rate access.
+- **[Salad AI Gateway](/ai-gateway/explanation/overview)** - no infrastructure to deploy or manage. Available in beta
+  with [pay-per-token billing](/ai-gateway/reference/pricing). Connect to the shared endpoint using your
+  organization-specific AI Gateway API key.
 - **Self-hosted model** - deploy your own SaladCloud container group for full control over the model, hardware, and
   configuration. Still very easy to set up and use.
 
@@ -27,7 +33,7 @@ The Vercel AI SDK works with SaladCloud in two ways:
 Before getting started, make sure you have:
 
 - A [SaladCloud account](https://portal.salad.com)
-- Node.js 18+ installed
+- Node.js 22 or newer installed
 
 ## Step-by-Step Setup
 
@@ -37,15 +43,11 @@ Before getting started, make sure you have:
   <Tab title="Salad AI Gateway">
     Salad AI Gateway is the fastest way to get started - no container groups to deploy, no cold starts to wait for.
 
-    1. Sign up for early access at [salad.com/ai-gateway](https://salad.com/ai-gateway).
-    2. Once approved, find your **Salad API key** in the [portal](https://portal.salad.com/api-key).
+    1. Sign in to the [SaladCloud portal](https://portal.salad.com).
+    2. Follow [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to add credits and create your
+       organization's **AI Gateway API key**.
 
-    Available models:
-
-    | Model                         | Description                                                                      |
-    | :---------------------------- | :------------------------------------------------------------------------------- |
-    | `qwen3.6-35b-a3b` | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
-    | `qwen3.5-35b-a3b` | Qwen 3.5 35B-A3B - cost-efficient agentic tasks and reasoning                   |
+    This guide uses `qwen3.6-35b-a3b`.
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -79,59 +81,68 @@ Before getting started, make sure you have:
 
 ### Step 2: Install the Dependencies
 
-In your project directory, install the Vercel AI SDK and the OpenAI-compatible provider:
+In a new project directory, initialize an ES module project. If you already have a project, keep its existing
+configuration and adapt the examples to its module system.
 
 ```bash
-npm install ai @ai-sdk/openai-compatible
-```
-
-The Vercel AI SDK uses ES modules. Make sure your `package.json` has `"type": "module"` set:
-
-```bash
+npm init -y
 npm pkg set type=module
 ```
 
-To use environment variables for your API key and endpoint, also install `dotenv`:
+Install the packages for your chosen backend:
 
-```bash
-npm install dotenv
-```
+<Tabs>
+  <Tab title="Salad AI Gateway">
+    ```bash
+    npm install ai@7 @saladtechnologies-oss/ai-sdk-provider@^0.2.0
+    ```
+
+    Version `0.2.0` of the SaladCloud provider implements the AI SDK 7 provider interface. Do not use it with
+    `ai@6` or older.
+
+  </Tab>
+  <Tab title="Self-Hosted on SaladCloud">
+    ```bash
+    npm install ai@7 @ai-sdk/openai-compatible@3
+    ```
+  </Tab>
+</Tabs>
 
 ### Step 3: Configure the SaladCloud Provider
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    Store your credentials in a `.env` file:
+    Create a `.env` file with your organization's **AI Gateway API key**:
 
     ```bash
-    SALAD_API_KEY=your-salad-api-key
+    SALAD_CLOUD_API_KEY=your-ai-gateway-api-key
     ```
 
-    Create a provider instance pointing to the AI Gateway endpoint:
+    Create `provider.js`:
 
-    ```javascript
-    import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-    import dotenv from 'dotenv'
-    dotenv.config()
+    ```javascript provider.js
+    import { saladCloud } from '@saladtechnologies-oss/ai-sdk-provider'
 
-    const saladcloud = createOpenAICompatible({
-      name: 'saladcloud',
-      baseURL: 'https://ai.salad.cloud/v1',
-      apiKey: process.env.SALAD_API_KEY,
-    })
+    export const model = saladCloud('qwen3.6-35b-a3b')
     ```
 
-    No custom headers are needed - your Salad API key in `apiKey` is all that's required.
+    The provider reads `SALAD_CLOUD_API_KEY` and defaults to `https://ai.salad.cloud/v1`. You do not need to supply a
+    base URL or custom headers. A regular SaladCloud API key is not a substitute for an AI Gateway key.
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
-    Create a provider instance pointing to your SaladCloud endpoint. If you set SaladCloud to authenticate, you need to
-    do that via the `Salad-Api-Key` request header - pass it through the `headers` option rather than `apiKey`:
+    Create a `.env` file for your container group:
 
-    ```javascript
+    ```bash
+    SALAD_API_KEY=your-saladcloud-api-key
+    SALAD_BASE_URL=https://your-endpoint.salad.cloud/v1
+    ```
+
+    Create `provider.js`. This example assumes Container Gateway authentication is enabled; omit `headers` if your
+    deployment does not use it. If your model server requires additional authentication, configure that separately.
+
+    ```javascript provider.js
     import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-    import dotenv from 'dotenv'
-    dotenv.config()
 
     const saladcloud = createOpenAICompatible({
       name: 'saladcloud',
@@ -140,38 +151,30 @@ npm install dotenv
         'Salad-Api-Key': process.env.SALAD_API_KEY,
       },
     })
+
+    export const model = saladcloud('qwen3.6-35b-a3b')
     ```
 
-    Store your credentials in a `.env` file (never hardcode secrets):
-
-    ```bash
-    SALAD_API_KEY=your-salad-api-key
-    SALAD_BASE_URL=https://your-endpoint.salad.cloud/v1
-    ```
+    Replace the model ID with the one served by your deployment. Unlike AI Gateway, Container Gateway uses the
+    `Salad-Api-Key` header when authentication is enabled.
 
   </Tab>
 </Tabs>
 
+Add `.env` and `.env.local` to your project's `.gitignore`. Keep the key on the server: do not expose it in browser code
+or a `NEXT_PUBLIC_` environment variable. In Next.js, run the provider inside a server-side route or action and store
+`SALAD_CLOUD_API_KEY` in `.env.local` or your hosting platform's secret settings.
+
 ### Step 4: Generate Text and Test the Connection
 
-Use `generateText` to test that your setup works:
+Create `test.js`. This example works with either `provider.js` above:
 
-```javascript
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+```javascript test.js
 import { generateText } from 'ai'
-import dotenv from 'dotenv'
-dotenv.config()
-
-const saladcloud = createOpenAICompatible({
-  name: 'saladcloud',
-  baseURL: process.env.SALAD_BASE_URL,
-  headers: {
-    'Salad-Api-Key': process.env.SALAD_API_KEY,
-  },
-})
+import { model } from './provider.js'
 
 const { text } = await generateText({
-  model: saladcloud('qwen3.6-35b-a3b'),
+  model,
   prompt: 'Explain distributed GPU computing in one paragraph.',
 })
 
@@ -181,37 +184,39 @@ console.log(text)
 Run it with:
 
 ```bash
-node test.js
+node --env-file=.env test.js
 ```
 
 If you see a response, your setup is complete.
 
 ### Streaming Chat Responses
 
-Use `streamText` for chat interfaces that display responses as they are generated:
+Create `stream.js` to display text as it is generated:
 
-```javascript
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
+```javascript stream.js
 import { streamText } from 'ai'
-import dotenv from 'dotenv'
-dotenv.config()
-const saladcloud = createOpenAICompatible({
-  name: 'saladcloud',
-  baseURL: process.env.SALAD_BASE_URL,
-  headers: {
-    'Salad-Api-Key': process.env.SALAD_API_KEY,
-  },
-})
+import { model } from './provider.js'
 
 const result = streamText({
-  model: saladcloud('qwen3.6-35b-a3b'),
-  messages: [
-    { role: 'system', content: 'You are a helpful coding assistant.' },
-    { role: 'user', content: 'How do I read a file in Python?' },
-  ],
+  model,
+  instructions: 'You are a helpful coding assistant.',
+  prompt: 'How do I read a file in Python?',
 })
 
 for await (const chunk of result.textStream) {
   process.stdout.write(chunk)
 }
+process.stdout.write('\n')
 ```
+
+```bash
+node --env-file=.env stream.js
+```
+
+## Troubleshooting
+
+- **Unsupported model version:** check `npm ls ai @saladtechnologies-oss/ai-sdk-provider`. Use `ai@7` with SaladCloud
+  provider `0.2.0`.
+- **Missing API key or HTTP 401:** load `.env` with `--env-file` and use an organization-specific AI Gateway key in
+  `SALAD_CLOUD_API_KEY`. For self-hosted deployments, check the separate `Salad-Api-Key` header configuration.
+- **Unexpected endpoint:** remove an old `SALAD_CLOUD_BASE_URL` override if you intend to use the shared AI Gateway.
