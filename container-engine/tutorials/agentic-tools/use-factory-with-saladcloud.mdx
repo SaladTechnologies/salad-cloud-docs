@@ -1,0 +1,146 @@
+---
+title: 'Use Factory with SaladCloud'
+sidebarTitle: 'Factory (Droid)'
+description: 'Connect the Factory Droid coding agent to Salad AI Gateway using your own API key.'
+---
+
+_Last Updated: September 21, 2026_
+
+Connect [Factory's Droid CLI](https://docs.factory.ai/droid-cli/quickstart) to
+[Salad AI Gateway](/ai-gateway/explanation/overview) using **BYOK (Bring Your Own Key)**. This guide uses
+`qwen3.6-35b-a3b` through the OpenAI-compatible endpoint, without deploying a container group or installing the
+SaladCloud AI SDK provider. Requests use [pay-per-token billing](/ai-gateway/reference/pricing).
+
+<Note>
+  This is a custom-model configuration, not a native SaladCloud entry in Factory's model catalog. Factory supports
+  custom models in the CLI and desktop app, but not its hosted web or mobile platforms. This walkthrough covers the CLI
+  and was tested with Droid `0.223.0`.
+</Note>
+
+## Prerequisites
+
+- A macOS or Linux terminal running Bash for the commands below
+- A [SaladCloud account](https://portal.salad.com), credits, and an organization-specific AI Gateway API key from
+  [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding)
+
+## Step 1: Install Droid
+
+Use Factory's installer, then check the installed version:
+
+```bash
+curl -fsSL https://app.factory.ai/cli | sh
+droid --version
+```
+
+If `droid` is not found, follow the installer's instructions to add its directory to your `PATH`. For other operating
+systems and installation methods, see the [Factory quickstart](https://docs.factory.ai/droid-cli/quickstart).
+
+## Step 2: Set Your AI Gateway Key
+
+Enter your key at the hidden prompt so it is not included in your shell history:
+
+```bash
+read -r -s -p 'Salad AI Gateway API key: ' SALAD_CLOUD_API_KEY
+printf '\n'
+export SALAD_CLOUD_API_KEY
+```
+
+Use your organization's **AI Gateway key**, not a regular SaladCloud API key or a Factory API key. Keep this terminal
+open for the following steps. The export applies to this shell and programs launched from it; in a new terminal, repeat
+this step or load the variable through your secret manager. Do not commit the key to your project.
+
+## Step 3: Add the Custom Model
+
+Create the configuration directory if necessary:
+
+```bash
+mkdir -p ~/.factory
+```
+
+Open `~/.factory/settings.json` in your editor and add the following configuration. If the file already exists, preserve
+your settings and append the model object to its `customModels` array instead of replacing the file. To disable cloud
+session syncing in an existing configuration too, set its top-level `cloudSessionSync` to `false`.
+
+```json
+{
+  "cloudSessionSync": false,
+  "customModels": [
+    {
+      "model": "qwen3.6-35b-a3b",
+      "displayName": "SaladCloud-Qwen3.6-35B",
+      "baseUrl": "https://ai.salad.cloud/v1",
+      "apiKey": "${SALAD_CLOUD_API_KEY}",
+      "provider": "generic-chat-completion-api",
+      "maxOutputTokens": 8192
+    }
+  ]
+}
+```
+
+Keep `${SALAD_CLOUD_API_KEY}` as written: Droid reads the exported variable when it starts. The example disables cloud
+session syncing and uses an 8,192-token output budget; this budget is a client setting, not the model's maximum output
+limit.
+
+<Warning>
+  Use `generic-chat-completion-api`, not `openai`: Factory's `openai` provider uses the Responses API. The configuration
+  above uses Chat Completions and sends your key as Bearer authentication automatically. Do not add a `Salad-Api-Key`
+  header or append `/chat/completions` to the base URL.
+</Warning>
+
+See [Factory's BYOK reference](https://docs.factory.ai/model-independence/byok) for the supported configuration fields.
+
+## Step 4: Test the Connection
+
+Run a small request from the same terminal:
+
+```bash
+droid exec --model 'custom:SaladCloud-Qwen3.6-35B-0' \
+  'Reply with exactly: FACTORY_SALAD_OK. Do not use tools.'
+```
+
+The response should contain:
+
+```text
+FACTORY_SALAD_OK
+```
+
+Factory's CLI model ID combines `custom:`, the display name with spaces replaced by dashes, and the model's zero-based
+index in `customModels`. The `-0` suffix assumes this is your first custom model. Adjust it if you appended the entry
+after other models; the API model name remains `qwen3.6-35b-a3b`.
+
+For machine-readable streamed output:
+
+```bash
+droid exec --model 'custom:SaladCloud-Qwen3.6-35B-0' --output-format stream-json \
+  'Explain in three short sentences how an AI coding assistant can help review code. Do not use tools.'
+```
+
+These commands send real requests billed to your SaladCloud organization. A zero Factory-credit count does not mean the
+Salad request is free. The headless BYOK smoke test on Droid `0.223.0` worked with the Salad key alone, without a
+Factory login or `FACTORY_API_KEY`.
+
+## Step 5: Use Droid in Your Project
+
+From your project directory, run:
+
+```bash
+droid
+```
+
+Complete Factory's sign-in flow if prompted. Run `/model`, select **SaladCloud-Qwen3.6-35B** under **Custom models**,
+and start with a read-only task such as:
+
+> Read the README and summarize how to run this project. Do not change any files.
+
+Review requested permissions before allowing file edits or command execution. See the
+[Droid CLI reference](https://docs.factory.ai/droid-cli/cli-reference) for autonomy controls.
+
+## Troubleshooting
+
+- **Model not found:** check the display name and zero-based index in the `custom:` ID. Use `settings.json` with
+  `customModels`, not the legacy `config.json` format.
+- **Missing key or HTTP 401:** repeat Step 2 in the terminal where you launch Droid and verify that the key belongs to
+  AI Gateway. The environment-variable reference does not save the key itself.
+- **HTTP 404 or Responses API errors:** use `generic-chat-completion-api` and exactly `https://ai.salad.cloud/v1`.
+- **Custom models blocked:** your Factory organization may restrict custom models or permitted endpoint URLs. Ask your
+  administrator to allow Salad's endpoint.
