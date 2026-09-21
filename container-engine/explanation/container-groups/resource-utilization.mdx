@@ -50,8 +50,8 @@ same data on each instance:
 
 Both percentages are relative to **what you requested for the container group**, not to the node's total hardware:
 
-- `cpu_percent` is measured against the **number of vCPUs** you configured (1–16).
-- `memory_usage_percent` is measured against the **memory (RAM)** you configured (1–60 GB).
+- `cpu_percent` is measured against the **number of vCPUs** you configured.
+- `memory_usage_percent` is measured against the **memory (RAM)** you configured.
 
 So a container group configured with 4 vCPUs that reports `CPU 50%` is consuming the equivalent of 2 full cores. This is
 deliberately not a percentage of the node: SaladCloud nodes vary widely in size, and a percentage of node hardware would
