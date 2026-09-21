@@ -98,41 +98,41 @@ billable request.
 
 ## Facts agents get wrong
 
-These are verified behaviors of the current platform. When one of them surprises the user, cite it rather than
-re-deriving it.
+When one of these surprises the user, cite it rather than re-deriving it. If live API behavior contradicts a row, trust
+the live behavior and report the row as stale.
 
-| Area       | Fact                                                                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Updates    | A container group update is an RFC 7386 merge patch, but `environment_variables` is **replaced, not merged** — send the complete map every time.                                           |
-| Updates    | Setting `replicas` puts scheduled scaling on hold; re-enable it explicitly if the user relies on it.                                                                                       |
-| Updates    | A patch on a CPU-only group resets `container.priority` to batch; `networking` in a patch accepts only `port`; `image_caching` is ignored on write.                                        |
-| Updates    | `autostart_policy` is a create-time intent that the platform flips to `false` once the group starts; a later read showing `false` is expected, not a lost setting. Use start/stop instead. |
-| Names      | A deleted group's name stays taken for a minute or two (soft delete); a create that fails on the name right after a delete is not a permissions problem.                                   |
-| Instances  | An invalid `container.command` does not fail the deploy: the instance sits in `creating` indefinitely with no failure event. Check the command before waiting on state.                    |
-| Logs       | The first stdout line of a freshly started container is not ingested. Log entries carry no unique ID, and `receive_time` cannot be queried — window on emission time.                      |
-| Quota      | Quota counts replicas of stopped groups and the autoscaling maximum, not just what is running.                                                                                             |
-| Priority   | High priority prevents preemption **by other workloads** only; the node can still go offline. Priority is a `container.priority` field: `high`, `medium`, `low`, `batch`.                  |
-| Images     | Over 35 GB compressed fails to pull. A pull that has been "Downloading" longer than about two minutes per GB usually means a slow node; reallocating is normal, not a defect.              |
-| Gateway    | Container Gateway requires IPv6 inside the container and caps requests at 1 GB.                                                                                                            |
-| AI Gateway | `/v1/models` answers without authentication, so a successful models call proves nothing about the key; only a completion does.                                                             |
-| AI Gateway | Hosted models reason before answering unless `chat_template_kwargs.enable_thinking` is `false`; a small `max_tokens` without that flag returns an empty-looking answer.                    |
-| AI Gateway | Uncertain completions cannot be reconciled after the fact — there is no status read — so never retry a timed-out billable completion without the user's approval.                          |
+| Area       | Fact                                                                                                                                                                                                                                                |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Updates    | A container group update is an RFC 7386 merge patch, but `environment_variables` is **replaced, not merged** — send the complete map every time.                                                                                                    |
+| Updates    | Setting `replicas` puts scheduled scaling on hold; re-enable it explicitly if the user relies on it.                                                                                                                                                |
+| Updates    | A patch on a CPU-only group resets `container.priority` to batch; `networking` in a patch accepts only `port`; `image_caching` is ignored on write.                                                                                                 |
+| Updates    | `autostart_policy` is a create-time intent that the platform flips to `false` once the group starts; a later read showing `false` is expected, not a lost setting. Use start/stop instead.                                                          |
+| Names      | Container group names must be unique within the organization and project, including against deleted groups. Deleting a group does not release its name — pick a different one.                                                                      |
+| Instances  | An invalid `container.command` fails the instance at start and the platform reallocates it, so the group loops across nodes instead of settling. Repeated short-lived instances after a deploy point at the command or entrypoint, not at capacity. |
+| Quota      | Quota counts replicas of stopped groups and the autoscaling maximum, not just what is running.                                                                                                                                                      |
+| Priority   | High priority prevents preemption **by other workloads** only; the node can still go offline. Priority is a `container.priority` field: `high`, `medium`, `low`, `batch`.                                                                           |
+| Images     | Over 35 GB compressed fails to pull. A pull that has been "Downloading" longer than about two minutes per GB usually means a slow node.                                                                                                             |
+| Gateway    | Container Gateway requires IPv6 inside the container, caps requests at 1 GB, and times out a response after 100 seconds by default, returning 524 to the caller. Work that can take longer must stream its response or move to the job queue.       |
+| AI Gateway | `/v1/models` answers without authentication, so a successful models call proves nothing about the key; only a completion does.                                                                                                                      |
+| AI Gateway | Hosted models reason before answering unless `chat_template_kwargs.enable_thinking` is `false`; a small `max_tokens` without that flag returns an empty-looking answer.                                                                             |
+| AI Gateway | Uncertain completions cannot be reconciled after the fact — there is no status read — so never retry a timed-out billable completion without the user's approval.                                                                                   |
 
 ## Symptom → likely cause → next step
 
-| Symptom                                              | Likely cause                                                | Next step                                                                                |
-| ---------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| 401 or 403 on a read that should work                | Wrong key type, or org/project name mistyped                | Confirm `Salad-Api-Key` (not Bearer) and the exact names; read quotas with `get_quotas`. |
-| 404 on an organization or project                    | Name guessed or from a different account                    | Stop; ask the user for the name. The API cannot list organizations for a key.            |
-| 409 or "name taken" right after a delete             | Soft-delete window                                          | Wait one to two minutes or pick another name.                                            |
-| Instances stuck in `creating`, logs stop after start | Invalid `container.command`, or a probe that can never pass | Fix the command or probe; do not extend the wait.                                        |
-| Instances stuck in `downloading`                     | Large image or slow node                                    | Check image size; if under 35 GB, reallocate the instance or wait.                       |
-| Env var missing after an update                      | `environment_variables` replaced by a partial map           | Re-send the full map via `update_container_group`; verify with `get_container_group`.    |
-| Scheduled scaling stopped firing                     | A replicas write put it on hold                             | Re-enable scheduled scaling after the replicas change.                                   |
-| Gateway 5xx or timeouts on every request             | App listening on IPv4 only, or wrong port                   | Enable IPv6 in the image; confirm the group's `networking.port`.                         |
-| Requests dropped mid-flight                          | Instance reallocated                                        | Expected on this network; retry at the client and run more replicas.                     |
-| Create rejected for quota                            | Stopped groups or autoscaling maxima are consuming quota    | Read `get_quotas`; delete unused groups or request an increase.                          |
-| AI Gateway returns a 200 but no visible answer       | Model spent the token budget thinking                       | Set `enable_thinking: false` or raise `max_tokens`.                                      |
+| Symptom                                          | Likely cause                                                              | Next step                                                                                |
+| ------------------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 401 or 403 on a read that should work            | Wrong key type, or org/project name mistyped                              | Confirm `Salad-Api-Key` (not Bearer) and the exact names; read quotas with `get_quotas`. |
+| 404 on an organization or project                | Name guessed or from a different account                                  | Stop; ask the user for the name. The API cannot list organizations for a key.            |
+| 409 or "name taken" on create                    | The name is already in use in this project, deleted groups included       | Pick a different name; waiting will not free it.                                         |
+| Instances looping across nodes, never staying up | Invalid `container.command` or entrypoint, or a probe that can never pass | Fix the command or probe; more waiting will not help.                                    |
+| Instances stuck in `downloading`                 | Large image or slow node                                                  | Check image size; if under 35 GB, reallocate the instance or wait.                       |
+| Env var missing after an update                  | `environment_variables` replaced by a partial map                         | Re-send the full map via `update_container_group`; verify with `get_container_group`.    |
+| Scheduled scaling stopped firing                 | A replicas write put it on hold                                           | Re-enable scheduled scaling after the replicas change.                                   |
+| Gateway 5xx or timeouts on every request         | App listening on IPv4 only, or wrong port                                 | Enable IPv6 in the image; confirm the group's `networking.port`.                         |
+| 524 from the gateway on a long request           | Server response timeout, 100 s by default                                 | Stream the response, shorten the work, or move it to the job queue.                      |
+| Requests dropped mid-flight                      | Instance reallocated                                                      | Expected on this network; retry at the client and run more replicas.                     |
+| Create rejected for quota                        | Stopped groups or autoscaling maxima are consuming quota                  | Read `get_quotas`; delete unused groups or request an increase.                          |
+| AI Gateway returns a 200 but no visible answer   | Model spent the token budget thinking                                     | Set `enable_thinking: false` or raise `max_tokens`.                                      |
 
 ## Building for Salad (coding-agent guidance)
 
