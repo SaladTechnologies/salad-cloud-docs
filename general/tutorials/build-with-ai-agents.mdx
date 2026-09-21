@@ -88,7 +88,7 @@ is wrong or missing. Pair it with the skills so the agent can look up the page a
 <CodeGroup>
 
 ```bash Claude Code
-claude mcp add --transport http salad-docs https://docs.salad.com/mcp
+claude mcp add --transport http --scope user salad-docs https://docs.salad.com/mcp
 ```
 
 ```json Cursor (.cursor/mcp.json)
@@ -118,6 +118,9 @@ url = "https://docs.salad.com/mcp"
 ```
 
 </CodeGroup>
+
+`--scope user` puts the server in every project; drop it and Claude Code adds it to the current project only. Codex
+accepts `codex mcp add salad-docs --url https://docs.salad.com/mcp`, which writes the same TOML block for you.
 
 This server reads documentation only. It does not call the SaladCloud API on your behalf; for that, the agent uses your
 API key directly, as described next.
