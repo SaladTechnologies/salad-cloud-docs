@@ -90,10 +90,6 @@ A few consequences follow from the sampling model:
 
 ## Why utilization can exceed 100%
 
-It is normal and expected to see CPU or RAM above 100% on SaladCloud, and the Portal deliberately shows the real number
-rather than clamping it at 100%. The reason is that the vCPU and RAM values you configure are a **request used for
-scheduling and billing**, and they are not enforced as a hard ceiling in every case.
-
 ### GPU workloads
 
 For container groups with a GPU class, vCPUs and RAM are included in the GPU price — as described in
