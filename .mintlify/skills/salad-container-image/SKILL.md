@@ -102,8 +102,11 @@ documentation pages above; do not rely on this skill's summary when the two disa
    probes at a port that is not the gateway port.
 7. **Handle reallocation as normal.** Retry at the client; checkpoint long work to the user's storage, S4, or a queue;
    on an unrecoverable local condition (bad node, missing GPU capability), call IMDS `reallocate` rather than exiting
-   and hoping. Exit `137` after reallocate or restart is expected. Run at least two replicas (the docs recommend three
-   for latency-sensitive work) — one replica has no failover.
+   and hoping. Exit `137` after reallocate or restart is expected. Replica count follows the workload shape from step 1:
+   anything serving callers through the gateway needs at least two (three for latency-sensitive work), because one
+   replica means downtime on every node event. For queue workers and batch jobs replica count is a throughput and cost
+   decision, and a deliberate single-replica group per unit of work is a supported pattern — ask the user which shape
+   applies instead of defaulting to a number.
 8. **For queue workloads, implement the worker contract.** The Salad Job Queue Worker binary runs inside the container
    next to the app (s6-overlay or a supervising shell script), pulls jobs from the SaladCloud queue, and delivers each
    job as an HTTP request to the app on the local **port and path** configured in the container group's queue
