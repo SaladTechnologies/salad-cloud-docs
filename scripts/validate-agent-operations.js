@@ -24,6 +24,8 @@ const runbooks = [
     'agents/reference/safety-retries-and-freshness.mdx',
 ]
 const skills = [
+    'salad',
+    'salad-container-image',
     'salad-container-engine-preflight',
     'salad-container-engine-deploy',
     'salad-container-engine-operate',
