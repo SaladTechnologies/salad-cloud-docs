@@ -4,7 +4,7 @@ sidebarTitle: 'Getting Started'
 description: 'Make your first API call to Salad AI Gateway in under 5 minutes.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 23, 2026_
 
 <Visibility for="agents">
   > Treat examples as minimal templates, not live model or account facts. Use the `salad-ai-gateway-request` skill,
@@ -12,7 +12,9 @@ _Last Updated: September 17, 2026_
   > stop rather than retry an uncertain completion or partial stream.
 </Visibility>
 
-<Warning>Salad AI Gateway is currently in **beta**.</Warning>
+<Warning>
+  Salad AI Gateway is currently in **beta**. Pay-per-token access is self-service; no beta approval is required.
+</Warning>
 
 ## Prerequisites
 
@@ -30,11 +32,26 @@ https://ai.salad.cloud/v1
 
 ## Authentication
 
-Pass your organization-specific AI Gateway API key as a Bearer token in the `Authorization` header:
+Pass your organization-specific AI Gateway API key as a Bearer token in the `Authorization` header. Usage is billed to
+the organization associated with that key:
 
 ```
 Authorization: Bearer <your-ai-gateway-api-key>
 ```
+
+<Note>
+  Use the key created on your organization's **AI Gateway** page, not the account's **Current API Key**. The
+  `Salad-Api-Key` header used by other SaladCloud APIs does not authenticate AI Gateway requests.
+</Note>
+
+Store your key in the environment before running any example below:
+
+```bash
+export SALAD_AI_GATEWAY_API_KEY="<your-ai-gateway-api-key>"
+```
+
+Keep the key server-side and out of source control. See
+[Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key) to copy, regenerate, or delete it.
 
 ## Step 1: Test with curl
 
@@ -106,11 +123,12 @@ pip install openai
 ```
 
 ```python
+import os
 from openai import OpenAI
 
 client = OpenAI(
     base_url="https://ai.salad.cloud/v1",
-    api_key="your-ai-gateway-api-key",
+    api_key=os.environ["SALAD_AI_GATEWAY_API_KEY"],
 )
 
 response = client.chat.completions.create(
@@ -119,22 +137,6 @@ response = client.chat.completions.create(
 )
 
 print(response.choices[0].message.content)
-```
-
-Store your key in an environment variable rather than hardcoding it:
-
-```bash
-export SALAD_AI_GATEWAY_API_KEY=your-ai-gateway-api-key
-```
-
-```python
-import os
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="https://ai.salad.cloud/v1",
-    api_key=os.environ["SALAD_AI_GATEWAY_API_KEY"],
-)
 ```
 
 ## Step 4: Streaming
@@ -197,3 +199,4 @@ See the [Models Reference](/ai-gateway/reference/models) for full details.
 - Browse [integration guides](/ai-gateway/integrations/overview) for agentic tools, IDEs, and frameworks
 - Read the [Models Reference](/ai-gateway/reference/models) for model capabilities and limits
 - Review [AI Gateway Pricing](/ai-gateway/reference/pricing) for input and output token rates
+- Check [AI Gateway Errors](/ai-gateway/reference/errors) for credit or access failures

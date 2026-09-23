@@ -3,7 +3,7 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: September 21, 2026_
+_Last Updated: September 22, 2026_
 
 <Visibility for="agents">
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
@@ -40,6 +40,12 @@ Salad-Api-Key: YOUR_API_KEY
 This authentication scheme is also used to access container groups (when authentication is enabled) and inference
 endpoints.
 
+<Note>
+  AI Gateway pay-per-token requests use a separate key for each user and organization, sent as
+  `Authorization: Bearer <your-ai-gateway-api-key>`. The account key described above is not a substitute. See
+  [Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key).
+</Note>
+
 ## Get your SaladCloud API Key
 
 Navigate to the `API Access` section under the account drop down
@@ -62,9 +68,14 @@ user and organization:
 
 Send this key as a Bearer token in the `Authorization` header. Follow
 [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) for the complete setup and first-request
-workflow.
+workflow, or [Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key) for regeneration, expiration
+delays, deletion, and organization membership changes. Gateway-specific access errors are documented in
+[AI Gateway Errors](/ai-gateway/reference/errors).
 
 ## Refreshing API Keys
+
+This section applies to the account's **Current API Key**. Manage AI Gateway keys separately on each organization's **AI
+Gateway** page.
 
 If you need to update your API key for any reason, you can refresh the API key from the `API Access` page. Select
 **Change API Key**, then choose how long the previous key should remain valid.

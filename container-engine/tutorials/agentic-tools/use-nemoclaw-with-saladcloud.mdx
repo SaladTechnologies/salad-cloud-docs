@@ -5,7 +5,7 @@ description:
   'Learn how to use NVIDIA NemoClaw - a secure, sandboxed OpenClaw runtime with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 22, 2026_
 
 ## Introduction
 
@@ -106,8 +106,8 @@ nemoclaw --version
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    AI Gateway uses standard Bearer token authentication. Enter your Salad API key when the onboarding wizard prompts
-    for an API key - no additional configuration needed.
+    AI Gateway uses standard Bearer token authentication. Enter your organization-specific AI Gateway key when the
+    onboarding wizard prompts for an API key, not your account API key. No custom headers are needed.
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
     For easy setup, when deploying your SaladCloud container group, leave the **Authentication** toggle off. Your
@@ -142,8 +142,8 @@ When prompted to select an inference endpoint:
 
 <Tabs>
   <Tab title="Salad AI Gateway">
-    - **Endpoint URL**: `https://ai.salad.cloud/v1` - **API key**: your Salad API key - **Model name**: e.g.
-    `qwen3.6-35b-a3b`
+    - **Endpoint URL**: `https://ai.salad.cloud/v1` - **API key**: your organization-specific AI Gateway API key -
+    **Model name**: e.g. `qwen3.6-35b-a3b`
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
     - **Endpoint URL**: `https://your-endpoint.salad.cloud/v1` - **API key**: any non-empty string (e.g., `dummy`) since

@@ -1,10 +1,10 @@
 ---
 title: 'AI Gateway Pricing'
 sidebarTitle: 'Pricing'
-description: 'Pay-per-token pricing for Salad AI Gateway input and output tokens.'
+description: 'AI Gateway pay-per-token rates, organization credit billing, and the closed-beta flat-rate access path.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 23, 2026_
 
 <Visibility for="agents">
   > Treat these published rates as current documentation, not live account balance or historical usage. Confirm the
@@ -17,12 +17,29 @@ _Last Updated: September 17, 2026_
 
 ## Pay-Per-Token Billing
 
-Salad AI Gateway uses pay-per-token billing. Usage is charged for input and output tokens at the published rates below,
-with no concurrency limit.
+Self-service AI Gateway access uses pay-per-token billing. Usage is charged for input and output tokens at the published
+rates below, with no concurrency limit.
 
-Usage draws from your organization's SaladCloud credit balance. Follow
-[Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to add credits and create an
-organization-specific AI Gateway API key.
+Each AI Gateway key belongs to one user and one organization. Usage is billed to the organization associated with the
+key and draws from that organization's SaladCloud credit balance. The organization must have a **positive credit
+balance** when a request is admitted. Follow [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding)
+to add credits and create an organization-specific AI Gateway API key.
+
+Requests already admitted are allowed to complete and their tokens are billed even if credits run out during generation.
+New requests are rejected with `402 credits_exhausted` once the credit balance is no longer positive. Likewise, revoking
+or regenerating a key does not cancel or remove charges for requests already admitted. See
+[key lifecycle behavior](/ai-gateway/how-to-guides/manage-api-key#requests-already-in-progress).
+
+See [Errors](/ai-gateway/reference/errors) for suggested actions and safe retry behavior.
+
+## Closed Beta
+
+The existing allowlisted closed-beta path remains a separate access option with a flat monthly fee and no per-token
+charges under that plan. It does not require self-service pay-per-token enrollment. Contact
+[SaladCloud Support](/support/contact) about your existing plan or access.
+
+The rates below apply to pay-per-token requests, not to usage covered by the closed-beta flat-rate plan. See
+[Access Model](/ai-gateway/explanation/overview#access-model) for the two paths.
 
 ## Pay-Per-Token Rates
 

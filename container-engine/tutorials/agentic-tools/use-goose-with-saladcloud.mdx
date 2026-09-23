@@ -5,7 +5,7 @@ description:
   'Learn how to use Goose, an open-source extensible AI agent by Block, with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 22, 2026_
 
 ## Introduction
 
@@ -116,7 +116,7 @@ follow these steps:
 <Tabs>
   <Tab title="Salad AI Gateway">
     - **API URL**: `https://ai.salad.cloud/v1/chat/completions`
-    - **API key**: your Salad API key
+    - **API key**: your organization-specific AI Gateway API key, not your account API key
     - **Available models**: e.g. `qwen3.6-35b-a3b`
     - When asked **"Does this provider require custom headers?"**, select **No**
 
@@ -130,7 +130,7 @@ follow these steps:
       "engine": "openai",
       "display_name": "SaladCloud AI Gateway",
       "description": "Salad AI Gateway",
-      "api_key_env": "SALAD_API_KEY",
+      "api_key_env": "SALAD_AI_GATEWAY_API_KEY",
       "base_url": "https://ai.salad.cloud/v1",
       "models": [
         { "name": "qwen3.6-35b-a3b", "context_limit": 262144 },
@@ -144,7 +144,7 @@ follow these steps:
     Then set the environment variable:
 
     ```bash
-    export SALAD_API_KEY=your-salad-api-key
+    export SALAD_AI_GATEWAY_API_KEY=your-ai-gateway-api-key
     ```
 
   </Tab>
@@ -217,8 +217,8 @@ Download and run the app, then on the startup page:
     1. Click **Connect to a Provider** 2. Click **Add Custom Provider** 3. Click **Configure Manually** and fill in: -
     **Provider Type**: OpenAI Compatible - **Display Name**: `SaladCloud AI Gateway` - **API URL**:
     `https://ai.salad.cloud/v1/` - **API Base Path**: leave blank - Under **Authentication**, select **This provider
-    requires API Key** and enter your Salad API key - **Available Models**: `qwen3.6-35b-a3b, qwen3.5-35b-a3b` 4. Click
-    **Create Provider** and start using Goose
+    requires API Key** and enter your organization-specific AI Gateway key - **Available Models**: `qwen3.6-35b-a3b,
+    qwen3.5-35b-a3b` 4. Click **Create Provider** and start using Goose
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
     1. Click **Connect to a Provider** 2. Click **Add Custom Provider** 3. Click **Configure Manually** and fill in: -

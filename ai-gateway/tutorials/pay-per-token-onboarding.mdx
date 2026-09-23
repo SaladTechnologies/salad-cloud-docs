@@ -4,7 +4,7 @@ sidebarTitle: 'Pay-Per-Token Onboarding'
 description: 'Create an organization-specific Salad AI Gateway API key and make your first pay-per-token request.'
 ---
 
-_Last Updated: September 1, 2026_
+_Last Updated: September 23, 2026_
 
 <Visibility for="agents">
   > Account, organization, credit, and key creation are user-facing Portal actions. Never ask the user to paste a key,
@@ -12,7 +12,9 @@ _Last Updated: September 1, 2026_
   > the [AI Gateway request runbook](/agents/ai-gateway/select-model-and-send-request).
 </Visibility>
 
-<Warning>Salad AI Gateway is currently in **beta**.</Warning>
+<Warning>
+  Salad AI Gateway is currently in **beta**. Pay-per-token access is self-service; no beta approval is required.
+</Warning>
 
 Pay-per-token access is self-service. Each AI Gateway API key belongs to one user and one organization, and usage made
 with that key is billed to the organization's credit balance.
@@ -34,6 +36,9 @@ with that key is billed to the organization's credit balance.
 AI Gateway pay-per-token usage draws from the selected organization's SaladCloud credit balance. In the organization,
 select **Billing & Usage** from the left navigation and add credits. The organization must have a positive credit
 balance before it can process AI Gateway requests.
+
+Credits are checked when each request is admitted. If credits run out during generation, requests already admitted are
+allowed to complete and are billed; new requests return `402 credits_exhausted` until the balance is positive.
 
 See [Billing](/general/explanation/billing) for instructions on adding credits and configuring auto recharge.
 
@@ -69,7 +74,9 @@ The key is associated with your user and the selected organization. Do not share
 </Note>
 
 The API Access page shows only AI Gateway keys that you created. To reveal, regenerate, or delete a key, click
-**Manage** or return to that organization's **AI Gateway** page.
+**Manage** or return to that organization's **AI Gateway** page. Follow
+[Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key) for expiration delays, deletion, and what
+happens when organization membership changes.
 
 ## Step 5: Store the Key Securely
 
@@ -106,3 +113,4 @@ at the [published pay-per-token rates](/ai-gateway/reference/pricing).
   examples.
 - Review the [Models reference](/ai-gateway/reference/models) for model IDs and capabilities.
 - Browse [AI Gateway integrations](/ai-gateway/integrations/overview) for coding agents, IDEs, and frameworks.
+- Check [AI Gateway Errors](/ai-gateway/reference/errors) for credit or access failures.

@@ -1,0 +1,100 @@
+---
+title: 'Manage Your AI Gateway API Key'
+sidebarTitle: 'Manage API Key'
+description:
+  'Create, copy, regenerate, and delete an organization-specific AI Gateway key, and understand its lifecycle.'
+---
+
+_Last Updated: September 23, 2026_
+
+Use this guide to manage the key for AI Gateway pay-per-token access. For account setup, credits, and a first request,
+start with [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding).
+
+## Key Scope and Billing
+
+Each key belongs to one user and one organization. You can create one current AI Gateway key per organization you belong
+to; other members manage their own keys. Usage with your key is billed to that organization's SaladCloud credit balance.
+Use a separate key for each organization you want to bill.
+
+<Note>
+  An AI Gateway key is not your account's **Current API Key**. Send the Gateway key in `Authorization: Bearer`, not in
+  the `Salad-Api-Key` header. Changing your account API key does not rotate your AI Gateway keys.
+</Note>
+
+## Create a Key
+
+1. Sign in to the [SaladCloud portal](https://portal.salad.com) and open the organization you want to bill.
+2. Select **AI Gateway** in the organization's left navigation.
+3. Click **Create API Key for _organization name_**.
+
+If you already have a key for this organization, copy or regenerate it instead of creating another one. The organization
+needs a positive credit balance for pay-per-token requests to be admitted.
+
+## Find and Copy a Key
+
+1. Select your username in the upper-right corner of the portal, then select **API Access**.
+2. Under **AI Gateway Keys**, find the organization you want to bill.
+3. Click the copy icon next to that organization's masked key.
+
+This list contains only keys you created, across your organizations. The **Current API Key** above the list is the
+separate account key. Select **Manage** to return to an organization's **AI Gateway** page, where you can reveal,
+regenerate, or delete its key.
+
+Store the copied value in a secret environment variable named `SALAD_AI_GATEWAY_API_KEY` or your application's secret
+manager. Never commit it to source control, expose it in browser code, or share it with other users.
+
+## Regenerate a Key
+
+Regeneration creates a replacement for your key in the same organization. Use an expiration delay to migrate clients
+without interrupting new requests during the changeover:
+
+1. Open the organization's **AI Gateway** page, directly or through **Manage** on the **API Access** page.
+2. Choose "Change API Key" for the key you want to regenerate.
+3. Choose when the previous key should expire, then confirm regeneration. The expiration delay applies to the **previous
+   key**, not the replacement.
+4. Copy the replacement key and update every application or secret store that uses the old value.
+5. Before the delay expires, verify your applications use the replacement key. A test completion consumes tokens and is
+   billed to the organization.
+
+During the overlap, both keys can admit requests, subject to the organization's access and credit balance. After the
+delay expires, the previous key no longer admits new requests. If you choose immediate expiration, there is no overlap.
+
+<Warning>
+  If a key has been exposed, expire it immediately or delete it. An expiration delay lets anyone holding the previous
+  key continue to submit requests until it expires. Regeneration does not cancel requests already admitted.
+</Warning>
+
+## Delete a Key
+
+1. Open the organization's **AI Gateway** page.
+2. Choose the key's delete action and confirm deletion.
+3. Remove the deleted credential from applications and secret stores that used it.
+
+Deletion revokes the key for new requests. To resume access, create a new key and update your clients. Deleting a key
+does not cancel requests already admitted or remove charges for their usage.
+
+## Organization Membership and Deletion
+
+- If you leave or are removed from an organization, your AI Gateway key for that organization is deleted. Keys for other
+  organizations are unaffected.
+- If an organization is deleted, all AI Gateway keys belonging to it are deleted.
+- If your user account is deleted, all of your AI Gateway keys are deleted.
+
+An old key is not restored if you later rejoin an organization. Create a new key after your membership is restored.
+
+## Requests Already in Progress
+
+The Gateway checks the key and pay-per-token access conditions when it admits a request, not continuously during
+generation. Requests already admitted, including streaming responses, are allowed to complete and their token usage is
+billed to the key's organization even if:
+
+- The key is deleted, revoked, or regenerated while the request is running.
+- The previous key's expiration delay ends while the request is running.
+- The organization's credits run out while the request is running.
+
+Key revocation and credit exhaustion prevent new requests; they do not cancel work already admitted. A client timeout or
+disconnected stream also does not prove the request was cancelled. Do not automatically resend an uncertain request,
+because another completion can incur another charge.
+
+See [Pricing](/ai-gateway/reference/pricing) for billing and [Errors](/ai-gateway/reference/errors) for rejected
+requests and suggested actions.

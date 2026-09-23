@@ -4,7 +4,7 @@ sidebarTitle: 'Overview'
 description: 'Connect Salad AI Gateway to your favorite coding agents, IDEs, messaging bots, and developer frameworks.'
 ---
 
-_Last Updated: September 21, 2026_
+_Last Updated: September 22, 2026_
 
 <Visibility for="agents">
   > Verify each tool's exact base URL, Bearer-key environment variable, installed version, model ID, and streaming
@@ -15,6 +15,12 @@ _Last Updated: September 21, 2026_
 Salad AI Gateway exposes a standard OpenAI-compatible endpoint, so any tool that supports a custom base URL works with
 it out of the box. Set the base URL to `https://ai.salad.cloud/v1` and use your
 [organization-specific AI Gateway API key](/ai-gateway/tutorials/pay-per-token-onboarding) for authentication.
+
+<Note>
+  Use `Authorization: Bearer` with the AI Gateway key, not your account's **Current API Key** or a `Salad-Api-Key`
+  custom header. Where a guide offers both backends, choose its **Salad AI Gateway** tab. The **Self-Hosted on
+  SaladCloud** tab applies to your own Container Engine deployment and retains its separate authentication setup.
+</Note>
 
 ## Coding Agents & IDEs
 
