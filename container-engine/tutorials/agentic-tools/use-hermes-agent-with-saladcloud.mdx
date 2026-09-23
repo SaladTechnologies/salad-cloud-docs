@@ -6,7 +6,7 @@ description:
   SaladCloud.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 22, 2026_
 
 ## Introduction
 
@@ -170,11 +170,13 @@ hermes --version
       If you do not use the setup wizard, export your AI Gateway key in the terminal where you launch Hermes:
 
       ```bash
-      export SALAD_API_KEY="your-ai-gateway-api-key"
+      export SALAD_CLOUD_API_KEY="your-ai-gateway-api-key"
       ```
 
-      The plugin also accepts `SALAD_CLOUD_API_KEY`, but `SALAD_API_KEY` takes precedence if both are set. Use the
-      explicit provider/model command in Step 5. Exporting a variable does not save it for future terminal sessions.
+      The plugin also accepts `SALAD_API_KEY`, which takes precedence if both are set. Make sure an existing
+      `SALAD_API_KEY` does not supply an account API key instead: use a separate terminal environment for Gateway
+      access. Use the explicit provider/model command in Step 5. Exporting a variable does not save it for future
+      terminal sessions.
 
     </Accordion>
 

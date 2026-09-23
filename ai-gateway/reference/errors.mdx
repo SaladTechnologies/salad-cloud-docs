@@ -1,0 +1,52 @@
+---
+title: 'AI Gateway Errors'
+sidebarTitle: 'Errors'
+description: 'Resolve AI Gateway credit and access errors without unsafe retries.'
+---
+
+_Last Updated: September 23, 2026_
+
+Read the HTTP status and error code together when an AI Gateway request fails.
+
+## Pay-Per-Token Access Errors
+
+| HTTP status | Error code          | Meaning                                                                     | Suggested action                                                                                                                                                        |
+| ----------- | ------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `402`       | `credits_exhausted` | The organization billed by the key no longer has a positive credit balance. | Add credits through that organization's **Billing & Usage** page, then retry after the balance is positive. Check that your key belongs to the organization you funded. |
+| `403`       | `no_access`         | The credential does not have AI Gateway access.                             | Use the intended organization's AI Gateway key, confirm your organization membership and access, and contact support if access is still denied. Do not retry unchanged. |
+
+For credit management, see [Billing](/general/explanation/billing). For creating, replacing, or revoking a key, see
+[Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key). For the distinction between self-service
+pay-per-token access and closed-beta access, see [Access Model](/ai-gateway/explanation/overview#access-model).
+
+## Authentication Checks
+
+For missing or invalid credentials, check all of the following without logging the key:
+
+- The base URL is `https://ai.salad.cloud/v1`.
+- The request uses `Authorization: Bearer <your-ai-gateway-api-key>`.
+- The value is the organization's **AI Gateway key**, not the account's **Current API Key**.
+- The key has not been deleted or replaced by a regenerated key whose overlap period has ended.
+
+A successful `GET /v1/models` request confirms model discovery, not that your key or credit balance permits a billable
+completion.
+
+## Admission and In-Flight Requests
+
+Key validity and pay-per-token access are checked when a request is admitted. A request rejected at admission for one of
+the access errors above is not processed as a completion.
+
+Once admitted, a request can finish and its tokens are billed even if its key is revoked or regenerated, or the
+organization's credits run out before it finishes. This also applies to streaming requests. Deleting a key is not a way
+to cancel an existing completion or avoid its charge. See
+[Requests Already in Progress](/ai-gateway/how-to-guides/manage-api-key#requests-already-in-progress).
+
+## Retry Safely
+
+- For `credits_exhausted` or `no_access`, resolve the billing or access issue before submitting again.
+- After a timeout, connection failure, server error, or partial stream, the outcome and charge can be uncertain. Do not
+  automatically repeat the request; a new completion can incur another charge.
+
+If the issue persists, [contact SaladCloud Support](/support/contact) with the endpoint, model ID, UTC time, HTTP
+status, error code, and request identifier if provided. Do not include API keys or sensitive prompts and outputs. Agents
+should follow the [troubleshooting runbook](/agents/ai-gateway/troubleshoot-request).

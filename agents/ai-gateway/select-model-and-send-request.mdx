@@ -6,7 +6,7 @@ description:
   credentials or automatically repeating uncertain billable work.'
 ---
 
-_Last Updated: September 1, 2026_
+_Last Updated: September 23, 2026_
 
 ## When to use this runbook
 
@@ -36,6 +36,8 @@ Engine model; run an unapproved load test; or automatically repeat a request who
 | Create a chat response  | `POST https://ai.salad.cloud/v1/chat/completions` — [Getting Started](/ai-gateway/tutorials/getting-started)                     |
 | Authenticate            | `Authorization: Bearer <organization-specific-key>` — [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) |
 | Compare published rates | [AI Gateway Pricing](/ai-gateway/reference/pricing)                                                                              |
+| Key lifecycle           | [Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key)                                                       |
+| Access errors           | [AI Gateway Errors](/ai-gateway/reference/errors)                                                                                |
 
 This repository does not currently contain an OpenAPI specification for Salad AI Gateway. Do not infer unsupported
 request fields, response fields, idempotency, retry guarantees, or model availability from the SaladCloud public API
@@ -107,7 +109,9 @@ output safely. A disconnected stream can have an uncertain final outcome and cha
 | Requested model appears in the live catalog        | Use that exact ID.                                                                                             |
 | Requested model is absent                          | Stop or request approval for a live alternative; do not silently substitute.                                   |
 | Model choice is open and cost matters              | Compare current published rates and required capabilities, then state the selected tradeoff.                   |
-| `401` or `403`                                     | Stop; distinguish the AI Gateway key from the regular SaladCloud API key and request valid authorization.      |
+| `401` or other `403`                               | Stop; distinguish the AI Gateway key from the regular SaladCloud API key and request valid authorization.      |
+| `402 credits_exhausted`                            | Stop; ask the user to restore the key's organization's positive credit balance before retrying.                |
+| `403 no_access`                                    | Stop; confirm the intended organization, key, membership, and access. Do not substitute the account API key.   |
 | Clear validation failure                           | Correct only documented fields; do not retry the unchanged body.                                               |
 | `429` with `Retry-After`                           | Honor the header within the caller's budget; retry only when the response clearly rejected the request.        |
 | Transport failure, timeout, or `5xx` after sending | Treat completion and billing as uncertain; do not automatically repeat the prompt.                             |
@@ -122,6 +126,10 @@ complete JSON response.
 
 An accepted or partially streamed request is billable work, not an idempotent resource mutation. The service exposes no
 read endpoint that can reconcile whether an uncertain chat completion finished after the client disconnected.
+
+The key and pay-per-token access conditions are checked at request admission. Requests already admitted can complete and
+are billed even if the key is revoked or regenerated, or organization credits run out during generation. Do not use key
+deletion or rotation as cancellation, and do not assume these events make an uncertain completion safe to retry.
 
 ## Retry behavior
 

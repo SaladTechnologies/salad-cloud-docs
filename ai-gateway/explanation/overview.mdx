@@ -4,7 +4,7 @@ sidebarTitle: 'Overview'
 description: 'OpenAI-compatible LLM API powered by SaladCloud distributed GPU infrastructure.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: September 22, 2026_
 
 <Visibility for="agents">
   > Use the `salad-ai-gateway-request` skill and [AI Gateway request
@@ -13,7 +13,9 @@ _Last Updated: September 17, 2026_
   > work.
 </Visibility>
 
-<Warning>Salad AI Gateway is currently in **beta**.</Warning>
+<Warning>
+  Salad AI Gateway is currently in **beta**. Pay-per-token access is self-service; no beta approval is required.
+</Warning>
 
 ## What is Salad AI Gateway?
 
@@ -41,11 +43,20 @@ The following models are currently available:
 
 Additional models will be added as the service moves toward general availability.
 
+## Access Model
+
+- **Pay per token:** Self-service access with an AI Gateway key belonging to one user and one organization. Requests are
+  billed to that organization's credits; a positive balance is required to admit new requests.
+- **Closed beta:** The existing allowlisted flat-rate path remains available to approved users under their monthly plan,
+  without per-token charges. [Contact Support](/support/contact) for questions about an existing plan.
+
+The setup examples on this page use the pay-per-token path and its organization-specific AI Gateway key.
+
 ## Billing
 
-Salad AI Gateway uses **pay-per-token billing** at the
-[published input and output token rates](/ai-gateway/reference/pricing), with no concurrency limit. Usage draws from
-your organization's SaladCloud credit balance.
+Pay-per-token requests use the [published input and output token rates](/ai-gateway/reference/pricing), with no
+concurrency limit. Usage draws from the credit balance of the organization associated with your key. Requests already
+admitted complete and are billed even if credits run out during generation or the key is revoked or regenerated.
 
 Follow [Pay-Per-Token Onboarding](/ai-gateway/tutorials/pay-per-token-onboarding) to add credits and create your AI
 Gateway API key.
@@ -53,12 +64,14 @@ Gateway API key.
 ## Quick Start
 
 The API follows the OpenAI `v1/chat/completions` format. Send requests using your organization-specific AI Gateway API
-key in the `Authorization` header:
+key in the `Authorization` header. This is not the account API key used with `Salad-Api-Key`:
 
 ```bash
+export SALAD_AI_GATEWAY_API_KEY="<your-ai-gateway-api-key>"
+
 curl https://ai.salad.cloud/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-ai-gateway-api-key>" \
+  -H "Authorization: Bearer $SALAD_AI_GATEWAY_API_KEY" \
   -d '{
     "model": "qwen3.6-35b-a3b",
     "messages": [
@@ -75,10 +88,10 @@ Because Salad AI Gateway exposes a standard OpenAI-compatible endpoint, you can 
 custom base URL.
 
 We have integration guides for many popular agentic tools - Cline, Aider, OpenCode, OpenClaw, Kilo Code, Roo Code,
-Continue, Goose, Hermes Agent, and more. All of those guides apply here with one difference: **use standard
-authentication instead of the `Salad-Api-Key` custom header**. Set your organization-specific AI Gateway key as the API
-key in whichever field the tool provides (the `Authorization: Bearer` header), and point the base URL to
-`https://ai.salad.cloud/v1`.
+Continue, Goose, Hermes Agent, and more. In guides with both backends, follow the **Salad AI Gateway** tab. Self-hosted
+Container Engine deployments use different endpoints and authentication. For AI Gateway, set your organization-specific
+AI Gateway key in the tool's API key field (sent as `Authorization: Bearer`) and point the base URL to
+`https://ai.salad.cloud/v1`. Do not add a `Salad-Api-Key` custom header.
 
 <CardGroup cols={2}>
   <Card title="Cline" icon="code" href="/container-engine/tutorials/agentic-tools/use-cline-with-saladcloud">
@@ -124,11 +137,12 @@ key in whichever field the tool provides (the `Authorization: Bearer` header), a
 **Python (openai SDK):**
 
 ```python
+import os
 from openai import OpenAI
 
 client = OpenAI(
     base_url="https://ai.salad.cloud/v1",
-    api_key="your-ai-gateway-api-key",
+    api_key=os.environ["SALAD_AI_GATEWAY_API_KEY"],
 )
 
 response = client.chat.completions.create(
@@ -142,8 +156,11 @@ print(response.choices[0].message.content)
 
 ```bash
 export OPENAI_BASE_URL=https://ai.salad.cloud/v1
-export OPENAI_API_KEY=your-ai-gateway-api-key
+export OPENAI_API_KEY="$SALAD_AI_GATEWAY_API_KEY"
 ```
+
+These tool-specific variables contain the same AI Gateway key set in Quick Start, not an account API key or an OpenAI
+API key.
 
 ## Why Salad AI Gateway?
 
@@ -156,7 +173,10 @@ export OPENAI_API_KEY=your-ai-gateway-api-key
 
 ## Get Access
 
-Salad AI Gateway is currently in beta.
+Pay-per-token access is available through self-service onboarding; you do not need closed-beta approval.
 
 [Self-onboard for pay-per-token access](/ai-gateway/tutorials/pay-per-token-onboarding) or
 [learn more about Salad AI Gateway](https://salad.com/ai-gateway).
+
+Already have a key? See [Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key) for rotation and
+deletion, or [Errors](/ai-gateway/reference/errors) for billing and access failures.
