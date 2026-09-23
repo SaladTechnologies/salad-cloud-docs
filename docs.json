@@ -2,6 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "SaladCloud",
+  "description": "SaladCloud documentation: Salad Container Engine, AI Gateway, Transcription API, S4 storage, and Gateway Service. Agents: start at /general/tutorials/build-with-ai-agents.",
   "colors": {
     "primary": "#53A626",
     "light": "#53A626",
@@ -19,7 +20,7 @@
           },
           {
             "group": "Tutorials",
-            "pages": ["general/tutorials/account-setup"]
+            "pages": ["general/tutorials/account-setup", "general/tutorials/build-with-ai-agents"]
           }
         ]
       },
@@ -727,8 +728,11 @@
   "search": {
     "prompt": "Search..."
   },
+  "contextual": {
+    "options": ["copy", "view", "claude", "chatgpt", "cursor", "mcp", "add-mcp"]
+  },
   "markdown": {
-    "instructions": "For autonomous tasks, use live SaladCloud API responses for current state, availability, quotas, models, and other dynamic values. Use current OpenAPI specifications where provided for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, models, or state. Prefer API workflows over Portal steps. Read before changing and never expose credentials, signed media URLs, prompts, or sensitive outputs. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Verify every write with a read. Stop rather than repeat an uncertain non-idempotent or billable request. AI Gateway uses an organization-specific Bearer key and live /v1/models discovery. Do not delete, cancel, stop, or reduce capacity without explicit user intent. Bind shared operation IDs to the selected product path. Treat Container Engine instances as interruptible and local state as ephemeral."
+    "instructions": "For autonomous tasks, use live SaladCloud API responses for current state, availability, quotas, models, and other dynamic values. Use current OpenAPI specifications where provided for paths, schemas, required fields, and enums. Never invent endpoints, fields, prices, availability, quotas, models, or state. Prefer API workflows over Portal steps. Read before changing and never expose credentials, signed media URLs, prompts, or sensitive outputs. Retry only safe or idempotent operations with bounded backoff, honoring Retry-After. Verify every write with a read. Stop rather than repeat an uncertain non-idempotent or billable request. AI Gateway uses an organization-specific Bearer key and live /v1/models discovery. Do not delete, cancel, stop, or reduce capacity without explicit user intent. Bind shared operation IDs to the selected product path. Treat Container Engine instances as interruptible and local state as ephemeral. Install the SaladCloud skills (npx skills add https://docs.salad.com), start from the salad skill and /agents/overview; docs MCP: https://docs.salad.com/mcp."
   },
   "footer": {
     "socials": {

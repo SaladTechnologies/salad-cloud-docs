@@ -43,7 +43,7 @@ def extract_pages_from_json(data: dict, base_path: str = "") -> Set[str]:
             
             # Recurse through all other keys
             for key, value in obj.items():
-                if key not in ['pages', 'groups', 'tabs', 'navigation']:
+                if key not in ['pages', 'groups', 'tabs', 'navigation', 'contextual']:  # contextual.options are menu ids, not pages
                     if isinstance(value, (dict, list)):
                         extract_recursive(value, current_path)
         
