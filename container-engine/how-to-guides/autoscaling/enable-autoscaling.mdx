@@ -87,11 +87,6 @@ curl --request POST \
 Now create a container group connected to the queue, then turn on autoscaling with an update. Your container image must
 include both your application and the Job Queue Worker.
 
-<Note>
-  The create request currently ignores `queue_autoscaler`: the group is created with `queue_autoscaler: null` and no
-  error. Set the autoscaler with an update after the group exists, as shown below, and confirm it in Step 5.
-</Note>
-
 First, create the container group:
 
 ```bash

@@ -282,11 +282,6 @@ add a `SALAD_LOG_LEVEL` [environment variable](/container-engine/how-to-guides/e
   alt="The portal Environment Variables panel with the key SALAD_LOG_LEVEL set to info"
 />
 
-<Note>
-  The variable is `SALAD_LOG_LEVEL`. Earlier versions of this page named it `SALAD_QUEUE_WORKER_LOG_LEVEL`, which the
-  worker ignores.
-</Note>
-
 | Level             | What it logs                                                                                                                                                                   |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `error` (default) | No line for a failed attempt, because those are logged at `warn`. A job that fails all four attempts leaves nothing in your container logs.                                    |
@@ -300,6 +295,6 @@ add a `SALAD_LOG_LEVEL` [environment variable](/container-engine/how-to-guides/e
 </Warning>
 
 <Warning>
-  At `debug`, the worker also logs the instance's workload token in full every time it fetches its status. Use `debug`
-  only while troubleshooting, and treat logs from that period as sensitive.
+  Use `debug` only while troubleshooting. Its logs can contain sensitive values, so treat logs from that period as
+  sensitive.
 </Warning>
