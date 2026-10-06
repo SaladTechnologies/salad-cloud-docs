@@ -6,7 +6,7 @@ description:
   savings while maintaining job orchestration capabilities.'
 ---
 
-_Last Updated: September 11, 2026_
+_Last Updated: October 6, 2026_
 
 # Overview
 
@@ -262,8 +262,9 @@ npm install @saladtechnologies/salad-cloud-sdk
 FROM my-ecr-repo/processor:latest
 
 # Download the Salad Job Queue Worker binary
-ADD https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-job-queue-worker-linux-amd64 /usr/local/bin/salad-job-queue-worker
-RUN chmod +x /usr/local/bin/salad-job-queue-worker
+ADD https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-http-job-queue-worker_x86_64.tar.gz /tmp/
+RUN tar -xzf /tmp/salad-http-job-queue-worker_x86_64.tar.gz -C /usr/local/bin salad-http-job-queue-worker && \
+    rm /tmp/salad-http-job-queue-worker_x86_64.tar.gz
 
 # Your existing application setup
 WORKDIR /app

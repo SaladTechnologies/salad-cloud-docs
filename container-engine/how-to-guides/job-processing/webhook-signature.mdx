@@ -4,7 +4,7 @@ sidebarTitle: 'Webhook Signatures'
 description: 'Learn how to validate webhook signatures for the Job Queue API in SaladCloud.'
 ---
 
-_Last Updated: June 2, 2025_
+_Last Updated: October 6, 2026_
 
 # Validating Webhook Signatures
 
@@ -17,6 +17,54 @@ the `svix` library.
 
 ![Webhook Signature Example](/container-engine/images/webhook-secret-key.png)
 
+## The secret key format
+
+The webhook secret key is a base64 string with no `whsec_` prefix. The `svix` library's `Webhook(secret)` accepts it as
+it is. If you use a different library, the signature follows the [Standard Webhooks](https://www.standardwebhooks.com/)
+scheme:
+
+1. Base64-decode the secret.
+2. Compute an HMAC-SHA256 over `{webhook-id}.{webhook-timestamp}.{raw body}`, using the decoded secret as the key.
+3. Base64-encode the result and compare it with the value after `v1,` in the `webhook-signature` header.
+
+Always use the raw request body, exactly as received, and not a re-serialized copy of the parsed JSON.
+
+## Webhook payload
+
+For a job that succeeded, SaladCloud sends one `POST` to your webhook URL shortly after the job finishes:
+
+```json
+{
+  "type": "queue.job.succeeded",
+  "timestamp": "2026-10-05T21:15:34.4256376Z",
+  "data": {
+    "id": "50150edd-e182-47b5-a754-2d2a04d6ee31",
+    "status": "succeeded",
+    "input": {},
+    "output": {},
+    "events": [
+      { "type": "created", "time": "2026-10-05T21:15:32.1180000Z" },
+      { "type": "started", "time": "2026-10-05T21:15:33.0120000Z" },
+      { "type": "succeeded", "time": "2026-10-05T21:15:34.4010000Z" }
+    ],
+    "create_time": "2026-10-05T21:15:32.1180000Z",
+    "update_time": "2026-10-05T21:15:34.4010000Z",
+    "webhook": "https://callback.example.com/result",
+    "organization_name": "my-organization",
+    "project_name": "my-project",
+    "queue_name": "my-queue"
+  }
+}
+```
+
+`input` and `output` hold your job's input and your application's response. The values above are placeholders.
+
+<Note>
+  In this payload each event is keyed `type`. In the Job Queue API's job document the same field is called `action`. We
+  have documented only the payload for a succeeded job. The `type` values for failed or cancelled jobs are not covered
+  here.
+</Note>
+
 ## Validating the Signature
 
 ### Node.js Example
@@ -27,12 +75,16 @@ First, install `svix`:
 npm install svix
 ```
 
-Then, you can use the following code to validate the signature:
+Then, you can use the following code to validate the signature. Set `SALAD_WEBHOOK_SECRET` to the webhook secret key
+from the portal. The middleware needs the raw request body, so register it on a route that uses `express.raw()` rather
+than `express.json()`:
 
 ```javascript
 const { Webhook } = require('svix')
 
-//Express.js middleware
+const secret = process.env.SALAD_WEBHOOK_SECRET
+
+// Express.js middleware. Use with express.raw({ type: 'application/json' }) so req.body is the raw body.
 function validateWebhookSignature(req, res, next) {
   const webhook = new Webhook(secret)
   try {
@@ -53,12 +105,16 @@ First, install `svix`:
 pip install svix
 ```
 
-Then, you can use the following code to validate the signature:
+Then, you can use the following code to validate the signature. Set `SALAD_WEBHOOK_SECRET` to the webhook secret key
+from the portal:
 
 ```python
+import os
 from fastapi import FastAPI, Request, HTTPException
 from svix import Webhook
 from typing import Any, Dict
+
+webhook_secret = os.environ["SALAD_WEBHOOK_SECRET"]
 
 async def validate_webhook(request: Request) -> Dict[str, Any]:
     """

@@ -2,7 +2,7 @@
 title: 'Job Queue Worker'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: October 6, 2026_
 
 # Overview
 
@@ -10,8 +10,16 @@ To work with a job queue, you'll need to customize the container that you deploy
 receive jobs from the Job Queue, pass them to your application, then receive the results from your application and
 return them to the Queue. For this purpose, we provide a Job Queue Worker as a precompiled go binary which can be
 included and run inside your container. You can download it from
-[Github](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker). Note that the binary will work for any
-Linux-based image.
+[Github](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker). The binary is named
+`salad-http-job-queue-worker`, and it works in any Linux-based image that runs on x86_64 (amd64).
+
+> ⚠️ Architecture and where it runs
+>
+> - The release ships a single x86_64 (amd64) build. There is no arm64 build. If you build your image on Apple silicon,
+>   build with `docker build --platform linux/amd64`.
+> - The worker runs only on SaladCloud. It depends on the Instance Metadata Service, so it cannot run on your
+>   workstation. If you start it elsewhere it logs `failed to fetch workload instance status … connection refused` over
+>   and over. Test your application's HTTP endpoint locally, and test the worker only in a deployed container group.
 
 > 📘 Prerequisites
 >
@@ -39,7 +47,7 @@ primary application and the Job Queue Worker process. Here's how to do it.
 2. Now we will build your original image. As an example, see
    [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base) -
    this is a simple container that receives requests and returns images of the mandelbrot set. It uses `uvicorn` to
-   listen on port 80 on the `generate` path for requests to be handled by the mandelbrot generation code.
+   listen on port 80 on the `/generate` path for requests to be handled by the mandelbrot generation code.
 
    ```dockerfile dockerfile
    FROM python:3.11-slim
@@ -82,10 +90,10 @@ primary application and the Job Queue Worker process. Here's how to do it.
      rm -rf /tmp/s6-overlay-x86_64.tar.xz
    COPY --chmod=755 s6 /etc/
 
-   COPY --chmod=755 ./salad-job-queue-worker /usr/local/bin/
+   COPY --chmod=755 ./salad-http-job-queue-worker /usr/local/bin/
 
    ENTRYPOINT ["/init"]
-   CMD ["/usr/local/bin/salad-job-queue-worker"]
+   CMD ["/usr/local/bin/salad-http-job-queue-worker"]
    ```
 
    1. The s6 configuration files are stored in
@@ -135,7 +143,7 @@ CMD ["/usr/local/bin/salad-http-job-queue-worker"]
    you're configuring your container group to include a connection to a job queue. This port and path are where the
    queue worker SDK will be sending the jobs to. In our example, we have the following values:
    1. Port: **80**
-   2. Path: **generate**
+   2. Path: **/generate**
 
 ## Build a wrapper image with a shell script
 
@@ -146,10 +154,10 @@ Here's how to do it.
    binary to our local machine and build it into our container image by adding a `COPY` command to the Dockerfile.
    Alternatively, you may choose to download and unpack the SDK when your container starts by including `ADD` and `RUN`
    commands in your Dockerfile.
-   1. The binary will work for any Linux-based base image.
+   1. The binary works on any x86_64 (amd64) Linux-based base image.
 2. Now we will build your original image. As an example, see
    [samples/mandelbrot/base/](https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/tree/main/samples/mandelbrot/base) -
-   this is a simple container that receives JSON requests on port 80 at the `generate` path and returns images of the
+   this is a simple container that receives JSON requests on port 80 at the `/generate` path and returns images of the
    mandelbrot set. It uses `uvicorn` to listen on port 80 for requests to be handled by the mandelbrot generation code.
 
    ```dockerfile dockerfile
@@ -214,7 +222,32 @@ Here's how to do it.
    you're configuring your container group to include a connection to a job queue. This port and path are where the
    queue worker SDK will be sending the jobs to. In our example, we have the following values:
    1. Port: **80**
-   2. Path: **generate**
+   2. Path: **/generate**
+
+# Make sure your application is ready before the worker takes jobs
+
+Both examples above start the worker and your application together. The worker starts asking for jobs as soon as it
+runs, and it does not wait for your application. If your application is not listening yet, the worker still takes a
+waiting job, gets `connection refused` on your port, and retries it straight away. In our testing, a worker that started
+before its application used all four attempts of a waiting job within seconds, and the job was marked `failed` for good.
+
+Pick one of these:
+
+- **Add a readiness probe (recommended).** Configure an HTTP
+  [readiness probe](/container-engine/explanation/infrastructure-platform/readiness-probes) on your application's port
+  when you create the container group. The worker waits for the probe to pass before it takes jobs. In the same test
+  with a probe in place, the worker logged `readiness changed ready=true` only after the application was up, then took
+  the jobs with no failed attempts. See
+  [Creating a Job Queue](/container-engine/how-to-guides/job-processing/creating-a-job-queue) for an example.
+- **Start the worker only after your application answers.** If your image cannot have a probe, have the wrapper script
+  wait for the port before it starts the worker. In `run.sh`, start your application first, then wait for it:
+
+  ```shell
+  # Wait until the application accepts connections on port 80
+  until (echo > /dev/tcp/127.0.0.1/80) 2>/dev/null; do sleep 1; done
+
+  /usr/local/bin/salad-http-job-queue-worker &
+  ```
 
 # Pushing the image to a Registry
 
@@ -223,22 +256,45 @@ some way of managing both processes. It's time to push it to the container regis
 registries supported by SaladCloud at
 [Container Registries](/container-engine/explanation/infrastructure-platform/container-registries).
 
-# Additional notes about the SaladCloud Job Queue Worker;
+# Additional notes about the SaladCloud Job Queue Worker
 
-- The Worker needs to connect to a local HTTP server running inside of SEL, our special version of Linux running on the
-  host machine behind your container replica. This means you won't be able to test the Job Queue Worker locally.
-- By default, the Worker logging level is set to `error`. Logs will be sent to the
-  [SaladCloud Container Logs](/container-engine/explanation/container-groups/container-logs) or your
-  [external logging](/container-engine/explanation/infrastructure-platform/external-logging) tools. You can adjust the
-  logging level by adding a 'SALAD_QUEUE_WORKER_LOG_LEVEL'
-  [environment variable](/container-engine/how-to-guides/environment-variables).
+- The worker connects to a local HTTP server running inside of SEL, our special version of Linux running on the host
+  machine behind your container replica. This means you can't run the worker locally.
+- **Your application's response.** The worker returns your application's response body to the queue as the job's output.
+  It must be valid JSON and cannot exceed 10 MB. A larger reply counts as a failed attempt: the job runs again in full,
+  up to four times in total, and then fails. The job does not record why. To return large results, write them to
+  external storage and return a link.
+- Without a startup or readiness probe the worker takes jobs before your application may be ready, and those jobs can
+  fail. See
+  [Make sure your application is ready before the worker takes jobs](#make-sure-your-application-is-ready-before-the-worker-takes-jobs).
+  [Read more about health probes here.](/container-engine/explanation/infrastructure-platform/health-probes)
 
-<img src="/container-engine/images/portal-configure-job-queue-worker-log-level.png" />
+# Logging
 
-- The value can be changed to `warn`, `info`, and `debug`. If the logging level is set to `debug` the worker will output
-  a heartbeat log every few seconds as it checks for a new job. That log will look something like this
-  `time="2024-04-26T14:30:42Z" level=info msg=heartbeat file="[worker.go:162]"`.
-- If you choose not to use any Startup and/or Readiness probes, the Job Queue Worker will immediately start to look for
-  jobs, even if your application inside is not yet ready to receive jobs. If this happens, the job will fail and you`ll
-  need to submit it again.
-  [Read more about health probes here. ](/container-engine/explanation/infrastructure-platform/health-probes)
+By default, the worker logs only at the `error` level. Logs are sent to the
+[SaladCloud Container Logs](/container-engine/explanation/container-groups/container-logs) or your
+[external logging](/container-engine/explanation/infrastructure-platform/external-logging) tools. To change the level,
+add a `SALAD_LOG_LEVEL` [environment variable](/container-engine/how-to-guides/environment-variables) with the value
+`debug`, `info`, `warn`, or `error`. An invalid value stops the worker at startup.
+
+<img
+  src="/container-engine/images/portal-configure-job-queue-worker-log-level.png"
+  alt="The portal Environment Variables panel with the key SALAD_LOG_LEVEL set to info"
+/>
+
+| Level             | What it logs                                                                                                                                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `error` (default) | No line for a failed attempt, because those are logged at `warn`. A job that fails all four attempts leaves nothing in your container logs.                                    |
+| `warn`            | One line per failed attempt, such as `failed to execute job <id> with status code 500`, `invalid job output jobId=<id>` (reply over 10 MB), or the `connection refused` error. |
+| `info`            | Start-up lines, then for each job a `received job` line that includes the full job input, and `job completed jobId=<id>` or `job rejected jobId=<id>`.                         |
+| `debug`           | Everything above, plus status and heartbeat lines every few seconds as the worker checks for a new job.                                                                        |
+
+<Warning>
+  At `info` and `debug`, the worker writes each job's full input to the container logs. Don't use these levels if your
+  job inputs contain sensitive data.
+</Warning>
+
+<Warning>
+  Use `debug` only while troubleshooting. Its logs can contain sensitive values, so treat logs from that period as
+  sensitive.
+</Warning>

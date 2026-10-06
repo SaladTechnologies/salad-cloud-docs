@@ -6,7 +6,7 @@ description:
   workload demand.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 6, 2026_
 
 <Visibility for="agents">
   > Validate all request fields against the current OpenAPI schema before execution; do not copy static hardware IDs or
@@ -82,10 +82,12 @@ curl --request POST \
   }'
 ```
 
-## Step 3: Create Container Group with Autoscaling
+## Step 3: Create the Container Group and Enable Autoscaling
 
-Now create a container group with autoscaling enabled. Your container image must include both your application and the
-Job Queue Worker. Here's a complete example:
+Now create a container group connected to the queue, then turn on autoscaling with an update. Your container image must
+include both your application and the Job Queue Worker.
+
+First, create the container group:
 
 ```bash
 curl --request POST \
@@ -103,7 +105,7 @@ curl --request POST \
         "gpu_classes": ["gtx1660_super", "rtx3060", "rtx4060"]
       },
       "environment_variables": {
-        "SALAD_QUEUE_WORKER_LOG_LEVEL": "info"
+        "SALAD_LOG_LEVEL": "info"
       }
     },
     "replicas": 0,
@@ -116,16 +118,32 @@ curl --request POST \
     "readiness_probe": {
       "http": {
         "path": "/ready",
-        "port": 8080
+        "port": 8080,
+        "scheme": "http",
+        "headers": []
       },
       "initial_delay_seconds": 10,
-      "period_seconds": 10
+      "period_seconds": 10,
+      "timeout_seconds": 2,
+      "success_threshold": 1,
+      "failure_threshold": 3
     },
     "queue_connection": {
       "path": "/process",
       "port": 8080,
       "queue_name": "my-processing-queue"
-    },
+    }
+  }'
+```
+
+Then apply the autoscaler with an update:
+
+```bash
+curl --request PATCH \
+  --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/autoscaling-workers \
+  --header 'Content-Type: application/merge-patch+json' \
+  --header 'Salad-Api-Key: YOUR_API_KEY' \
+  --data '{
     "queue_autoscaler": {
       "min_replicas": 0,
       "max_replicas": 50,
@@ -141,8 +159,9 @@ curl --request POST \
 
 - **`queue_connection.path`**: HTTP endpoint where your app receives jobs (e.g., `/process`)
 - **`queue_connection.port`**: Port your application listens on (must match networking.port)
-- **`readiness_probe`**: Ensures your app is ready before the worker starts sending jobs
-- **`SALAD_QUEUE_WORKER_LOG_LEVEL`**: Controls worker logging (error, warn, info, debug)
+- **`readiness_probe`**: Ensures your app is ready before the worker starts sending jobs. An HTTP probe sent through the
+  API needs `scheme` and a `headers` list, even an empty one.
+- **`SALAD_LOG_LEVEL`**: Controls worker logging (error, warn, info, debug)
 
 ## Step 4: Configure Autoscaling Parameters
 
@@ -170,7 +189,7 @@ Rate limiting prevents aggressive scaling that could cause instability or unnece
 
 ## Step 5: Verify Your Setup
 
-After creating your container group, verify the configuration:
+After creating your container group and applying the autoscaler, verify the configuration:
 
 ```bash
 curl --request GET \
@@ -207,15 +226,15 @@ done
 Monitor the scaling behavior:
 
 ```bash
-# Check current replica count
+# Check the desired replica count and how many instances are running
 curl --request GET \
   --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/containers/{container_group_name} \
-  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '.current_state.instance_count'
+  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '{replicas, running: .current_state.instance_status_counts.running_count}'
 
 # Check queue length
 curl --request GET \
   --url https://api.salad.com/api/public/organizations/{organization_name}/projects/{project_name}/queues/my-processing-queue \
-  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '.size'
+  --header 'Salad-Api-Key: YOUR_API_KEY' | jq '.current_queue_length'
 ```
 
 ### **Test Scale Down**
@@ -347,9 +366,8 @@ COPY main.py .
 
 # Download and install the SaladCloud Job Queue Worker
 RUN apt-get update && apt-get install -y curl && \
-    curl -L -o /usr/local/bin/salad-job-queue-worker \
-    https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-job-queue-worker-linux-amd64 && \
-    chmod +x /usr/local/bin/salad-job-queue-worker
+    curl -fsSL https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-http-job-queue-worker_x86_64.tar.gz \
+    | tar -xz -C /usr/local/bin salad-http-job-queue-worker
 
 # Copy startup script
 COPY start.sh .
@@ -364,7 +382,7 @@ CMD ["./start.sh"]
 #!/bin/bash
 
 # Start the SaladCloud Job Queue Worker in background
-/usr/local/bin/salad-job-queue-worker &
+/usr/local/bin/salad-http-job-queue-worker &
 
 # Start your application (only needs to listen on localhost)
 uvicorn main:app --host 127.0.0.1 --port 8080 &
@@ -459,7 +477,7 @@ When creating your container group, ensure the `queue_connection` matches your a
 
 ### **Worker Connection Issues**
 
-1. **Check Worker Logs**: Set `SALAD_QUEUE_WORKER_LOG_LEVEL=debug` for detailed logging
+1. **Check Worker Logs**: Set `SALAD_LOG_LEVEL=debug` for detailed logging
 2. **Verify Port Configuration**: Ensure networking.port matches queue_connection.port
 3. **Test Application Endpoint**: Manually test your app's HTTP endpoint for job processing
 4. **Review Process Management**: Ensure both worker and application processes are running

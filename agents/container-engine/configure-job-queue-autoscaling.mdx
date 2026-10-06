@@ -4,7 +4,7 @@ sidebarTitle: 'Queue Autoscaling'
 description: 'Create or discover a SaladCloud Job Queue and configure a safely verified queue-autoscaled worker group.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 6, 2026_
 
 ## When to use this runbook
 
@@ -47,7 +47,8 @@ Use [Job Queues](/container-engine/explanation/job-processing/job-queues),
 ## Dynamic values to retrieve
 
 - Exact queues and groups already present in the project.
-- Queue `current_queue_length`, associated `container_groups`, and current job states/events.
+- Queue `current_queue_length` and current job states/events. To find the groups attached to a queue, read each group's
+  `queue_connection`.
 - Group `queue_connection`, `queue_autoscaler`, desired replicas, status/version, instances, and readiness.
 - Live quota headroom using the planned `max_replicas`, plus current hardware availability.
 - Worker and application logs for the relevant UTC window.
@@ -93,7 +94,11 @@ Replace the example with the approved `SALAD_QUEUE`; never treat the example as 
 ### Associate a new worker group and enable autoscaling
 
 The actual association is `queue_connection` in Operation: `create_container_group`. The queue and group must be in the
-same supplied project. This schema-derived scale-from-zero template uses maximum replicas 2:
+same supplied project.
+
+Create the group with `queue_connection` and the readiness probe, then set `queue_autoscaler` with Operation:
+`update_container_group`, then read the group back to confirm the values. This schema-derived scale-from-zero template
+uses a replica count of 0:
 
 ```bash
 curl --fail-with-body --silent --show-error \
@@ -111,7 +116,7 @@ curl --fail-with-body --silent --show-error \
         "memory": 8192
       },
       "environment_variables": {
-        "SALAD_QUEUE_WORKER_LOG_LEVEL": "info"
+        "SALAD_LOG_LEVEL": "info"
       },
       "priority": "batch"
     },
@@ -122,14 +127,6 @@ curl --fail-with-body --silent --show-error \
       "path": "/process",
       "port": 8080,
       "queue_name": "agent-example-queue"
-    },
-    "queue_autoscaler": {
-      "desired_queue_length": 1,
-      "min_replicas": 0,
-      "max_replicas": 2,
-      "polling_period": 30,
-      "max_upscale_per_minute": 2,
-      "max_downscale_per_minute": 1
     },
     "readiness_probe": {
       "http": {
@@ -147,6 +144,29 @@ curl --fail-with-body --silent --show-error \
   }'
 ```
 
+Then enable autoscaling on the new group with a merge patch. This example scales from zero to a maximum of 2 replicas.
+The three optional fields (`polling_period`, `max_upscale_per_minute`, `max_downscale_per_minute`) may be left out, and
+they stay `null`:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  --request PATCH \
+  --url "https://api.salad.com/api/public/organizations/${SALAD_ORGANIZATION}/projects/${SALAD_PROJECT}/containers/agent-example-workers" \
+  --header "Salad-Api-Key: ${SALAD_API_KEY}" \
+  --header 'Content-Type: application/merge-patch+json' \
+  --header 'Accept: application/json' \
+  --data '{
+    "queue_autoscaler": {
+      "desired_queue_length": 1,
+      "min_replicas": 0,
+      "max_replicas": 2,
+      "polling_period": 30,
+      "max_upscale_per_minute": 2,
+      "max_downscale_per_minute": 1
+    }
+  }'
+```
+
 Replace all examples with approved values and a live hardware plan. For an existing group that already has the correct
 `queue_connection`, read it, then patch only `queue_autoscaler` with Operation: `update_container_group` and verify.
 
@@ -160,6 +180,9 @@ Replace all examples with approved values and a live hardware plan. For an exist
    instance becomes ready, and the job reaches a terminal status.
 5. After the queue drains, verify the group returns no lower than `min_replicas`; with minimum 0, expect cold starts on
    subsequent jobs.
+
+Scaling from zero adds a cold start of a few minutes before the first job runs, while a new instance is allocated, pulls
+the image, and passes readiness. Plan the polling budget for it.
 
 ### Worker, retry, and webhook behavior
 
@@ -190,7 +213,8 @@ Observe job events and worker logs. When a job uses a webhook, validate the docu
 
 Queue/group creation returns `201`; update returns `200`; job creation returns `201`; delete/cancel operations return
 `202`. Queue job statuses are `pending`, `running`, `succeeded`, `cancelled`, and `failed`. A queue response can include
-`current_queue_length` and associated `container_groups`; treat absent optional current length as unknown.
+`current_queue_length`; treat an absent optional current length as unknown. Confirm an association from the group's
+`queue_connection`.
 
 Canonical autoscaling guidance uses `ceil(queue length / desired queue length)` bounded by minimum/maximum and rate
 settings. Verify actual live behavior rather than calculating success from the formula alone.
@@ -204,21 +228,28 @@ have produced side effects. Use an application idempotency record and explicit r
 
 ## Verification
 
-| Mutation                | Read before           | Read after                         | Success                                                                | Failure or unresolved                                                         |
-| ----------------------- | --------------------- | ---------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Create queue            | `list_queues`         | `get_queue`                        | Exact queue exists with intended metadata                              | Duplicate ambiguity, mismatch, or unresolved `404`                            |
-| Create associated group | Queue/group lists     | `get_container_group`, `get_queue` | Group has intended queue/autoscaler and queue lists the group          | Mismatch, group failure, or association absent past budget                    |
-| Update autoscaler       | `get_container_group` | Same plus queue/instances          | Values match and scaling stays within bounds                           | Mismatch, quota/availability block, or no response to queued work past budget |
-| Submit test job         | `get_queue`           | `get_queue_job` plus scaling reads | Job reaches intended terminal status and scaling predicate is observed | Failed/cancelled unexpectedly or pending/running past budget                  |
+| Mutation                | Read before           | Read after                         | Success                                                                                          | Failure or unresolved                                                         |
+| ----------------------- | --------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Create queue            | `list_queues`         | `get_queue`                        | Exact queue exists with intended metadata                                                        | Duplicate ambiguity, mismatch, or unresolved `404`                            |
+| Create associated group | Queue/group lists     | `get_container_group`              | Group has the intended `queue_connection`; `queue_autoscaler` is applied by the following update | Mismatch, group failure, or `queue_connection` absent past budget             |
+| Update autoscaler       | `get_container_group` | Same plus queue/instances          | `queue_autoscaler` values match and scaling stays within bounds                                  | Mismatch, quota/availability block, or no response to queued work past budget |
+| Submit test job         | `get_queue`           | `get_queue_job` plus scaling reads | Job reaches intended terminal status and scaling predicate is observed                           | Failed/cancelled unexpectedly or pending/running past budget                  |
 
 ## Rollback or recovery
 
 - Restore only the previous autoscaler object with a fresh merge patch when it is known and authorized.
 - Do not detach a queue through an undocumented field; the current patch schema has no `queue_connection`.
 - Preserve a failed job and logs for diagnosis. Resubmit only after the cause is corrected and idempotency is proven.
-- Safe cleanup begins with `get_queue`, `list_queue_jobs`, `get_container_group`, and instance reads. If the queue has
-  associated groups or active jobs, stop. Cancel jobs, reduce/stop/delete capacity, and delete the queue only with
-  explicit intent, then verify each deletion in the same trusted scope.
+- Safe cleanup begins with `get_queue`, `list_queue_jobs`, `get_container_group`, and instance reads. The queue's check
+  each group's `queue_connection` to find groups attached to the queue. If any group is attached or any job is active,
+  stop. Cancel jobs, reduce/stop/delete capacity, and delete the queue only with explicit intent, then verify each
+  deletion in the same trusted scope.
+- Deleting a queue permanently removes its connection from every attached group, and the group keeps running with no
+  queue. Recreating a queue with the same name does not reconnect it.
+- Stopping or deleting a group does not stop its worker at once, and the old container can take new jobs for a short
+  time afterwards. Those jobs read `running` until the queue notices the worker is gone, which takes several minutes,
+  and longer when no other worker is polling the queue. Stop job submission or let the queue drain first.
+- Cancelling a running job does not stop it. The instance runs the job to the end and the output is discarded.
 
 ## Stop and escalation conditions
 
