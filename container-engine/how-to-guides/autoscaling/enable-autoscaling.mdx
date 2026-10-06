@@ -6,7 +6,7 @@ description:
   workload demand.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 6, 2026_
 
 <Visibility for="agents">
   > Validate all request fields against the current OpenAPI schema before execution; do not copy static hardware IDs or
@@ -103,7 +103,7 @@ curl --request POST \
         "gpu_classes": ["gtx1660_super", "rtx3060", "rtx4060"]
       },
       "environment_variables": {
-        "SALAD_QUEUE_WORKER_LOG_LEVEL": "info"
+        "SALAD_LOG_LEVEL": "info"
       }
     },
     "replicas": 0,
@@ -142,7 +142,7 @@ curl --request POST \
 - **`queue_connection.path`**: HTTP endpoint where your app receives jobs (e.g., `/process`)
 - **`queue_connection.port`**: Port your application listens on (must match networking.port)
 - **`readiness_probe`**: Ensures your app is ready before the worker starts sending jobs
-- **`SALAD_QUEUE_WORKER_LOG_LEVEL`**: Controls worker logging (error, warn, info, debug)
+- **`SALAD_LOG_LEVEL`**: Controls worker logging (error, warn, info, debug)
 
 ## Step 4: Configure Autoscaling Parameters
 
@@ -347,9 +347,8 @@ COPY main.py .
 
 # Download and install the SaladCloud Job Queue Worker
 RUN apt-get update && apt-get install -y curl && \
-    curl -L -o /usr/local/bin/salad-job-queue-worker \
-    https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-job-queue-worker-linux-amd64 && \
-    chmod +x /usr/local/bin/salad-job-queue-worker
+    curl -fsSL https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-http-job-queue-worker_x86_64.tar.gz \
+    | tar -xz -C /usr/local/bin salad-http-job-queue-worker
 
 # Copy startup script
 COPY start.sh .
@@ -364,7 +363,7 @@ CMD ["./start.sh"]
 #!/bin/bash
 
 # Start the SaladCloud Job Queue Worker in background
-/usr/local/bin/salad-job-queue-worker &
+/usr/local/bin/salad-http-job-queue-worker &
 
 # Start your application (only needs to listen on localhost)
 uvicorn main:app --host 127.0.0.1 --port 8080 &
@@ -459,7 +458,7 @@ When creating your container group, ensure the `queue_connection` matches your a
 
 ### **Worker Connection Issues**
 
-1. **Check Worker Logs**: Set `SALAD_QUEUE_WORKER_LOG_LEVEL=debug` for detailed logging
+1. **Check Worker Logs**: Set `SALAD_LOG_LEVEL=debug` for detailed logging
 2. **Verify Port Configuration**: Ensure networking.port matches queue_connection.port
 3. **Test Application Endpoint**: Manually test your app's HTTP endpoint for job processing
 4. **Review Process Management**: Ensure both worker and application processes are running

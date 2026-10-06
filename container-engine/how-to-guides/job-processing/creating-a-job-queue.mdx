@@ -2,7 +2,7 @@
 title: 'Creating a Job Queue'
 ---
 
-_Last Updated: March 24, 2025_
+_Last Updated: October 6, 2026_
 
 # Using the Public API
 
@@ -15,14 +15,17 @@ order to attach a job queue to it.
 > 📘 Job Queue Connections
 >
 > A Job Queue can be connected to multiple container groups at once. but a container group can only be connected to at
-> most a single Job Queue.
+> most a single Job Queue. The connection is set when you create the container group. It cannot be added, changed or
+> removed afterwards, so to change it you need a new container group.
 
 **We recommend adding a [readiness probe](/container-engine/explanation/infrastructure-platform/readiness-probes) to
 your container deployment**. This probe will allow your replica to announce to the Job Queue Service when it's ready to
 receive and process jobs. We recommend using it in conjunction with a startup probe. Readiness probes will start to run
 after a startup probe succeeds. Without a startup or readiness probe, the Job Queue Worker will immediately start to
 look for jobs, even if your application inside is not yet ready to receive jobs. If this happens, the job will fail and
-you’ll need to submit it again.
+you’ll need to submit it again. In our testing, all four attempts of a waiting job were used up in about 3 seconds, and
+the job was marked `failed` permanently. With a readiness probe in place, the worker waited until the probe passed and
+then took the jobs with no failed attempts.
 
 How the readiness probe is configured will depend on your container image, and how it’s configured inside. Many prebuilt
 containers or http-apps found in open-source libraries will have a liveness API URL you can check, that will respond
@@ -43,3 +46,9 @@ Timeout Seconds: 1
 Success Threshold: 1
 Failure Threshold: 3
 ```
+
+<Note>
+  The portal shows "Headers: None Configured". If you create the container group through the API, an HTTP probe must
+  still send `"headers": []`. Leaving the field out is rejected with `ReadinessProbe.Http.Headers: The Headers field is
+  required`.
+</Note>

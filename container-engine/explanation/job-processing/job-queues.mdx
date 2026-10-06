@@ -2,7 +2,7 @@
 title: 'Salad Job Queues'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 6, 2026_
 
 <Visibility for="agents">
   > Use `salad-job-queue-autoscaling` and the [queue autoscaling
@@ -22,22 +22,42 @@ transient failures.
   symantics, e.g. return 200 for a successful job, 500 for a failed job.
 - Jobs will be retried up to 3 times (meaning 4 total attempts) before being marked as failed. This limitation in
   combination with interruptible instances means our job queues are not well suited for extremely long running tasks.
-- Instance interruptions count as job failures, and those jobs will be retried according to the above policy.
-- Jobs are not guaranteed to be processed in order, but they will be processed in a FIFO manner.
+- A failed attempt is retried at once, about half a second later and with no backoff. The retry can land on the same
+  instance: with one instance running, all four attempts of a failing job ran on it within about 3 seconds. A transient
+  fault that lasts a few seconds therefore fails the job.
+- Instance interruptions count as job failures, and those jobs will be retried according to the above policy. The
+  interruption is noticed only when the job's lease runs out, about 5.5 minutes after the attempt started, and until
+  then the job reads `running`. In our testing, an instance reallocated 25 seconds into a job was marked failed 5
+  minutes 31 seconds after the attempt began, and the job then ran on another machine.
+- Jobs are dispatched in the order they were created. With more than one instance, jobs run at the same time and can
+  finish out of order.
 - Jobs are not guaranteed to be processed by the same node, but they will be processed by a healthy node.
-- The response body from your http server cannot exceed 10MB.
+- The response body from your http server cannot exceed 10MB. A larger reply counts as a failed attempt, so the job runs
+  four times in full and then fails. The job does not record why, and the retries cannot succeed.
+- A container group's queue connection can be set only when the group is created. It cannot be added, changed or removed
+  afterwards, so to change it you need a new container group.
+- Deleting a queue deletes its pending jobs and permanently removes the connection from every container group attached
+  to it. The group keeps running with no queue, and creating a new queue with the same name does not reconnect it. The
+  API neither refuses the delete nor reports this.
+- Stopping or deleting a container group does not stop its worker at once. In our testing, after a stop (status
+  `stopped`, zero instances) or a delete, the old container took new jobs 2, 14 and 28 seconds later. Those jobs read
+  `running` until their lease expires, about 5.5 minutes, and another worker asks for work. With no other worker, they
+  stay `running` indefinitely. Stop submitting jobs, or let the queue drain, before you stop a group.
+- Cancelling a running job does not stop it. See
+  [Using Queues](/container-engine/how-to-guides/job-processing/using-queues).
 - Job Queues can only be managed and accessed via the [Job Queue API](/reference/saladcloud-api/queues/create-queue)
 
 # Terminology
 
 - **Job:** An individual request to be processed. An example of a job might be a token string sent to an image
   generation service.
-- **Job Queue Worker:** A small, multi-architecture go binary program you install in your container which receives jobs
+- **Job Queue Worker:** A small go binary program (x86_64 Linux only) you install in your container which receives jobs
   from the Queue, forwards them to your application running in the container, receives results and returns them to the
   Queue.
 - **Job Queue:** Salad-managed queue service that receives requests from your systems, queues them, and distributes them
   FIFO to nodes. Job queues distribute received jobs to one or more container groups. A container group is connected to
-  a Job Queue when the container group is first created.
+  a Job Queue when the container group is first created, and that connection cannot be added, changed or removed
+  afterwards.
 
 # Architecture
 

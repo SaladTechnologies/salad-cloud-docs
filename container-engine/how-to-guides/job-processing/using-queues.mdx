@@ -2,7 +2,7 @@
 title: 'Using Queues'
 ---
 
-_Last Updated: October 10, 2024_
+_Last Updated: October 6, 2026_
 
 # Posting a Job
 
@@ -138,11 +138,23 @@ Here is an example response when checking the Job status for job `id` 50150edd-e
 - `pending` - The job has been added to the queue and is waiting to be run
 - `running` - The job has been popped from the queue and dispatched to a workload instance for processing.
 - `succeeded` - The job has been run and the response has been received.
-- `cancelled` - The job was cancelled before it was dispatched to a workload instance. **Note: a job cannot be cancelled
-  once it has been dispatched.**
+- `cancelled` - The job was cancelled. **Note: cancelling a job after it has been dispatched does not stop the work.**
+  The request is accepted (`202`) and the job reads `cancelled`, and its output is discarded, but the instance runs the
+  job to the end. Write your handlers to be idempotent.
 - `failed` - The job was retried three times and failed to run to completion. **Note: once a job has reached a failed
   status, it will not be retried and instead must be resubmitted to the queue.**
+
+## Job events
+
+Each job's `events` list records what happened to it. Each entry has an `action` and a `time`. The `action` is one of
+`created`, `started`, `succeeded`, `failed`, or `cancelled`. A retry shows as a `failed` event followed by another
+`started` event; there is no separate retry event.
+
+When you list jobs, they are not returned in creation order, and there is no sort parameter. Sort by `create_time` in
+your own code if you need an order.
 
 # Viewing results
 
 Once the job has finished, the results will be available on this response object, and at the webhook URL (if provided).
+For the payload SaladCloud sends to your webhook and how to verify it, see
+[Validating Webhook Signatures](/container-engine/how-to-guides/job-processing/webhook-signature#webhook-payload).
