@@ -22,13 +22,12 @@ transient failures.
   symantics, e.g. return 200 for a successful job, 500 for a failed job.
 - Jobs will be retried up to 3 times (meaning 4 total attempts) before being marked as failed. This limitation in
   combination with interruptible instances means our job queues are not well suited for extremely long running tasks.
-- A failed attempt is retried at once, about half a second later and with no backoff. The retry can land on the same
-  instance: with one instance running, all four attempts of a failing job ran on it within about 3 seconds. A transient
-  fault that lasts a few seconds therefore fails the job.
+- A failed attempt is retried immediately, with no backoff, and the retry can land on the same instance. With one
+  instance running, all four attempts of a failing job can be used up within seconds, so a transient fault that lasts a
+  few seconds fails the job.
 - Instance interruptions count as job failures, and those jobs will be retried according to the above policy. The
-  interruption is noticed only when the job's lease runs out, about 5.5 minutes after the attempt started, and until
-  then the job reads `running`. In our testing, an instance reallocated 25 seconds into a job was marked failed 5
-  minutes 31 seconds after the attempt began, and the job then ran on another machine.
+  interruption is noticed only when the job's lease runs out, which takes several minutes. Until then the job reads
+  `running`.
 - Jobs are dispatched in the order they were created. With more than one instance, jobs run at the same time and can
   finish out of order.
 - Jobs are not guaranteed to be processed by the same node, but they will be processed by a healthy node.
@@ -39,10 +38,10 @@ transient failures.
 - Deleting a queue deletes its pending jobs and permanently removes the connection from every container group attached
   to it. The group keeps running with no queue, and creating a new queue with the same name does not reconnect it. The
   API neither refuses the delete nor reports this.
-- Stopping or deleting a container group does not stop its worker at once. In our testing, after a stop (status
-  `stopped`, zero instances) or a delete, the old container took new jobs 2, 14 and 28 seconds later. Those jobs read
-  `running` until their lease expires, about 5.5 minutes, and another worker asks for work. With no other worker, they
-  stay `running` indefinitely. Stop submitting jobs, or let the queue drain, before you stop a group.
+- Stopping or deleting a container group does not stop its worker immediately. The old container can keep taking new
+  jobs for a short time afterwards. A job it takes then stays `running` until the queue notices the worker is gone and
+  retries the job. That takes several minutes, and longer if no other worker is connected to the queue. Stop submitting
+  jobs, or let the queue drain, before you stop or delete a group.
 - Cancelling a running job does not stop it. See
   [Using Queues](/container-engine/how-to-guides/job-processing/using-queues).
 - Job Queues can only be managed and accessed via the [Job Queue API](/reference/saladcloud-api/queues/create-queue)

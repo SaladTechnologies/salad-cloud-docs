@@ -229,8 +229,7 @@ Here's how to do it.
 Both examples above start the worker and your application together. The worker starts asking for jobs as soon as it
 runs, and it does not wait for your application. If your application is not listening yet, the worker still takes a
 waiting job, gets `connection refused` on your port, and retries it straight away. In our testing, a worker that started
-60 seconds before its application used all four attempts of a waiting job in about 3 seconds, and the job was marked
-`failed` for good.
+before its application used all four attempts of a waiting job within seconds, and the job was marked `failed` for good.
 
 Pick one of these:
 

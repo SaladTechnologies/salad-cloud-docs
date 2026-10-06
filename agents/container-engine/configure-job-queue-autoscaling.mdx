@@ -171,10 +171,8 @@ Replace all examples with approved values and a live hardware plan. For an exist
 5. After the queue drains, verify the group returns no lower than `min_replicas`; with minimum 0, expect cold starts on
    subsequent jobs.
 
-Observed timings, for scale from zero, with `min_replicas` 0, `max_replicas` 3 and `desired_queue_length` 1 on CPU batch
-instances: replicas went from 0 to 1 within 16 seconds of the first job and from 1 to 3 within 50 seconds. The first job
-started 2 minutes 14 seconds after it was submitted. After the queue drained, replicas returned to 0 in about 65
-seconds. Use these as a rough guide when you set the polling budget, not as a guarantee.
+Scaling from zero adds a cold start of a few minutes before the first job runs, while a new instance is allocated, pulls
+the image, and passes readiness. Plan the polling budget for it.
 
 ### Worker, retry, and webhook behavior
 
@@ -238,9 +236,9 @@ have produced side effects. Use an application idempotency record and explicit r
   only with explicit intent, then verify each deletion in the same trusted scope.
 - Deleting a queue permanently removes its connection from every attached group, and the group keeps running with no
   queue. Recreating a queue with the same name does not reconnect it.
-- Stopping or deleting a group does not stop its worker at once, and the old container can take new jobs for about 30
-  seconds afterwards. Stop job submission or let the queue drain first. Jobs it takes after the stop read `running`
-  until their lease expires, about 5.5 minutes later.
+- Stopping or deleting a group does not stop its worker at once, and the old container can take new jobs for a short
+  time afterwards. Those jobs read `running` until the queue notices the worker is gone, which takes several minutes,
+  and longer when no other worker is polling the queue. Stop job submission or let the queue drain first.
 - Cancelling a running job does not stop it. The instance runs the job to the end and the output is discarded.
 
 ## Stop and escalation conditions
