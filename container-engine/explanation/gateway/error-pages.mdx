@@ -2,7 +2,7 @@
 title: 'Error Pages'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: October 7, 2026_
 
 When the Container Gateway is configured for a container group, it will be assigned an Access Domain Name URL. If you
 try to access that URL in your browser, and encounter an error, we provide error messaging to help you understand the
@@ -57,6 +57,8 @@ It is possible to get this 503 error, if you have
 [health probes](/container-engine/explanation/infrastructure-platform/health-probes) configured that are not yet passing
 
 If a 503 occurs, check that it is passing on at least 1 instance.
+
+If the instance has only just become ready, there may be a short delay before the gateway starts routing traffic to it.
 
 <img src="/container-engine/images/container-gateway-error-503.png" />
 
