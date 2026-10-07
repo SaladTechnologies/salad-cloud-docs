@@ -3086,7 +3086,9 @@
           },
           "language_code": {
             "type": "string",
-            "description": "Language code for the transcription. Defaults to 'en' (English).",
+            "nullable": true,
+            "default": null,
+            "description": "Language code for the transcription. Omit it or set it to null to detect the language automatically. Set a Whisper language code to force that language; the audio is then transcribed or translated as that language.",
             "example": "en",
             "enum": [
               "en", "zh", "de", "es", "ru", "ko", "fr", "ja", "pt", "tr", "pl", "ca",
@@ -3097,8 +3099,15 @@
               "gl", "mr", "pa", "si", "km", "sn", "yo", "so", "af", "oc", "ka", "be",
               "tg", "sd", "gu", "am", "yi", "lo", "uz", "fo", "ht", "ps", "tk", "nn",
               "mt", "sa", "lb", "my", "bo", "tl", "mg", "as", "tt", "haw", "ln", "ha",
-              "ba", "jw", "su", "yue"
+              "ba", "jw", "su", "yue", null
             ]
+          },
+          "audio_stream_index": {
+            "type": "integer",
+            "nullable": true,
+            "default": null,
+            "description": "Index of the audio stream to transcribe in a file with several audio streams. Omit it or set it to null to use the default stream. An index the file does not have fails the job with an invalid_audio_stream error.",
+            "example": 0
           },
           "multichannel": {
             "type": "boolean",

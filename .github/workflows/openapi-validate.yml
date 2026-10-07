@@ -16,3 +16,7 @@ jobs:
           node-version: "24"
       - name: Validate All API Specs
         run: .github/scripts/validate-all-workflows.sh
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate agent operations against the specs
+        run: npm run validate:agent-operations
