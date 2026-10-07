@@ -148,6 +148,8 @@ _Note that the progress bar is a conservative estimate — actual download time 
   will route traffic to the container, but the container may not be able to handle it yet, resulting in 503 errors.
 - Ensure at least one node is running and "ready" in the Salad portal. If all nodes are down, or not ready, the gateway
   will return 503 errors.
+- If the instance has only just become ready, there may be a short delay before the gateway starts routing traffic to
+  it.
 
 ## My Container Group Is Running But I Get 403 Errors With The Container Gateway
 

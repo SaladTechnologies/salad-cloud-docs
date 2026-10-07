@@ -3,7 +3,7 @@ title: 'The Deployment Lifecycle'
 sidebarTitle: 'Deployment Lifecycle'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: October 7, 2026_
 
 The status of container groups and individual instances changes over the lifecycle of a deployment. This page clarifies
 the associated terminology and statuses.
@@ -18,6 +18,13 @@ a Kubernetes ReplicaSet.
   - **Pulling** the image from the repository.
   - **Compressing** the image for faster transmission.
   - **Storing** the result for distribution.
+
+  A new container group starts in `pending` while SaladCloud pulls its container image. For a large image, or when the
+  platform is busy, this can take a long time, and no system events are logged for the group yet. Once the image is
+  pulled the group moves to `deploying` and SaladCloud looks for machines to run it on; from then on the system events
+  show each instance being allocated, downloading and starting. Be patient while a group is `pending`; if it stays there
+  for a very long time, contact SaladCloud support.
+
 - **Stopped:** The container group is prepared, but is either not yet running or has been stopped. Note that presently,
   individual instances can still be running even after the container group is stopped while the stop message propagates
   through the network.
