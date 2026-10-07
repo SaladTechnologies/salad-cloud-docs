@@ -2,7 +2,7 @@
 title: 'Job Queue Worker'
 ---
 
-_Last Updated: October 6, 2026_
+_Last Updated: October 7, 2026_
 
 # Overview
 
@@ -20,6 +20,11 @@ included and run inside your container. You can download it from
 > - The worker runs only on SaladCloud. It depends on the Instance Metadata Service, so it cannot run on your
 >   workstation. If you start it elsewhere it logs `failed to fetch workload instance status … connection refused` over
 >   and over. Test your application's HTTP endpoint locally, and test the worker only in a deployed container group.
+
+<Tip>
+  Testing in a deployed container group means waiting for instances to start. [Cold Starts and Iterating
+  Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly) shows how to keep each test round short.
+</Tip>
 
 > 📘 Prerequisites
 >

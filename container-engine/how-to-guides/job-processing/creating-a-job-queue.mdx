@@ -2,7 +2,7 @@
 title: 'Creating a Job Queue'
 ---
 
-_Last Updated: October 6, 2026_
+_Last Updated: October 7, 2026_
 
 # Using the Public API
 
@@ -11,6 +11,11 @@ Job Queues are not available through the portal, but you can create a Job Queue 
 [create your container group](/reference/saladcloud-api/container-groups/create-container-group) via the public API in
 order to attach a job queue to it.
 [Ensure your container image includes the job queue worker](/container-engine/how-to-guides/job-processing/queue-worker)
+
+<Tip>
+  To keep each test round short while you get the queue working, see [Cold Starts and Iterating
+  Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
+</Tip>
 
 > 📘 Job Queue Connections
 >

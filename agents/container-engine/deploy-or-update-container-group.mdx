@@ -5,7 +5,7 @@ description:
   'Create or safely update a SaladCloud Container Group with duplicate prevention and post-write verification.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 7, 2026_
 
 ## When to use this runbook
 
@@ -43,7 +43,9 @@ them or include them in evidence.
 
 Use [Managing Deployments](/container-engine/how-to-guides/managing-deployments),
 [Container Registries](/container-engine/explanation/infrastructure-platform/container-registries), and
-[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) for product behavior.
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) for product behavior. Use
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly) for test-loop
+tactics.
 
 ## Dynamic values to retrieve
 
@@ -124,6 +126,12 @@ curl --fail-with-body --silent --show-error \
 
 Replace `agent-example-group` with the approved `SALAD_CONTAINER_GROUP` value when constructing the actual request; do
 not execute the example name. Set `autostart_policy: true` only when the user intends creation to start capacity.
+
+When the image or configuration is not yet proven, follow
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly): validate ports,
+probes, and queue or gateway settings with a small image first, then update to the real image. For a start failure,
+debug with `"command": ["sleep", "2147483647"]` and the startup and liveness probes removed. Each of these is an update
+and needs the same user intent as any other.
 
 ### Update a group
 

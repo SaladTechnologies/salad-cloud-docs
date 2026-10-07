@@ -1,0 +1,85 @@
+---
+title: 'Cold Starts and Iterating Quickly'
+sidebarTitle: 'Cold Starts and Iterating'
+description:
+  'Keep the build, deploy and debug loop short on SaladCloud: test with a small image first, debug startup by hand, run
+  spare replicas while testing, and attach the Job Queue autoscaler last.'
+---
+
+_Last Updated: October 7, 2026_
+
+Before a new instance can do any work, SaladCloud allocates it to a node, the node downloads your image, and your
+container starts. Each node downloads at its own speed, and a large image can take a while to download on a node that
+hasn't pulled it before. You aren't billed while an instance is allocating or downloading (see
+[Billing](/container-engine/explanation/billing-pricing/billing)), but you do wait, and while you are still getting a
+deployment right, every change can mean another wait. The habits below keep that loop short.
+
+## Prove the plumbing with a small image first
+
+Most problems in a first deployment are in the configuration around your application: a port or path that doesn't match,
+a probe that never passes, a job document in the wrong shape, missing registry credentials. A small image shows these as
+well as your real one does, and it downloads quickly.
+
+1. Deploy a small image that answers HTTP on the same port and paths your application will use, including the path your
+   readiness probe checks.
+2. Check everything around it: the
+   [queue connection](/container-engine/how-to-guides/job-processing/creating-a-job-queue) or
+   [Container Gateway](/container-engine/how-to-guides/gateway/sending-requests), the
+   [health probes](/container-engine/explanation/infrastructure-platform/health-probes), the job or request your client
+   sends and the response it gets back, and scaling.
+3. When that works, [update the container group](/reference/saladcloud-api/container-groups/update-container-group) to
+   your real image.
+
+## Debug startup by hand
+
+If your real image fails to start or exits early, you don't need to rebuild and redeploy for every guess. Keep the
+container alive with a command that only sleeps, connect to it, and run the startup yourself:
+
+1. Set the container group's [command](/container-engine/how-to-guides/specifying-a-command) to `sleep 2147483647`. In
+   the API, that is `"command": ["sleep", "2147483647"]`. In the portal, enter `sleep` as the command and `2147483647`
+   as its argument. The command replaces the image's `ENTRYPOINT` and `CMD`, so the container starts and does nothing
+   else.
+2. Remove the startup and liveness probes for now. Your application isn't running, so they would fail, and a failed
+   startup or liveness probe moves the instance to a new node.
+3. When an instance is running, connect to it with
+   [SSH or the web terminal](/container-engine/explanation/container-groups/ssh-and-terminal).
+4. Run the image's original entrypoint by hand and watch what happens. Check that the expected files, binaries and
+   environment variables are there, that the GPU is visible (`nvidia-smi` on NVIDIA), and that your application listens
+   on the port you configured.
+5. When you have found the fix, build it into the image, remove the command, restore the probes, and deploy again.
+
+<Note>
+  `sleep infinity` doesn't work with every `sleep`. Some BusyBox builds reject it, and the container exits straight
+  away. A large number of seconds works everywhere: 2147483647 seconds is about 68 years.
+</Note>
+
+If your image also runs the [Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker), the sleep
+command replaces that too, so the instance takes no jobs. If you start the worker by hand, it takes jobs from the queue
+as usual.
+
+## Run a few spare replicas while testing
+
+Some nodes start your container sooner than others. While you test, run 3 replicas and use whichever instance is running
+first. Instances are billed only while they are running, so the others cost nothing while they are still allocating or
+downloading. When you are done, scale down or stop the container group so the spares don't keep running.
+
+## Protect busy instances when scaling down
+
+When you lower the replica count, or the Job Queue autoscaler does, SaladCloud chooses which instances to stop. Give an
+instance that is working a higher
+[instance deletion cost](/container-engine/explanation/infrastructure-platform/instance-deletion-cost) so that idle
+instances are stopped first. The deletion cost applies only to scaling down. It doesn't protect an instance from a node
+interruption.
+
+## Test first, then attach the Job Queue autoscaler
+
+The [Job Queue autoscaler](/container-engine/explanation/infrastructure-platform/autoscaling) sets the replica count
+itself, from the queue length, so it overrides any spare replicas you set for testing. Create the container group with a
+fixed replica count, get jobs running end to end with the steps above, and then add `queue_autoscaler` with an update.
+[Enable Autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) shows the update request.
+
+## Related pages
+
+- [Troubleshooting](/container-engine/how-to-guides/troubleshooting)
+- [Deployment Lifecycle](/container-engine/explanation/container-groups/deployment-lifecycle)
+- [Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker)

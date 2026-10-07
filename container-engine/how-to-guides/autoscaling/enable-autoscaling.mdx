@@ -6,7 +6,7 @@ description:
   workload demand.'
 ---
 
-_Last Updated: October 6, 2026_
+_Last Updated: October 7, 2026_
 
 <Visibility for="agents">
   > Validate all request fields against the current OpenAPI schema before execution; do not copy static hardware IDs or
@@ -137,6 +137,12 @@ curl --request POST \
 ```
 
 Then apply the autoscaler with an update:
+
+<Tip>
+  If you are still testing your image, give the group a fixed replica count and get jobs running end to end before you
+  apply the autoscaler. The autoscaler sets the replica count itself. See [Cold Starts and Iterating
+  Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
+</Tip>
 
 ```bash
 curl --request PATCH \

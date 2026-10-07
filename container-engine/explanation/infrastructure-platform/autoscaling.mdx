@@ -6,7 +6,7 @@ description:
   performance and cost for batch processing workloads.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 7, 2026_
 
 <Visibility for="agents">
   > Treat queue length, quota, and capacity as live values. Use the [Job Queue autoscaling
@@ -30,6 +30,11 @@ Before you can enable Job Queue autoscaling, you must configure the Job Queue:
 2. Verify that your application can handle scaling with multiple container instances.
 3. Review the [Job Queue Autoscaling Settings](/container-engine/reference/autoscaling/settings) to understand how to
    fine-tune autoscaling for your workloads.
+
+<Tip>
+  Get jobs running end to end with a fixed replica count first, then attach the autoscaler. See [Cold Starts and
+  Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
+</Tip>
 
 ## Example Use Case
 
