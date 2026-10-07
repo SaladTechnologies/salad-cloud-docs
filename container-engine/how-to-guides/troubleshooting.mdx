@@ -4,7 +4,7 @@ sidebarTitle: Troubleshooting
 description: Troubleshooting common issues with Salad Container Engine workloads.
 ---
 
-_Last Updated: July 13, 2026_
+_Last Updated: October 7, 2026_
 
 <Visibility for="agents">
   > Invoke `salad-container-engine-troubleshoot` and follow the [deterministic evidence
@@ -106,7 +106,9 @@ To systematically debug start failures:
 2. Ensure the container image is intended for GPU workloads if deploying to a GPU container group, or vice versa.
 3. Start the container with a minimal long-running command such as `sleep infinity` and connect via the terminal in the
    Portal or with SSH. Once connected, manually verify that the expected files, binaries, and environment variables are
-   present and correct. Also verify that the intended entrypoint or command run successfully.
+   present and correct. Also verify that the intended entrypoint or command run successfully. For the full steps,
+   including which probes to remove first, see
+   [Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly#debug-startup-by-hand).
 
 ### GPU Compatibility Checks
 

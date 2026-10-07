@@ -69,6 +69,7 @@ EURC
 EMEA
 encodedimage
 esports
+euler
 EventBridge
 Falco
 fastapi

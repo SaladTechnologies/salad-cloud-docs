@@ -226,6 +226,7 @@
               "container-engine/how-to-guides/deployment-strategies",
               "container-engine/how-to-guides/environment-variables",
               "container-engine/how-to-guides/specifying-a-command",
+              "container-engine/how-to-guides/cold-starts-and-iterating-quickly",
               "container-engine/how-to-guides/troubleshooting",
               {
                 "group": "Container Registries",

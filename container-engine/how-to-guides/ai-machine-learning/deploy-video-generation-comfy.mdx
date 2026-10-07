@@ -17,7 +17,7 @@ description:
 'twitter:image:height': 540
 ---
 
-_Last Updated: January 8, 2026_
+_Last Updated: October 7, 2026_
 
 This guide will take you step by step through the process of creating and deploying a production ready video-generation
 service on SaladCloud. We will be using the following technologies:
@@ -891,7 +891,7 @@ To use the job queue, we simply need to add the Job Queue worker binary to our D
 
 ```dockerfile
 # Download and extract the job queue worker
-RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.5.0/salad-http-job-queue-worker_x86_64.tar.gz && \
+RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-http-job-queue-worker_x86_64.tar.gz && \
   tar -xvf salad-http-job-queue-worker_x86_64.tar.gz && \
   rm salad-http-job-queue-worker_x86_64.tar.gz && \
   chmod +x salad-http-job-queue-worker
@@ -920,6 +920,11 @@ docker push saladtechnologies/comfyui:video-gen-example
 ```
 
 This may take some time, depending on your network speed. Once it's done, you can deploy your container to SaladCloud.
+
+<Tip>
+  A large image can take a while to download on a node that hasn't pulled it. To keep each test round short, see [Cold
+  Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
+</Tip>
 
 Because we are using the Job Queue, we need to create a new Container Group with the
 [Public API](/reference/saladcloud-api/container-groups/create-container-group). This functionality is not available in

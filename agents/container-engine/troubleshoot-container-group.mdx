@@ -6,7 +6,7 @@ description:
   failures.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 7, 2026_
 
 ## When to use this runbook
 
@@ -43,7 +43,9 @@ instance. Do not diagnose infrastructure failure solely from performance variati
 Use [Troubleshooting](/container-engine/how-to-guides/troubleshooting),
 [Deployment Lifecycle](/container-engine/explanation/container-groups/deployment-lifecycle),
 [System Events](/container-engine/explanation/container-groups/system-events), and
-[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) to interpret evidence.
+[Health Probes](/container-engine/explanation/infrastructure-platform/health-probes) to interpret evidence. Use
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly) to debug startup
+by hand.
 
 ## Dynamic values to retrieve
 
@@ -84,7 +86,10 @@ Follow this evidence order without skipping directly to reallocation:
    size limit, registry reachability/rate limits, and valid private-registry permissions. Never print credentials.
 7. **Check startup and probes.** Confirm the image has a long-running process; command paths exist; GPU runtime/vendor
    matches selected GPU classes; probe handler/port/path and all thresholds match actual startup/readiness/liveness
-   behavior.
+   behavior. If events and logs don't explain a start failure or early exit, debug startup by hand with explicit intent:
+   set `command` to `["sleep", "2147483647"]`, remove the startup and liveness probes, connect over SSH, and run the
+   entrypoint ([steps](/container-engine/how-to-guides/cold-starts-and-iterating-quickly#debug-startup-by-hand)).
+   Restore both afterward.
 8. **Check networking and queue/gateway configuration.** Confirm the application binds the configured port and supports
    the documented gateway IPv6 requirements; require at least one running, ready instance. For queues, confirm worker,
    local path/port, readiness, queue name, and group association.

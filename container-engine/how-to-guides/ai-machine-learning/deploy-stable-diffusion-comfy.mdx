@@ -4,7 +4,7 @@ sidebarTitle: 'ComfyUI Deployment'
 description: 'A comprehensive guide to deploying ComfyUI-based image and video generation services on SaladCloud'
 ---
 
-_Last Updated: January 8, 2026_
+_Last Updated: October 7, 2026_
 
 This guide covers deploying any ComfyUI workflow as a production API on SaladCloud, including image generation models
 (Stable Diffusion 1.5, SDXL, SD 3.5, Flux) and video generation models (LTX Video, Hunyuan, CogVideoX, Mochi, Cosmos).
@@ -706,6 +706,11 @@ curl -X POST http://localhost:3000/prompt \
 
 ## Deploying to SaladCloud
 
+<Tip>
+  ComfyUI images are large and can take a while to download on a node that hasn't pulled them. To keep each test round
+  short, see [Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
+</Tip>
+
 ### Container Gateway Deployment
 
 1. Push your image to a container registry:
@@ -783,7 +788,7 @@ flowchart LR
 
 ```dockerfile
 # Download and install the job queue worker
-RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/download/v0.5.0/salad-http-job-queue-worker_x86_64.tar.gz && \
+RUN wget https://github.com/SaladTechnologies/salad-cloud-job-queue-worker/releases/latest/download/salad-http-job-queue-worker_x86_64.tar.gz && \
     tar -xvf salad-http-job-queue-worker_x86_64.tar.gz && \
     rm salad-http-job-queue-worker_x86_64.tar.gz && \
     chmod +x salad-http-job-queue-worker

@@ -4,7 +4,7 @@ sidebarTitle: 'Queue Autoscaling'
 description: 'Create or discover a SaladCloud Job Queue and configure a safely verified queue-autoscaled worker group.'
 ---
 
-_Last Updated: October 6, 2026_
+_Last Updated: October 7, 2026_
 
 ## When to use this runbook
 
@@ -42,7 +42,9 @@ Group patch schema.
 Use [Job Queues](/container-engine/explanation/job-processing/job-queues),
 [Job Queue Worker](/container-engine/how-to-guides/job-processing/queue-worker),
 [Job Queue Autoscaling](/container-engine/explanation/infrastructure-platform/autoscaling), and
-[Autoscaling Settings](/container-engine/reference/autoscaling/settings) for canonical behavior.
+[Autoscaling Settings](/container-engine/reference/autoscaling/settings) for canonical behavior. Use
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly) for test-loop
+tactics.
 
 ## Dynamic values to retrieve
 
@@ -169,6 +171,11 @@ curl --fail-with-body --silent --show-error \
 
 Replace all examples with approved values and a live hardware plan. For an existing group that already has the correct
 `queue_connection`, read it, then patch only `queue_autoscaler` with Operation: `update_container_group` and verify.
+
+When the worker image is not yet proven, create the group with an approved fixed replica count instead of 0, confirm a
+test job reaches `succeeded` (test-job submission needs explicit intent), and only then apply `queue_autoscaler`. The
+autoscaler sets the replica count from queue length, so it overrides the fixed count. See
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
 
 ### Verify scaling behavior
 
