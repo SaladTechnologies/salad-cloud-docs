@@ -4,7 +4,7 @@ sidebarTitle: 'OpenCode'
 description: 'Use the OpenCode terminal coding agent with Salad AI Gateway or a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: September 17, 2026_
+_Last Updated: October 12, 2026_
 
 ## Introduction
 
@@ -272,9 +272,9 @@ planning without the risk of unintended file modifications.
 
 ### Context Window
 
-The Qwen 3.6-35B-A3B recipe and AI Gateway support a 262,144 token context window. The `context` value in the config
-lets OpenCode track how much context is remaining and manage prompt sizes accordingly, so make sure it reflects your
-actual deployment configuration.
+The Qwen 3.6-35B-A3B recipe supports a 262,144 token context window. AI Gateway context windows vary by model; see the
+[AI Gateway models page](/ai-gateway/reference/models). The `context` value in the config lets OpenCode track how much
+context is remaining and manage prompt sizes accordingly, so make sure it reflects your actual deployment configuration.
 
 ### Persist Your API Key
 
