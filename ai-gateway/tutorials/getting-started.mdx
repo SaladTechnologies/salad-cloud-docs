@@ -4,7 +4,7 @@ sidebarTitle: 'Getting Started'
 description: 'Make your first API call to Salad AI Gateway in under 5 minutes.'
 ---
 
-_Last Updated: September 23, 2026_
+_Last Updated: October 12, 2026_
 
 <Visibility for="agents">
   > Treat examples as minimal templates, not live model or account facts. Use the `salad-ai-gateway-request` skill,
@@ -187,10 +187,12 @@ console.log(response.choices[0].message.content)
 
 ## Available Models
 
-| Model             | Context Window | Best For                                 |
-| :---------------- | :------------- | :--------------------------------------- |
-| `qwen3.6-35b-a3b` | 262,144 tokens | Complex reasoning, agentic tasks, coding |
-| `qwen3.5-35b-a3b` | 131,072 tokens | Cost-efficient agentic tasks             |
+| Model             | Context Window | Best For                                       |
+| :---------------- | :------------- | :--------------------------------------------- |
+| `qwen3.6-35b-a3b` | 262,144 tokens | Complex reasoning, agentic tasks, coding       |
+| `qwen3.6-27b`     | 195,200 tokens | General purpose, balanced speed and capability |
+| `qwen3.5-35b-a3b` | 262,144 tokens | Cost-efficient agentic tasks                   |
+| `qwen3.5-9b`      | 196,608 tokens | High-volume, simple queries                    |
 
 See the [Models Reference](/ai-gateway/reference/models) for full details.
 

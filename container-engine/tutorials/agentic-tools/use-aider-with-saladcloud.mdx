@@ -4,7 +4,7 @@ sidebarTitle: 'Aider'
 description: 'Learn how to use the Aider AI coding agent from the command line with a self-hosted model on SaladCloud.'
 ---
 
-_Last Updated: September 22, 2026_
+_Last Updated: October 12, 2026_
 
 ## Introduction
 
@@ -46,7 +46,9 @@ Before getting started, make sure you have:
     | Model                         | Description                                                                      |
     | :---------------------------- | :------------------------------------------------------------------------------- |
     | `qwen3.6-35b-a3b` | Qwen 3.6 35B-A3B - best for agentic tasks, coding, and complex reasoning        |
+    | `qwen3.6-27b`     | Qwen 3.6 27B - general purpose, balancing capability and speed                  |
     | `qwen3.5-35b-a3b` | Qwen 3.5 35B-A3B - cost-efficient agentic tasks and reasoning                   |
+    | `qwen3.5-9b`      | Qwen 3.5 9B - fastest model, for high-volume simple queries                     |
 
   </Tab>
   <Tab title="Self-Hosted on SaladCloud">
@@ -187,7 +189,7 @@ git init
 
 When using a custom deployment, set the context window to the maximum value your model can use so Aider can send as much
 repository context as possible. For the Qwen models listed on the
-[AI Gateway models page](/ai-gateway/reference/models), that maximum is **262,144 tokens**.
+[AI Gateway models page](/ai-gateway/reference/models), the maximum depends on the model, up to **262,144 tokens**.
 
 ### Model Recommendations
 
