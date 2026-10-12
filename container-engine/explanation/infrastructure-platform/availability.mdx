@@ -6,7 +6,7 @@ description:
   SaladCloud.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 12, 2026_
 
 <Visibility for="agents">
   > Do not infer current capacity from this page or its screenshot. Use the `salad-container-engine-preflight` skill and
@@ -43,7 +43,7 @@ Keep in mind the following considerations when interpreting availability counts:
   that previously ran your workload and exited with a non-zero exit code and will not be reassigned to it. Check your
   workload’s system events to confirm whether it has failed on nodes.
 
-- **Available nodes may not be immediately reassigned.** Some nodes remain with their current workloads for a minimum
-  running duration before being reallocated. This prevents excessive workload churn and repeated image pulls. The
-  minimum duration varies by priority level—from about 30 minutes for low-priority workloads to indefinitely for
-  high-priority workloads, which are never reallocated.
+- **Available nodes may not be immediately reassigned.** Some nodes stay with their current workloads for a period
+  before being reallocated. This prevents excessive workload churn and repeated image pulls. How long a node stays
+  depends on the priority level of the workload it is running, and nodes running high-priority workloads are not
+  reallocated to other workloads.
