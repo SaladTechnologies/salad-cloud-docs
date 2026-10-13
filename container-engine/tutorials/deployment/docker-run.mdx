@@ -3,7 +3,7 @@ title: 'Docker Run on SaladCloud'
 sidebarTitle: 'Docker Run'
 ---
 
-_Last Updated: November 18, 2024_
+_Last Updated: October 13, 2026_
 
 This tutorial will guide you through the process of running a container locally and deploying a GPU-accelerated
 application on SaladCloud, following best practices. Before you begin, please complete
@@ -260,7 +260,8 @@ the container group.
 Setting a lower priority for the selected GPUs can help reduce costs; however, low-priority workloads may be preempted
 when higher-priority workloads become available on SaladCloud. If you notice that instances with a lower priority level
 are being reallocated too frequently for your needs, you can edit the running container group to select a higher
-priority level.
+priority level. The change applies immediately without restarting instances. See
+[Changing Priority](/container-engine/explanation/billing-pricing/priority-pricing#changing-priority).
 
 ### SaladCloud Job Queue
 

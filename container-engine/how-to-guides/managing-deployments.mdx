@@ -2,7 +2,7 @@
 title: 'Managing Deployments'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: October 13, 2026_
 
 <Visibility for="agents">
   > Before any update, call `get_container_group`, preserve unrelated configuration, and use only fields supported by
@@ -77,6 +77,10 @@ your Container Group deployment.
 - You can adjust the replica count to scale your application up or down as needed.
 - You can modify hardware resource requirements, such as the number of vCPUs, Memory (RAM), GPUs, and
   [Disk Space](/container-engine/explanation/container-groups/disk-space).
+- You can change the [priority level](/container-engine/explanation/billing-pricing/priority-pricing#changing-priority).
+  Raising priority is allowed at any time. Lowering priority on a running container group is subject to limits on how
+  frequently it can be lowered; to lower it right away, stop the container group, change the priority, and start it
+  again.
 - You can edit the [Health Check Probes](/container-engine/explanation/infrastructure-platform/health-probes) (Startup,
   and Liveness).
 - You can edit the [Command](/container-engine/how-to-guides/specifying-a-command).
@@ -101,6 +105,8 @@ associated with those choices updated in real-time.
   satisfy the new requirements. Replicas that fall outside the updated limits are reallocated to compliant nodes, so
   only those instances restart.
 - Display name edits, replica count adjustments, and autoscaler configuration updates apply without forcing a restart.
+- Priority level changes apply to running instances immediately without a restart. The new priority's preemption
+  behavior and hourly rate take effect from that point on.
 - Because restarts happen right away, plan rollouts carefully and consult
   [Deployment Strategies on SaladCloud](/container-engine/how-to-guides/deployment-strategies) for approaches that
   maintain availability during updates.

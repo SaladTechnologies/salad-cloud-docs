@@ -2,7 +2,7 @@
 title: 'Priority Pricing'
 ---
 
-_Last Updated: November 06, 2025_
+_Last Updated: October 13, 2026_
 
 ## SaladCloud Infrastructure
 
@@ -22,11 +22,35 @@ redundancy.
 Priority levels let you balance interruptions and cost savings according to your needs. Container Groups run at one of
 four priority levels on our network: "High", "Medium", "Low", or "Lowest" (formally "Batch"). Lower priority levels have
 reduced costs. Higher priority container groups can preempt lower priority ones if a higher-paying job becomes
-available. If you find that instances at a lower priority level are reallocating too frequently for your needs, you can
-edit the container group to select a higher priority level.
+available. Pick the lowest priority level that meets your interruption tolerance when you deploy. If instances at a
+lower priority level are being interrupted too frequently for your needs, you can raise the priority of a running
+container group at any time. See [Changing Priority](#changing-priority).
 
 After adding a GPU to your container group, you can choose between priority levels. At the highest priority level, your
 container group instances will not be interrupted _by other workloads_. However, high priority instances **will** still
 be reallocated if your container exits, you request a reallocation, or the node powering the instance disconnects.
 Container groups without a GPU always run at the "Lowest" priority level, and can be interrupted by any container group
 requesting a GPU.
+
+## Changing Priority
+
+You can change the priority level of an existing container group in the Portal by editing the container group, or with
+the [Update Container Group API](/reference/saladcloud-api/container-groups/update-container-group).
+
+- **Changes apply to running instances immediately.** Nothing restarts or redeploys. The new priority level determines
+  both whether your instances can be preempted by higher priority container groups and the hourly rate billed from that
+  point on.
+- **Raising priority** is allowed at any time on a running container group.
+- **Lowering priority** on a running container group is subject to limits on how frequently it can be lowered. If you
+  attempt to lower the priority too soon, the request is rejected with an error and the container group stays at its
+  current priority level. To move a running container group to a lower priority level right away, stop the container
+  group, change the priority, and start it again.
+- **Stopped container groups** can change priority freely. The new priority level applies when the container group
+  starts.
+- **Container groups without a GPU** always run at the "Lowest" priority level. A priority value set on them is ignored.
+
+<Tip>
+  Pick the lowest priority level that meets your interruption tolerance when you deploy. Raising priority later is
+  always available if instances are interrupted too often, while lowering it on a running container group may have to
+  wait.
+</Tip>
