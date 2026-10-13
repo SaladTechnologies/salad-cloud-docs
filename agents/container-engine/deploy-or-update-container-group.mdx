@@ -158,24 +158,25 @@ curl --fail-with-body --silent --show-error \
 
 ## Decision rules
 
-| Current evidence and intent                                           | Action                                                                                                                                                         |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No exact-name group exists                                            | Create after complete preflight.                                                                                                                               |
-| Exact-name group exists and matches intent                            | Return no-op success with the fresh read.                                                                                                                      |
-| Exact-name group exists but differs                                   | Patch it; do not create a duplicate.                                                                                                                           |
-| Only `display_name` matches                                           | Treat as ambiguous and ask for the intended immutable `name`.                                                                                                  |
-| User requests fewer replicas                                          | Require explicit capacity-reduction intent before patching.                                                                                                    |
-| User changes image, command, environment, probes, or gateway settings | Warn that canonical deployment guidance says a new container version can restart replicas.                                                                     |
-| User changes CPU, RAM, GPU, or storage                                | Warn that noncompliant instances may be reallocated.                                                                                                           |
-| User lowers priority on a running group                               | Warn that lowering priority on a running group is subject to frequency limits; if the API rejects it, report the error and offer stop, change priority, start. |
-| User requests autostart/restart-policy update                         | Stop: those fields are required on create but absent from the current patch schema.                                                                            |
-| User requests gateway auth/protocol update                            | Stop: the current patch schema exposes only networking `port`.                                                                                                 |
-| Existing group lacks `queue_connection`                               | Do not attach it with update: the current patch schema has no `queue_connection`; request an approved replacement strategy.                                    |
+| Current evidence and intent                                           | Action                                                                                                                                                                                  |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No exact-name group exists                                            | Create after complete preflight.                                                                                                                                                        |
+| Exact-name group exists and matches intent                            | Return no-op success with the fresh read.                                                                                                                                               |
+| Exact-name group exists but differs                                   | Patch it; do not create a duplicate.                                                                                                                                                    |
+| Only `display_name` matches                                           | Treat as ambiguous and ask for the intended immutable `name`.                                                                                                                           |
+| User requests fewer replicas                                          | Require explicit capacity-reduction intent before patching.                                                                                                                             |
+| User changes image, command, environment, probes, or gateway settings | Warn that canonical deployment guidance says a new container version can restart replicas.                                                                                              |
+| User changes CPU, RAM, GPU, or storage                                | Warn that noncompliant instances may be reallocated.                                                                                                                                    |
+| User lowers priority on a running group                               | Warn that lowering is allowed only after 1 hour at the current priority; if the API returns `400` `container_group_update_exception`, report it and offer stop, change priority, start. |
+| User requests autostart/restart-policy update                         | Stop: those fields are required on create but absent from the current patch schema.                                                                                                     |
+| User requests gateway auth/protocol update                            | Stop: the current patch schema exposes only networking `port`.                                                                                                                          |
+| Existing group lacks `queue_connection`                               | Do not attach it with update: the current patch schema has no `queue_connection`; request an approved replacement strategy.                                                             |
 
 Priority is `container.priority` in create/update requests. Valid values are `high`, `medium`, `low`, and `batch`.
 Priority changes apply to running instances immediately without a restart. Raising priority on a running group is
-allowed at any time. Lowering it is subject to limits on how frequently it can be lowered; a rejected request leaves the
-group at its current priority. See
+allowed at any time. Lowering it is allowed only after the group has been running at its current priority for 1 hour,
+counted from the last start or last priority change; an earlier request fails with HTTP `400` and problem type
+`container_group_update_exception`, and the group keeps its current priority. Stopping clears the timer. See
 [Changing Priority](/container-engine/explanation/billing-pricing/priority-pricing#changing-priority). Select at most
 the approved countries through `country_codes`; omitting the field permits any country.
 

@@ -41,16 +41,21 @@ the [Update Container Group API](/reference/saladcloud-api/container-groups/upda
   both whether your instances can be preempted by higher priority container groups and the hourly rate billed from that
   point on.
 - **Raising priority** is allowed at any time on a running container group.
-- **Lowering priority** on a running container group is subject to limits on how frequently it can be lowered. If you
-  attempt to lower the priority too soon, the request is rejected with an error and the container group stays at its
-  current priority level. To move a running container group to a lower priority level right away, stop the container
-  group, change the priority, and start it again.
-- **Stopped container groups** can change priority freely. The new priority level applies when the container group
-  starts.
+- **Lowering priority** on a running container group is only allowed once the container group has been running at its
+  current priority level for 1 hour. The hour counts from the container group's last start or its last priority change,
+  whichever is later, and a priority change in either direction restarts it. This applies while the container group is
+  deploying or running.
+- **Rejected changes.** If you attempt to lower the priority before the hour has passed, the request is rejected and the
+  container group keeps its current priority level. The API returns HTTP `400` with the problem type
+  `container_group_update_exception` and the message: "The priority of a running container group can only be lowered
+  after it has been running at this priority for 60 minutes. Stop the container group to change its priority
+  immediately." The Portal shows the same error.
+- **Stopped container groups** can change priority freely, and stopping clears the 1-hour timer. To move a running
+  container group to a lower priority level right away, stop the container group, change the priority, and start it
+  again. The new priority level applies when the container group starts.
 - **Container groups without a GPU** always run at the "Lowest" priority level. A priority value set on them is ignored.
 
 <Tip>
-  Pick the lowest priority level that meets your interruption tolerance when you deploy. Raising priority later is
-  always available if instances are interrupted too often, while lowering it on a running container group may have to
-  wait.
+  Choose the lowest priority level that meets your interruption tolerance when you deploy. Raise priority whenever you
+  need nodes faster. To lower priority right away, stop the container group, change the priority, and start it again.
 </Tip>

@@ -221,8 +221,8 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
 ### Can I change the priority of a running container group?
 
 Yes. Priority changes apply to running instances immediately, without restarting or redeploying them. You can raise the
-priority of a running container group at any time. Lowering the priority of a running container group is subject to
-limits on how frequently it can be lowered. If a request to lower priority is rejected, the container group stays at its
+priority of a running container group at any time. You can lower the priority of a running container group only after it
+has been running at its current priority for 1 hour. A request made sooner is rejected and the container group keeps its
 current priority. To lower it right away, stop the container group, change the priority, and start it again. See
 [Changing Priority](/container-engine/explanation/billing-pricing/priority-pricing#changing-priority).
 
