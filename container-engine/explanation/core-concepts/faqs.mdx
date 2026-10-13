@@ -3,7 +3,7 @@ title: 'Salad Container Engine FAQs'
 sidebarTitle: 'FAQs'
 ---
 
-_Last Updated: July 13, 2026_
+_Last Updated: October 13, 2026_
 
 This document is a must-read before getting started with SaladCloud. Here, we detail what SaladCloud is, the nature of
 our network, how SaladCloud works, unique traits of our distributed network, the choice of consumer GPUs over data
@@ -217,6 +217,14 @@ This checklist is for SCE. For checklists for APIs and SGS, check the relevant d
   internal SLOs, and provided a 0-downtime experience.
 
   <img src="/container-engine/images/starting-salad2.png" />
+
+### Can I change the priority of a running container group?
+
+Yes. Priority changes apply to running instances immediately, without restarting or redeploying them. You can raise the
+priority of a running container group at any time. You can lower the priority of a running container group only after it
+has been running at its current priority for 1 hour. A request made sooner is rejected and the container group keeps its
+current priority. To lower it right away, stop the container group, change the priority, and start it again. See
+[Changing Priority](/container-engine/explanation/billing-pricing/priority-pricing#changing-priority).
 
 ### How do I use SSH with Salad?
 
