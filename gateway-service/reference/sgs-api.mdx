@@ -38,6 +38,8 @@ Or append a `&tag=` parameter to your session ID:
 
 The legacy forms `X-Sgs-Capabilities: {yourTag}` and `{sessionId}&cap={yourTag}` are still supported.
 
+The examples on this page use HTTP CONNECT requests.
+
 A few details to keep in mind:
 
 - Tag names are case-sensitive. `internal-site-a` and `Internal-Site-A` are different tags.
@@ -51,13 +53,13 @@ For each request, SGS checks the following in order and uses the first one that 
 
 1. **`X-Sgs-Machine-Id` header.** The request is pinned to that exact node (see
    [Targeting a specific node](#targeting-a-specific-node)).
-2. **`X-Sgs-Tag` header.** A random node is chosen from the nodes that are currently connected and have the tag. If none
-   match, SGS continues down this list.
+2. **`X-Sgs-Tag` header.** SGS chooses from the nodes that are currently connected and have the tag. If none match, SGS
+   continues down this list.
 3. **`X-Sgs-Capabilities` header, `&tag=`, or `&cap=` parameter.**
-   1. A random node that is currently connected and has the tag.
-   2. If none match, a random node that passes Salad's
+   1. Nodes that are currently connected and have the tag.
+   2. If none match, nodes that pass Salad's
       [Destination Health Checks](/gateway-service/explanation/destination-health-checks) for that capability.
-4. **Normal routing.** If nothing above matched, SGS routes the request as if no tag had been requested.
+4. **Normal routing.** If nothing above matched, SGS routes the request normally.
 
 This means a tag never blocks traffic. If no connected node has the requested tag (for example, because a test was
 misconfigured and every node failed it), requests "fail open" to normal routing instead of failing.
@@ -94,7 +96,7 @@ during initial integration. If you need one, contact your account manager.
 GET /nodes
 ```
 
-Returns every node that has connected to your SGS server, along with its tags.
+Returns the nodes SGS has a record of, along with their tags.
 
 <Warning>
   This list includes nodes that are **not currently connected**. SGS keeps a node's tags when it disconnects, so a node
@@ -121,7 +123,7 @@ Returns every node that has connected to your SGS server, along with its tags.
 
 - `machine_id`: the node's Salad machine ID.
 - `tags`: the node's tags and their values. A node with no tags has an empty object.
-- `updated_at`: the time, in UTC, when SGS first saw the node.
+- `updated_at`: a UTC timestamp.
 
 ### Retrieve a node
 
@@ -214,7 +216,7 @@ Errors return a JSON body with the HTTP status code and its name:
 | ------------------ | --------------------------------------------------------------------- |
 | `400 Bad Request`  | The `PATCH` body is not a JSON object of tag names and numeric values |
 | `401 Unauthorized` | The JWT is missing, invalid, or not authorized for this SGS server    |
-| `404 Not Found`    | The machine ID has never connected to this SGS server                 |
+| `404 Not Found`    | `PATCH` was sent for a machine ID that SGS has no record of           |
 
 ## Common workflows
 
@@ -236,7 +238,7 @@ Errors return a JSON body with the HTTP status code and its name:
      https://target-site.com
    ```
 
-   If the proxy returns `503`, the node is offline. Skip it and leave its tags as they are.
+   If the proxy returns `503`, the node is usually offline. Skip it and leave its tags as they are.
 
 3. Tag the nodes that passed, using a unique tag name such as `internal-target-site`. Set the tag to `0` on nodes that
    failed:
