@@ -24,28 +24,13 @@ your usual CONNECT or PROXY v2 port.
 
 ### Requesting a tag
 
-Add the `X-Sgs-Tag` proxy header to your request:
+Add the `X-Sgs-Tag` proxy header to your HTTP CONNECT request:
 
 ```
 X-Sgs-Tag: {yourTag}
 ```
 
-Or append a `&tag=` parameter to your session ID:
-
-```
-{sessionId}&tag={yourTag}
-```
-
-The legacy forms `X-Sgs-Capabilities: {yourTag}` and `{sessionId}&cap={yourTag}` are still supported.
-
-The examples on this page use HTTP CONNECT requests.
-
-A few details to keep in mind:
-
-- Tag names are case-sensitive. `internal-site-a` and `Internal-Site-A` are different tags.
-- The `&tag=` (or `&cap=`) parameter must come directly after the session ID. It is not recognized if another `&`
-  parameter comes before it.
-- If you send more than one `X-Sgs-Tag` header, SGS only selects nodes that have **all** of the requested tags.
+Tag names are case-sensitive. `internal-site-a` and `Internal-Site-A` are different tags.
 
 ### How node selection works
 
@@ -53,13 +38,8 @@ For each request, SGS checks the following in order and uses the first one that 
 
 1. **`X-Sgs-Machine-Id` header.** The request is pinned to that exact node (see
    [Targeting a specific node](#targeting-a-specific-node)).
-2. **`X-Sgs-Tag` header.** SGS chooses from the nodes that are currently connected and have the tag. If none match, SGS
-   continues down this list.
-3. **`X-Sgs-Capabilities` header, `&tag=`, or `&cap=` parameter.**
-   1. Nodes that are currently connected and have the tag.
-   2. If none match, nodes that pass Salad's
-      [Destination Health Checks](/gateway-service/explanation/destination-health-checks) for that capability.
-4. **Normal routing.** If nothing above matched, SGS routes the request normally.
+2. **`X-Sgs-Tag` header.** SGS chooses from the nodes that are currently connected and have the tag.
+3. **Normal routing.** If no connected node has the tag, SGS routes the request normally.
 
 This means a tag never blocks traffic. If no connected node has the requested tag (for example, because a test was
 misconfigured and every node failed it), requests "fail open" to normal routing instead of failing.
@@ -229,8 +209,8 @@ Errors return a JSON body with the HTTP status code and its name:
      -H "Authorization: Bearer YOUR_SALAD_JWT" | jq -r '.nodes[].machine_id'
    ```
 
-2. For each machine ID, test the node against the target site by pinning the request to it. Don't add `&tag=` or `&cap=`
-   to the session ID while testing.
+2. For each machine ID, test the node against the target site by pinning the request to it. Don't add an `X-Sgs-Tag`
+   header while testing.
 
    ```bash
    curl --proxy-header "X-Sgs-Machine-Id: {machineId}" \
@@ -257,9 +237,8 @@ Errors return a JSON body with the HTTP status code and its name:
      -H "Authorization: Bearer YOUR_SALAD_JWT"
    ```
 
-5. Route the site's traffic to the tagged nodes by appending `&tag=internal-target-site` to your session IDs (for
-   example, `https://{sessionId}&tag=internal-target-site:{password}@{sgsName}.salad.com:8443`), or by adding the proxy
-   header `X-Sgs-Tag: internal-target-site`.
+5. Route the site's traffic to the tagged nodes by adding the proxy header `X-Sgs-Tag: internal-target-site` to your
+   requests.
 
 6. Nodes connect and disconnect over time, and their ability to reach a site can change. Repeat steps 1–4 regularly, at
    least every 2–3 hours. Nodes that are offline during a pass keep their existing tags, and SGS only routes to tagged
