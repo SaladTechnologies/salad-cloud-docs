@@ -1,67 +1,92 @@
 ---
 title: 'SGS API'
+sidebarTitle: 'SGS API'
 description: 'Optional feature to manage streaming capability tags for nodes in your network'
 ---
 
-_Last Updated: March 20, 2025_
+_Last Updated: October 16, 2026_
 
 # The SGS API
 
-The SGS API enables you to manage streaming capability tags for nodes in your network. By tagging nodes based on their
-ability to connect to specific streaming services, you can create optimized routing paths for different workloads. Note
-that it is up to you to develop, run, and maintain any such connectivity tests.
+The SGS API lets you tag the nodes on your SGS server, then route requests to nodes that carry a given tag. A typical
+use is to test each node against a streaming service, tag the nodes that pass, and send that service's traffic only to
+those nodes. You develop, run, and maintain any such connectivity tests yourself.
 
-> **Important:** The SGS API is currently in limited release and is only available on some SGS servers. Contact your
-> account manager to enable this feature.
+<Note>
+  The SGS API is in limited release and is only available on some SGS servers. Contact your account manager to enable
+  it.
+</Note>
 
-## How Node Selection Works
+The API is served on port `7443` of your SGS server (`https://{sgsName}.salad.com:7443`). Proxy traffic continues to use
+your usual CONNECT or PROXY v2 port.
 
-When you specify a tag, our system selects nodes in this order:
+## Routing requests to tagged nodes
 
-1. Nodes with your requested tag
-2. Nodes with internal tags assigned by Salad's DHC system (if no match is found in step 1)
-3. Least-loaded node (if no match is found in steps 1 or 2)
+### Requesting a tag
 
-## Usage Examples
-
-### HTTP Headers
-
-Request a node with a specific tag by adding the `X-Sgs-Tag` proxy header to your request:
+Add the `X-Sgs-Tag` proxy header to your request:
 
 ```
 X-Sgs-Tag: {yourTag}
-X-Sgs-Capabilities: {yourTag}  (legacy, still supported)
 ```
 
-### URL Parameters
-
-Alternatively, you can request a node with a specific tag by adding the `&tag=` parameter to the end of your session ID:
+Or append a `&tag=` parameter to your session ID:
 
 ```
 {sessionId}&tag={yourTag}
-{sessionId}&cap={yourTag}  (legacy, still supported)
 ```
 
-All examples above produce identical routing behavior. Note that the new `X-Sgs-Tag` proxy header replaces the legacy
-`X-Sgs-Capabilities` proxy header, while the `&tag=` parameter replaces the legacy `&cap=` parameter. Both headers and
-parameters currently function identically, but we recommend using either the `X-Sgs-Tag` proxy header or the `&tag=` URL
-parameter for future compatibility.
+The legacy forms `X-Sgs-Capabilities: {yourTag}` and `{sessionId}&cap={yourTag}` are still supported.
 
-# Tagging Nodes
+A few details to keep in mind:
+
+- Tag names are case-sensitive. `internal-itv` and `Internal-ITV` are different tags.
+- The `&tag=` (or `&cap=`) parameter must come directly after the session ID. It is not recognized if another `&`
+  parameter comes before it.
+- If you send more than one `X-Sgs-Tag` header, SGS only selects nodes that have **all** of the requested tags.
+
+### How node selection works
+
+For each request, SGS checks the following in order and uses the first one that matches:
+
+1. **`X-Sgs-Machine-Id` header.** The request is pinned to that exact node (see
+   [Targeting a specific node](#targeting-a-specific-node)).
+2. **`X-Sgs-Tag` header.** A random node is chosen from the nodes that are currently connected and have the tag. If none
+   match, SGS continues down this list.
+3. **`X-Sgs-Capabilities` header, `&tag=`, or `&cap=` parameter.**
+   1. A random node that is currently connected and has the tag.
+   2. If none match, a random node that passes Salad's
+      [Destination Health Checks](/gateway-service/explanation/destination-health-checks) for that capability.
+4. **Normal routing.** If nothing above matched, SGS routes the request as if no tag had been requested.
+
+This means a tag never blocks traffic. If no connected node has the requested tag (for example, because a test was
+misconfigured and every node failed it), requests "fail open" to normal routing instead of failing.
+
+### Targeting a specific node
+
+The `X-Sgs-Machine-Id` proxy header sends a request to a specific node. This is mainly useful for testing nodes one at a
+time.
+
+- If the node is not currently connected to your SGS server (it is offline, or it has been quarantined), the request
+  fails immediately with `503 Service Unavailable`. SGS does not fall back to another node.
+- If the node accepts the request but cannot reach the destination, SGS may retry the request on a different node.
+
+A `503` on a pinned request usually just means the node is offline right now. It does not mean the node failed your
+test.
 
 ## Authentication
 
-All API requests require your Salad-provided JWT token:
+Every API request requires your Salad-provided JWT:
 
 ```bash
 curl https://{sgsName}.salad.com:7443/nodes \
   -H "Authorization: Bearer YOUR_SALAD_JWT"
 ```
 
-Requests without proper authentication will receive a `401 Unauthorized` response. JWT tokens were shared with your team
-during initial integration; if you need a JWT token, contact your account manager.
+Requests with a missing, invalid, or unauthorized token receive `401 Unauthorized`. Your JWT was shared with your team
+during initial integration. If you need one, contact your account manager.
 
-## Nodes
+## Endpoints
 
 ### List all nodes
 
@@ -69,7 +94,13 @@ during initial integration; if you need a JWT token, contact your account manage
 GET /nodes
 ```
 
-Returns all active, non-quarantined nodes connected to your SGS server.
+Returns every node that has connected to your SGS server, along with its tags.
+
+<Warning>
+  This list includes nodes that are **not currently connected**. SGS keeps a node's tags when it disconnects, so a node
+  that comes back later still has the tags you gave it. The API does not currently tell you which nodes are online. If a
+  node returns `503` when you target it with `X-Sgs-Machine-Id`, treat it as offline and test it again later.
+</Warning>
 
 #### Example response
 
@@ -82,11 +113,15 @@ Returns all active, non-quarantined nodes connected to your SGS server.
         "internal-nflx": 1,
         "internal-dsnp": 1
       },
-      "update_time": "2023-05-04T05:41:05Z"
+      "updated_at": "2026-05-04T05:41:05Z"
     }
   ]
 }
 ```
+
+- `machine_id`: the node's Salad machine ID.
+- `tags`: the node's tags and their values. A node with no tags has an empty object.
+- `updated_at`: the time, in UTC, when SGS first saw the node.
 
 ### Retrieve a node
 
@@ -94,20 +129,7 @@ Returns all active, non-quarantined nodes connected to your SGS server.
 GET /nodes/{machineId}
 ```
 
-Retrieves information about a specific node.
-
-#### Example response
-
-```json
-{
-  "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
-  "tags": {
-    "internal-nflx": 1,
-    "internal-dsnp": 1
-  },
-  "update_time": "2023-05-04T05:41:05Z"
-}
-```
+Returns a single node in the same format as an entry in the `nodes` list.
 
 ### Retrieve a node's tags
 
@@ -115,7 +137,7 @@ Retrieves information about a specific node.
 GET /nodes/{machineId}/tags
 ```
 
-Retrieves only the tags for a specific node.
+Returns only the node's tags.
 
 #### Example response
 
@@ -126,22 +148,25 @@ Retrieves only the tags for a specific node.
 }
 ```
 
-### Update a node
+### Update a node's tags
 
 ```http
 PATCH /nodes/{machineId}/tags
 ```
 
-Updates capability tags for a specific node.
+Adds, changes, or removes tags on a node. The request body is a JSON object of tag names and values. Tags you leave out
+of the request are not changed.
 
-Tag values must be between 0 and 1, where:
+- Any value other than `0` adds the tag, or updates it if the node already has it.
+- A value of `0` removes the tag.
 
-- `0` indicates the node cannot handle the service
-- Any value `> 0` and `≤ 1` indicates the node can handle the service
-  > **Note:** The rational number tag values (between `0` and `1`) enable future weighted load balancing features.
+Use values from `0` to `1`. Today, routing only checks whether a node has a tag, so `0.5` and `1` behave the same.
+Values between `0` and `1` are reserved for future weighted load balancing.
 
-> **Important:** We recommend using a prefix (like `internal-`) for your tags to avoid conflicts with Salad's existing
-> DHC labels.
+<Tip>
+  Use a prefix such as `internal-` for your tag names so they don't collide with the capability names used by Salad's
+  Destination Health Checks.
+</Tip>
 
 #### Example request
 
@@ -149,7 +174,20 @@ Tag values must be between 0 and 1, where:
 {
   "internal-nflx": 1,
   "internal-dsnp": 0,
-  "internal-itv": 0.8
+  "internal-itv": 1
+}
+```
+
+This adds or keeps `internal-nflx` and `internal-itv`, and removes `internal-dsnp`.
+
+#### Example response
+
+The response contains the node's full set of tags after the update:
+
+```json
+{
+  "internal-nflx": 1,
+  "internal-itv": 1
 }
 ```
 
@@ -159,48 +197,68 @@ Tag values must be between 0 and 1, where:
 DELETE /nodes/{machineId}/tags
 ```
 
-Removes all capability tags from a node. Note that passing a `0` value for a tag is equivalent to removing it.
+Removes every tag from the node.
 
-## Routing behavior
+## Errors
 
-- SGS routes sessions for a service only to nodes with a positive tag value (`> 0`) for that service
-- Missing tags are treated as `0` (unroutable)
-- If all nodes are unroutable for a requested capability, SGS will "fail open" and distribute traffic across all nodes
-- The rational number tag values (between `0` and `1`) enable future weighted load balancing features
+Errors return a JSON body with the HTTP status code and its name:
+
+```json
+{
+  "code": 404,
+  "status": "Not Found"
+}
+```
+
+| Status             | Cause                                                                 |
+| ------------------ | --------------------------------------------------------------------- |
+| `400 Bad Request`  | The `PATCH` body is not a JSON object of tag names and numeric values |
+| `401 Unauthorized` | The JWT is missing, invalid, or not authorized for this SGS server    |
+| `404 Not Found`    | The machine ID has never connected to this SGS server                 |
 
 ## Common workflows
 
 ### Qualifying nodes for a new service
 
-1. List all nodes and retrieve their machine IDs:
+1. List all nodes and get their machine IDs:
+
    ```bash
    curl https://{sgsName}.salad.com:7443/nodes \
-     -H "Authorization: Bearer YOUR_SALAD_JWT" | jq '.nodes[] | .machine_id'
+     -H "Authorization: Bearer YOUR_SALAD_JWT" | jq -r '.nodes[].machine_id'
    ```
-2. For each machine ID, test its connectivity to the target service (e.g., "target-service") by targeting specific
-   nodes:
+
+2. For each machine ID, test the node against the target service by pinning the request to it. Don't add `&tag=` or
+   `&cap=` to the session ID while testing.
+
    ```bash
-   # Add the X-Sgs-Machine-Id header to test a specific node
-   # Do not use &cap= or &tag= in the sessionID during testing
-   curl --proxy-header "X-Sgs-Machine-Id: {machineId}" -X https://{sessionID}:{password}@{sgsName}.salad.com:8443 \
+   curl --proxy-header "X-Sgs-Machine-Id: {machineId}" \
+     -x "https://{sessionId}:{password}@{sgsName}.salad.com:8443" \
      https://target-service.com
    ```
-3. Tag nodes which connected successfully (use a unique name for the tag e.g., "internal-target-service"):
+
+   If the proxy returns `503`, the node is offline. Skip it and leave its tags as they are.
+
+3. Tag the nodes that passed, using a unique tag name such as `internal-target-service`. Set the tag to `0` on nodes
+   that failed:
+
    ```bash
-   curl PATCH https://{sgsName}.salad.com:7443/nodes/{machineId}/tags \
+   curl -X PATCH https://{sgsName}.salad.com:7443/nodes/{machineId}/tags \
      -H "Authorization: Bearer YOUR_SALAD_JWT" \
      -H "Content-Type: application/json" \
      -d '{"internal-target-service": 1}'
    ```
-4. Verify the tags were updated successfully:
+
+4. Check that the tags were updated:
+
    ```bash
-   curl https://{sgsName}.salad.com:7443/nodes \
+   curl https://{sgsName}.salad.com:7443/nodes/{machineId}/tags \
      -H "Authorization: Bearer YOUR_SALAD_JWT"
    ```
-5. Adjust your configuration so that any traffic for "target-service" is routed to your tagged nodes by suffixing
-   `&tag=internal-target-service` to your session IDs (e.g.,
-   "`https://sessionID1234&tag=internal-target-service:{password}@{sgsName}.salad.com`"), or by adding it as a proxy
-   header in your request as follows: "`X-Sgs-Tag`:`internal-target-service`".
-6. Because nodes occasionally connect and disconnect from SGS, regularly repeat steps 1-3 to ensure your tags are
-   up-to-date. The frequency of these checks depends on several factors, but we recommend performing them at least every
-   2-3 hours.
+
+5. Route the service's traffic to the tagged nodes by appending `&tag=internal-target-service` to your session IDs (for
+   example, `https://{sessionId}&tag=internal-target-service:{password}@{sgsName}.salad.com:8443`), or by adding the
+   proxy header `X-Sgs-Tag: internal-target-service`.
+
+6. Nodes connect and disconnect over time, and their ability to reach a service can change. Repeat steps 1–4 regularly,
+   at least every 2–3 hours. Nodes that are offline during a pass keep their existing tags, and SGS only routes to
+   tagged nodes that are connected.
