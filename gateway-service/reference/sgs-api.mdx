@@ -1,7 +1,7 @@
 ---
 title: 'SGS API'
 sidebarTitle: 'SGS API'
-description: 'Optional feature to manage streaming capability tags for nodes in your network'
+description: 'Optional feature to manage routing tags for nodes in your network'
 ---
 
 _Last Updated: October 16, 2026_
@@ -9,8 +9,8 @@ _Last Updated: October 16, 2026_
 # The SGS API
 
 The SGS API lets you tag the nodes on your SGS server, then route requests to nodes that carry a given tag. A typical
-use is to test each node against a streaming service, tag the nodes that pass, and send that service's traffic only to
-those nodes. You develop, run, and maintain any such connectivity tests yourself.
+use is to test each node against a site, tag the nodes that pass, and send that site's traffic only to those nodes. You
+develop, run, and maintain any such connectivity tests yourself.
 
 <Note>
   The SGS API is in limited release and is only available on some SGS servers. Contact your account manager to enable
@@ -40,7 +40,7 @@ The legacy forms `X-Sgs-Capabilities: {yourTag}` and `{sessionId}&cap={yourTag}`
 
 A few details to keep in mind:
 
-- Tag names are case-sensitive. `internal-itv` and `Internal-ITV` are different tags.
+- Tag names are case-sensitive. `internal-site-a` and `Internal-Site-A` are different tags.
 - The `&tag=` (or `&cap=`) parameter must come directly after the session ID. It is not recognized if another `&`
   parameter comes before it.
 - If you send more than one `X-Sgs-Tag` header, SGS only selects nodes that have **all** of the requested tags.
@@ -110,8 +110,8 @@ Returns every node that has connected to your SGS server, along with its tags.
     {
       "machine_id": "5ebfa363-6e0b-4db1-b9be-70ed4995d0b1",
       "tags": {
-        "internal-nflx": 1,
-        "internal-dsnp": 1
+        "internal-site-a": 1,
+        "internal-site-b": 1
       },
       "updated_at": "2026-05-04T05:41:05Z"
     }
@@ -143,8 +143,8 @@ Returns only the node's tags.
 
 ```json
 {
-  "internal-nflx": 1,
-  "internal-dsnp": 1
+  "internal-site-a": 1,
+  "internal-site-b": 1
 }
 ```
 
@@ -172,13 +172,13 @@ Values between `0` and `1` are reserved for future weighted load balancing.
 
 ```json
 {
-  "internal-nflx": 1,
-  "internal-dsnp": 0,
-  "internal-itv": 1
+  "internal-site-a": 1,
+  "internal-site-b": 0,
+  "internal-site-c": 1
 }
 ```
 
-This adds or keeps `internal-nflx` and `internal-itv`, and removes `internal-dsnp`.
+This adds or keeps `internal-site-a` and `internal-site-c`, and removes `internal-site-b`.
 
 #### Example response
 
@@ -186,8 +186,8 @@ The response contains the node's full set of tags after the update:
 
 ```json
 {
-  "internal-nflx": 1,
-  "internal-itv": 1
+  "internal-site-a": 1,
+  "internal-site-c": 1
 }
 ```
 
@@ -218,7 +218,7 @@ Errors return a JSON body with the HTTP status code and its name:
 
 ## Common workflows
 
-### Qualifying nodes for a new service
+### Qualifying nodes for a new site
 
 1. List all nodes and get their machine IDs:
 
@@ -227,25 +227,25 @@ Errors return a JSON body with the HTTP status code and its name:
      -H "Authorization: Bearer YOUR_SALAD_JWT" | jq -r '.nodes[].machine_id'
    ```
 
-2. For each machine ID, test the node against the target service by pinning the request to it. Don't add `&tag=` or
-   `&cap=` to the session ID while testing.
+2. For each machine ID, test the node against the target site by pinning the request to it. Don't add `&tag=` or `&cap=`
+   to the session ID while testing.
 
    ```bash
    curl --proxy-header "X-Sgs-Machine-Id: {machineId}" \
      -x "https://{sessionId}:{password}@{sgsName}.salad.com:8443" \
-     https://target-service.com
+     https://target-site.com
    ```
 
    If the proxy returns `503`, the node is offline. Skip it and leave its tags as they are.
 
-3. Tag the nodes that passed, using a unique tag name such as `internal-target-service`. Set the tag to `0` on nodes
-   that failed:
+3. Tag the nodes that passed, using a unique tag name such as `internal-target-site`. Set the tag to `0` on nodes that
+   failed:
 
    ```bash
    curl -X PATCH https://{sgsName}.salad.com:7443/nodes/{machineId}/tags \
      -H "Authorization: Bearer YOUR_SALAD_JWT" \
      -H "Content-Type: application/json" \
-     -d '{"internal-target-service": 1}'
+     -d '{"internal-target-site": 1}'
    ```
 
 4. Check that the tags were updated:
@@ -255,10 +255,10 @@ Errors return a JSON body with the HTTP status code and its name:
      -H "Authorization: Bearer YOUR_SALAD_JWT"
    ```
 
-5. Route the service's traffic to the tagged nodes by appending `&tag=internal-target-service` to your session IDs (for
-   example, `https://{sessionId}&tag=internal-target-service:{password}@{sgsName}.salad.com:8443`), or by adding the
-   proxy header `X-Sgs-Tag: internal-target-service`.
+5. Route the site's traffic to the tagged nodes by appending `&tag=internal-target-site` to your session IDs (for
+   example, `https://{sessionId}&tag=internal-target-site:{password}@{sgsName}.salad.com:8443`), or by adding the proxy
+   header `X-Sgs-Tag: internal-target-site`.
 
-6. Nodes connect and disconnect over time, and their ability to reach a service can change. Repeat steps 1–4 regularly,
-   at least every 2–3 hours. Nodes that are offline during a pass keep their existing tags, and SGS only routes to
-   tagged nodes that are connected.
+6. Nodes connect and disconnect over time, and their ability to reach a site can change. Repeat steps 1–4 regularly, at
+   least every 2–3 hours. Nodes that are offline during a pass keep their existing tags, and SGS only routes to tagged
+   nodes that are connected.
