@@ -82,6 +82,39 @@ location:
 ssh -i ~/.ssh/my_custom_key root@<hostname> -p <port>
 ```
 
+The SSH command appears once the instance is scheduled on a node, which can take a little longer than the instance
+reaching the Running state.
+
+### Connecting as Another User
+
+The user in the SSH command must exist in your container image. `root` always works. To connect as another user, create
+it in your image (for example, with `useradd` in your Dockerfile) and replace `root` in the command. Sessions start in
+`/bin/sh`, so your image must include it.
+
+### Running One-Off Commands
+
+You can run a single command without opening an interactive session:
+
+```bash
+ssh root@<hostname> -p <port> -- nvidia-smi
+```
+
+The connection always reports exit code `1` for one-off commands, even when the command succeeds, and the command's
+errors are mixed into its standard output. Check the output instead of the exit code, especially in scripts.
+
+### Copying Files
+
+SFTP is supported, so `sftp` and modern `scp` (which uses SFTP by default in OpenSSH 9 and later) can copy files to and
+from an instance:
+
+```bash
+scp -P <port> ./input.txt root@<hostname>:/data/
+scp -P <port> root@<hostname>:/data/output.txt ./
+```
+
+Files you copy into an instance are stored on its ephemeral disk and are lost when the instance is reallocated or
+recreated.
+
 ## Terminal Access
 
 The web-based terminal provides quick access directly from your browser without any SSH setup.
@@ -89,3 +122,6 @@ The web-based terminal provides quick access directly from your browser without 
 1. Open the [SaladCloud Portal](https://portal.salad.com) and navigate to your container group.
 2. Click on a running instance.
 3. Click on the **Terminal** tab to open an interactive shell.
+
+The terminal opens `/bin/sh` as `root`. If it doesn't connect, see
+[Troubleshooting](/container-engine/how-to-guides/troubleshooting#my-container-group-is-running-but-i-cant-access-it-with-the-web-terminal).
