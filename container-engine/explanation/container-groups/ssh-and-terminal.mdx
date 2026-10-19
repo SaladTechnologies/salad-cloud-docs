@@ -51,8 +51,9 @@ There are two ways to access the SSH key settings:
 Paste your public key into the field and save it.
 
 <Note>
-  Each account holds one SSH public key, and saving a new key replaces the existing one. If you connect from more than
-  one machine, use the same key pair on each.
+  Each user holds one SSH public key, and saving a new key replaces the existing one. If you connect from more than one
+  machine, use the same key pair on each. A public key can belong to only one user, so teammates each need their own key
+  pair. Saving a key that another user has already registered fails with "SSH key already registered".
 </Note>
 
 ![](/container-engine/images/ssh-access-1.png)
