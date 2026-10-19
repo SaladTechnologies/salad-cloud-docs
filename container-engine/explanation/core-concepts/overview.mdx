@@ -1,164 +1,144 @@
 ---
-title: 'Salad Container Engine (SCE)'
+title: 'Salad Container Engine Overview: How SaladCloud Works'
 sidebarTitle: 'Overview'
+description:
+  'How Salad Container Engine runs your containers on a distributed network of consumer GPUs, and what to plan for:
+  interruptions, cold starts, updates, networking, and storage.'
 ---
 
-_Last Updated: November 01, 2024_
+_Last Updated: October 19, 2026_
 
-Containers provide a portable and immutable format for packaging, deploying, and managing cloud-native applications at
-scale. **Salad Container Engine (SCE)** offers fully managed container orchestration, dynamically distributes workloads
-to optimal hardware cohorts in accordance with technical requirements, and features GPU-accelerated compute on every
-available node instance.
+**Salad Container Engine (SCE)** runs your container image on a distributed network of consumer GPUs. You choose the
+image, the hardware, and how many replicas to run, and SCE finds nodes, starts your containers, and replaces instances
+when nodes come and go. There are no virtual machines or clusters to manage.
 
-It's the fastest, simplest, and most affordable way to run containerized HPC workloads—without managing virtual machines
-or underlying compute infrastructure.
+Because it's a distributed network of thousands of machines, many of them individually owned PCs, SaladCloud can offer a
+wide range of GPUs at a much lower cost than a traditional data center. It also means a few things work differently.
+Applications built with the points below in mind run well on SaladCloud, and they're also more robust anywhere else.
 
-We highly recommend checking out the [FAQs](/container-engine/explanation/core-concepts/faqs) for more information on
-how SCE works.
+## How SaladCloud Is Different
 
-# Supported Workflows
+### Instances Can Be Interrupted
 
-SaladCloud offers two methods of creating and managing your deployments:
+SaladCloud works to keep your instances running with high uptime. Still, we don't have physical control of the machines,
+so a node can go offline, and instances at a lower
+[priority](/container-engine/explanation/billing-pricing/priority-pricing) can be replaced by higher-priority work. When
+that happens, SaladCloud automatically starts a replacement instance on another node.
 
-### Portal
+Any cloud can lose a machine, so robust applications handle it anyway. On SaladCloud it's worth planning for from the
+start:
 
-The **Portal** is a browser-based UI at [https://portal.salad.com](https://portal.salad.com) that allows you full
-control over your deployments, including create, read, update, and delete functionality. The Portal also provides access
-to organization management, billing, and support.
+- Run at least 2 replicas, so another instance keeps serving while one is replaced.
+- Retry failed requests in your clients.
+- Save progress from long jobs regularly. See
+  [Long-Running Tasks](/container-engine/explanation/job-processing/long-running-tasks).
 
-### SaladCloud API
+### Storage Is Temporary
 
-When you are ready for a deeper integration, the **SaladCloud API** also offers full control over your deployments.
-Occasionally, new features are made available from the API before they are visible in the Portal. You can dive directly
-into our API documentation [here](/reference/saladcloud-api).
+Each instance gets its own [disk space](/container-engine/explanation/container-groups/disk-space), up to 250 GB. It's
+kept while the instance runs and restarts, but a replacement instance on another node starts with an empty disk. Keep
+anything you need to keep, such as results, checkpoints, or model weights you download at startup, in external storage
+like Amazon S3, Google Cloud Storage, or Azure Blob Storage. Because nodes are spread around the world, a provider that
+doesn't charge egress fees, such as Cloudflare R2, can save a lot.
 
-# Defining Workloads
+### Cold Starts Take Longer
 
-In the Salad Container Engine lexicon, container deployments are known as **Container Groups.** Each Container Group
-represents a set of "identical" **Container Instances** that each run on dedicated hardware.
+Each node downloads your container image before it starts. Many nodes are on residential internet connections, which are
+usually slower than a data center's. Plenty of nodes have fast connections, and SaladCloud caches images to speed up
+downloads, but large images still take a while to arrive, especially on a new node. Images are limited to 35 GB
+(compressed).
 
-### Container Groups
+You aren't billed while an instance is downloading its image. Billing starts when the container starts running, so a
+slow download costs time, not money.
 
-A Container Group is defined as a container image, the required hardware resources, and a predetermined number of
-**replicas** to be maintained at any given time. Once a Container Group has been defined, SCE automatically creates or
-purges Container Instances as needed to reach the desired replica count.
+To start faster, keep images small, especially when you're first iterating or debugging. See
+[Cold Starts and Iterating Quickly](/container-engine/how-to-guides/cold-starts-and-iterating-quickly).
 
-For enhanced reliability and smoother operation, we strongly recommend deploying with a minimum of 2 replicas. This
-ensures your applications remain resilient and maintain performance, even if a node becomes temporarily unavailable.
-Scaling beyond a single node not only increases fault tolerance but also optimizes resource allocation and load
-balancing across our distributed cloud infrastructure. Start with 2 or more replicas to unlock the full potential of our
-platform and experience seamless scaling and improved uptime for your containers.
+### Updates Restart Every Replica
 
-Container Groups can be created, started, stopped, or scaled via the SaladCloud API and UI, giving you direct control
-over your workloads before and after deployment.
+When you change the image, command, environment variables, or resources, every replica restarts on the new version at
+about the same time. There's no built-in rolling update. Customers keep services available during updates with patterns
+like running the new version as a second container group, described in
+[Deployment Strategies](/container-engine/how-to-guides/deployment-strategies). If rolling updates are important for
+your workload, [contact us](/support) so we know.
 
-### Container Instances
+### Performance Variability
 
-A Container Instance represents a single instantiation of a container on a dedicated host connected to the Salad
-network. Each time a container is deployed to a SaladCloud machine node, a new Container Instance is created with a
-unique id and discrete logs.
+Nodes that match the same requirements still differ in network speed, CPU, and storage. For example, a container group
+that requests 2 vCPU, 12 GB RAM, and an RTX 4090 can land on nodes with quite different network performance. Monitor
+your application's performance over time, and reallocate instances that consistently underperform.
 
-# Compute Environment
+<img src="/container-engine/images/node-variability.png" />
 
-SaladCloud leverages hardware-native virtualization and industry-standard container runtimes to standardize the compute
-environment across a distributed network of heterogeneous hardware.
+### Capacity Is Shared
 
-Once a container image has been deployed, SCE instantiates replicas on a predetermined number of available physical
-devices as stateless processes within virtual Linux subsystems.
+Nodes are shared by all SaladCloud customers. The
+[availability](/container-engine/explanation/infrastructure-platform/availability) shown when you create a container
+group is an estimate, not a reservation, and higher priority levels get nodes first. Selecting more than one GPU class
+makes it easier to find nodes. Your organization also has a [replica quota](/container-engine/reference/quotas), which
+you can ask to increase.
 
-### Host Environment
+### Networking Goes Through the Container Gateway
 
-All SCE container instances deploy to consumer-owned hardware running modern Windows NT operating systems (Windows 10 or
-later). This allows the SaladCloud desktop client to leverage Microsoft Hyper-V virtualization features, manage and
-monitor workloads, and boot true Linux kernels from the Windows Subsystem for Linux (WSL2).
+To receive requests from the internet, enable the
+[Container Gateway](/container-engine/explanation/infrastructure-platform/networking). It gives your container group a
+public URL and load-balances requests across ready instances. Your application must listen on IPv6 (`::`) on the one
+port you configure. A request fails if your application sends nothing back for 100 seconds, so stream long responses, or
+use a [job queue](/container-engine/explanation/job-processing/job-queues) for long-running work.
 
-> 📘 Supported Containers
->
-> Currently, SCE supports Linux containers on AMD64 (also commonly known as x86-64). Container image manifests must be
-> Docker compliant (e.g. Docker image manifest v1 or v2) or OCI Compliant. ARM architecture is not supported at this
-> time. Windows containers are not supported at this time.
+### Containers Run in WSL2
 
-### Stateless Execution
+Nodes run Windows, and your container runs in a Linux environment under the Windows Subsystem for Linux (WSL2). Your
+image must be a Linux image built for AMD64 (x86-64); ARM images and Windows containers aren't supported. If you build
+on an ARM-based Mac, build for AMD64:
 
-Active SCE container instances are treated as stateless workloads. Whenever the virtual execution context closes
-(through down-scaling, batch job termination, or failure), the container image is purged from the host machine's local
-memory. While running, the SaladCloud container orchestrator uses heartbeat monitoring to assess potential interruptions
-or other failures, and determine when and how best to dynamically fail over to another dedicated node to maximize
-resource availability.
-
-### Open-source Dependencies
-
-SaladCloud incorporates battle-tested and incrementally developed tooling for reliable performance and replicable
-results. The SaladCloud API conforms to **[OpenAPI](https://www.openapis.org/)** specifications and generates templates
-in various coding languages to facilitate testing and development. When deployed from the SaladCloud API or the
-SaladCloud UI, SCE container instances are automatically executed in the latest stable version of the open-source
-**[containerd](https://containerd.io/)** container runtime.
-
-# Use Cases
-
-SaladCloud's affordable infrastructure is as versatile as your imagination. Here are just a few examples of what you can
-build with SCE:
-
-- use AI models to perform image generation, text to audio, image captioning, and other tasks
-- proxy video-streaming requests for virtual private networks
-- conduct long-running data processing queues
-- execute massively parallelizable workloads
-- distribute 3D rendering or VFX queues
-- procedurally-generated mapping simulations
-
-# Additional Considerations
-
-Developers interested in using SCE should be aware of these additional considerations:
-
-### AMD64 Architecture
-
-SaladCloud currently **supports only AMD64 architecture** for container instances. ARM architecture **is not supported**
-at this time. If you are developing on a Mac or other ARM-based system, you may need to cross-compile your application
-for AMD64. Docker supports [multi-architecture builds](https://docs.docker.com/build/building/multi-platform/), so you
-can build your application for both ARM and AMD64 at the same time using the `--platform` flag:
-
-```
-docker buildx build --platform linux/amd64,linux/arm64 .
+```bash
+docker buildx build --platform linux/amd64 .
 ```
 
-### Cold-start Overhead
+GPU access works through CUDA on NVIDIA GPUs and ROCm on AMD GPUs. Because the GPU is also used by the Windows host, a
+small part of its VRAM is reserved for Windows, so your container sees slightly less than the card's full VRAM.
+Containers can't run in privileged mode or access extra devices.
 
-Cold-start times on SaladCloud can be longer than on traditional clouds. This is primarily due to the time it takes to
-download container images to the host machine. Since host machines are consumer-owned, they often have slower internet
-connections than data centers.
+### Logs Come From Standard Output
 
-### Data-sensitivity Compliance
+SaladCloud collects what your application writes to standard output and standard error. See
+[Container Logs](/container-engine/explanation/container-groups/container-logs).
+
+### Data-Sensitivity Compliance
 
 Customers in specialized industries may be legally obligated to protect sensitive data such as medical records or
 private financial information. While SaladCloud takes precautions to secure every workload on our network, we cannot
 guarantee that our solutions are considered compliant with requirements outlined by select regulatory commissions or
 legislative authorities (including but not limited to HIPAA and the Financial Modernization Act of 1999).
 
-### Scaling Container Groups
+## Key Concepts
 
-While SCE does maintain a stable replica count within a given Container Group, SCE deployments do not currently
-auto-scale Container Groups based on performance. Container Groups must be scaled up or down on demand through the
-Portal, or by direct request via the SaladCloud API.
+A **container group** is a container image, the hardware it needs, and the number of **replicas** to run. SCE creates or
+replaces **container instances** as needed to keep that many running.
 
-### Persistent Storage
+A **container instance** is one run of your container on one node. Each instance has a unique ID and its own logs. When
+an instance is moved to a different node, it gets a new instance ID.
 
-SaladCloud does not currently support persistent storage for container instances. All data written to the container
-instance's filesystem is ephemeral and will be lost when the container instance is terminated. If you need persistent
-storage, you can use an external storage service like Amazon S3, Google Cloud Storage, or Azure Blob Storage. We
-recommend a vendor that does not charge egress fees, as SaladCloud nodes are globally distributed and egress fees can
-add up quickly.
+## Ways to Deploy
 
-### WSL2
+- **[SaladCloud Portal](https://portal.salad.com):** Create, edit, and monitor container groups in your browser, and
+  manage your organization, billing, and support.
+- **[SaladCloud API](/reference/api-usage):** Manage container groups from your own code or pipelines. New features
+  sometimes reach the API before the Portal.
 
-SaladCloud uses Windows Subsystem for Linux 2 (WSL2) to run Linux containers on Windows machines. Customers may notice
-that less than 100% of VRAM is available to the container. This is because WSL2 reserves a small portion of the VRAM for
-the Windows host machine.
+## Scaling
 
-### Performance Variability
+You can change the replica count at any time in the Portal or the API. SCE can also scale for you:
 
-Because SaladCloud nodes are individual residential gaming PCs, there is some expected performance variability. Your
-container group may request 3 nodes with 2 vCPU, 12gb RAM, and an RTX 4090, but within that criteria, there can still be
-significant variability in network, compute, and storage performance. It is important to monitor the performance of your
-application over time so that you can detect anomalous behavior and reallocate under-performing nodes.
+- [Job queue autoscaling](/container-engine/how-to-guides/autoscaling/enable-autoscaling) adds and removes replicas
+  based on the number of jobs waiting in a queue.
+- [Scheduled scaling](/container-engine/how-to-guides/autoscaling/time-of-day-scaling) changes replicas on a schedule.
 
-<img src="/container-engine/images/node-variability.png" />
+## Next Steps
+
+- [Quickstart](/container-engine/tutorials/quickstart): Deploy your first container group.
+- [Architectural Overview](/container-engine/explanation/core-concepts/architectural-overview): How SCE works under the
+  hood.
+- [Troubleshooting](/container-engine/how-to-guides/troubleshooting): Fix common problems.
+- [FAQs](/container-engine/explanation/core-concepts/faqs): Answers to common questions.
