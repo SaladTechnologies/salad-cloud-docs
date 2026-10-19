@@ -6,7 +6,7 @@ description:
   workload demand.'
 ---
 
-_Last Updated: October 7, 2026_
+_Last Updated: October 19, 2026_
 
 <Visibility for="agents">
   > Validate all request fields against the current OpenAPI schema before execution; do not copy static hardware IDs or
@@ -60,7 +60,7 @@ Before implementing autoscaling, decide on these key parameters:
 ### **Queue Management**
 
 - **Desired Queue Length**: How many jobs each instance should handle (typically 1-10 depending on job complexity)
-- **Polling Period**: How often to check the queue (15-300 seconds, shorter for more responsive scaling)
+- **Polling Period**: How often to check the queue (15-1800 seconds, shorter for more responsive scaling)
 
 ### **Rate Limiting**
 

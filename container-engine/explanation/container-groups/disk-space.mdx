@@ -2,7 +2,7 @@
 title: 'Disk Space'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: October 19, 2026_
 
 # How Disk Space is Calculated
 
@@ -15,7 +15,11 @@ installing dependencies, and caching results.
 
 If you expect to need significantly more free space on your nodes than your container itself requires, configure it by
 selecting a Disk Space option when configuring your container group in the Portal or in the API by passing
-a`"storage_amount": x` in megabytes on the resources object.
+`"storage_amount"` on the resources object. The API value is in bytes and must be a whole number of gigabytes, from 1 GB
+(`1073741824`) to 250 GB (`268435456000`).
+
+Disk space is ephemeral. It's kept when an instance restarts, but an instance that is reallocated or recreated starts
+with an empty disk, so store results you need to keep outside the container.
 
 <img src="/container-engine/images/portal-select-disk-space.png" />
 
