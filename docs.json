@@ -772,7 +772,7 @@
     },
     {
       "source": "/docs/openvoice-api",
-      "destination": "/products/sce/guides/openvoice-api"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning"
     },
     {
       "source": "/docs/run-tgi-text-generation-interface-by-huggingface",
@@ -792,7 +792,7 @@
     },
     {
       "source": "/docs/youtube",
-      "destination": "/guides/transcription/youtube"
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/youtube-transcription-pipeline"
     },
     {
       "source": "/docs/jupyterlab",
@@ -812,11 +812,11 @@
     },
     {
       "source": "/reference/api-reference",
-      "destination": "/reference/saladcloud-api"
+      "destination": "/reference/api-usage"
     },
     {
       "source": "/api-reference",
-      "destination": "/reference/saladcloud-api"
+      "destination": "/reference/api-usage"
     },
     {
       "source": "/gateway-service/introduction",
@@ -876,7 +876,7 @@
     },
     {
       "source": "/products/sce/registries/gcp-gcr",
-      "destination": "/products/sce/container-groups/registries/gcp-gcr"
+      "destination": "/container-engine/how-to-guides/registries/gcp-gar"
     },
     {
       "source": "/products/sce/registries/github-ghcr",
@@ -920,7 +920,7 @@
     },
     {
       "source": "/products/sce/health-probes/health-probe-examples",
-      "destination": "/products/sce/container-groups/health-probes/health-probe-examples"
+      "destination": "/container-engine/explanation/infrastructure-platform/health-probes"
     },
     {
       "source": "/products/sce/health-probes/liveness-probes",
@@ -1769,6 +1769,370 @@
     {
       "source": "/guides/transcription/salad-transcription-api/migrate-to-salad-transcription-api/migrate-from-deepgram-transcription",
       "destination": "/transcription/how-to-guides/migration/migrate-from-deepgram-transcription"
+    },
+    {
+      "source": "/products/sce/container-groups/availability",
+      "destination": "/container-engine/explanation/infrastructure-platform/availability"
+    },
+    {
+      "source": "/container-engine/guides/stable-diffusion/basic-how-to-deploy-flux-on-salad-comfy",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/docs/request-resources",
+      "destination": "/container-engine/reference/quotas"
+    },
+    {
+      "source": "/container-engine/specifying-a-command",
+      "destination": "/container-engine/how-to-guides/specifying-a-command"
+    },
+    {
+      "source": "/inference-endpoints/transcription/transcriptionquickstart",
+      "destination": "/transcription/tutorials/transcription-quick-start"
+    },
+    {
+      "source": "/container-engine/container-logs",
+      "destination": "/container-engine/explanation/container-groups/container-logs"
+    },
+    {
+      "source": "/container-engine/reference/recipes/wan-5b-kelpie",
+      "destination": "/container-engine/reference/recipes/wan-5b"
+    },
+    {
+      "source": "/docs/google-container-registry",
+      "destination": "/container-engine/how-to-guides/registries/gcp-gar"
+    },
+    {
+      "source": "/container-engine/quotas",
+      "destination": "/container-engine/reference/quotas"
+    },
+    {
+      "source": "/container-engine/guides/how-to-deploy-a-node-app-on-salad",
+      "destination": "/container-engine/tutorials/nodejs/how-to-deploy-a-node-app-on-salad"
+    },
+    {
+      "source": "/products/sce/gpu-classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/products/sce/gpu-pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/container-engine/priority-pricing",
+      "destination": "/container-engine/explanation/billing-pricing/priority-pricing"
+    },
+    {
+      "source": "/container-engine/explanation/gateway/container-gateway",
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
+    },
+    {
+      "source": "/products/sce/pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/reference/create_container_group",
+      "destination": "/reference/saladcloud-api/container-groups/create-container-group"
+    },
+    {
+      "source": "/reference/list_gpu_classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/docs/train-a-custom-yolov8-model",
+      "destination": "/container-engine/tutorials/computer-vision/yolov8-model-training"
+    },
+    {
+      "source": "/products/transcription/transcription",
+      "destination": "/transcription/explanation/overview"
+    },
+    {
+      "source": "/products/sce/architectural-overview",
+      "destination": "/container-engine/explanation/core-concepts/architectural-overview"
+    },
+    {
+      "source": "/products/sce/billing-and-pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/api-reference/container_groups/get-a-container-group-instance",
+      "destination": "/reference/saladcloud-api/container-groups/get-container-group-instance"
+    },
+    {
+      "source": "/container-engine/overview",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/container-engine/reference/recipes/vllm-dc",
+      "destination": "/container-engine/reference/recipes/vllm"
+    },
+    {
+      "source": "/docs/yolov8-step-by-step-deployment",
+      "destination": "/container-engine/tutorials/computer-vision/yolov8-deployment-tutorial"
+    },
+    {
+      "source": "/inference-endpoints/transcription/awsdownloadablefile",
+      "destination": "/transcription/how-to-guides/cloud-storage/aws-downloadable-file"
+    },
+    {
+      "source": "/api-reference/container_groups/get-a-container-group",
+      "destination": "/reference/saladcloud-api/container-groups/get-container-group"
+    },
+    {
+      "source": "/reference/api-overview",
+      "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/container-engine/reference/api-reference",
+      "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/container-engine/reference/recipes/vllm-gpt-oss-120b",
+      "destination": "/container-engine/reference/recipes/vllm"
+    },
+    {
+      "source": "/guides/transcription/salad-transcription-api/transcription-quick-start.mdx",
+      "destination": "/transcription/tutorials/transcription-quick-start"
+    },
+    {
+      "source": "/products/sce",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/products/sce/container-groups/priority",
+      "destination": "/container-engine/explanation/billing-pricing/priority-pricing"
+    },
+    {
+      "source": "/storage/cloud-storage/overview",
+      "destination": "/storage/explanation/overview"
+    },
+    {
+      "source": "/api-reference/container_groups/reallocate-a-container-group-instance",
+      "destination": "/reference/saladcloud-api/container-groups/reallocate-container-group-instance"
+    },
+    {
+      "source": "/api-reference/container_groups/stop-a-container-group",
+      "destination": "/reference/saladcloud-api/container-groups/stop-container-group"
+    },
+    {
+      "source": "/api-reference/inference_endpoints/get-an-inference-endpoint",
+      "destination": "/reference/saladcloud-api/inference-endpoints/get-inference-endpoint"
+    },
+    {
+      "source": "/reference/saladcloud-api/container_groups/list-container-groups",
+      "destination": "/reference/saladcloud-api/container-groups/list-container-groups"
+    },
+    {
+      "source": "/reference/saladcloud-api",
+      "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/reference/billing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/reference/pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/container-engine/quickstart",
+      "destination": "/container-engine/tutorials/quickstart"
+    },
+    {
+      "source": "/container-engine/gettingstartedwithsaladcloud",
+      "destination": "/container-engine/explanation/core-concepts/faqs"
+    },
+    {
+      "source": "/container-engine/how-to-guides/ai-machine-learning/run-comfyui",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/deploy-stable-diffusion-comfy"
+    },
+    {
+      "source": "/container-engine/explanation/infrastructure-platform/architectural-overview",
+      "destination": "/container-engine/explanation/core-concepts/architectural-overview"
+    },
+    {
+      "source": "/container-engine/explanation/billing-pricing/pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/container-engine/reference/recipes/opemm-srcg",
+      "destination": "/container-engine/reference/recipes/openmm-srcg"
+    },
+    {
+      "source": "/docs/openvoice-text-to-speech-and-voice-cloning-guide",
+      "destination": "/container-engine/how-to-guides/ai-machine-learning/openvoice-tts-voice-cloning"
+    },
+    {
+      "source": "/inference-endpoints/transcription/azuredownloadablefile",
+      "destination": "/transcription/how-to-guides/cloud-storage/azure-downloadable-file"
+    },
+    {
+      "source": "/products/sce/overview",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/products/sce/container-groups",
+      "destination": "/container-engine/explanation/container-groups/container-groups"
+    },
+    {
+      "source": "/products/sce/container-groups/autoscaling",
+      "destination": "/container-engine/explanation/infrastructure-platform/autoscaling"
+    },
+    {
+      "source": "/products/sce/gateway/container-gateway",
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
+    },
+    {
+      "source": "/products/sce/security",
+      "destination": "/container-engine/explanation/core-concepts/faqs"
+    },
+    {
+      "source": "/products/containers/getting-started",
+      "destination": "/container-engine/tutorials/quickstart"
+    },
+    {
+      "source": "/tutorials/howtousethesaladterminal",
+      "destination": "/container-engine/tutorials/development-tools/interactive-terminal"
+    },
+    {
+      "source": "/api-reference/container_groups/create-a-container-group",
+      "destination": "/reference/saladcloud-api/container-groups/create-container-group"
+    },
+    {
+      "source": "/api-reference/inference_endpoints/delete-an-inference-endpoint-job",
+      "destination": "/reference/saladcloud-api/inference-endpoints/delete-inference-endpoint-job"
+    },
+    {
+      "source": "/reference/saladcloud-api/container_groups/get-a-container-group-instance",
+      "destination": "/reference/saladcloud-api/container-groups/get-container-group-instance"
+    },
+    {
+      "source": "/reference/saladcloud-api/organization-data/list-gpu-classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/reference/saladcloud-api/organizations/get-gpu-classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/reference/saladcloud-api/organizations",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/reference/update_container_group",
+      "destination": "/reference/saladcloud-api/container-groups/update-container-group"
+    },
+    {
+      "source": "/reference/list-gpu-classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/reference/container_group_instance_recreate",
+      "destination": "/reference/saladcloud-api/container-groups/recreate-container-group-instance"
+    },
+    {
+      "source": "/reference/getting-started",
+      "destination": "/reference/api-usage"
+    },
+    {
+      "source": "/container-engine/deploy-containers",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/container-engine/introduction",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/container-engine/guides/how-to-deploy-a-node-app-on-salad/create-a-container-1",
+      "destination": "/container-engine/tutorials/nodejs/create-a-container"
+    },
+    {
+      "source": "/container-engine/explanation/core-concepts/networking",
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
+    },
+    {
+      "source": "/container-engine/reference/pricing",
+      "destination": "/container-engine/explanation/billing-pricing/billing"
+    },
+    {
+      "source": "/container-engine/explanation/infrastructure-platform/gpu-classes",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/container-engine/tutorials/performance/network-bandwidth-check",
+      "destination": "/container-engine/tutorials/performance/network-bandwidth-checks"
+    },
+    {
+      "source": "/docs/startup-probes",
+      "destination": "/container-engine/explanation/infrastructure-platform/startup-probes"
+    },
+    {
+      "source": "/products/transcription/overview",
+      "destination": "/transcription/explanation/overview"
+    },
+    {
+      "source": "/products/transcription/pabblyintegration",
+      "destination": "/transcription/how-to-guides/automation-integrations/pabbly-integration"
+    },
+    {
+      "source": "/products/transcription/pricing",
+      "destination": "/transcription/explanation/billing"
+    },
+    {
+      "source": "/products/sce/container-groups/create-container-group",
+      "destination": "/container-engine/tutorials/quickstart"
+    },
+    {
+      "source": "/products/sce/container-groups/priority-pricing",
+      "destination": "/container-engine/explanation/billing-pricing/priority-pricing"
+    },
+    {
+      "source": "/products/sce/priority",
+      "destination": "/container-engine/explanation/billing-pricing/priority-pricing"
+    },
+    {
+      "source": "/products/sce/general/networking",
+      "destination": "/container-engine/explanation/infrastructure-platform/networking"
+    },
+    {
+      "source": "/products/sce/gpus",
+      "destination": "/reference/saladcloud-api/organizations/list-gpu-classes"
+    },
+    {
+      "source": "/products/s4/overview",
+      "destination": "/storage/explanation/overview"
+    },
+    {
+      "source": "/api-reference/queues/2",
+      "destination": "/reference/saladcloud-api/queues/list-queues"
+    },
+    {
+      "source": "/api-reference/queues/1",
+      "destination": "/reference/saladcloud-api/queues/list-queues"
+    },
+    {
+      "source": "/container-engine/explanation/core-concepts/saladcloud-secure",
+      "destination": "/container-engine/explanation/core-concepts/overview"
+    },
+    {
+      "source": "/container-engine/reference/recipes/nockpool-miner",
+      "destination": "/container-engine/how-to-guides/miners/run-miners-on-saladcloud"
+    },
+    {
+      "source": "/api-reference/container_groups/0",
+      "destination": "/reference/saladcloud-api/container-groups/list-container-groups"
+    },
+    {
+      "source": "/api-reference/container_groups/1",
+      "destination": "/reference/saladcloud-api/container-groups/list-container-groups"
+    },
+    {
+      "source": "/api-reference/inference_endpoints/1",
+      "destination": "/reference/saladcloud-api/inference-endpoints/list-inference-endpoints"
     }
   ]
 }

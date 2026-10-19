@@ -74,12 +74,12 @@ artifacts and implement each option.
 - **Multi-service worker containers** – If your prover stack currently runs as several containers (for example, a prover
   process, a separate verifier, and a small coordinator or metrics helper), package those processes into a single Docker
   image and start them with a process manager such as
-  [s6-overlay](container-engine/how-to-guides/job-processing/queue-worker), supervisord, or a custom entrypoint script.
+  [s6-overlay](/container-engine/how-to-guides/job-processing/queue-worker), supervisord, or a custom entrypoint script.
   Salad runs one container per node, but that container can host multiple processes. To handle more proofs, you increase
   the container group replica count so more nodes run the same stack in parallel.
 
 - **On-demand / CI-triggered runs** – Use the
-  [SaladCloud API](reference/saladcloud-api/container-groups/create-container-group) from your CI/CD pipeline or a
+  [SaladCloud API](/reference/saladcloud-api/container-groups/create-container-group) from your CI/CD pipeline or a
   one-off script to spin up a container group, run a fixed set of proofs (for example regression tests, parameter
   sweeps, or benchmark runs), and then scale the group back down or stop it when finished. This avoids keeping a queue
   and workers running between bursts, but you should account for cold starts: large images can take a few minutes to
@@ -101,9 +101,9 @@ with Kelpie to test out the system and adapt it to your prover of choice.
 
 - **Parameterize with environment variables** – Read the proof “type” (for example which circuit/program to use),
   proving key locations, input objects, and output prefixes from
-  [environment variables](container-engine/how-to-guides/environment-variables) so the same image can serve multiple use
-  cases or networks without rebuilds. You can change these env vars at deployment time on Salad, which makes it easy to
-  duplicate or tweak container groups without rebuilding the image.
+  [environment variables](/container-engine/how-to-guides/environment-variables) so the same image can serve multiple
+  use cases or networks without rebuilds. You can change these env vars at deployment time on Salad, which makes it easy
+  to duplicate or tweak container groups without rebuilding the image.
 
 - **Checkpoint long-running work** – For long STARK or ZK-VM jobs, write partial artifacts into the upload folder
   periodically. If a node is interrupted and the job is retried from the queue, your prover can resume from the latest
