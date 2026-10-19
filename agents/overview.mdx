@@ -5,7 +5,7 @@ description:
   'Source precedence, authorization boundaries, and evidence requirements for autonomous SaladCloud operations.'
 ---
 
-_Last Updated: September 21, 2026_
+_Last Updated: October 19, 2026_
 
 <Note>
   Setting up an agent rather than being one? Start with [Build with AI Agents](/general/tutorials/build-with-ai-agents):
@@ -86,8 +86,9 @@ Do not cache these values as permanent facts. Prices and example hardware identi
 
 1. Confirm no credential value will be printed, logged, committed, or included in returned evidence.
 2. Confirm the user supplied or approved the organization and any project name required by the selected API.
-3. Validate the supplied scope with the applicable product read: Container Engine quota/project reads, the exact
-   Transcription endpoint read, or AI Gateway `GET /v1/models`.
+3. Validate the supplied scope with the applicable product read: Container Engine quota/project reads or the exact
+   Transcription endpoint read. AI Gateway `GET /v1/models` answers without authentication, so it confirms reachability
+   and the live model list but not the key; only a completion verifies an AI Gateway key.
 4. For a resource mutation, read the target and compare its current state with the requested outcome.
 5. Run [Container Engine preflight](/agents/container-engine/discover-scope-and-preflight),
    [AI Gateway request preflight](/agents/ai-gateway/select-model-and-send-request), or

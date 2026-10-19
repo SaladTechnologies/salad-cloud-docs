@@ -72,6 +72,7 @@ esports
 euler
 EventBridge
 Falco
+faqs
 fastapi
 FIROPOW
 ffprobe

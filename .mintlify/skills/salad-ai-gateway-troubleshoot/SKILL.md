@@ -37,7 +37,8 @@ Never print the key, prompts, conversations, images, tools, output, or unrelated
 
 ## Endpoints
 
-- `GET /v1/models` — separate reachability/authentication and live model selection from completion failures.
+- `GET /v1/models` — separate reachability and live model selection from completion failures. It answers without
+  authentication, so only a completion verifies the key.
 - `POST /v1/chat/completions` — diagnostic calls are new billable work and require explicit approval.
 
 No AI Gateway OpenAPI specification or completion-reconciliation endpoint is present in this repository. Do not invent

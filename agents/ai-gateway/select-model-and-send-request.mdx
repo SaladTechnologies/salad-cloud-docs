@@ -6,7 +6,7 @@ description:
   credentials or automatically repeating uncertain billable work.'
 ---
 
-_Last Updated: September 23, 2026_
+_Last Updated: October 19, 2026_
 
 ## When to use this runbook
 
@@ -51,7 +51,7 @@ specification, a different OpenAI-compatible provider, an SDK type alone, or an 
 - Response usage metadata when the live response supplies it.
 
 The Gateway API does not expose the organization's credit balance through these endpoints. Do not infer balance from a
-successful key check or from historical usage.
+successful models read or from historical usage.
 
 ## Preflight checks
 
@@ -76,7 +76,8 @@ curl --fail-with-body --silent --show-error \
 ```
 
 Select only a model ID returned by the live response. Documentation lists supported models for reference, but the live
-catalog is authoritative for immediate request routing.
+catalog is authoritative for immediate request routing. The models endpoint answers without authentication, so a
+successful response does not verify the key; only a completion does.
 
 ### Send one non-streaming request
 

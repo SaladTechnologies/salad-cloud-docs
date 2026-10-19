@@ -1,23 +1,75 @@
 ---
 title: SaladCloud Support
-description: Need support for your SaladCloud account? Start here.
+description:
+  Get help with SaladCloud. Find answers to common problems, check service status, and contact the SaladCloud Support
+  team.
 mode: wide
 ---
 
-_Last Updated: September 25, 2024_
+_Last Updated: October 19, 2026_
+
+## Find an Answer
+
+Most problems have a documented fix. Start with the page for your product:
 
 <CardGroup cols={2}>
+  <Card title="Container Engine Troubleshooting" icon="wrench" href="/container-engine/how-to-guides/troubleshooting">
+    Fix image pulls, start failures, container exits, stuck downloads, and Container Gateway errors.
+  </Card>
+  <Card title="Container Engine FAQs" icon="circle-question" href="/container-engine/explanation/core-concepts/faqs">
+    Answers to common questions about nodes, networking, storage, and billing.
+  </Card>
+  <Card
+    title="GPU Availability"
+    icon="microchip"
+    href="/container-engine/explanation/infrastructure-platform/availability"
+  >
+    Check how many nodes are available for your GPU or CPU at each priority level.
+  </Card>
+  <Card title="AI Gateway Errors" icon="triangle-exclamation" href="/ai-gateway/reference/errors">
+    Resolve AI Gateway credit, access, and request errors.
+  </Card>
+  <Card title="Transcription FAQ" icon="file-audio" href="/transcription/reference/faq">
+    Answers to common questions about file size limits, processing time, accuracy, and billing.
+  </Card>
   <Card title="Status Page" icon="traffic-light" href="https://cloud-status.salad.com">
-    Check the current status of the SaladCloud products and services. You may also subscribe to receive real-time
-    notifications when incidents occur.
+    Check whether SaladCloud products and services are having an incident, and subscribe to notifications.
   </Card>
+</CardGroup>
+
+## Contact Support
+
+SaladCloud Support is available Monday through Friday, 9am to 5pm Pacific Time. Requests are handled in the order they
+are received.
+
+- **Email** [cloud@salad.com](mailto:cloud@salad.com) from the email address on your SaladCloud account.
+- **Use the support widget** in the bottom right corner of this site, or the help icon in the top navigation bar of the
+  [SaladCloud Portal](https://portal.salad.com).
+
+See [Contact Support](/support/contact) for details on the support widgets.
+
+### What to Include
+
+Include these details so we can help you without asking follow-up questions:
+
+- Your organization and project names.
+- The product you are using, and the container group name, job ID, or request ID if you have one.
+- The instance or machine ID, if the problem affects specific instances.
+- When the problem happened, with the date, time, and time zone.
+- The exact error message, status code, or log output.
+- What you expected to happen, and what you have already tried.
+
+<Warning>Never send API keys, passwords, or other secrets in a support request.</Warning>
+
+## Other Ways to Reach Us
+
+<CardGroup cols={2}>
   <Card title="Contact Sales" icon="seedling" href="mailto:cloud@salad.com">
-    Contact the SaladCloud Sales team with questions about pricing and for help with large deployments.
-  </Card>
-  <Card title="Contact Support" icon="comment" href="/support/contact">
-    Contact the SaladCloud Support team for general help with your SaladCloud account.
+    Ask about pricing, large deployments, and support plans.
   </Card>
   <Card title="Report Abuse" icon="bug" href="mailto:dev@salad.com">
     If you suspect abuse, please let us know.
   </Card>
 </CardGroup>
+
+SaladCloud also has a [community Discord](https://discord.gg/ApSm4Kn7Aq).
