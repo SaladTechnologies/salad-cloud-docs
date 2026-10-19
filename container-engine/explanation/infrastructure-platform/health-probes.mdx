@@ -2,7 +2,7 @@
 title: 'Health Probes'
 ---
 
-_Last Updated: October 30, 2024_
+_Last Updated: October 19, 2026_
 
 # Overview
 
@@ -155,13 +155,13 @@ is 'done' and the Liveness and Readiness probes (if configured) are initiated.
 
 All probes (Startup, Liveness, and Readiness) share the following properties.
 
-| Property                  | Type (Min, Max)      | Details                                                                                                                                                                                                                                              |
-| :------------------------ | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Initial Delay Seconds** | Integer (0 - 10,000) | The number of seconds after the container has started before the probe is initiated. If a Startup probe is configured, the initial delay for Liveness and Readiness probes begins counting when the Startup probe has reached the success threshold. |
-| **Period Seconds**        | Integer (1 - 10,000) | How often, in seconds, to perform the probe.                                                                                                                                                                                                         |
-| **Timeout Seconds**       | Integer (1 - 10,000) | After a probe initiates, the number of seconds to wait for a successful response before timing out (failing).                                                                                                                                        |
-| **Success Threshold**     | Integer (1 - 10,000) | The minimum consecutive successes for the probe to return a 0 (success) for the probe to be considered successful.                                                                                                                                   |
-| **Failure Threshold**     | Integer (1 - 10,000) | The number of consecutive failures of the probe before the container is reallocated (in the case of Startup and Liveness probes) or Container Gateway (networking) is disabled (in the case of Readiness probes).                                    |
+| Property                  | Type (Min, Max)     | Details                                                                                                                                                                                                                                              |
+| :------------------------ | :------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Initial Delay Seconds** | Integer (0 - 1,200) | The number of seconds after the container has started before the probe is initiated. If a Startup probe is configured, the initial delay for Liveness and Readiness probes begins counting when the Startup probe has reached the success threshold. |
+| **Period Seconds**        | Integer (1 - 120)   | How often, in seconds, to perform the probe.                                                                                                                                                                                                         |
+| **Timeout Seconds**       | Integer (1 - 60)    | After a probe initiates, the number of seconds to wait for a successful response before timing out (failing).                                                                                                                                        |
+| **Success Threshold**     | Integer (1 - 10)    | The minimum consecutive successes for the probe to return a 0 (success) for the probe to be considered successful.                                                                                                                                   |
+| **Failure Threshold**     | Integer (1 - 20)    | The number of consecutive failures of the probe before the container is reallocated (in the case of Startup and Liveness probes) or Container Gateway (networking) is disabled (in the case of Readiness probes).                                    |
 
 # Further Reading
 
