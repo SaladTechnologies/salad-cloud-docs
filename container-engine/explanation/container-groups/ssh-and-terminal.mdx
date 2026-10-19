@@ -2,7 +2,7 @@
 title: 'SSH & Terminal Access'
 ---
 
-_Last Updated: January 30, 2026_
+_Last Updated: October 19, 2026_
 
 SaladCloud provides two ways to access a shell inside your running container instances: a web-based terminal directly in
 the Portal, and SSH access for connecting from your local machine or other SSH clients.
@@ -19,7 +19,8 @@ If you already have an SSH key pair, you can skip this step. To check for existi
 ls -la ~/.ssh/
 ```
 
-Look for files named `id_ed25519.pub`, `id_rsa.pub`, or similar `.pub` files.
+Look for files named `id_ed25519.pub` or `id_rsa.pub`. SaladCloud accepts Ed25519 (`ssh-ed25519`) and RSA (`ssh-rsa`)
+keys only, so an ECDSA key such as `id_ecdsa.pub` won't work.
 
 To create a new SSH key:
 
@@ -49,6 +50,11 @@ There are two ways to access the SSH key settings:
 
 Paste your public key into the field and save it.
 
+<Note>
+  Each account holds one SSH public key, and saving a new key replaces the existing one. If you connect from more than
+  one machine, use the same key pair on each.
+</Note>
+
 ![](/container-engine/images/ssh-access-1.png)
 
 ### 4. Connect to a Container Instance
@@ -65,8 +71,8 @@ Paste your public key into the field and save it.
 4. The Portal also displays the key fingerprint for verification, so you can confirm you're connecting with the correct
    key.
 
-SSH automatically tries default key files from `~/.ssh/` (such as `id_ed25519`, `id_rsa`, `id_ecdsa`), so the command
-shown in the Portal works without modification for most users.
+SSH automatically tries default key files from `~/.ssh/` (such as `id_ed25519` and `id_rsa`), so the command shown in
+the Portal works without modification for most users.
 
 If your key has a custom name or is stored in a non-standard location, add the `-i` flag to specify your key name and
 location:

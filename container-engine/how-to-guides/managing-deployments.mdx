@@ -2,7 +2,7 @@
 title: 'Managing Deployments'
 ---
 
-_Last Updated: October 13, 2026_
+_Last Updated: October 19, 2026_
 
 <Visibility for="agents">
   > Before any update, call `get_container_group`, preserve unrelated configuration, and use only fields supported by
@@ -82,7 +82,7 @@ your Container Group deployment.
   been running at its current priority for 1 hour; to lower it right away, stop the container group, change the
   priority, and start it again.
 - You can edit the [Health Check Probes](/container-engine/explanation/infrastructure-platform/health-probes) (Startup,
-  and Liveness).
+  Readiness, and Liveness).
 - You can edit the [Command](/container-engine/how-to-guides/specifying-a-command).
 - If enabled, you can edit the [Container Gateway](/container-engine/explanation/infrastructure-platform/networking)
   Port. Note: the edit Container Group functionality doesn't allow for the Container Gateway to be disabled, enabled, or
@@ -107,7 +107,10 @@ associated with those choices updated in real-time.
 - Display name edits, replica count adjustments, and autoscaler configuration updates apply without forcing a restart.
 - Priority level changes apply to running instances immediately without a restart. The new priority's preemption
   behavior and hourly rate take effect from that point on.
-- Because restarts happen right away, plan rollouts carefully and consult
+- When a change creates a new container version, each replica restarts onto it the next time its node checks in, and old
+  and new versions never run side by side. Each replica downloads the full image again, even on a node that ran the
+  previous version, so a container group with one replica is unavailable for the full download plus your application's
+  start-up time. Plan rollouts carefully and consult
   [Deployment Strategies on SaladCloud](/container-engine/how-to-guides/deployment-strategies) for approaches that
   maintain availability during updates.
 

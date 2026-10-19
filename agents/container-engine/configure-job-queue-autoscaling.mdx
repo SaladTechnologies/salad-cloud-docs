@@ -4,7 +4,7 @@ sidebarTitle: 'Queue Autoscaling'
 description: 'Create or discover a SaladCloud Job Queue and configure a safely verified queue-autoscaled worker group.'
 ---
 
-_Last Updated: October 7, 2026_
+_Last Updated: October 19, 2026_
 
 ## When to use this runbook
 
@@ -247,10 +247,11 @@ have produced side effects. Use an application idempotency record and explicit r
 - Restore only the previous autoscaler object with a fresh merge patch when it is known and authorized.
 - Do not detach a queue through an undocumented field; the current patch schema has no `queue_connection`.
 - Preserve a failed job and logs for diagnosis. Resubmit only after the cause is corrected and idempotency is proven.
-- Safe cleanup begins with `get_queue`, `list_queue_jobs`, `get_container_group`, and instance reads. The queue's check
-  each group's `queue_connection` to find groups attached to the queue. If any group is attached or any job is active,
-  stop. Cancel jobs, reduce/stop/delete capacity, and delete the queue only with explicit intent, then verify each
-  deletion in the same trusted scope.
+- Safe cleanup begins with `get_queue`, `list_queue_jobs`, `get_container_group`, and instance reads. The queue's
+  `container_groups` list can be empty even while a connected group is running, so check each group's `queue_connection`
+  to find groups attached to the queue. If any group is attached or any job is active, stop. Cancel jobs,
+  reduce/stop/delete capacity, and delete the queue only with explicit intent, then verify each deletion in the same
+  trusted scope.
 - Deleting a queue permanently removes its connection from every attached group, and the group keeps running with no
   queue. Recreating a queue with the same name does not reconnect it.
 - Stopping or deleting a group does not stop its worker at once, and the old container can take new jobs for a short

@@ -6,7 +6,7 @@ description:
   live evidence without repeating uncertain billable requests.'
 ---
 
-_Last Updated: September 23, 2026_
+_Last Updated: October 19, 2026_
 
 ## When to use this runbook
 
@@ -49,7 +49,8 @@ undocumented behavior, and do not invent fields, error meanings, retry guarantee
 
 ## Dynamic values to retrieve
 
-- Current reachability and response from `GET https://ai.salad.cloud/v1/models` with the supplied key.
+- Current reachability and response from `GET https://ai.salad.cloud/v1/models`. This endpoint answers without
+  authentication, so its response says nothing about the supplied key.
 - Current live model IDs and whether the failing exact ID is present.
 - Exact response class, safe headers, server-provided retry guidance, and redacted problem details.
 - Current published rate for the selected model when billing is part of the incident.
@@ -86,7 +87,7 @@ undocumented behavior, and do not invent fields, error meanings, retry guarantee
 | Evidence                                                | Classification and action                                                                                            |
 | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Base URL/path differs from the documented endpoint      | Correct local configuration, then verify once if authorized.                                                         |
-| `/models` returns `401` or `403`                        | Credential type, validity, or authorization problem; stop and request a valid AI Gateway key.                        |
+| Completion returns `401` or `403`                       | Credential type, validity, or authorization problem; stop and request a valid AI Gateway key.                        |
 | `/models` succeeds but exact model is absent            | Model-catalog mismatch; stop or request approval for a listed alternative.                                           |
 | `/models` succeeds and completion returns a clear `4xx` | Inspect documented field names/types and billing/access evidence; do not retry unchanged.                            |
 | `402 credits_exhausted`                                 | Ask the user to add credits to the organization associated with the key; stop until its balance is positive.         |
