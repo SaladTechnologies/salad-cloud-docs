@@ -68,6 +68,7 @@ Eeuo
 EURC
 EMEA
 encodedimage
+enplabs
 esports
 euler
 EventBridge
@@ -283,6 +284,7 @@ sklearn
 snarkjs
 spanish
 splunk
+SpotWarp
 srcg
 SRCG
 subseed
