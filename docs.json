@@ -380,6 +380,7 @@
                   "container-engine/reference/recipes/risc0",
                   "container-engine/reference/recipes/sam3",
                   "container-engine/reference/recipes/sogni-fast-worker",
+                  "container-engine/reference/recipes/spotwarp",
                   "container-engine/reference/recipes/tei-bge-m3",
                   "container-engine/reference/recipes/tei-bge-reranker-v2-m3",
                   "container-engine/reference/recipes/tgi",
