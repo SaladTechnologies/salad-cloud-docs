@@ -6,7 +6,7 @@ description:
   volume discounts.'
 ---
 
-_Last Updated: October 2, 2026_
+_Last Updated: October 27, 2026_
 
 # Prepaid Billing
 
@@ -62,8 +62,14 @@ We accept:
 # Pay with Crypto
 
 You can buy credits with USDC, USDT, or RENDER on the Solana network directly from the Portal, using a
-[Phantom](https://phantom.app/download) or [Solflare](https://solflare.com/download) wallet. You don't need SOL for
-network fees.
+[Solflare](https://solflare.com/download) wallet. You don't need SOL for network fees. If you don't have a Solflare
+wallet, you can pay by card instead.
+
+<Note>
+  Phantom wallets aren't supported yet. Crypto payments are processed through Coinbase's x402 payment service, which
+  rejects the extra security checks Phantom adds to each transaction. No funds are taken on a failed attempt; the
+  payment is rejected before anything is sent on-chain. We'll enable Phantom once Coinbase resolves the issue.
+</Note>
 
 1. In the Portal, go to **Billing & Usage** and click **Add Credits**.
 2. Choose USDC, USDT, or RENDER, and enter the amount of credits to buy (\$5 to \$10,000).
