@@ -1,0 +1,324 @@
+---
+title: 'SaladCloud CLI Overview'
+sidebarTitle: 'Overview'
+description:
+  'Install the saladcloud command-line tool, log in, and manage container groups, job queues, transcription, and AI
+  Gateway from a terminal, a script, a CI pipeline, or an AI agent.'
+---
+
+_Last Updated: November 12, 2026_
+
+<Visibility for="agents">
+  > Run `saladcloud -o json <command>` instead of calling the API over raw HTTP. A failure is one JSON line on stderr
+  > whose `hint` is the fix, and `saladcloud <command> --help` is the reference. Setup belongs to the user: when a hint
+  > says to run `saladcloud login`, ask the user to run it in their own terminal, and never ask for a key in the chat.
+  > Read [Use the SaladCloud CLI with AI Agents](/cli/how-to-guides/use-with-ai-agents) before operating on an account.
+</Visibility>
+
+<Warning>
+  The SaladCloud CLI is in **beta**. Commands, flags, messages, exit codes, and JSON output may still change. Every
+  change is listed in the [changelog](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/CHANGELOG.md), and
+  bug reports are welcome on [GitHub](https://github.com/SaladTechnologies/salad-cloud-cli/issues/new/choose).
+</Warning>
+
+These examples target **v0.1.0**. Check `saladcloud version` and the installed command's `--help`; the repository's
+`main` branch can include features that are not in the latest release yet.
+
+## What is the SaladCloud CLI?
+
+The SaladCloud CLI is an open-source command-line tool that wraps the [SaladCloud API](/reference/api-usage). It lets
+you do from a terminal what you would otherwise do in the [Portal](https://portal.salad.com) or with hand-written API
+requests: deploy and update container groups, follow their logs, open a shell on a running instance, submit jobs to a
+queue, transcribe a recording, or check your AI Gateway key.
+
+The CLI behaves the same whether a person, a shell script, a CI pipeline, or an AI coding agent runs it:
+
+- **Every command works without prompts.** Anything the CLI asks for at a terminal can also be given as a flag or an
+  environment variable.
+- **Every command exits with a documented code**, so a script can tell "not found" from "authentication failed" without
+  parsing text.
+- **Resource and action results support `--output json`.** Logs stream JSON lines; SSH sessions, shell completion, and
+  help retain their native output. In JSON mode an error is a single JSON object on stderr, with an `error.hint` that
+  suggests a fix when one is available.
+
+The source code and releases are on [GitHub](https://github.com/SaladTechnologies/salad-cloud-cli), under the MIT
+license.
+
+## What You Can Do with It
+
+| Area                        | Commands                                                                              | What they cover                                                                                                            |
+| :-------------------------- | :------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------- |
+| Setup and account           | `login`, `logout`, `use`, `whoami`, `doctor`, `config`, `orgs`, `quotas`              | Save and switch your API key, organization, and project; diagnose setup problems; read your quotas                         |
+| GPUs and capacity           | `gpus`, `availability`                                                                | List GPU classes with their price per priority tier; estimate how many nodes could run a replica right now                 |
+| Container groups            | `container-groups` (alias `cg`)                                                       | Create, list, inspect, update, scale, start, stop, and delete container groups; restart, recreate, or reallocate instances |
+| Logs                        | `logs`, `container-groups logs`                                                       | Query or follow application logs and system events for an organization, a project, or one container group                  |
+| Remote access               | `container-groups ssh`, `container-groups cp`, `container-groups sftp`, `ssh-key`     | Open a shell on a running instance and copy files to or from it                                                            |
+| Job queues                  | `queues`, `queues jobs`                                                               | Create job queues, and submit, list, and cancel jobs                                                                       |
+| Inference and transcription | `inference`, `inference jobs`, `inference transcribe`, `inference transcription-lite` | List managed inference endpoints, queue jobs on them, and transcribe a file or URL in one step                             |
+| AI Gateway                  | `ai-gateway`                                                                          | Save and test an AI Gateway key, and list the models the gateway serves                                                    |
+| Webhooks                    | `webhook-secret`                                                                      | Print or rotate the secret that signs your organization's webhook deliveries                                               |
+| Coding agents               | `agent init`, `changelog`                                                             | Tell a coding agent how to use the CLI, and let it catch up on what changed between releases                               |
+
+A few things are still done in the Portal: creating your account, organizations, and projects; billing; creating API
+keys and AI Gateway keys; and registering your SSH public key.
+
+## Before You Start
+
+You need a SaladCloud account, an organization, and a billing method with credits. Without credits you cannot create or
+start container groups, or use any other SaladCloud service. [Account Setup](/general/tutorials/account-setup) walks
+through all three. Every organization starts with a project named `default`.
+
+## Install
+
+<CodeGroup>
+
+```bash macOS and Linux
+curl -fsSL https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/install.sh | sh
+```
+
+```powershell Windows (PowerShell)
+irm https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/install.ps1 | iex
+```
+
+</CodeGroup>
+
+The install script downloads the newest release for your machine, verifies it against the release's checksums, and
+installs the `saladcloud` binary:
+
+- On macOS and Linux, to `~/.local/bin`. The script tells you if that folder is not on your `PATH`.
+- On Windows, to `%LOCALAPPDATA%\Programs\saladcloud`, which the script adds to your user `PATH`.
+
+If `saladcloud` is not found after installation on macOS or Linux, add the default install folder to your current bash
+or zsh session, and put the same line in your shell's startup file:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Prebuilt binaries cover Linux (amd64 and arm64), macOS (Apple silicon and Intel), and Windows (amd64, which also runs on
+Windows 11 on ARM under emulation).
+
+Confirm the install. This prints the version and commit, which you will want in any bug report:
+
+```bash
+saladcloud version
+```
+
+To update to a newer release later, run the install command again.
+
+<AccordionGroup>
+  <Accordion title="Pin a version or change the install folder">
+    Both install scripts read the same environment variables. `SALAD_CLI_VERSION` pins a release, and
+    `SALAD_CLI_INSTALL_DIR` chooses the folder.
+
+    ```bash macOS and Linux
+    curl -fsSL https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/install.sh | SALAD_CLI_VERSION=v0.1.0 sh
+    ```
+
+    ```powershell Windows (PowerShell)
+    $env:SALAD_CLI_VERSION = 'v0.1.0'
+    irm https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/install.ps1 | iex
+    ```
+
+    Pinning a version is a good idea in CI while the CLI is in beta.
+
+  </Accordion>
+  <Accordion title="Download a release manually">
+    The archives and `checksums.txt` are attached to each
+    [release](https://github.com/SaladTechnologies/salad-cloud-cli/releases). Every archive carries a build provenance
+    attestation, which you can check with the GitHub CLI:
+
+    ```bash
+    gh attestation verify ./saladcloud_v0.1.0_linux_amd64.tar.gz --repo SaladTechnologies/salad-cloud-cli
+    ```
+
+    Replace the filename with the archive you downloaded for your platform. This requires a GitHub CLI version that
+    provides `gh attestation verify`.
+
+  </Accordion>
+  <Accordion title="Install with Go">
+    With Go 1.26 or later, on any platform Go supports:
+
+    ```bash
+    go install github.com/saladtechnologies/salad-cloud-cli/cmd/saladcloud@latest
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+## Log In
+
+```bash
+saladcloud login
+```
+
+`login` asks for three things and checks each against the API before saving anything:
+
+1. **Your API key.** The input is hidden. Pressing Enter at the prompt opens the Portal's
+   [API key page](https://portal.salad.com/api-key) in your browser. The key is your user's key, and it works for every
+   organization you are a member of.
+2. **Your organization.** If you belong to several, `login` shows a numbered list.
+3. **Your project.** `default` is offered unless you saved a different one before.
+
+Organizations and projects are always named by their **URL names**, the segments in
+`https://portal.salad.com/organizations/<org>/projects/<project>`, not the display names the Portal shows.
+`saladcloud orgs list` shows both names for each of your organizations.
+
+The key is saved in a config file in your user profile, and the CLI never prints it in full: tables and JSON output show
+only its last four characters.
+
+Run `saladcloud config path` to locate the file. It stores credentials as plain text, not in an encrypted keychain; keep
+it out of repositories, shared artifacts, and chat. `saladcloud logout` removes the saved SaladCloud API key, but does
+not revoke it or clear a key supplied through `SALAD_API_KEY`. The AI Gateway key has its own
+`saladcloud ai-gateway logout` command.
+
+Three commands are useful right after logging in:
+
+```bash
+# Show the key (masked), organization, and project in effect, and where each value came from
+saladcloud whoami
+
+# Switch to another organization and project
+saladcloud use my-org/my-project
+
+# Check the config file, API access, key, organization, and project, with a fix for anything that fails
+saladcloud doctor
+```
+
+<Tip>
+  Scripts and CI pipelines skip `login` and set `SALAD_API_KEY`, `SALAD_ORGANIZATION`, and `SALAD_PROJECT` instead. See
+  [Usage and Automation](/cli/how-to-guides/usage-and-automation#authenticate-without-logging-in).
+</Tip>
+
+Two features need one more step in the Portal:
+
+- SSH need an SSH public key registered to your account. Run `saladcloud ssh-key setup`, which finds or generates a
+  local key and prints it with the link to register it.
+- **`saladcloud ai-gateway test`** needs an AI Gateway key, which is separate from your SaladCloud API key. Create one
+  as described in [Manage Your AI Gateway API Key](/ai-gateway/how-to-guides/manage-api-key), then run
+  `saladcloud ai-gateway login`.
+
+## Deploy Your First Container Group
+
+These commands deploy a small public image that logs a line every 5 seconds, read its logs, and delete it. They work the
+same in bash, zsh, and PowerShell.
+
+```bash
+# List GPU classes with prices
+saladcloud gpus list
+
+# Deploy a container group: a busybox image that logs a line every 5 seconds
+saladcloud container-groups create my-first-group --image docker.io/library/busybox:1.36 --cpu 1 --memory 1024 --priority batch --wait --timeout 15m -- sh -c 'while true; do echo hello from SaladCloud; sleep 5; done'
+
+# Check its status, instance counts and, if it failed, the reason
+saladcloud container-groups get my-first-group
+
+# Follow its logs (Ctrl-C to stop)
+saladcloud container-groups logs my-first-group -f
+
+# Delete it
+saladcloud container-groups delete my-first-group
+```
+
+<Note>
+  A container group is billed while it runs, so delete or stop the ones you are done with. `delete` acts immediately,
+  with no confirmation prompt. A deleted group's name is never released, so give each new group a new name. If the wait
+  fails or times out, the group may still exist: inspect it and stop or delete it when you are done.
+</Note>
+
+## How Commands Are Structured
+
+The grammar is the same across the whole CLI, so once you know one command you can guess the rest:
+
+- **A resource noun always takes a verb:** `saladcloud gpus list`, `saladcloud orgs get my-org`.
+- **The thing a command acts on is its one positional argument, and its parents are flags:**
+  `saladcloud container-groups instances restart <instance-id> -c my-app` restarts one instance of the group `my-app`.
+- **`cg` is short for `container-groups`:** `saladcloud cg list` lists your container groups.
+- **Common flags control output and scope:** `-o table|json|yaml` chooses the output format where supported, and
+  `--debug` prints each API request on stderr. `--org` and `--project` override saved context only on commands that use
+  that scope. Organization-scoped commands such as `gpus` and `inference` reject `--project`; `ai-gateway` commands
+  reject both. Check the command's `--help` before adding scope flags.
+
+Every command has `--help` with its full flags and examples. A mistyped command or flag gets a suggestion for the
+nearest match, and a command line in the wrong shape gets the corrected command as a hint.
+
+## Shell Completion
+
+Enable Tab autocompletion for CLI commands, flags, and resource names. Add the command below to your shell startup file
+to enable it in every new terminal session.
+
+<CodeGroup>
+
+```bash bash (~/.bashrc)
+source <(saladcloud completion bash)
+```
+
+```bash zsh (~/.zshrc)
+source <(saladcloud completion zsh)
+```
+
+```bash fish (~/.config/fish/config.fish)
+saladcloud completion fish | source
+```
+
+```powershell PowerShell ($PROFILE)
+saladcloud completion powershell | Out-String | Invoke-Expression
+```
+
+</CodeGroup>
+
+## Get Help and Report Problems
+
+- `saladcloud doctor` diagnoses setup and connectivity problems, and prints a fix for each check that does not pass.
+- `--debug` on any command prints one line per API request on stderr. `--debug=body` adds headers and bodies, with
+  credentials redacted.
+- `saladcloud changelog` prints the changelog built into the binary.
+- For a crash, a wrong exit code, or output that contradicts `--help`,
+  [open an issue](https://github.com/SaladTechnologies/salad-cloud-cli/issues/new/choose) with the output of
+  `saladcloud version`, the exact command, and the error. Never paste an API key.
+- For account, billing, or workload problems, as opposed to CLI bugs, [contact support](/support).
+
+## Uninstall
+
+<CodeGroup>
+
+```bash macOS and Linux
+curl -fsSL https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/uninstall.sh | sh
+```
+
+```powershell Windows (PowerShell)
+irm https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/main/uninstall.ps1 | iex
+```
+
+</CodeGroup>
+
+The uninstall script removes the `saladcloud` binary and, on Windows, its folder from your user `PATH`. Your config
+file, which holds your saved API keys, is kept so that a reinstall picks up where you left off. Set `SALAD_CLI_PURGE=1`
+to remove it too. If you installed into a custom folder, set the same `SALAD_CLI_INSTALL_DIR` when uninstalling. An
+installation made with Go or a manual download needs its binary removed from that installation's location instead. If
+you added a `saladcloud completion` line to a shell startup file, remove it yourself.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Usage and Automation" icon="terminal" href="/cli/how-to-guides/usage-and-automation">
+    Deploy, update, inspect, and debug container groups, then run the same commands unattended in scripts and CI.
+  </Card>
+  <Card title="Use with AI Agents" icon="robot" href="/cli/how-to-guides/use-with-ai-agents">
+    Set up Claude Code, Codex, Cursor, or another coding agent to operate SaladCloud through the CLI.
+  </Card>
+  <Card
+    title="CLI Guide on GitHub"
+    icon="github"
+    href="https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/docs/guide.md"
+  >
+    The full guide: every create flag, update semantics, logs, job queues, exit codes, and the JSON contract.
+  </Card>
+  <Card
+    title="Command Reference"
+    icon="list"
+    href="https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/docs/commands.md"
+  >
+    Every command at a glance, with its aliases.
+  </Card>
+</CardGroup>

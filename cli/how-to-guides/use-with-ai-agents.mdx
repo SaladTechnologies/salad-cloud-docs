@@ -1,0 +1,331 @@
+---
+title: 'Use the SaladCloud CLI with AI Agents'
+sidebarTitle: 'Use with AI Agents'
+description:
+  'Set up Claude Code, Codex, Cursor, or another coding agent to deploy and operate SaladCloud through the saladcloud
+  CLI: agent init, credentials that stay out of the chat, JSON output, exit codes, and guardrails.'
+---
+
+_Last Updated: November 12, 2026_
+
+<Visibility for="agents">
+  > If you are an agent reading this page: run `saladcloud -o json <command>` instead of raw HTTP, and use
+  > `saladcloud <command> --help` as the reference. A failure is one JSON line on stderr; act on its `hint`. Setup
+  > belongs to the user: when a hint says to run `saladcloud login`, `saladcloud ai-gateway login`, or
+  > `saladcloud ssh-key setup`, ask the user to run it in their own terminal, and never ask for a key in the chat. Pass
+  > `--org`, and `--project` where a command takes it, instead of running `use` or `config set`. If a name is not found,
+  > ask the user which one; never pick from a list. Read the `warning:` and `note:` lines on stderr after every write.
+  > `container-groups delete` is immediate and unconfirmed, so confirm with the user first. Then follow the [Agent
+  > Operations Overview](/agents/overview) for authorization, retry, and verification rules.
+</Visibility>
+
+A coding agent that can run shell commands can deploy and operate SaladCloud for you through the
+[SaladCloud CLI](/cli/explanation/overview). This guide shows how to set that up so that the agent knows how to use the
+CLI, never handles your API key in the conversation, and asks before it does anything destructive or billable.
+
+It builds on two other parts of the documentation:
+
+- [Build with AI Agents](/general/tutorials/build-with-ai-agents) covers the SaladCloud skills, the documentation MCP
+  server, and what an API key lets an agent do. Read its API key section before you give any agent access.
+- [Agent Operations](/agents/overview) holds the runbooks an agent follows: which sources to trust, which actions need
+  your go-ahead, and how to verify a change.
+
+<Warning>
+  The CLI is in **beta**, so commands, flags, exit codes, and JSON output may still change. An agent can read what
+  changed with `saladcloud changelog`.
+</Warning>
+
+## Why Give an Agent the CLI
+
+An agent can call the SaladCloud API directly, but the CLI removes most of the ways that goes wrong:
+
+- **One command per task, with built-in documentation.** `saladcloud <command> --help` lists the flags and examples for
+  the installed version, so the agent does not have to rely on what it remembers.
+- **Errors say how to fix them.** With `-o json`, a failure is one JSON object on stderr whose `hint` field is the next
+  step.
+- **Exit codes separate the cases an agent must treat differently:** bad input, a missing resource, an authentication
+  problem, a rate limit, a network failure.
+- **Writes check themselves.** `create`, `update`, and `scale` compare what the API did with what was asked for and
+  print a `warning:` or `note:` line when they differ.
+- **The API key stays out of the conversation.** The agent runs commands that read a saved key; no command prints it.
+
+Resource output is not automatically safe to share: logs, container environment variables, job input/output, and
+transcripts can contain secrets or private data. Redact them before including them in a conversation or bug report.
+
+## Step 1: Install the CLI and Log In Yourself
+
+Setup is your job, not the agent's. [Install the CLI](/cli/explanation/overview#install), then log in from your own
+terminal:
+
+```bash
+saladcloud login
+```
+
+`login` saves your API key, organization, and project in a config file in your user profile. From then on, any
+`saladcloud` command the agent runs on that machine uses the saved key, and you never paste the key into a chat, a
+prompt, or a file in the repository.
+
+If the agent should also open SSH sessions or copy files, or use the AI Gateway, do those setup steps yourself too:
+
+```bash
+# Find or generate a local SSH key and print it with the Portal page where you register it
+saladcloud ssh-key setup
+
+# Save an AI Gateway key (sends one billed request to check it)
+saladcloud ai-gateway login
+```
+
+For an agent that runs somewhere without your login, such as a cloud sandbox or a CI job, provide `SALAD_API_KEY`,
+`SALAD_ORGANIZATION`, and `SALAD_PROJECT` as secret environment variables instead. See
+[Authenticate Without Logging In](/cli/how-to-guides/usage-and-automation#authenticate-without-logging-in).
+
+<Warning>
+  Keeping the key out of the chat is not the same as limiting what the agent can do. The key grants access to every
+  organization, project, and container group your user can reach, and an agent with a shell on your machine acts with
+  that access. The saved config contains the key in plain text, so an agent with filesystem access may still read it. To
+  limit access, give the agent a dedicated member account's key and set your organization's
+  [quotas](/container-engine/reference/quotas) deliberately, as described in [Build with AI
+  Agents](/general/tutorials/build-with-ai-agents).
+</Warning>
+
+## Step 2: Add the SaladCloud Section to Your Project
+
+Coding agents can read project instruction files, such as `CLAUDE.md` for Claude Code or `AGENTS.md` for tools that
+support it. Other tools may use different filenames. `agent init` writes a short SaladCloud section into the selected
+file. Run it in your project's root folder:
+
+```bash
+saladcloud agent init
+```
+
+The section tells the agent:
+
+- How workloads run on SaladCloud: as container groups on interruptible nodes, with ephemeral local disk and one port
+  reachable through the Container Gateway.
+- To use `saladcloud -o json <command>` rather than raw HTTP, to act on an error's `hint`, and what each exit code
+  means.
+- That setup belongs to you. When a command says to run `saladcloud login`, the agent asks you to run it in your own
+  terminal, and it never asks for a key in the chat.
+- To pass `--org` and `--project` on each command rather than change your saved settings, and to ask you when a name is
+  not found rather than pick one from a list.
+- To read the warnings after a write, and to confirm with you before `container-groups delete`.
+- To test ports, probes, and authentication locally before deploying, and how to debug a container that fails at
+  startup.
+- To install the SaladCloud skills before any non-trivial work.
+
+The command never calls the API and needs no credentials, and the section contains no account information, so the file
+is safe to commit.
+
+Which file it writes:
+
+| Situation                                                | File written |
+| :------------------------------------------------------- | :----------- |
+| You pass `--file <path>`                                 | That file    |
+| The command is run by Claude Code (it sets `CLAUDECODE`) | `CLAUDE.md`  |
+| The folder has a `CLAUDE.md` and no `AGENTS.md`          | `CLAUDE.md`  |
+| Anything else                                            | `AGENTS.md`  |
+
+If you use more than one agent in the same project, run the command once for each file:
+
+```bash
+saladcloud agent init --file AGENTS.md
+saladcloud agent init --file CLAUDE.md
+```
+
+Other options:
+
+```bash
+# Preview the section without writing anything
+saladcloud agent init --print
+
+# Write into another project
+saladcloud agent init --dir ../my-other-project
+```
+
+The section sits between `<!-- SALADCLOUD START -->` and `<!-- SALADCLOUD END -->` markers. Running the command again
+replaces the section in place and leaves the rest of the file alone, so run it again after you upgrade the CLI to pick
+up the current text.
+
+Check which instruction files your agent actually loads. For a tool that uses a different file, pass its path with
+`--file`; a generated file only helps when the agent reads it.
+
+## Step 3: Install the SaladCloud Skills
+
+The section that `agent init` writes carries only facts that stay true between releases. Detailed, task-specific
+guidance lives in the SaladCloud skills, which the section tells the agent to install. Installing them yourself lets you
+choose which skills and which agents:
+
+```bash
+npx skills add https://docs.salad.com
+```
+
+[Build with AI Agents](/general/tutorials/build-with-ai-agents#install-the-saladcloud-skills) lists the skills and shows
+how to add the documentation MCP server.
+
+The skills and the [Agent Operations](/agents/overview) runbooks describe each task in terms of API operations. Their
+rules about what to read first, when to stop and ask, and how to verify a change apply in the same way when the agent
+carries out those operations with CLI commands.
+
+## Step 4: Make Sure the CLI Never Waits for Input
+
+A few setup commands, such as `login`, prompt when they are run at a terminal. Some agent tools run commands under a
+pseudo-terminal, where a prompt would wait for an answer that never comes. Set `SALAD_CLI_NO_PROMPT` in the agent's
+environment so that the CLI never prompts and instead fails with a hint that says what to do:
+
+```bash
+export SALAD_CLI_NO_PROMPT=1
+```
+
+Where you set it depends on the agent. In Claude Code, for example, add it to the project's settings file:
+
+```json .claude/settings.json
+{
+  "env": {
+    "SALAD_CLI_NO_PROMPT": "1"
+  }
+}
+```
+
+## Step 5: Tell the Agent Which Organization and Project to Use
+
+Give the agent the organization and project by their URL names, either in your prompt or in the project instruction
+file. The agent then passes them on each command:
+
+```bash
+saladcloud container-groups list --org my-org --project staging -o json
+```
+
+This keeps the agent from changing the organization and project saved on your machine, and makes each command's target
+visible when you review what the agent ran. If an agent works on one project only, you can instead set
+`SALAD_ORGANIZATION` and `SALAD_PROJECT` in its environment.
+
+Use scope flags only where the command's help supports them. `inference` is organization-scoped and rejects `--project`.
+`ai-gateway` rejects both flags and bills the organization associated with its separate Gateway key.
+
+<Note>
+  When nothing sets a project, the CLI uses the project named `default` and prints a warning. In an organization with
+  several projects, always name the project so that the agent does not act on `default` by accident.
+</Note>
+
+## Decide What the Agent May Do Without Asking
+
+Most agent tools let you allow some commands and require approval for others. A reasonable split for the SaladCloud CLI:
+
+| Policy                                | Commands                                                                                                                                                                                                                                                                                                |
+| :------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Allow                                 | Read-only commands: `whoami`, `doctor`, `version`, `changelog`, `logs`, `container-groups logs`, `quotas get`, `ai-gateway models list`, and the `list` and `get` verbs of `orgs`, `gpus`, `container-groups`, `container-groups instances`, `queues`, `queues jobs`, `inference`, and `inference jobs` |
+| Ask first: starts or adds cost        | `container-groups create`, `container-groups start`, `container-groups scale` to a higher count, `queues jobs create`, `inference jobs create`, `inference transcribe`, `inference transcription-lite`, `ai-gateway test`                                                                               |
+| Ask first: interrupts or removes work | `container-groups delete`, `container-groups stop`, `container-groups scale` to a lower count, `container-groups update`, `container-groups instances restart`, `recreate`, and `reallocate`, `queues delete`, `queues jobs cancel`, `inference jobs cancel`                                            |
+| Ask first: reaches into a container   | `container-groups ssh`, `container-groups cp`, `container-groups sftp`                                                                                                                                                                                                                                  |
+| Do it yourself                        | `login`, `logout`, `use`, `config set`, `ai-gateway login`, `ssh-key setup`, `webhook-secret get`, `webhook-secret rotate`                                                                                                                                                                              |
+
+Three commands deserve particular care:
+
+- **`container-groups delete` is immediate and unconfirmed.** The CLI has no prompt and no dry run, and a deleted
+  group's name can never be used again in that project.
+- **`container-groups update` restarts every instance** when it changes the image, command, environment variables,
+  probes, or gateway settings.
+- **`availability` is read-only but expensive for the platform.** An agent should run it once before a deployment, not
+  in a loop.
+
+## Try It
+
+With the setup done, start your agent in the project and give it a task that names the organization, the project, and
+where it must stop. For example:
+
+```text
+Using the saladcloud CLI in organization my-org, project default: deploy docker.io/library/busybox:1.36 as a
+container group named agent-demo-1 with 1 vCPU, 1024 MB of memory, and batch priority, running a loop that prints a
+line every 5 seconds. Wait until it is running, show me its last few log lines, and then ask me before you delete it.
+```
+
+An agent that has read the SaladCloud section runs commands like these:
+
+```bash
+# Confirm what the CLI will use, without printing the key
+saladcloud whoami -o json
+
+# Deploy and wait until the group is running
+saladcloud container-groups create agent-demo-1 --org my-org --project default --image docker.io/library/busybox:1.36 --cpu 1 --memory 1024 --priority batch --wait -o json -- sh -c 'while true; do echo hello from SaladCloud; sleep 5; done'
+
+# Read the logs
+saladcloud container-groups logs agent-demo-1 --org my-org --project default --since 5m -o json
+
+# Only after you say yes
+saladcloud container-groups delete agent-demo-1 --org my-org --project default -o json
+```
+
+A container group is billed while it runs, so make sure the task ends with the group deleted or stopped.
+
+## What the Agent Sees
+
+Knowing what the CLI gives the agent helps you read a session and write better instructions.
+
+**Results.** With `-o json`, resource and action commands print a JSON document on stdout, and a list is
+`{"items": [...]}`. Logs stream JSON lines; SSH/SFTP sessions, shell completion, and help keep their native output. A
+waiting write such as `create --wait` prints its result only after the wait succeeds, but `doctor` can print results and
+still fail. Always check the exit code. In v0.1.0, a successful `update` means the configuration settled, not that every
+instance runs the new version or passes its readiness probe.
+
+**Errors.** A failed command prints one JSON object as the last line of stderr and exits with a non-zero code. This is
+what the agent gets when no API key is available:
+
+```json
+{
+  "error": {
+    "exit_code": 3,
+    "kind": "auth",
+    "message": "no API key set",
+    "hint": "run saladcloud login in a terminal, or set SALAD_API_KEY",
+    "http_status": null
+  }
+}
+```
+
+An agent that follows the SaladCloud section does not try to fix this itself. It stops and asks you to run
+`saladcloud login` in your own terminal.
+
+**Exit codes.** `1` is a general error, `2` a usage error, `3` an authentication failure, `4` not found, `5` rate
+limited, `6` invalid input, `7` a network error, and `10` an AI Gateway billing refusal. The
+[exit code table](/cli/how-to-guides/usage-and-automation#handle-exit-codes-and-errors) has the details.
+
+**Warnings and notes.** After a write, the CLI reports on stderr anything the API changed or ignored, as `warning:` and
+`note:` lines. These never contain a secret: an environment variable's value is described as `(set)` or `(changed)`, not
+printed.
+
+**Timeouts and uncertain results.** A timeout or interrupted wait does not cancel work already accepted by SaladCloud.
+Inspect the named group or returned job ID before retrying. Do not automatically repeat a job submission or Gateway
+completion whose outcome is uncertain; it can create duplicate work or another charge.
+
+<Note>
+  A one-shot `saladcloud container-groups ssh <group> -- <command>` exits with code 1 even when the command succeeded,
+  because the SaladCloud relay does not pass exit codes back. The SaladCloud section tells the agent about this; if you
+  write your own instructions, mention it so that the agent checks the command's output instead.
+</Note>
+
+## Keep the Agent Up to Date
+
+The CLI changes between releases, and an agent may have learned an older version. Two commands close the gap without
+network access:
+
+```bash
+# What changed since a version or a date
+saladcloud changelog --since 0.1.0
+saladcloud changelog --since 2026-11-01
+
+# The flags and examples of the installed version
+saladcloud container-groups create --help
+```
+
+After you upgrade the CLI, run `saladcloud agent init` again in each project to refresh the SaladCloud section.
+
+## Report Problems
+
+If the CLI misbehaves during an agent session, for example a crash, a wrong exit code, or output that contradicts
+`--help`, the SaladCloud section tells the agent to say so and offer to draft a bug report. Reports go to the CLI's
+[issue tracker](https://github.com/SaladTechnologies/salad-cloud-cli/issues/new/choose), with the output of
+`saladcloud version`, the exact command, and the error line from stderr. Check that the report contains no credentials
+before you submit it.
+
+For gaps in this documentation or in the skills, use the documentation MCP server's feedback tool or the
+[support page](/support).
