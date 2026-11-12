@@ -1,0 +1,564 @@
+---
+title: 'Everyday Usage and Automation with the SaladCloud CLI'
+sidebarTitle: 'Usage and Automation'
+description:
+  'Deploy, update, inspect, and debug container groups with the saladcloud CLI, then run the same commands unattended in
+  scripts and CI using environment variables, JSON output, and exit codes.'
+---
+
+_Last Updated: November 12, 2026_
+
+<Visibility for="agents">
+  > Use `-o json` on every command and branch on the exit code, not on message text. Read the `warning:` and `note:`
+  > lines on stderr after any write. `container-groups delete`, `stop`, scaling down, and instance restarts need the
+  > user's explicit go-ahead. See [Use the SaladCloud CLI with AI Agents](/cli/how-to-guides/use-with-ai-agents).
+</Visibility>
+
+This guide covers the commands you will use most with the SaladCloud CLI, and then how to run them unattended in a shell
+script or a CI pipeline. It assumes you have [installed the CLI and logged in](/cli/explanation/overview).
+
+The examples use placeholder names: `my-app` for a container group, `ghcr.io/me/app` for an image, and `my-org` for an
+organization. Container group commands are written out as `saladcloud container-groups`; `saladcloud cg` is the same
+command.
+
+Replace image names and media URLs with resources you can access, and create any named input files before running a
+command. The shell scripts and `jq` examples below use bash and require `jq`. Deployment, queued work, transcription,
+and AI Gateway completions can incur charges; stop or delete temporary groups after testing.
+
+<Warning>
+  The CLI is in **beta**, so commands, flags, exit codes, and JSON output may still change. In automation, pin the CLI
+  version and read the [changelog](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/CHANGELOG.md) before
+  you upgrade.
+</Warning>
+
+## Everyday Usage
+
+### Check Prices and Capacity Before You Deploy
+
+```bash
+# GPU classes and their price per priority tier
+saladcloud gpus list
+
+# How many nodes could run one replica with these requirements right now
+saladcloud availability --gpu "RTX 4090 (24 GB)" --cpu 8 --memory 16384
+
+# Your organization's container group quotas
+saladcloud quotas get
+```
+
+`availability` takes the requirements of one replica: `--gpu` (a GPU class name or ID, repeated for several classes),
+`--cpu`, `--memory` in MB, `--storage` in GB, and `--country`. Each query is expensive for the platform, so run it once
+before a deployment rather than in a loop. The counts are estimates, and a row of all zeros can mean the availability
+service is overloaded rather than that no nodes exist; the CLI prints a warning when that may be the case.
+
+### Deploy a Container Group
+
+`container-groups create` builds a container group from flags, from a definition file, or from a copy of an existing
+group.
+
+**From flags.** This is the quickest way to deploy an image:
+
+```bash
+saladcloud container-groups create my-app --image ghcr.io/me/app:v1 --gpu "RTX 3060 (12 GB)" --cpu 4 --memory 8192 --replicas 3 --port 8080 -e MODE=prod --wait
+```
+
+- Fields you do not set get defaults: 1 vCPU, 1024 MB of memory, 1 replica, a restart policy of `always`, and the group
+  starts as soon as it is created.
+- `--port` exposes one container port through the
+  [Container Gateway](/container-engine/explanation/infrastructure-platform/networking). Requests to the group's URL
+  must then carry a SaladCloud API key in the `Salad-Api-Key` header; add `--no-auth` to make the URL public.
+- `--wait` blocks until the group is `running` and exits non-zero if it fails, stops, or does not get there before
+  `--timeout` (10 minutes by default).
+- Words after `--` replace the image's `ENTRYPOINT` and `CMD` together, for example `-- python app.py --port 8080`.
+
+**From a definition file.** A file can carry everything the API accepts, including the settings that have no flag, such
+as [health probes](/container-engine/explanation/infrastructure-platform/health-probes) and registry credentials for a
+private image. The file is JSON or YAML with the API's field names:
+
+```yaml web.yaml
+name: my-web
+container:
+  image: ghcr.io/me/web:v1
+  resources:
+    cpu: 2
+    memory: 4096
+replicas: 1
+restart_policy: always
+networking:
+  protocol: http
+  port: 8080
+  auth: true
+readiness_probe:
+  http:
+    path: /health
+    port: 8080
+    scheme: http
+    headers:
+      - name: Accept
+        value: application/json
+  initial_delay_seconds: 0
+  period_seconds: 5
+  timeout_seconds: 2
+  success_threshold: 1
+  failure_threshold: 3
+```
+
+```bash
+# Create the group as the file describes it
+saladcloud container-groups create -f web.yaml --wait
+
+# Use the file as a base and override parts of it: flags always win over the file
+saladcloud container-groups create my-web-two -f web.yaml --replicas 2 -e DEBUG=1
+```
+
+The CLI rejects a field it does not recognize and names the path, with a suggestion when it looks like a misspelling, so
+a typo in a file never deploys silently.
+
+**From an existing group.** `--from` copies a group in the same organization, which is useful for trying a new image
+next to the running version:
+
+```bash
+saladcloud container-groups create my-app-v2 --from my-app --image ghcr.io/me/app:v2
+```
+
+Registry credentials are not copied, because the API never returns them. A copy of a group that uses a private image
+needs them again, in a `-f` file under `container.registry_authentication`.
+
+<Note>
+  A deleted container group's name is never released. Creating a group with a name that was ever used in the project
+  fails with `name_conflict`, so give each new group a new name.
+</Note>
+
+### Inspect Container Groups and Instances
+
+```bash
+# Every container group in the project, with running instances against replicas
+saladcloud container-groups list
+
+# One group: status, instance counts, and the platform's reason if it failed or stopped
+saladcloud container-groups get my-app
+
+# The group's instances, with each one's state, image download progress, and readiness
+saladcloud container-groups instances list -c my-app
+```
+
+Add `-w` to `list`, `get`, or `instances list` to redraw the table every few seconds until you press Ctrl-C.
+
+A group reads `running` as soon as any instance's container runs, whether or not it is passing its readiness probe yet.
+`instances list` shows the `READY` state of each instance.
+
+### Update, Scale, Start, and Stop
+
+```bash
+# Roll out a new image
+saladcloud container-groups update my-app --image ghcr.io/me/app:v2
+
+# Change resources
+saladcloud container-groups update my-app --cpu 4 --memory 8192 --gpu "RTX 4090 (24 GB)"
+
+# Set one environment variable; the group's other variables are kept
+saladcloud container-groups update my-app -e LOG_LEVEL=debug
+
+# Change the replica count
+saladcloud container-groups scale my-app --replicas 5
+
+# Stop the group, and start it again later
+saladcloud container-groups stop my-app
+saladcloud container-groups start my-app --wait
+```
+
+`update` and `scale` wait for the change to settle before they return, then compare the result with what you asked for.
+If the API changed or ignored part of your request, they print a `warning:` or `note:` line on stderr. If the platform
+rejects the change, for example because the registry does not serve the new image tag, the command exits with code 6 and
+the platform's reason, and the group keeps running what it had.
+
+In v0.1.0, **settled does not mean rolled out or ready**: the group's configuration can be accepted while instances
+still run its previous version or are starting. Inspect `container-groups instances list -c my-app` and test your
+application before sending traffic to it. `--wait` on create or start waits for the group to be `running`, not for every
+replica to pass its readiness probe. Do not use an unreleased flag from the repository's `main` branch unless your
+installed CLI's `--help` lists it.
+
+Three behaviors are worth knowing before you update a group that is serving traffic:
+
+- **A change to the image, command, environment variables, probes, or gateway settings restarts every instance.** Each
+  instance downloads the new image again, and old and new versions never run side by side. To avoid downtime, deploy the
+  new version as a second group with `create --from`, check it, and switch your clients over. See
+  [Deployment Strategies](/container-engine/how-to-guides/deployment-strategies).
+- **A new private image needs its registry credentials again.** Pass them in a `-f` file together with `--image`.
+- **Setting the replica count puts [scheduled scaling](/container-engine/how-to-guides/autoscaling/time-of-day-scaling)
+  on hold.** `scale --replicas <n> --keep-schedule` sets the count and switches the schedule back on.
+
+To change a setting that has no flag, save a minimal patch containing only that setting. For example, save this as
+`patch.json` to restore the image's own command:
+
+```json patch.json
+{
+  "container": {
+    "command": []
+  }
+}
+```
+
+```bash
+saladcloud container-groups update my-app -f patch.json
+```
+
+Patch files use the API's update schema. Omitted settings are left alone, arrays are replaced, and a patch file's
+`container.environment_variables` replaces the entire set; use `-e` to preserve other environment variables. Only use
+`null` where the [update schema](/reference/saladcloud-api/container-groups/update-container-group) permits clearing a
+field.
+
+<Warning>
+  In v0.1.0, `container-groups get my-app --writable` can drop an HTTP probe's `headers` when that list is empty. Do not
+  apply that export unchanged. Prefer a minimal patch; if you include a probe, supply its required fields and headers
+  according to the update schema. Exports also include `replicas`; omit it unless you intend to set the replica count.
+  The empty-list fix is listed in the CLI's
+  [changelog](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/CHANGELOG.md).
+</Warning>
+
+### Read Logs and System Events
+
+```bash
+# The last hour of one container group's logs
+saladcloud container-groups logs my-app --since 1h
+
+# Follow new entries until Ctrl-C
+saladcloud container-groups logs my-app -f
+
+# Only errors, across every container group in a project
+saladcloud logs --project production --severity error
+
+# Only system events: allocation, image download, start, probes, and exits
+saladcloud container-groups logs my-app --since 1h --query 'resource.type != "container"'
+```
+
+Without `--since`, a query covers the last 15 minutes. It prints the newest 1,000 entries in the range by default;
+`--limit` changes that. `--filter` matches a substring, and `--query` takes a raw
+[log query](/container-engine/reference/log-queries).
+
+`saladcloud logs` with no flags searches the whole organization. Only an explicit `--project` or `-c <group>` narrows
+it; your saved default project does not.
+
+### Open a Shell or Copy Files
+
+SSH access needs a public key registered to your account. Do this once:
+
+```bash
+saladcloud ssh-key setup
+```
+
+The command finds or generates a local key and prints it with the Portal page where you register it. Then:
+
+```bash
+# Open a shell on a running instance
+saladcloud container-groups ssh my-app
+
+# Run one command
+saladcloud container-groups ssh my-app -- nvidia-smi
+
+# Copy a file up, and a directory's contents back down
+saladcloud container-groups cp ./input.json my-app:/data/input.json
+saladcloud container-groups cp -r my-app:/data/output/. ./output
+```
+
+Without `--instance <id>`, these commands use the group's first running instance and say which one on stderr. See
+[SSH and Terminal Access](/container-engine/explanation/container-groups/ssh-and-terminal) for what the image needs.
+
+<Note>
+  A one-shot `ssh <group> -- <command>` exits with code 1 even when the command succeeded, because the SaladCloud relay
+  does not pass exit codes back. In a script, have the remote command print a line you can check for. `cp` exit codes
+  are reliable.
+</Note>
+
+### Debug a Container That Will Not Start
+
+Start with the system events, which show each instance being allocated, downloading the image, starting, and exiting
+with its exit code:
+
+```bash
+saladcloud container-groups logs my-app --since 1h --query 'resource.type != "container"'
+```
+
+If the container exits as soon as it starts, keep it up without its entrypoint and run the entrypoint by hand:
+
+```bash
+saladcloud container-groups update my-app -- sleep 2147483647
+saladcloud container-groups ssh my-app
+```
+
+`sleep 2147483647` is used because `sleep infinity` fails in BusyBox-based images. When you are done, put the image's
+own command back by sending a patch file that contains `{"container": {"command": []}}`:
+
+```bash
+saladcloud container-groups update my-app -f patch.json
+```
+
+The [Troubleshooting](/container-engine/how-to-guides/troubleshooting) guide covers the common causes.
+
+### Job Queues, Transcription, and AI Gateway
+
+The CLI also covers the other SaladCloud services. Each has `--help` with the full set of flags.
+
+```bash
+# Job queues: create a queue, connect a new group to it, and submit a job
+saladcloud queues create my-queue
+saladcloud container-groups create my-worker --image ghcr.io/me/worker:v1 --queue my-queue --queue-port 8080 --queue-path /job
+saladcloud queues jobs create --queue my-queue --input '{"prompt": "hello"}' --wait
+
+# Transcription: upload a local file, wait, and print the transcript
+saladcloud inference transcribe ./meeting.mp3
+
+# Transcription Lite, with subtitles for a file that is already on the web
+saladcloud inference transcription-lite https://example.com/talk.mp4 --srt
+
+# AI Gateway: save a key, list the models, and send one test completion
+saladcloud ai-gateway login
+saladcloud ai-gateway models list
+saladcloud ai-gateway test --prompt "say hello"
+```
+
+- A queue connection is set when a group is created and cannot be changed later. The image must run the
+  [job queue worker](/container-engine/how-to-guides/job-processing/queue-worker) next to your application. Give the
+  group a readiness probe in a `-f` file as well, so that the worker takes jobs only once your server is listening.
+- `inference transcribe` uploads a local file to [S4](/storage/explanation/overview) and deletes the upload once the
+  transcript is back. Transcription is billed by audio length; see [Transcription](/transcription/explanation/overview).
+  A failed or timed-out job can leave the upload in S4; read the diagnostic for its path and clean it up once no job
+  needs it. `--no-wait` and `--keep-upload` also retain the file. Do not share signed media URLs.
+- `ai-gateway login` and `ai-gateway test` each send one billed request to check the key. The
+  [AI Gateway](/ai-gateway/explanation/overview) uses its own key, not your SaladCloud API key.
+
+## Automation
+
+Everything above works unattended. A script or pipeline needs three things from the CLI: credentials that do not come
+from a prompt, output it can parse, and a reliable signal of success or failure.
+
+### Authenticate Without Logging In
+
+Set these environment variables instead of running `saladcloud login`:
+
+| Variable                   | What it sets                                                              |
+| :------------------------- | :------------------------------------------------------------------------ |
+| `SALAD_API_KEY`            | Your SaladCloud API key                                                   |
+| `SALAD_ORGANIZATION`       | The organization's URL name                                               |
+| `SALAD_PROJECT`            | The project's URL name                                                    |
+| `SALAD_AI_GATEWAY_API_KEY` | The AI Gateway key, only for the `ai-gateway` commands                    |
+| `SALAD_CLI_NO_PROMPT`      | Set to any value so that the CLI never prompts, even if it has a terminal |
+| `SALAD_CLI_CONFIG_DIR`     | The folder that holds the config file, to isolate a job from saved logins |
+
+An environment variable wins over the value saved in the config file, and a flag (`--org`, `--project`) wins over both.
+Scope flags are accepted only where applicable: `inference` uses `--org`, not `--project`, and `ai-gateway` accepts
+neither. AI Gateway billing follows its key's organization. A saved project is ignored when you select a different
+organization; set the project explicitly for that organization.
+
+- **Always set `SALAD_PROJECT`.** When nothing sets a project, the CLI uses `default` and prints a warning on stderr. In
+  an organization with several projects, a script that relies on that fallback can act on the wrong one.
+- **The CLI does not prompt when `CI` is set**, which GitHub Actions, GitLab CI, and most other CI systems do for you.
+  Elsewhere, set `SALAD_CLI_NO_PROMPT=1` if your runner gives commands a terminal.
+- **Store the key as a secret.** It grants access to everything your user can reach, in every organization you belong
+  to. Consider a dedicated member account for automation; the API key section of
+  [Build with AI Agents](/general/tutorials/build-with-ai-agents) explains why and how.
+
+`saladcloud whoami` shows which value is in effect for each setting and where it came from, without printing the key.
+
+### Parse JSON Output
+
+Add `-o json` to any command:
+
+```bash
+# The name and status of every container group in the project
+saladcloud container-groups list -o json | jq -r '.items[] | "\(.name)\t\(.current_state.status)"'
+
+# How many instances of a group are running
+saladcloud container-groups get my-app -o json | jq '.current_state.instance_status_counts.running_count'
+
+# The hostname of a group's Container Gateway URL
+saladcloud container-groups get my-app -o json | jq -r '.networking.dns'
+```
+
+What a script can rely on:
+
+- **One JSON document for resource and action results.** A list is `{"items": [...]}`. `logs` prints one JSON object per
+  line as entries arrive. SSH and SFTP sessions retain remote output; `ssh --config`, shell completion, and help print
+  text instead of JSON.
+- **Every key is always present.** A list or map the API left out is empty (`[]`, `{}`), and `null` means the value is
+  unknown or not set.
+- **The exit code determines success.** Waiting writes (`create --wait`, `update`, `scale`) withhold their result until
+  the wait succeeds. Other commands can print output before failing: `doctor` prints its check results even when a check
+  fails, and a log stream or SSH session can fail after producing output.
+- **stderr carries `warning:` and `note:` lines**, and the error document if the command fails. Keep the two streams
+  apart: do not pipe `2>&1` into a JSON parser.
+- **Keys are snake_case**, with two exceptions on a container group that the API spells with hyphens: `scaling-actions`
+  and `scheduled-scaling-enabled`. In `jq`, write them as `.["scaling-actions"]`.
+
+### Handle Exit Codes and Errors
+
+| Exit code | Meaning                                                                                          |
+| :-------- | :----------------------------------------------------------------------------------------------- |
+| 0         | Success                                                                                          |
+| 1         | General error: an API server error, a wait that timed out, a group or job that failed, or Ctrl-C |
+| 2         | Usage error: the command line cannot be parsed, such as an unknown flag or a missing argument    |
+| 3         | Authentication failed, or no API key was found                                                   |
+| 4         | Not found                                                                                        |
+| 5         | Rate limited, after the CLI's own retries                                                        |
+| 6         | Invalid input: a value breaks a platform rule, a file cannot be read, or a change was rejected   |
+| 7         | Network error: no response from the API                                                          |
+| 10        | Not available: the AI Gateway declined the request for billing reasons                           |
+
+`container-groups ssh`, `cp`, and `sftp` are the exception: they exit with the code of the underlying `ssh` or `sftp`
+process.
+
+With `-o json`, a failed command prints one JSON object as the last line of stderr:
+
+```json
+{
+  "error": {
+    "exit_code": 4,
+    "kind": "not_found",
+    "message": "...",
+    "hint": "...",
+    "http_status": 404
+  }
+}
+```
+
+`message` states the problem and `hint` states the fix; `hint` is `null` when there is none. `kind` comes from a fixed
+set, such as `auth`, `not_found`, `invalid_input`, `wait_timeout`, and `group_failed`, so a script can branch on it. The
+full list is in the
+[CLI guide](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/docs/guide.md#error-kinds).
+
+This snippet reads a group's status and handles the two outcomes a deploy script usually cares about:
+
+```bash
+if out=$(saladcloud container-groups get my-app -o json 2>err.log); then
+  code=0
+else
+  code=$?
+fi
+
+case $code in
+  0) echo "my-app is $(echo "$out" | jq -r '.current_state.status')" ;;
+  4) echo "my-app does not exist yet" ;;
+  *)
+    tail -n 1 err.log | jq -r '.error | "\(.kind): \(.message)\nhint: \(.hint)"' >&2
+    exit "$code"
+    ;;
+esac
+```
+
+<Note>
+  Check the exit code, not the output. A command with no resource to return, such as `delete`, prints a document with
+  `"ok": true`, but `ok` is never `false`: a failure is always a non-zero exit code with the error document on stderr.
+</Note>
+
+### Example: A Deploy Script
+
+This script rolls out a new image. It creates the group from a definition file the first time it runs, and updates the
+image on every run after that.
+
+Save the `web.yaml` definition above beside `deploy.sh` and run the script from that directory. Adapt the port and
+readiness probe to your application, and pass a complete image reference that has already been pushed to its registry.
+
+```bash deploy.sh
+#!/usr/bin/env bash
+set -uo pipefail
+
+GROUP="my-app"
+IMAGE="${1:?usage: deploy.sh <image-reference>}"
+
+saladcloud container-groups get "$GROUP" -o json >/dev/null
+code=$?
+case $code in
+  0)
+    # The group exists: roll out the new image. update waits for the change to settle
+    # and exits 6 if the platform rejects the image.
+    saladcloud container-groups update "$GROUP" --image "$IMAGE" --timeout 5m -o json
+    ;;
+  4)
+    # The group does not exist: create it from the definition file, with this image.
+    saladcloud container-groups create "$GROUP" -f web.yaml --image "$IMAGE" --wait --timeout 15m -o json
+    ;;
+  *)
+    echo "could not read $GROUP; run 'saladcloud doctor' to check the setup" >&2
+    exit "$code"
+    ;;
+esac
+```
+
+The script exits with the exit code of the `update` or `create` command, because that command is the last one it runs.
+For example, run `bash deploy.sh ghcr.io/my-org/my-app:v2` with your own image reference. A successful update verifies
+the accepted configuration, not application readiness; check the instances and application afterward. If the image is in
+a private registry, add a `-f` file with `container.registry_authentication` to the `update` command as well.
+
+### Example: GitHub Actions
+
+This manually triggered workflow installs a pinned CLI and updates an **existing** group. Store the API key as a
+repository secret named `SALAD_API_KEY`, replace the organization, project, and group names, and supply an image that
+has already been built and pushed. It does not build an image or create a missing group. Private images also need
+registry credentials supplied securely to the update command.
+
+```yaml .github/workflows/deploy.yml
+name: Deploy to SaladCloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Full image reference already pushed to its registry
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SALAD_API_KEY: ${{ secrets.SALAD_API_KEY }}
+      SALAD_ORGANIZATION: my-org
+      SALAD_PROJECT: production
+      IMAGE: ${{ inputs.image }}
+    steps:
+      - name: Install the SaladCloud CLI
+        env:
+          SALAD_CLI_VERSION: v0.1.0
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/SaladTechnologies/salad-cloud-cli/v0.1.0/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Check credentials and scope
+        run: saladcloud doctor
+
+      - name: Roll out the new image
+        run: saladcloud container-groups update my-app --image "$IMAGE" --timeout 5m
+```
+
+- GitHub Actions sets `CI`, so the CLI never prompts.
+- `saladcloud doctor` fails the job early, with a hint, if the key, organization, or project is wrong. A missing AI
+  Gateway key or SSH key does not fail it.
+- The `update` step fails the job if the platform rejects the new image, for example because the tag was never pushed.
+  Success does not establish that every replica runs the new version or that the application is ready for traffic.
+
+### What Surprises Scripts
+
+- **`delete` is immediate and unconfirmed.** There is no prompt and no dry run, so guard destructive steps in your own
+  code.
+- **Names are single-use.** A pipeline that creates a group per run needs a unique name each time, for example with the
+  commit SHA as a suffix. Names are 2 to 63 characters: lowercase letters, digits, and hyphens, starting with a letter.
+- **A wait that times out does not undo anything.** The group keeps deploying on SaladCloud. Check it with
+  `container-groups get` and `instances list`; do not blindly repeat a create or other write. A timed-out job submission
+  or AI Gateway completion may also have succeeded and incurred charges. Reconcile the existing resource or job before
+  retrying, and never automatically repeat an uncertain billed completion.
+- **`-w` is for people.** `--watch` redraws a table and cannot be combined with `-o json`. In a script, use `--wait`, or
+  poll `get -o json` yourself.
+- **`update --no-wait` skips verification.** It returns before the change settles, so nothing checks that the API
+  applied what you asked for.
+
+## Further Reading
+
+- The [CLI guide](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/docs/guide.md) on GitHub documents
+  every create flag, update and merge-patch behavior, scheduled scaling, and the complete JSON and exit code contracts.
+- The [notes](https://github.com/SaladTechnologies/salad-cloud-cli/blob/main/docs/notes.md) list CLI and platform
+  behavior that tends to surprise people.
+- [Use the SaladCloud CLI with AI Agents](/cli/how-to-guides/use-with-ai-agents) covers running the CLI from a coding
+  agent.

@@ -6,7 +6,7 @@ description:
   server, hand over an API key safely, and know which runbooks the agent should follow.'
 ---
 
-_Last Updated: September 21, 2026_
+_Last Updated: November 12, 2026_
 
 <Visibility for="agents">
   > If you are an agent reading this page: install the SaladCloud skills with `npx skills add https://docs.salad.com`,
@@ -124,6 +124,12 @@ accepts `codex mcp add salad-docs --url https://docs.salad.com/mcp`, which write
 
 This server reads documentation only. It does not call the SaladCloud API on your behalf; for that, the agent uses your
 API key directly, as described next.
+
+<Tip>
+  An agent with shell access can also operate SaladCloud through the [SaladCloud CLI](/cli/explanation/overview), which
+  reads a key you saved with `saladcloud login` so that you do not need to paste the key into the conversation. See [Use
+  the SaladCloud CLI with AI Agents](/cli/how-to-guides/use-with-ai-agents).
+</Tip>
 
 ## Give the agent an API key — and understand what you are handing over
 
