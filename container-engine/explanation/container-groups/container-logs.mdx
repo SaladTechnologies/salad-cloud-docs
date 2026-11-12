@@ -2,7 +2,7 @@
 title: 'Container Logs'
 ---
 
-_Last Updated: January 6, 2026_
+_Last Updated: November 12, 2026_
 
 ## How to Log From Your Container
 
@@ -57,6 +57,7 @@ take you to the Log Explorer page in the SaladCloud Portal with the current quer
 - A maximum of 500 logs can be returned per query. Utilize specific query filters and time ranges to get the logs you
   are looking for.
 - Logs are retained and accessible for up to 90 days.
+- Each query counts against your [daily log query limits](#daily-log-query-limits).
 - If you encounter this error message, try narrowing your query's time range
   - <img src="/container-engine/images/portal-container-logs-error-getting-logs.png" />
 
@@ -147,3 +148,47 @@ Each log event takes the following structure.
 - Any of these fields can be used in the query language.
   [Here](https://docs.salad.com/container-engine/reference/log-queries#examples) are some examples of queries you can
   make. These queries can be passed as the `query` parameter in the body of the request to the API.
+
+## Daily Log Query Limits
+
+SaladCloud limits how many log queries you can run each day. There are two limits, one per organization and one per
+account, and both apply to every query.
+
+Every log query counts, whether it comes from the Portal, the API, or the [SaladCloud CLI](/cli/explanation/overview).
+The limits reset at 00:00 UTC. They only limit reading logs through SaladCloud: your containers keep running and logging
+as normal.
+
+### When You Reach a Limit
+
+Log queries return `429 Too Many Requests` until 00:00 UTC, and the Portal shows a "Daily log query limit reached"
+banner. You can:
+
+- Wait for the reset.
+- [Use fewer queries](#use-fewer-queries).
+- Stream your logs to your own logging service with
+  [external logging](/container-engine/explanation/infrastructure-platform/external-logging). Logs go straight to your
+  provider as they're written, with no SaladCloud query limit. This is the best option if you need logs continuously or
+  in high volume.
+- [Contact support](/support) if you need a higher limit.
+
+### Use Fewer Queries
+
+- **Get more from each query.** Query Log Entries searches your whole organization, so one query can cover several
+  container groups or instances. Combine them with `or` instead of running a separate query for each one, and set
+  `page_size` to 100, the maximum, so you need fewer pages.
+- **Don't query in a tight loop.** Polling once a minute uses 1,440 queries a day. Polling every 5 minutes uses 288.
+- **When you poll, ask only for what's new.** Set `start_time` to the time of the last entry you already have, or a few
+  minutes back. Re-reading the last day or week on every poll is slower and returns entries you already have.
+- **Check instance status without logs.** To see whether instances are running or ready, use
+  [List Container Group Instances](/reference/saladcloud-api/container-groups/list-container-group-instances). It isn't
+  a log query.
+- **Log only what you need.** Less output makes log queries faster and means fewer pages to read.
+
+### Watch Out For Automatic Polling
+
+These keep running queries until you stop them, and use up the limit fastest:
+
+- **Portal auto-refresh** runs the query every 10 seconds. Turn it off or close the tab when you aren't watching.
+- **`logs -f` in the CLI** runs at least one query every 5 seconds by default, and more for a container that logs a lot.
+  Stop it when you're done, or set a longer `--poll-interval`.
+- **Scripts and AI agents** that poll logs in a loop. Poll every few minutes at most, or use external logging instead.

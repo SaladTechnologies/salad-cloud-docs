@@ -6,7 +6,7 @@ description:
   failures, readiness, Container Gateway errors, SSH, logs, and job queues.
 ---
 
-_Last Updated: October 19, 2026_
+_Last Updated: November 12, 2026_
 
 <Visibility for="agents">
   > Invoke `salad-container-engine-troubleshoot` and follow the [deterministic evidence
@@ -35,6 +35,7 @@ link to the matching section. If the problem continues, see [Still Stuck?](#stil
 | 503, 403, 504, or 524 errors from the Container Gateway                          | [Container Gateway Errors](#my-container-group-is-running-but-i-get-503-errors-with-the-container-gateway)                    |
 | Web terminal or SSH won't connect                                                | [Web Terminal](#my-container-group-is-running-but-i-cant-access-it-with-the-web-terminal) and [SSH](#i-cant-connect-over-ssh) |
 | Logs are empty or missing                                                        | [My Logs Are Empty or Missing](#my-logs-are-empty-or-missing)                                                                 |
+| "Daily log query limit reached", or log queries return `429`                     | [My Log Queries Return 429](#my-log-queries-return-429)                                                                       |
 | Job queue jobs stay pending, are canceled, or don't scale                        | [Job Queues](#my-job-queue-jobs-arent-processed)                                                                              |
 
 ## Deploying
@@ -335,6 +336,13 @@ See [SSH & Terminal Access](/container-engine/explanation/container-groups/ssh-a
 
 See [Container Logs](/container-engine/explanation/container-groups/container-logs) and
 [Log Queries](/container-engine/reference/log-queries).
+
+### My Log Queries Return 429
+
+Your organization or your account reached its daily log query limit. Queries work again at 00:00 UTC. See
+[Daily Log Query Limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits) for what
+to do, including streaming your logs to an
+[external logging service](/container-engine/explanation/infrastructure-platform/external-logging).
 
 ## Job Queues
 
