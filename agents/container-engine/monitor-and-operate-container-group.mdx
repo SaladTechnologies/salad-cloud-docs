@@ -148,7 +148,7 @@ original explicit intent, and do not extend the polling budget indefinitely.
 Log queries (`query_log_entries`, `get_system_logs`) have
 [daily limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits) per organization
 and per account. Use `list_container_group_instances` for instance state instead of polling logs. A `429` from a log
-query lasts until 00:00 UTC: stop log queries and report it rather than retrying.
+query lasts until 00:00 UTC: stop log queries and report it to the user rather than retrying.
 
 ## Verification
 
