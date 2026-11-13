@@ -36,8 +36,7 @@ the command, `-c` as a first argument, and `python server.py` as a second argume
   Security filters can reject a command or argument where `curl`, `wget`, or `perl` comes right after `;`, `|`, or `||`,
   such as `apt-get update; curl -O https://example.com/model.bin`. If you change a container group's command to one like
   this, the group can get stuck on its previous version: the Portal shows the new command, but instances keep running
-  the old one. Until you change the command to one of the forms below, stopping or restarting the group may not take
-  effect.
+  the old one. Until you change the command to one of the forms below, changes to the group may not take effect.
 </Warning>
 
 To avoid the filters, use one of these instead:
