@@ -2,11 +2,15 @@
 title: 'External Logging'
 ---
 
-_Last Updated: October 15, 2024_
+_Last Updated: November 12, 2026_
 
 You may wish to stream event logs from your container group deployment to an external service for easier parsing,
 retention, and monitoring. To configure external logging, click 'edit' on the External Logging Services section on the
 Container Group Deployment page.
+
+External logging is also the way to read logs continuously or in high volume. Reading logs through SaladCloud counts
+against [daily log query limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits),
+but logs streamed to your own service arrive as they're written, with no polling and no SaladCloud query limit.
 
 <img src="/container-engine/images/portal-edit-external-logging.png" />
 

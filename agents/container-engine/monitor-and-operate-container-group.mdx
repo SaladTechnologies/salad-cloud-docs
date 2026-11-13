@@ -4,7 +4,7 @@ sidebarTitle: 'Monitor and Operate'
 description: 'Read, scale, start, stop, and monitor SaladCloud Container Groups with bounded polling and verification.'
 ---
 
-_Last Updated: August 24, 2026_
+_Last Updated: November 12, 2026_
 
 ## When to use this runbook
 
@@ -144,6 +144,11 @@ as completion of a mutation.
 Poll with bounded exponential backoff and jitter within the caller's total time/attempt budget. Honor `Retry-After` when
 present. Re-read state before retrying a start, stop, or scale request. Do not retry a scale-down or stop without the
 original explicit intent, and do not extend the polling budget indefinitely.
+
+Log queries (`query_log_entries`, `get_system_logs`) have
+[daily limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits) per organization
+and per account. Use `list_container_group_instances` for instance state instead of polling logs. A `429` from a log
+query lasts until 00:00 UTC: stop log queries and report it to the user rather than retrying.
 
 ## Verification
 

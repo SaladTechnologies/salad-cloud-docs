@@ -2,7 +2,7 @@
 title: 'Log Explorer'
 ---
 
-_Last Updated: January 6, 2026_
+_Last Updated: November 12, 2026_
 
 The Log Explorer provides access to container and system logs across all container groups, allowing you to run detailed
 queries. Once you have selected an organization, the Log Explorer is accessible from the left menu. You can also access
@@ -16,5 +16,9 @@ fields to specify filters for your logs. The Code Builder allows you to write qu
 Language for more advanced capabilities.
 
 After you run a query, the results are displayed in the table below the query interface.
+
+Each query you run, and each auto-refresh, counts against your
+[daily log query limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits). If a
+limit is reached, the Log Explorer shows a "Daily log query limit reached" banner and queries resume at 00:00 UTC.
 
 <img src="/container-engine/images/portal-log-explorer.png" alt="Log Explorer Portal Screenshot" />

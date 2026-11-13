@@ -239,6 +239,11 @@ Without `--since`, a query covers the last 15 minutes. It prints the newest 1,00
 `saladcloud logs` with no flags searches the whole organization. Only an explicit `--project` or `-c <group>` narrows
 it; your saved default project does not.
 
+Every log query counts against your organization's and your account's
+[daily log query limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits). `-f`
+runs at least one query every 5 seconds by default, and more when the container logs a lot, so leave it running only
+while you watch, or set a longer `--poll-interval`.
+
 ### Open a Shell or Copy Files
 
 SSH access needs a public key registered to your account. Do this once:

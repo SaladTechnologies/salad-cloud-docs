@@ -3,7 +3,7 @@ title: 'Using the API'
 description: "Start integrating directly with SaladCloud's robust API"
 ---
 
-_Last Updated: September 22, 2026_
+_Last Updated: November 12, 2026_
 
 <Visibility for="agents">
   > Keep `SALAD_API_KEY` in a secret environment variable and never expose it. The public API does not enumerate
@@ -103,6 +103,11 @@ key is permanently invalidated and cannot be recovered.
 SaladCloud's servers enforce rate limits to ensure our APIs are responsive as we grow. The rate limit is tied to an
 individual API key and set to 240 requests per minute. If your team would like a higher rate limit, please
 [reach out to our team](/support/contact).
+
+Log queries also have
+[daily limits](/container-engine/explanation/container-groups/container-logs#daily-log-query-limits), one per
+organization and one per account, on top of the per-key rate limit. Once a limit is reached, log queries return
+`429 Too Many Requests` until 00:00 UTC.
 
 ## Errors
 
